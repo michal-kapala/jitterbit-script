@@ -51,19 +51,19 @@ The tables below shows the lexer's symbol support.
 
 | Symbol | jitterbit-interpreter | Jitterbit Studio |
 |---|---|---|
-| Integer |  | ✔️ |
-| Float   |  | ✔️ |
-| String  |  | ✔️ |
-| Boolean |  | ✔️ |
-| Null    |  | ❌ |
+| Integer        |  | ✔️ |
+| Float          |  | ✔️ |
+| String         |  | ✔️ |
+| `true`/`false` |  | ✔️ |
+| `null`         |  | ❌ |
 
 
 #### Objects
 
 | Symbol | jitterbit-interpreter | Jitterbit Studio |
 |----|---|---|
-| {} |  | ✔️ |
-| [] |  | ✔️ |
+| `{}` |  | ✔️ |
+| `[]` |  | ✔️ |
 
 ### Keywords
 As of current version, no keywords are supported by Jitterbit Script Language. Control statements like branching and loops are implemented as [Logical Functions](https://success.jitterbit.com/design-studio/design-studio-reference/formula-builder/logical-functions/).
@@ -75,42 +75,42 @@ The list of recognized operator tokens.
 
 | Symbol | jitterbit-interpreter | Jitterbit Studio |
 |-----|---|---|
-| <   |  | ✔️ |
-| >   |  | ✔️ |
-| <=  |  | ✔️ |
-| >=  |  | ✔️ |
-| ==  |  | ✔️ |
-| !=  |  | ✔️ |
+| `<`   |  | ✔️ |
+| `>`   |  | ✔️ |
+| `<=`  |  | ✔️ |
+| `>=`  |  | ✔️ |
+| `==`  |  | ✔️ |
+| `!=`  |  | ✔️ |
 
 #### Assignment
 
 | Symbol | jitterbit-interpreter | Jitterbit Studio |
 |-----|---|---|
-| =   |  | ✔️ |
-| +=  |  | ✔️ |
-| -=  |  | ✔️ |
-| *=  |  | ❌ |
-| /=  |  | ❌ |
+| `=`   |  | ✔️ |
+| `+=`  |  | ✔️ |
+| `-=`  |  | ✔️ |
+| `*=`  |  | ❌ |
+| `/=`  |  | ❌ |
 
 #### Other binary operators
 
 | Symbol | jitterbit-interpreter | Jitterbit Studio |
 |-------|---|---|
-| +     |  | ✔️ |
-| -     |  | ✔️ |
-| *     |  | ✔️ |
-| /     |  | ✔️ |
-| %     |  | ❌ |
-| &&    |  | ✔️ |
-| \|\|  |  | ✔️ |
+| `+`     |  | ✔️ |
+| `-`     |  | ✔️ |
+| `*`     |  | ✔️ |
+| `/`     |  | ✔️ |
+| `%`     |  | ❌ |
+| `&&`    |  | ✔️ |
+| `||`    |  | ✔️ |
 
 #### Unary
 
 | Symbol | jitterbit-interpreter | Jitterbit Studio |
 |----|---|---|
-| !  |  | ✔️ |
-| ++ |  | ✔️ |
-| -- |  | ✔️ |
+| `!`  |  | ✔️ |
+| `++` |  | ✔️ |
+| `--` |  | ✔️ |
 
 
 ## Statements/Expressions
@@ -119,7 +119,7 @@ The list of statements and expressions supported by the interpreter.
 
 | Expr | jitterbit-interpreter | Jitterbit Studio |
 |---|---|---|
-| <trans></trans>      |  | ✔️ |
+| \<trans>\</trans>    |  | ✔️ |
 | ()                   |  | ✔️ |
 | Function calls       |  | ✔️ |
 | []                   |  | ✔️ |
