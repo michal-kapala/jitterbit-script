@@ -1,6 +1,7 @@
-import Parser from "./frontend/parser.ts";
-import Environment, { createGlobalEnv } from "./runtime/environment.ts";
-import { evaluate } from "./runtime/interpreter.ts";
+import Parser from "./frontend/parser";
+import Environment, { createGlobalEnv } from "./runtime/environment";
+import { evaluate } from "./runtime/interpreter";
+import fs from "fs";
 
 // repl();
 run("./test.txt");
@@ -9,11 +10,14 @@ async function run(filename: string) {
   const parser = new Parser();
   const env = createGlobalEnv();
 
-  const input = await Deno.readTextFile(filename);
-  const program = parser.produceAST(input);
-
-  const result = evaluate(program, env);
-  console.log(result);
+  fs.readFile(filename, 'utf8', function (err,data) {
+    if (err) {
+      return console.log(err);
+    }
+    const program = parser.produceAST(data);
+    const result = evaluate(program, env);
+    console.log(result);
+  });
 }
 
 function repl() {
@@ -27,11 +31,11 @@ function repl() {
     const input = prompt("> ");
     // Check for no user input or exit keyword.
     if (!input || input.includes("exit")) {
-      Deno.exit(1);
+      return;
     }
 
     // Produce AST From sourc-code
-    const program = parser.produceAST(input);
+    const program = parser.produceAST(input ?? "");
 
     const result = evaluate(program, env);
     console.log(result);

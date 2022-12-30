@@ -1,4 +1,4 @@
-import { NumberVal, RuntimeVal } from "./values.ts";
+import { NullVal, NumberVal, RuntimeVal } from "./values";
 import {
   AssignmentExpr,
   BinaryExpr,
@@ -8,15 +8,15 @@ import {
   Program,
   Stmt,
   VarDeclaration,
-} from "../frontend/ast.ts";
-import Environment from "./environment.ts";
-import { eval_program, eval_var_declaration } from "./eval/statements.ts";
+} from "../frontend/ast";
+import Environment from "./environment";
+import { eval_program, eval_var_declaration } from "./eval/statements";
 import {
   eval_assignment,
   eval_binary_expr,
   eval_identifier,
   eval_object_expr,
-} from "./eval/expressions.ts";
+} from "./eval/expressions";
 
 export function evaluate(astNode: Stmt, env: Environment): RuntimeVal {
   switch (astNode.kind) {
@@ -44,6 +44,6 @@ export function evaluate(astNode: Stmt, env: Environment): RuntimeVal {
         "This AST Node has not yet been setup for interpretation.",
         astNode,
       );
-      Deno.exit(0);
+      return { type: "null" } as NullVal;
   }
 }

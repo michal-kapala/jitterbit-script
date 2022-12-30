@@ -1,4 +1,3 @@
-// https://github.com/tylerlaceby/guide-to-interpreters-series
 // -----------------------------------------------------------
 // ---------------          LEXER          -------------------
 // ---  Responsible for producing tokens from the source   ---
@@ -27,6 +26,7 @@ export enum TokenType {
   OpenBracket, // [
   CloseBracket, //]
   EOF, // Signified the end of file
+  UnknownToken // Token parsing error
 }
 
 /**
@@ -75,7 +75,7 @@ function isint(str: string) {
  * Given a string representing source code: Produce tokens and handles
  * possible unidentified characters.
  *
- * - Returns a array of tokens.
+ * - Returns an array of tokens.
  * - Does not modify the incoming string.
  */
 export function tokenize(sourceCode: string): Token[] {
@@ -135,7 +135,7 @@ export function tokenize(sourceCode: string): Token[] {
         // CHECK FOR RESERVED KEYWORDS
         const reserved = KEYWORDS[ident];
         // If value is not undefined then the identifier is
-        // reconized keyword
+        // recognized keyword
         if (typeof reserved == "number") {
           tokens.push(token(ident, reserved));
         } else {
@@ -143,17 +143,18 @@ export function tokenize(sourceCode: string): Token[] {
           tokens.push(token(ident, TokenType.Identifier));
         }
       } else if (isskippable(src[0])) {
-        // Skip uneeded chars.
+        // Skip unneeded chars.
         src.shift();
-      } // Handle unreconized characters.
-      // TODO: Impliment better errors and error recovery.
+      } // Handle unrecognized characters.
+      // TODO: Implement better errors and error recovery.
       else {
         console.error(
           "Unreconized character found in source: ",
           src[0].charCodeAt(0),
           src[0],
         );
-        Deno.exit(1);
+        tokens.push({ type: TokenType.EOF, value: "UnexpectedEndOfFile" });
+        return tokens;
       }
     }
   }

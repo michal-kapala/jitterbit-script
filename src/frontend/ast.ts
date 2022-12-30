@@ -1,5 +1,3 @@
-// deno-lint-ignore-file no-empty-interface
-// https://github.com/tylerlaceby/guide-to-interpreters-series
 // -----------------------------------------------------------
 // --------------          AST TYPES        ------------------
 // ---     Defines the structure of our languages AST      ---

@@ -3,10 +3,10 @@ import {
   BinaryExpr,
   Identifier,
   ObjectLiteral,
-} from "../../frontend/ast.ts";
-import Environment from "../environment.ts";
-import { evaluate } from "../interpreter.ts";
-import { MK_NULL, NumberVal, ObjectVal, RuntimeVal } from "../values.ts";
+} from "../../frontend/ast";
+import Environment from "../environment";
+import { evaluate } from "../interpreter";
+import { MK_NULL, NumberVal, ObjectVal, RuntimeVal } from "../values";
 
 function eval_numeric_binary_expr(
   lhs: NumberVal,

@@ -12,9 +12,9 @@ import {
   Property,
   Stmt,
   VarDeclaration,
-} from "./ast.ts";
+} from "./ast";
 
-import { Token, tokenize, TokenType } from "./lexer.ts";
+import { Token, tokenize, TokenType } from "./lexer";
 
 /**
  * Frontend for producing a valid AST from sourcode
@@ -52,7 +52,10 @@ export default class Parser {
     const prev = this.tokens.shift() as Token;
     if (!prev || prev.type != type) {
       console.error("Parser Error:\n", err, prev, " - Expecting: ", type);
-      Deno.exit(1);
+      return {
+        type: TokenType.UnknownToken,
+        value: prev ? prev.value : null
+      } as Token;
     }
 
     return prev;
@@ -352,7 +355,7 @@ export default class Parser {
       // Unidentified Tokens and Invalid Code Reached
       default:
         console.error("Unexpected token found during parsing!", this.at());
-        Deno.exit(1);
+        return { kind: "Program" };
     }
   }
 }
