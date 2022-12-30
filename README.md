@@ -20,7 +20,7 @@ This is an experimental standalone community interpreter shell for [Jitterbit Sc
 
 # Disclaimer
 
-Please note this is **not** an official Jitterbit interpreter. It *may* differ in behaviour and support from actual Jitterbit runtimes which execute scipts in Jitterbit Harmony.
+Please note this is **not** an official Jitterbit interpreter. It *may* differ in behaviour and support from actual Jitterbit runtimes which execute scripts in Jitterbit Harmony.
 
 [Jitterbit LSP server](https://github.com/michal-kapala/vscode-jitterbit) which utilizes this interpreter provides original editor and runtime error messages from Jitterbit Studio, extended where needed. It also provides additional warnings about potential runtime errors.
 
@@ -43,26 +43,27 @@ The tables below shows the lexer's symbol support.
 
 | Symbol | jitterbit-interpreter | Jitterbit Studio |
 |---|---|---|
-| Local variables   |  |  |
-| Global variables  |  |  |
-| System variables  |  |  |
+| Local variables   |  | ✔️ |
+| Global variables  |  | ✔️ |
+| System variables  |  | ✔️ |
 
 #### Constants
 
 | Symbol | jitterbit-interpreter | Jitterbit Studio |
 |---|---|---|
-| Integer |  |  |
-| Float   |  |  |
-| String  |  |  |
-| Boolean |  |  |
-| Null    |  |  |
+| Integer |  | ✔️ |
+| Float   |  | ✔️ |
+| String  |  | ✔️ |
+| Boolean |  | ✔️ |
+| Null    |  | ❌ |
 
 
 #### Objects
 
 | Symbol | jitterbit-interpreter | Jitterbit Studio |
 |----|---|---|
-| {} |  |  |
+| {} |  | ✔️ |
+| [] |  | ✔️ |
 
 ### Keywords
 As of current version, no keywords are supported by Jitterbit Script Language. Control statements like branching and loops are implemented as [Logical Functions](https://success.jitterbit.com/design-studio/design-studio-reference/formula-builder/logical-functions/).
@@ -74,43 +75,42 @@ The list of recognized operator tokens.
 
 | Symbol | jitterbit-interpreter | Jitterbit Studio |
 |-----|---|---|
-| <   |  |  |
-| >   |  |  |
-| <=  |  |  |
-| >=  |  |  |
-| ==  |  |  |
-| !=  |  |  |
+| <   |  | ✔️ |
+| >   |  | ✔️ |
+| <=  |  | ✔️ |
+| >=  |  | ✔️ |
+| ==  |  | ✔️ |
+| !=  |  | ✔️ |
 
 #### Assignment
 
 | Symbol | jitterbit-interpreter | Jitterbit Studio |
 |-----|---|---|
-| =   |  |  |
-| +=  |  |  |
-| -=  |  |  |
-| *=  |  |  |
-| /=  |  |  |
+| =   |  | ✔️ |
+| +=  |  | ✔️ |
+| -=  |  | ✔️ |
+| *=  |  | ❌ |
+| /=  |  | ❌ |
 
 #### Other binary operators
 
 | Symbol | jitterbit-interpreter | Jitterbit Studio |
 |-------|---|---|
-| +     |  |  |
-| -     |  |  |
-| *     |  |  |
-| /     |  |  |
-| %     |  |  |
-| &&    |  |  |
-| \|\|  |  |  |
+| +     |  | ✔️ |
+| -     |  | ✔️ |
+| *     |  | ✔️ |
+| /     |  | ✔️ |
+| %     |  | ❌ |
+| &&    |  | ✔️ |
+| \|\|  |  | ✔️ |
 
 #### Unary
 
 | Symbol | jitterbit-interpreter | Jitterbit Studio |
 |----|---|---|
-| !  |  |  |
-| ++ |  |  |
-| -- |  |  |
-| [] |  |  |
+| !  |  | ✔️ |
+| ++ |  | ✔️ |
+| -- |  | ✔️ |
 
 
 ## Statements/Expressions
@@ -119,10 +119,16 @@ The list of statements and expressions supported by the interpreter.
 
 | Expr | jitterbit-interpreter | Jitterbit Studio |
 |---|---|---|
-| <trans></trans>       |  |  |
-| ()                    |  |  |
-| Function calls        |  |  |
-| Array element access  |  |  |
+| <trans></trans>      |  | ✔️ |
+| ()                   |  | ✔️ |
+| Function calls       |  | ✔️ |
+| []                   |  | ✔️ |
+| Preincrementation    |  | ✔️ |
+| Postincrementation   |  | ✔️ |
+| Predecrementation    |  | ✔️ |
+| Postdecrementation   |  | ✔️ |
+| Logical              |  | ✔️ |
+| Postdecrementation   |  | ✔️ |
 
 ## APIs
 
