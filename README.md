@@ -128,7 +128,6 @@ The list of statements and expressions supported by the interpreter.
 | Predecrementation    |  | ✔️ |
 | Postdecrementation   |  | ✔️ |
 | Logical              |  | ✔️ |
-| Postdecrementation   |  | ✔️ |
 
 ## APIs
 
