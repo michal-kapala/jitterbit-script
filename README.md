@@ -1,5 +1,5 @@
 # Overview
-This is an experimental standalone community interpreter shell for [Jitterbit Script Language](https://github.com/tlaceby/guide-to-interpreters-series) created for dedicated [LSP server](https://github.com/michal-kapala/vscode-jitterbit). It aims to provide editor support for Jitterbit Script outside of proprietary [Jitterbit Studio (Jitterbit Harmony Design Studio)](https://success.jitterbit.com/design-studio/) and extend the script-scoped error handling.
+This is an experimental standalone community interpreter shell for [Jitterbit Script Language](https://success.jitterbit.com/design-studio/design-studio-reference/scripts/jitterbit-script-language/) created for dedicated [LSP server](https://github.com/michal-kapala/vscode-jitterbit). It aims to provide editor support for Jitterbit Script outside of proprietary [Jitterbit Studio (Jitterbit Harmony Design Studio)](https://success.jitterbit.com/design-studio/) and extend the script-scoped error handling.
  
  This repo is a fork of [tlaceby/guide-to-interpreters-series](https://github.com/tlaceby/guide-to-interpreters-series).
  
