@@ -102,7 +102,7 @@ The list of recognized operator tokens.
 | `/`     |  | ✔️ |
 | `%`     |  | ❌ |
 | `&&`    |  | ✔️ |
-| `||`    |  | ✔️ |
+| `\|\|`    |  | ✔️ |
 
 #### Unary
 
@@ -119,10 +119,12 @@ The list of statements and expressions supported by the interpreter.
 
 | Expr | jitterbit-interpreter | Jitterbit Studio |
 |---|---|---|
-| \<trans>\</trans>    |  | ✔️ |
-| ()                   |  | ✔️ |
+| `\<trans>\</trans>`  |  | ✔️ |
+| `()`                 |  | ✔️ |
+| `[]`                 |  | ✔️ |
+| Simple expressions   |  | ✔️ |
+| Assignments          |  | ✔️ |
 | Function calls       |  | ✔️ |
-| []                   |  | ✔️ |
 | Preincrementation    |  | ✔️ |
 | Postincrementation   |  | ✔️ |
 | Predecrementation    |  | ✔️ |
