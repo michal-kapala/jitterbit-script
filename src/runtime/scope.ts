@@ -1,23 +1,23 @@
 import { MK_BOOL, MK_NULL, RuntimeVal } from "./values";
 
-export function createGlobalEnv() {
-  const env = new Environment();
-  // Create Default Global Enviornment
-  env.declareVar("true", MK_BOOL(true), true);
-  env.declareVar("false", MK_BOOL(false), true);
-  env.declareVar("null", MK_NULL(), true);
+export function createGlobalScope() {
+  const scope = new Scope();
+  // Create default global scope
+  scope.declareVar("true", MK_BOOL(true), true);
+  scope.declareVar("false", MK_BOOL(false), true);
+  scope.declareVar("null", MK_NULL(), true);
 
-  return env;
+  return scope;
 }
 
-export default class Environment {
-  private parent?: Environment;
+export default class Scope {
+  private parent?: Scope;
   private variables: Map<string, RuntimeVal>;
   private constants: Set<string>;
 
-  constructor(parentENV?: Environment) {
-    const global = parentENV ? true : false;
-    this.parent = parentENV;
+  constructor(parentScope?: Scope) {
+    const global = parentScope ? true : false;
+    this.parent = parentScope;
     this.variables = new Map();
     this.constants = new Set();
   }
@@ -39,23 +39,23 @@ export default class Environment {
   }
 
   public assignVar(varname: string, value: RuntimeVal): RuntimeVal {
-    const env = this.resolve(varname);
+    const scope = this.resolve(varname);
 
     // Cannot assign to constant
-    if (env.constants.has(varname)) {
+    if (scope.constants.has(varname)) {
       throw `Cannot reasign to variable ${varname} as it was declared constant.`;
     }
 
-    env.variables.set(varname, value);
+    scope.variables.set(varname, value);
     return value;
   }
 
   public lookupVar(varname: string): RuntimeVal {
-    const env = this.resolve(varname);
-    return env.variables.get(varname) as RuntimeVal;
+    const scope = this.resolve(varname);
+    return scope.variables.get(varname) as RuntimeVal;
   }
 
-  public resolve(varname: string): Environment {
+  public resolve(varname: string): Scope {
     if (this.variables.has(varname)) {
       return this;
     }

@@ -9,7 +9,7 @@ import {
   Stmt,
   VarDeclaration,
 } from "../frontend/ast";
-import Environment from "./environment";
+import Scope from "./scope";
 import { eval_program, eval_var_declaration } from "./eval/statements";
 import {
   eval_assignment,
@@ -18,7 +18,7 @@ import {
   eval_object_expr,
 } from "./eval/expressions";
 
-export function evaluate(astNode: Stmt, env: Environment): RuntimeVal {
+export function evaluate(astNode: Stmt, scope: Scope): RuntimeVal {
   switch (astNode.kind) {
     case "NumericLiteral":
       return {
@@ -26,18 +26,18 @@ export function evaluate(astNode: Stmt, env: Environment): RuntimeVal {
         type: "number",
       } as NumberVal;
     case "Identifier":
-      return eval_identifier(astNode as Identifier, env);
+      return eval_identifier(astNode as Identifier, scope);
     case "ObjectLiteral":
-      return eval_object_expr(astNode as ObjectLiteral, env);
+      return eval_object_expr(astNode as ObjectLiteral, scope);
     case "AssignmentExpr":
-      return eval_assignment(astNode as AssignmentExpr, env);
+      return eval_assignment(astNode as AssignmentExpr, scope);
     case "BinaryExpr":
-      return eval_binary_expr(astNode as BinaryExpr, env);
+      return eval_binary_expr(astNode as BinaryExpr, scope);
     case "Program":
-      return eval_program(astNode as Program, env);
+      return eval_program(astNode as Program, scope);
     // Handle statements
     case "VarDeclaration":
-      return eval_var_declaration(astNode as VarDeclaration, env);
+      return eval_var_declaration(astNode as VarDeclaration, scope);
     // Handle unimplimented ast types as error.
     default:
       console.error(

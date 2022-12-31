@@ -355,6 +355,7 @@ export default class Parser {
       // Unidentified Tokens and Invalid Code Reached
       default:
         console.error("Unexpected token found during parsing!", this.at());
+        // TODO: this error should have a fallback to bubble it up
         return { kind: "Program" };
     }
   }
