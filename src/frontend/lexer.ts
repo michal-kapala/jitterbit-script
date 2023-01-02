@@ -5,6 +5,9 @@
 
 // Represents tokens that our language understands in parsing.
 export enum TokenType {
+  // Script scope tag
+  OpenTransTag,
+  CloseTransTag,
   // Literal Types
   Number,
   Identifier,
@@ -14,7 +17,7 @@ export enum TokenType {
 
   // Grouping * Operators
   BinaryOperator,
-  Equals,
+  Assignment,
   Comma,
   Dot,
   Colon,
@@ -32,18 +35,26 @@ export enum TokenType {
 /**
  * Constant lookup for keywords and known identifiers + symbols.
  */
+// to be yoinked
 const KEYWORDS: Record<string, TokenType> = {
   let: TokenType.Let,
   const: TokenType.Const,
 };
 
-// Reoresents a single token from the source-code.
+/**
+ * Represents a single token from the source-code.
+ */
 export interface Token {
   value: string; // contains the raw value as seen inside the source code.
   type: TokenType; // tagged structure.
 }
 
-// Returns a token of a given type and value
+/**
+ * Returns a token of a given type and value
+ * @param value token literal
+ * @param type token type
+ * @returns 
+ */
 function token(value = "", type: TokenType): Token {
   return { value, type };
 }
@@ -51,6 +62,7 @@ function token(value = "", type: TokenType): Token {
 /**
  * Returns whether the character passed in alphabetic -> [a-zA-Z]
  */
+// to be changed
 function isalpha(src: string) {
   return src.toUpperCase() != src.toLowerCase();
 }
@@ -58,6 +70,7 @@ function isalpha(src: string) {
 /**
  * Returns true if the character is whitespace like -> [\s, \t, \n]
  */
+// to be changed to support positioning (newline)
 function isskippable(str: string) {
   return str == " " || str == "\n" || str == "\t" || str == "\r";
 }
@@ -65,6 +78,7 @@ function isskippable(str: string) {
 /**
  Return whether the character is a valid integer -> [0-9]
  */
+// to be reworked
 function isint(str: string) {
   const c = str.charCodeAt(0);
   const bounds = ["0".charCodeAt(0), "9".charCodeAt(0)];
@@ -82,10 +96,87 @@ export function tokenize(sourceCode: string): Token[] {
   const tokens = new Array<Token>();
   const src = sourceCode.split("");
 
+  let skippedChar;
+  let currChar;
+  let nextChar;
+  let transTagOpened = false;
+  let transTagClosed = false;
+
   // produce tokens until the EOF is reached.
   while (src.length > 0) {
+    // BEGIN PARSING MULTICHARACTER TOKENS - OPERATORS, TAGS, COMMENTS
+
+    // SKIP DOUBLEDASH COMMENTS
+    if(src[0] == "/" && src[1] == "/") {
+      src.shift();
+      skippedChar = src.shift();
+      while(skippedChar != "\n") {
+        skippedChar = src.shift();
+      }
+    }
+    // SKIP MULTILINE COMMENTS
+    else if(src[0] == "/" && src[1] == "*") {
+      src.shift();
+      skippedChar = src.shift();
+      currChar = src[0];
+      nextChar = src[1];
+      if(currChar == "/") {
+        // JB throws 'Unknown token */' if the first commented character
+        // in a valid comment is a slash
+        // 'self closing comment' problem
+        // this should add an error/warning
+        console.warn("Warning: JB throws 'Unknown token */' with comment content that begins with a slash");
+      }
+      
+      // skip content
+      while(src.length > 0) {
+        // it is safe to skip to the end of the file
+        // script scope tag validation should return
+        // 'Missing closing tag </trans>' error
+        skippedChar = src.shift();
+        if(skippedChar === "*" && src[0] === "/"){
+          // consume the ending slash
+          src.shift();
+          break;
+        }
+      }
+    } else if(
+      !transTagOpened &&
+      src.length >= 7 &&
+      src[0] == "<" &&
+      src[1] == "t" &&
+      src[2] == "r" &&
+      src[3] == "a" &&
+      src[4] == "n" &&
+      src[5] == "s" &&
+      src[6] == ">"
+    ) {
+      for(let i = 0; i < 7; i++) src.shift();
+      tokens.push(token("<trans>", TokenType.OpenTransTag));
+      // only try to parse 1 trans tag opening
+      // the subsequent ones will result in an operator expr error
+      transTagOpened = true;
+    }
+    else if(
+      !transTagClosed && transTagOpened &&
+      src.length >= 8 &&
+      src[0] == "<" &&
+      src[1] == "/" &&
+      src[2] == "t" &&
+      src[3] == "r" &&
+      src[4] == "a" &&
+      src[5] == "n" &&
+      src[6] == "s" &&
+      src[7] == ">"
+    ) {
+      for(let i = 0; i< 8; i++) src.shift();
+      tokens.push(token("</trans>", TokenType.CloseTransTag));
+      // only try to parse the first trans tag closing
+      // the subsequent ones will be ignored
+      transTagClosed = true;
+    }
     // BEGIN PARSING ONE CHARACTER TOKENS
-    if (src[0] == "(") {
+    else if (src[0] == "(") {
       tokens.push(token(src.shift(), TokenType.OpenParen));
     } else if (src[0] == ")") {
       tokens.push(token(src.shift(), TokenType.CloseParen));
@@ -105,10 +196,11 @@ export function tokenize(sourceCode: string): Token[] {
       tokens.push(token(src.shift(), TokenType.BinaryOperator));
     } // Handle Conditional & Assignment Tokens
     else if (src[0] == "=") {
-      tokens.push(token(src.shift(), TokenType.Equals));
+      tokens.push(token(src.shift(), TokenType.Assignment));
     } else if (src[0] == ";") {
       tokens.push(token(src.shift(), TokenType.Semicolon));
     } else if (src[0] == ":") {
+      // Unsupported token
       tokens.push(token(src.shift(), TokenType.Colon));
     } else if (src[0] == ",") {
       tokens.push(token(src.shift(), TokenType.Comma));
@@ -132,6 +224,7 @@ export function tokenize(sourceCode: string): Token[] {
           ident += src.shift();
         }
 
+        // to be yoinked
         // CHECK FOR RESERVED KEYWORDS
         const reserved = KEYWORDS[ident];
         // If value is not undefined then the identifier is
@@ -139,7 +232,7 @@ export function tokenize(sourceCode: string): Token[] {
         if (typeof reserved == "number") {
           tokens.push(token(ident, reserved));
         } else {
-          // Unreconized name must mean user defined symbol.
+          // Unrecognized name must mean user defined symbol.
           tokens.push(token(ident, TokenType.Identifier));
         }
       } else if (isskippable(src[0])) {
@@ -148,13 +241,20 @@ export function tokenize(sourceCode: string): Token[] {
       } // Handle unrecognized characters.
       // TODO: Implement better errors and error recovery.
       else {
-        console.error(
-          "Unreconized character found in source: ",
-          src[0].charCodeAt(0),
-          src[0],
-        );
-        tokens.push({ type: TokenType.EOF, value: "UnexpectedEndOfFile" });
-        return tokens;
+        // only parse the unknown characters inside of the script scope
+        if(transTagOpened) {
+          console.error(
+            "Unrecognized character found in source: ",
+            src[0].charCodeAt(0),
+            src,
+          );
+          console.error("script scope opened: ", transTagOpened, "script scope closed: ", transTagClosed);
+          tokens.push({ type: TokenType.EOF, value: "UnexpectedEndOfFile" });
+        }
+        // pre-scope unhandled characters
+        else {
+          src.shift();
+        }
       }
     }
   }

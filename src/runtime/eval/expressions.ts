@@ -65,11 +65,11 @@ export function eval_assignment(
   node: AssignmentExpr,
   scope: Scope,
 ): RuntimeVal {
-  if (node.assigne.kind !== "Identifier") {
-    throw `Invalid LHS inaide assignment expr ${JSON.stringify(node.assigne)}`;
+  if (node.assignee.kind !== "Identifier") {
+    throw `Invalid LHS inaide assignment expr ${JSON.stringify(node.assignee)}`;
   }
 
-  const varname = (node.assigne as Identifier).symbol;
+  const varname = (node.assignee as Identifier).symbol;
   return scope.assignVar(varname, evaluate(node.value, scope));
 }
 

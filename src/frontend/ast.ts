@@ -46,7 +46,7 @@ export interface Expr extends Stmt {}
 
 export interface AssignmentExpr extends Expr {
   kind: "AssignmentExpr";
-  assigne: Expr;
+  assignee: Expr;
   value: Expr;
 }
 
@@ -54,6 +54,7 @@ export interface AssignmentExpr extends Expr {
  * A operation with two sides seperated by a operator.
  * Both sides can be ANY Complex Expression.
  * - Supported Operators -> + | - | / | * | %
+ * - Leftover operators -> <, >, <=, >=, ==, !=, &&, ||
  */
 export interface BinaryExpr extends Expr {
   kind: "BinaryExpr";
@@ -65,6 +66,7 @@ export interface BinaryExpr extends Expr {
 export interface CallExpr extends Expr {
   kind: "CallExpr";
   args: Expr[];
+  // caller is Expr only because of MemberExpr calls feature (to be changed as jb only suports API calls)
   caller: Expr;
 }
 
@@ -79,6 +81,7 @@ export interface MemberExpr extends Expr {
 /**
  * Represents a user-defined variable or symbol in source.
  */
+// to be changed to support local/global/system vars
 export interface Identifier extends Expr {
   kind: "Identifier";
   symbol: string;
@@ -88,17 +91,23 @@ export interface Identifier extends Expr {
  * Represents a numeric constant inside the soure code.
  */
 export interface NumericLiteral extends Expr {
+  // to be extended with IntLiteral and FloatLiteral
   kind: "NumericLiteral";
   value: number;
 }
 
+// to be yoinked, global/system variable identifiers to be changed
 export interface Property extends Expr {
   kind: "Property";
   key: string;
   value?: Expr;
 }
 
+// to be changed to suppport arrays and dictionaries
 export interface ObjectLiteral extends Expr {
   kind: "ObjectLiteral";
+  // To be changed:
+  // arrays: Expr[]
+  // dictionaries: Map<string, Expr>
   properties: Property[];
 }

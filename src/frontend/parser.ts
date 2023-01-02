@@ -39,7 +39,7 @@ export default class Parser {
   /**
    * Returns the previous token and then advances the tokens array to the next value.
    */
-  private eat() {
+  private consume() {
     const prev = this.tokens.shift() as Token;
     return prev;
   }
@@ -53,7 +53,7 @@ export default class Parser {
     if (!prev || prev.type != type) {
       console.error("Parser Error:\n", err, prev, " - Expecting: ", type);
       return {
-        type: TokenType.UnknownToken,
+        type: prev ? prev.type : TokenType.UnknownToken,
         value: prev ? prev.value : null
       } as Token;
     }
@@ -63,14 +63,71 @@ export default class Parser {
 
   public produceAST(sourceCode: string): Program {
     this.tokens = tokenize(sourceCode);
+
+    // find the evaluation scope - <trans>...</trans>
+    let openIdx = null;
+    let closeIdx = null;
+    this.tokens.forEach( (token, index) => {
+      if(token.type === TokenType.OpenTransTag)
+        openIdx = index;
+      if(token.type === TokenType.CloseTransTag)
+        closeIdx = index;
+    });
     const program: Program = {
       kind: "Program",
       body: [],
     };
 
-    // Parse until end of file
-    while (this.not_eof()) {
-      program.body.push(this.parse_stmt());
+    // validate the evaluation scope
+    if(openIdx === null) {
+      // Add warning:
+      // 'No <trans> tag, script returns its content as string.'
+      console.log('Warning: No <trans> tag, script returns its content as string.');
+      
+      // return the script source as a string
+      // TODO: string literals
+
+    } else if(closeIdx === null) {
+      // Add JB error:
+      // 'The expression <expr> is missing closing tag </trans>'
+      console.log(`JB error: The expression is missing </trans> closing tag:\n${sourceCode}\n`);
+    }
+    else {
+      if(openIdx !== 0) {
+        // Add warning:
+        // 'Script content before <trans> is not evaluated and may result in unexpected behaviour.'
+        console.log("Warning: Script content before <trans> is not evaluated and may result in unexpected behaviour.");
+
+        // Remove the front tail
+        while(this.tokens[0].type !== TokenType.OpenTransTag) {
+          this.tokens.shift();
+        }
+      }
+
+      if(closeIdx != this.tokens.length - 1) {
+        // Add warning:
+        // 'Script content after </trans> is not evaluated and may result in unexpected behaviour.'
+        console.log("Warning: Script content after </trans> is not evaluated and may result in unexpected behaviour.");
+
+        // Remove the back tail
+        let len = this.tokens.length - 1;
+        while(this.tokens[len].type !== TokenType.CloseTransTag) {
+          this.tokens.pop();
+          len--;
+        }
+      }
+
+      // Remove <trans> and </trans> then restore EOF into the evaluated token set
+      this.tokens.shift();
+      this.tokens.pop();
+      this.tokens.push({ type: TokenType.EOF, value: "EndOfFile" } as Token);
+
+      console.log("tokens:", JSON.stringify(this.tokens));
+
+      // Parse until end of file
+      while (this.not_eof()) {
+        program.body.push(this.parse_stmt());
+      }
     }
 
     return program;
@@ -91,14 +148,14 @@ export default class Parser {
   // LET IDENT;
   // ( LET | CONST ) IDENT = EXPR;
   parse_var_declaration(): Stmt {
-    const isConstant = this.eat().type == TokenType.Const;
+    const isConstant = this.consume().type == TokenType.Const;
     const identifier = this.expect(
       TokenType.Identifier,
       "Expected identifier name following let | const keywords.",
     ).value;
 
     if (this.at().type == TokenType.Semicolon) {
-      this.eat(); // expect semicolon
+      this.consume(); // expect semicolon
       if (isConstant) {
         throw "Must assigne value to constant expression. No value provided.";
       }
@@ -111,7 +168,7 @@ export default class Parser {
     }
 
     this.expect(
-      TokenType.Equals,
+      TokenType.Assignment,
       "Expected equals token following identifier in var declaration.",
     );
 
@@ -124,7 +181,7 @@ export default class Parser {
 
     this.expect(
       TokenType.Semicolon,
-      "Variable declaration statment must end with semicolon.",
+      "Variable declaration statement must end with semicolon.",
     );
 
     return declaration;
@@ -138,10 +195,10 @@ export default class Parser {
   private parse_assignment_expr(): Expr {
     const left = this.parse_object_expr();
 
-    if (this.at().type == TokenType.Equals) {
-      this.eat(); // advance past equals
+    if (this.at().type == TokenType.Assignment) {
+      this.consume(); // advance past equals
       const value = this.parse_assignment_expr();
-      return { value, assigne: left, kind: "AssignmentExpr" } as AssignmentExpr;
+      return { value, assignee: left, kind: "AssignmentExpr" } as AssignmentExpr;
     }
 
     return left;
@@ -153,7 +210,7 @@ export default class Parser {
       return this.parse_additive_expr();
     }
 
-    this.eat(); // advance past open brace.
+    this.consume(); // advance past open brace.
     const properties = new Array<Property>();
 
     while (this.not_eof() && this.at().type != TokenType.CloseBrace) {
@@ -162,7 +219,7 @@ export default class Parser {
 
       // Allows shorthand key: pair -> { key, }
       if (this.at().type == TokenType.Comma) {
-        this.eat(); // advance past comma
+        this.consume(); // advance past comma
         properties.push({ key, kind: "Property" } as Property);
         continue;
       } // Allows shorthand key: pair -> { key }
@@ -196,7 +253,7 @@ export default class Parser {
     let left = this.parse_multiplicitave_expr();
 
     while (this.at().value == "+" || this.at().value == "-") {
-      const operator = this.eat().value;
+      const operator = this.consume().value;
       const right = this.parse_multiplicitave_expr();
       left = {
         kind: "BinaryExpr",
@@ -216,7 +273,7 @@ export default class Parser {
     while (
       this.at().value == "/" || this.at().value == "*" || this.at().value == "%"
     ) {
-      const operator = this.eat().value;
+      const operator = this.consume().value;
       const right = this.parse_call_member_expr();
       left = {
         kind: "BinaryExpr",
@@ -270,7 +327,7 @@ export default class Parser {
   private parse_arguments_list(): Expr[] {
     const args = [this.parse_assignment_expr()];
 
-    while (this.at().type == TokenType.Comma && this.eat()) {
+    while (this.at().type == TokenType.Comma && this.consume()) {
       args.push(this.parse_assignment_expr());
     }
 
@@ -283,7 +340,7 @@ export default class Parser {
     while (
       this.at().type == TokenType.Dot || this.at().type == TokenType.OpenBracket
     ) {
-      const operator = this.eat();
+      const operator = this.consume();
       let property: Expr;
       let computed: boolean;
 
@@ -315,7 +372,7 @@ export default class Parser {
     return object;
   }
 
-  // Orders Of Prescidence
+  // Orders Of Precedence
   // Assignment
   // Object
   // AdditiveExpr
@@ -332,18 +389,18 @@ export default class Parser {
     switch (tk) {
       // User defined values.
       case TokenType.Identifier:
-        return { kind: "Identifier", symbol: this.eat().value } as Identifier;
+        return { kind: "Identifier", symbol: this.consume().value } as Identifier;
 
       // Constants and Numeric Constants
       case TokenType.Number:
         return {
           kind: "NumericLiteral",
-          value: parseFloat(this.eat().value),
+          value: parseFloat(this.consume().value),
         } as NumericLiteral;
 
       // Grouping Expressions
       case TokenType.OpenParen: {
-        this.eat(); // eat the opening paren
+        this.consume(); // eat the opening paren
         const value = this.parse_expr();
         this.expect(
           TokenType.CloseParen,

@@ -1,13 +1,16 @@
-let foo = 50 / 2;
-
-const obj = {
-  x: 100,
-  y: 32,
-  foo: foo,
-  complex: {
-    bar: true,
-  },
-};
-
-foo = obj.complex.bar + 5
-
+tretertertree
+!@#$%^&*()_+:";'<>?/.,\=|
+</trans>
+<trans>
+const xdd = (3+5);
+// this is a comment
+let lmao = xdd / 2;
+/* nice
+very nice
+*/
+lmao + 1
+</trans>
+sknfskdnfksdf
+jgtyututy
+7775765
+564j[y;kky]

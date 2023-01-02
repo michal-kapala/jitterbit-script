@@ -3,8 +3,8 @@ import Scope, { createGlobalScope } from "./runtime/scope";
 import { evaluate } from "./runtime/interpreter";
 import fs from "fs";
 
-repl();
-//run("./test.txt");
+//repl();
+run("./test.txt");
 
 async function run(filename: string) {
   const parser = new Parser();
