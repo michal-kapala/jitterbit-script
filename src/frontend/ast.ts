@@ -15,6 +15,7 @@ export type NodeType =
   | "Property"
   | "ObjectLiteral"
   | "NumericLiteral"
+  | "StringLiteral"
   | "Identifier"
   | "BinaryExpr";
 
@@ -110,4 +111,9 @@ export interface ObjectLiteral extends Expr {
   // arrays: Expr[]
   // dictionaries: Map<string, Expr>
   properties: Property[];
+}
+
+export interface StringLiteral extends Expr {
+  kind: "StringLiteral"
+  value: string
 }

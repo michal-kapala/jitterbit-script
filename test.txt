@@ -1,16 +1,6 @@
-tretertertree
-!@#$%^&*()_+:";'<>?/.,\=|
-</trans>
 <trans>
-const xdd = (3+5);
-// this is a comment
-let lmao = xdd / 2;
-/* nice
-very nice
-*/
-lmao + 1
+  let xdd = (3 + 5) * 3;
+  // this is a comment
+  let lmao = xdd / 2;
+  xdd = 'hello world!'
 </trans>
-sknfskdnfksdf
-jgtyututy
-7775765
-564j[y;kky]

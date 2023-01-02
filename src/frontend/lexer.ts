@@ -11,6 +11,8 @@ export enum TokenType {
   // Literal Types
   Number,
   Identifier,
+  SingleQuoteString,
+  DoubleQuoteString,
   // Keywords
   Let,
   Const,
@@ -83,6 +85,31 @@ function isint(str: string) {
   const c = str.charCodeAt(0);
   const bounds = ["0".charCodeAt(0), "9".charCodeAt(0)];
   return c >= bounds[0] && c <= bounds[1];
+}
+
+function resolve_escaped(escChar: string) {
+  switch(escChar) {
+    case "b":
+      return "\b";
+    case "f":
+      return "\f";
+    case "n":
+      return "\n";
+    case "r":
+      return "\r";
+    case "t":
+      return "\t";
+    case "v":
+      return "\v";
+    case "\\":
+      return "\\";
+    case "'":
+      return "'";
+    case "\"":
+      return "\"";
+    default:
+      return "\\" + escChar;
+  }
 }
 
 /**
@@ -175,6 +202,48 @@ export function tokenize(sourceCode: string): Token[] {
       // the subsequent ones will be ignored
       transTagClosed = true;
     }
+    // STRINGS
+    else if(src[0] == "'") {
+      // consume opening '
+      skippedChar = src.shift()
+      // make string literal
+      let sqString = "";
+      let escapedChar = "";
+      // consume string characters and omit escapes (\')
+      while(src.length > 0 && src[0] !== "'" && skippedChar !== "\\") {
+        skippedChar = src.shift();
+        // handle escaped characters
+        if(skippedChar == "\\" && src.length > 1) {
+          escapedChar = src.shift() as string;
+          sqString += resolve_escaped(escapedChar);
+        } else {
+          sqString += skippedChar;
+        }
+      }
+      // consume closing '
+      src.shift();
+      tokens.push(token(sqString, TokenType.SingleQuoteString));
+    } else if(src[0] == "\"") {
+      // consume opening "
+      src.shift()
+      // make string literal
+      let dqString = "";
+      let escapedChar = "";
+      // consume string characters and omit escapes (\')
+      while(src.length > 0 && src[0] !== "\"" && skippedChar !== "\\") {
+        skippedChar = src.shift();
+        // handle escaped characters
+        if(skippedChar == "\\" && src.length > 1) {
+          escapedChar = src.shift() as string;
+          dqString += resolve_escaped(escapedChar);
+        } else {
+          dqString += skippedChar;
+        }
+      }
+      // consume closing "
+      src.shift();
+      tokens.push(token(dqString, TokenType.DoubleQuoteString));
+    }
     // BEGIN PARSING ONE CHARACTER TOKENS
     else if (src[0] == "(") {
       tokens.push(token(src.shift(), TokenType.OpenParen));
@@ -248,7 +317,6 @@ export function tokenize(sourceCode: string): Token[] {
             src[0].charCodeAt(0),
             src,
           );
-          console.error("script scope opened: ", transTagOpened, "script scope closed: ", transTagClosed);
           tokens.push({ type: TokenType.EOF, value: "UnexpectedEndOfFile" });
         }
         // pre-scope unhandled characters
@@ -259,6 +327,5 @@ export function tokenize(sourceCode: string): Token[] {
     }
   }
 
-  tokens.push({ type: TokenType.EOF, value: "EndOfFile" });
   return tokens;
 }

@@ -6,8 +6,15 @@ import {
 } from "../../frontend/ast";
 import Scope from "../scope";
 import { evaluate } from "../interpreter";
-import { MK_NULL, NumberVal, ObjectVal, RuntimeVal } from "../values";
+import { MK_NULL, NullVal, NumberVal, ObjectVal, RuntimeVal, StringVal } from "../values";
 
+/**
+ * Evaluates binary expressions on numeric literals.
+ * @param lhs Left-hand side numeric literal.
+ * @param rhs Right-hand side numeric literal.
+ * @param operator Binary operator.
+ * @returns 
+ */
 function eval_numeric_binary_expr(
   lhs: NumberVal,
   rhs: NumberVal,
@@ -31,6 +38,32 @@ function eval_numeric_binary_expr(
 }
 
 /**
+ * Evaluates binary expressions on string literals.
+ * @param lhs Left-hand side string literal.
+ * @param rhs Right-hand side string literal.
+ * @param operator Binary operator.
+ */
+function eval_string_binary_expr(
+  lhs: StringVal,
+  rhs: StringVal,
+  operator: string,
+): StringVal | NullVal {
+  let result: string;
+  // string concatenation
+  if (operator == "+") {
+    result = lhs.value + rhs.value;
+    return { type: "string", value: result } as StringVal;
+  } else {
+    // Add JB error:
+    // Illegal operation, <operation name, ex. SUBTRACT> with incompatible data types: string <operator> string
+    console.error(`Illegal operation, ${operator} with incompatible data types: string ${operator} string`);
+    // Illegal operation returns null
+    return MK_NULL();
+  }
+
+}
+
+/**
  * Evaulates expressions following the binary operation type.
  */
 export function eval_binary_expr(
@@ -49,6 +82,18 @@ export function eval_binary_expr(
     );
   }
 
+  // string concatenation
+  if (lhs.type == "string" && rhs.type == "string") {
+    return eval_string_binary_expr(
+      lhs as StringVal,
+      rhs as StringVal,
+      binop.operator,
+    );
+  }
+
+  // Add JB error:
+  // Illegal operation, <operation name, ex. SUBTRACT> with incompatible data types: <lhs.type> <operator> <rhs.type>
+  console.error(`Illegal operation, ${binop.operator} with incompatible data types: ${lhs.type} ${binop.operator} ${rhs.type}`);
   // One or both are NULL
   return MK_NULL();
 }

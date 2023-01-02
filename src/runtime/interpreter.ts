@@ -1,4 +1,4 @@
-import { NullVal, NumberVal, RuntimeVal } from "./values";
+import { NullVal, NumberVal, RuntimeVal, StringVal } from "./values";
 import {
   AssignmentExpr,
   BinaryExpr,
@@ -7,6 +7,7 @@ import {
   ObjectLiteral,
   Program,
   Stmt,
+  StringLiteral,
   VarDeclaration,
 } from "../frontend/ast";
 import Scope from "./scope";
@@ -25,6 +26,11 @@ export function evaluate(astNode: Stmt, scope: Scope): RuntimeVal {
         value: ((astNode as NumericLiteral).value),
         type: "number",
       } as NumberVal;
+    case "StringLiteral":
+      return {
+        value: ((astNode as StringLiteral).value),
+        type: "string"
+      } as StringVal;
     case "Identifier":
       return eval_identifier(astNode as Identifier, scope);
     case "ObjectLiteral":

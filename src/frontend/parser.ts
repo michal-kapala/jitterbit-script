@@ -11,13 +11,14 @@ import {
   Program,
   Property,
   Stmt,
+  StringLiteral,
   VarDeclaration,
 } from "./ast";
 
 import { Token, tokenize, TokenType } from "./lexer";
 
 /**
- * Frontend for producing a valid AST from sourcode
+ * Frontend for producing a valid AST from source code.
  */
 export default class Parser {
   private tokens: Token[] = [];
@@ -30,7 +31,7 @@ export default class Parser {
   }
 
   /**
-   * Returns the currently available token
+   * Returns the currently available token.
    */
   private at() {
     return this.tokens[0] as Token;
@@ -45,7 +46,7 @@ export default class Parser {
   }
 
   /**
-   * Returns the previous token and then advances the tokens array to the next value.
+   *  Returns the previous token and then advances the tokens array to the next value.
    *  Also checks the type of expected token and throws if the values dnot match.
    */
   private expect(type: TokenType, err: any) {
@@ -107,7 +108,9 @@ export default class Parser {
       if(closeIdx != this.tokens.length - 1) {
         // Add warning:
         // 'Script content after </trans> is not evaluated and may result in unexpected behaviour.'
-        console.log("Warning: Script content after </trans> is not evaluated and may result in unexpected behaviour.");
+        // ignore the eof token
+        if(closeIdx != this.tokens.length - 2)
+          console.log("Warning: Script content after </trans> is not evaluated and may result in unexpected behaviour.");
 
         // Remove the back tail
         let len = this.tokens.length - 1;
@@ -137,6 +140,7 @@ export default class Parser {
   private parse_stmt(): Stmt {
     // skip to parse_expr
     switch (this.at().type) {
+      // to be removed
       case TokenType.Let:
       case TokenType.Const:
         return this.parse_var_declaration();
@@ -157,7 +161,7 @@ export default class Parser {
     if (this.at().type == TokenType.Semicolon) {
       this.consume(); // expect semicolon
       if (isConstant) {
-        throw "Must assigne value to constant expression. No value provided.";
+        throw "Must assign a value to constant expression. No value provided.";
       }
 
       return {
@@ -215,7 +219,7 @@ export default class Parser {
 
     while (this.not_eof() && this.at().type != TokenType.CloseBrace) {
       const key =
-        this.expect(TokenType.Identifier, "Object literal key exprected").value;
+        this.expect(TokenType.Identifier, "Object literal key expected").value;
 
       // Allows shorthand key: pair -> { key, }
       if (this.at().type == TokenType.Comma) {
@@ -270,6 +274,7 @@ export default class Parser {
   private parse_multiplicitave_expr(): Expr {
     let left = this.parse_call_member_expr();
 
+    // to be changed: modulo operator is unsupported
     while (
       this.at().value == "/" || this.at().value == "*" || this.at().value == "%"
     ) {
@@ -407,6 +412,16 @@ export default class Parser {
           "Unexpected token found inside parenthesised expression. Expected closing parenthesis.",
         ); // closing paren
         return value;
+      }
+
+      // '' string literal
+      case TokenType.SingleQuoteString: {
+        return { kind: "StringLiteral", value: this.consume().value } as StringLiteral;
+      }
+
+      // "" string literal
+      case TokenType.DoubleQuoteString: {
+        return { kind: "StringLiteral", value: this.consume().value } as StringLiteral;
       }
 
       // Unidentified Tokens and Invalid Code Reached

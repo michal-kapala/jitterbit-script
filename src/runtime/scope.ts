@@ -28,7 +28,7 @@ export default class Scope {
     constant: boolean,
   ): RuntimeVal {
     if (this.variables.has(varname)) {
-      throw `Cannot declare variable ${varname}. As it already is defined.`;
+      throw `Cannot declare variable ${varname} as it already is defined.`;
     }
 
     this.variables.set(varname, value);
@@ -43,7 +43,7 @@ export default class Scope {
 
     // Cannot assign to constant
     if (scope.constants.has(varname)) {
-      throw `Cannot reasign to variable ${varname} as it was declared constant.`;
+      throw `Cannot reassign to variable ${varname} as it was declared constant.`;
     }
 
     scope.variables.set(varname, value);
