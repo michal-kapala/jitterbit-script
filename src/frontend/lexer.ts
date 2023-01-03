@@ -210,7 +210,7 @@ export function tokenize(sourceCode: string): Token[] {
       let sqString = "";
       let escapedChar = "";
       // consume string characters and omit escapes (\')
-      while(src.length > 0 && src[0] !== "'" && skippedChar !== "\\") {
+      while(src.length > 0 && src[0] !== "'") {
         skippedChar = src.shift();
         // handle escaped characters
         if(skippedChar == "\\" && src.length > 1) {
@@ -225,12 +225,12 @@ export function tokenize(sourceCode: string): Token[] {
       tokens.push(token(sqString, TokenType.SingleQuoteString));
     } else if(src[0] == "\"") {
       // consume opening "
-      src.shift()
+      skippedChar = src.shift()
       // make string literal
       let dqString = "";
       let escapedChar = "";
       // consume string characters and omit escapes (\')
-      while(src.length > 0 && src[0] !== "\"" && skippedChar !== "\\") {
+      while(src.length > 0 && src[0] !== "\"" ) {
         skippedChar = src.shift();
         // handle escaped characters
         if(skippedChar == "\\" && src.length > 1) {

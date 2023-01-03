@@ -2,5 +2,5 @@
   let xdd = (3 + 5) * 3;
   // this is a comment
   let lmao = xdd / 2;
-  xdd = 'hello world!'
+  xdd = "hello world!" + " isn\'t it nice?\n"
 </trans>

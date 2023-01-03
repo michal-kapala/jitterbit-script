@@ -91,6 +91,7 @@ export default class Parser {
     } else if(closeIdx === null) {
       // Add JB error:
       // 'The expression <expr> is missing closing tag </trans>'
+      console.log("tokens:", JSON.stringify(this.tokens));
       console.log(`JB error: The expression is missing </trans> closing tag:\n${sourceCode}\n`);
     }
     else {
