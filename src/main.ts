@@ -16,7 +16,7 @@ async function run(filename: string) {
     }
     const program = parser.produceAST(data);
     const result = evaluate(program, globalScope);
-    console.log(result);
+    console.log("\nScript result:\n", result);
   });
 }
 

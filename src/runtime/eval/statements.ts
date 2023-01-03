@@ -5,9 +5,16 @@ import { MK_NULL, RuntimeVal } from "../values";
 
 export function eval_program(program: Program, env: Scope): RuntimeVal {
   let lastEvaluated: RuntimeVal = MK_NULL();
-  for (const statement of program.body) {
-    lastEvaluated = evaluate(statement, env);
+  try {
+    for (const statement of program.body) {
+      lastEvaluated = evaluate(statement, env);
+    }
   }
+  catch {
+    // this should be added as an error
+    console.error("\nInterpreterError: Could not evaluate the program.\nLast evaluated statement: ", lastEvaluated, "\n");
+  }
+  
   return lastEvaluated;
 }
 

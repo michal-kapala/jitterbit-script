@@ -9,7 +9,8 @@ export enum TokenType {
   OpenTransTag,
   CloseTransTag,
   // Literal Types
-  Number,
+  Integer,
+  Float,
   Identifier,
   SingleQuoteString,
   DoubleQuoteString,
@@ -80,11 +81,55 @@ function isskippable(str: string) {
 /**
  Return whether the character is a valid integer -> [0-9]
  */
-// to be reworked
-function isint(str: string) {
+function isnumber(str: string) {
   const c = str.charCodeAt(0);
   const bounds = ["0".charCodeAt(0), "9".charCodeAt(0)];
   return c >= bounds[0] && c <= bounds[1];
+}
+
+/**
+ * Checks if a character used in integer literal makes the token unknown/unrecognized.
+ * @param char Checked character
+ * @returns
+ */
+function isunknown(char: string) {
+  // '(' returns unrecognized in JB
+  let undefinedTokens = ['`', '~', '@', '#', '$', '%', '_', ':', '?', '('];
+  if(undefinedTokens.includes(char) || isalpha(char))
+    return true;
+  return false;
+}
+
+/**
+ * Checks if a character used in float literal makes the token undefined/unrecognized.
+ * @param char Checked character
+ * @returns
+ */
+function isundefined(char: string) {
+  // '(' returns unrecognized in JB
+  // <integer part>.. results in undefined too
+  let undefinedTokens = ['`', '~', '@', '#', '$', '%', '_', ':', '?', '.', '('];
+  if(undefinedTokens.includes(char) || isalpha(char))
+    return true;
+  return false;
+}
+
+/**
+ * Checks if the character is accepted into int literal candidate.
+ * @param char Checked char
+ * @returns
+ */
+function isintlike(char: string) {
+  return isnumber(char) || isunknown(char);
+}
+
+/**
+ * Checks if the character is accepted into float literal candidate.
+ * @param char 
+ * @returns
+ */
+function isfloatlike(char: string) {
+  return isnumber(char) || isundefined(char);
 }
 
 function resolve_escaped(escChar: string) {
@@ -277,15 +322,54 @@ export function tokenize(sourceCode: string): Token[] {
       tokens.push(token(src.shift(), TokenType.Dot));
     } // HANDLE MULTICHARACTER KEYWORDS, TOKENS, IDENTIFIERS ETC...
     else {
-      // Handle numeric literals -> Integers
-      if (isint(src[0])) {
+      // Handle numeric literals
+      if (isnumber(src[0])) {
         let num = "";
-        while (src.length > 0 && isint(src[0])) {
+        let isUnk = isunknown(src[0]);
+        while (src.length > 0 && isintlike(src[0])) {
+          if(isunknown(src[0]))
+            isUnk = true;
           num += src.shift();
         }
 
-        // append new numeric token.
-        tokens.push(token(num, TokenType.Number));
+        // Add JB error:
+        // 'Unknown token: <int-like literal>'
+        if(isUnk) {
+          console.error("Unknown token: ", num);
+          tokens.push(token(num, TokenType.UnknownToken));
+        }
+        // push the integer
+        else if(src[0] !== ".")
+          tokens.push(token(num, TokenType.Integer));
+        // read the floating point part
+        else if(src[0] === "."){
+          // read the dot
+          // <integer part>. literals are valid
+          num += src.shift();
+          // read the optional fraction part or undefined token
+          if(isfloatlike(src[0])) {
+            // handle 'Undefined token' JB error for numeric literals
+            let isUndef = isundefined(src[0]);
+            while (src.length > 0 && isfloatlike(src[0])) {
+              if(isundefined(src[0]))
+                isUndef = true;
+              num += src.shift();
+            }
+
+            // Add JB error:
+            // 'Undefined token: <float-like literal>'
+            if(isUndef) {
+              console.error("Undefined token: ", num);
+              tokens.push(token(num, TokenType.UnknownToken));
+            }
+            else
+              tokens.push(token(num, TokenType.Float));
+          }
+          // other known/defined token character found after <integer part>.
+          // push as float token
+          else
+            tokens.push(token(num, TokenType.Float));
+        }        
       } // Handle Identifier & Keyword Tokens.
       else if (isalpha(src[0])) {
         let ident = "";

@@ -4,9 +4,10 @@ import {
   BinaryExpr,
   CallExpr,
   Expr,
+  FloatLiteral,
   Identifier,
+  IntegerLiteral,
   MemberExpr,
-  NumericLiteral,
   ObjectLiteral,
   Program,
   Property,
@@ -356,14 +357,14 @@ export default class Parser {
         // get identifier
         property = this.parse_primary_expr();
         if (property.kind != "Identifier") {
-          throw `Cannonot use dot operator without right hand side being a identifier`;
+          throw `ParserError: Cannot use dot operator without right hand side being a identifier`;
         }
       } else { // this allows obj[computedValue]
         computed = true;
         property = this.parse_expr();
         this.expect(
           TokenType.CloseBracket,
-          "Missing closing bracket in computed value.",
+          "ParserError: Missing closing bracket in computed value.",
         );
       }
 
@@ -398,11 +399,17 @@ export default class Parser {
         return { kind: "Identifier", symbol: this.consume().value } as Identifier;
 
       // Constants and Numeric Constants
-      case TokenType.Number:
+      case TokenType.Integer:
+        return {
+          kind: "NumericLiteral",
+          value: parseInt(this.consume().value),
+        } as IntegerLiteral;
+      
+      case TokenType.Float:
         return {
           kind: "NumericLiteral",
           value: parseFloat(this.consume().value),
-        } as NumericLiteral;
+        } as FloatLiteral;
 
       // Grouping Expressions
       case TokenType.OpenParen: {
@@ -410,7 +417,7 @@ export default class Parser {
         const value = this.parse_expr();
         this.expect(
           TokenType.CloseParen,
-          "Unexpected token found inside parenthesised expression. Expected closing parenthesis.",
+          "ParserError: Unexpected token found inside parenthesised expression. Expected closing parenthesis.",
         ); // closing paren
         return value;
       }
@@ -427,8 +434,9 @@ export default class Parser {
 
       // Unidentified Tokens and Invalid Code Reached
       default:
-        console.error("Unexpected token found during parsing!", this.at());
-        // TODO: this error should have a fallback to bubble it up
+        console.error("ParserError: Unexpected token found during parsing!", this.at());
+        // TODO: add an error/error detail for every other token type here
+        // TODO: fix the loop
         return { kind: "Program" };
     }
   }

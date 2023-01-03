@@ -97,6 +97,16 @@ export interface NumericLiteral extends Expr {
   value: number;
 }
 
+/**
+ * Represents an integer number literal.
+ */
+export interface IntegerLiteral extends NumericLiteral {}
+
+/**
+ * Represents a floating point number literal.
+ */
+export interface FloatLiteral extends NumericLiteral {}
+
 // to be yoinked, global/system variable identifiers to be changed
 export interface Property extends Expr {
   kind: "Property";

@@ -21,6 +21,7 @@ import {
 
 export function evaluate(astNode: Stmt, scope: Scope): RuntimeVal {
   switch (astNode.kind) {
+    // handles both integer and float literals
     case "NumericLiteral":
       return {
         value: ((astNode as NumericLiteral).value),
