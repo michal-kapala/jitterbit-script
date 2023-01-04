@@ -3,8 +3,6 @@ import { MK_BOOL, MK_NULL, RuntimeVal } from "./values";
 export function createGlobalScope() {
   const scope = new Scope();
   // Create default global scope
-  scope.declareVar("true", MK_BOOL(true), true);
-  scope.declareVar("false", MK_BOOL(false), true);
   scope.declareVar("null", MK_NULL(), true);
 
   return scope;

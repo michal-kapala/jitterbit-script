@@ -1,4 +1,4 @@
-export type ValueType = "null" | "number" | "boolean" | "object" | "string" | "call";
+export type ValueType = "null" | "number" | "bool" | "object" | "string" | "call";
 
 export interface RuntimeVal {
   type: ValueType;
@@ -20,12 +20,12 @@ export function MK_NULL() {
  * Runtime value that has access to the raw native javascript boolean.
  */
 export interface BooleanVal extends RuntimeVal {
-  type: "boolean";
+  type: "bool";
   value: boolean;
 }
 
 export function MK_BOOL(b = true) {
-  return { type: "boolean", value: b } as BooleanVal;
+  return { type: "bool", value: b } as BooleanVal;
 }
 
 /**

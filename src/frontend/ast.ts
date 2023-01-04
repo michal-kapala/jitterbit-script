@@ -16,6 +16,7 @@ export type NodeType =
   | "ObjectLiteral"
   | "NumericLiteral"
   | "StringLiteral"
+  | "BooleanLiteral"
   | "Identifier"
   | "BinaryExpr";
 
@@ -126,4 +127,9 @@ export interface ObjectLiteral extends Expr {
 export interface StringLiteral extends Expr {
   kind: "StringLiteral"
   value: string
+}
+
+export interface BooleanLiteral extends Expr {
+  kind: "BooleanLiteral",
+  value: boolean
 }

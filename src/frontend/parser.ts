@@ -2,6 +2,7 @@
 import {
   AssignmentExpr,
   BinaryExpr,
+  BooleanLiteral,
   CallExpr,
   Expr,
   FloatLiteral,
@@ -410,6 +411,20 @@ export default class Parser {
           kind: "NumericLiteral",
           value: parseFloat(this.consume().value),
         } as FloatLiteral;
+
+      case TokenType.True:
+        this.consume();
+        return {
+          kind: "BooleanLiteral",
+          value: true,
+        } as BooleanLiteral;
+
+      case TokenType.False:
+        this.consume();
+        return {
+          kind: "BooleanLiteral",
+          value: false,
+        } as BooleanLiteral;
 
       // Grouping Expressions
       case TokenType.OpenParen: {

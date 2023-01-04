@@ -17,7 +17,8 @@ export enum TokenType {
   // Keywords
   Let,
   Const,
-
+  True,
+  False,
   // Grouping * Operators
   BinaryOperator,
   Assignment,
@@ -42,6 +43,8 @@ export enum TokenType {
 const KEYWORDS: Record<string, TokenType> = {
   let: TokenType.Let,
   const: TokenType.Const,
+  true: TokenType.True,
+  false: TokenType.False,
 };
 
 /**

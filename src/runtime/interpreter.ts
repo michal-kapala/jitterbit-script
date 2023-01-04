@@ -1,7 +1,8 @@
-import { NullVal, NumberVal, RuntimeVal, StringVal } from "./values";
+import { BooleanVal, NullVal, NumberVal, RuntimeVal, StringVal } from "./values";
 import {
   AssignmentExpr,
   BinaryExpr,
+  BooleanLiteral,
   Identifier,
   NumericLiteral,
   ObjectLiteral,
@@ -27,6 +28,11 @@ export function evaluate(astNode: Stmt, scope: Scope): RuntimeVal {
         value: ((astNode as NumericLiteral).value),
         type: "number",
       } as NumberVal;
+    case "BooleanLiteral":
+      return {
+        value: ((astNode as BooleanLiteral).value),
+        type: "bool"
+      } as BooleanVal;
     case "StringLiteral":
       return {
         value: ((astNode as StringLiteral).value),
