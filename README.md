@@ -43,9 +43,9 @@ The tables below shows the lexer's symbol support.
 
 | Symbol | jitterbit-interpreter | Jitterbit Studio |
 |---|---|---|
-| Local variables   |  | ✔️ |
-| Global variables  |  | ✔️ |
-| System variables  |  | ✔️ |
+| Local variables   | ✔️ | ✔️ |
+| Global variables  | ✔️ | ✔️ |
+| System variables  | ✔️ | ✔️ |
 
 #### Constants
 
@@ -53,9 +53,9 @@ The tables below shows the lexer's symbol support.
 |---|---|---|
 | Integer        |  | ✔️ |
 | Float          |  | ✔️ |
-| String         |  | ✔️ |
-| `true`/`false` |  | ✔️ |
-| `null`         |  | ❌ |
+| String         | ✔️ | ✔️ |
+| `true`/`false` | ✔️ | ✔️ |
+| `null`         | ❌ | ❌ |
 
 
 #### Objects
@@ -119,7 +119,7 @@ The list of statements and expressions supported by the interpreter.
 
 | Expr | jitterbit-interpreter | Jitterbit Studio |
 |---|---|---|
-| `\<trans>\</trans>`  |  | ✔️ |
+| `<trans></trans>`  | ✔️ | ✔️ |
 | `()`                 |  | ✔️ |
 | `[]`                 |  | ✔️ |
 | Simple expressions   |  | ✔️ |
@@ -134,5 +134,5 @@ The list of statements and expressions supported by the interpreter.
 ## APIs
 
 Currently supported Jitterbit API members are defined in separate files:
-- [system variables]()
+- [system variables](https://github.com/michal-kapala/jitterbit-interpreter/blob/main/src/api/sysvars.ts)
 - [functions]()
