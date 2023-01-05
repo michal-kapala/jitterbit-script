@@ -1,5 +1,5 @@
 import Parser from "./frontend/parser";
-import Scope, { createGlobalScope } from "./runtime/scope";
+import { createGlobalScope } from "./runtime/scope";
 import { evaluate } from "./runtime/interpreter";
 import fs from "fs";
 

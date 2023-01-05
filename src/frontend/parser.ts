@@ -1,4 +1,4 @@
-// deno-lint-ignore-file no-explicit-any
+import { getSystemVar } from "../api/sysvars";
 import {
   AssignmentExpr,
   BinaryExpr,
@@ -6,6 +6,7 @@ import {
   CallExpr,
   Expr,
   FloatLiteral,
+  GlobalIdentifier,
   Identifier,
   IntegerLiteral,
   MemberExpr,
@@ -238,7 +239,7 @@ export default class Parser {
       // { key: val }
       this.expect(
         TokenType.Colon,
-        "Missing colon following identifier in ObjectExpr",
+        "ParserError: Missing colon following identifier in ObjectExpr",
       );
       const value = this.parse_expr();
 
@@ -246,12 +247,12 @@ export default class Parser {
       if (this.at().type != TokenType.CloseBrace) {
         this.expect(
           TokenType.Comma,
-          "Expected comma or closing bracket following property",
+          "ParserError: Expected comma or closing bracket following property",
         );
       }
     }
 
-    this.expect(TokenType.CloseBrace, "Object literal missing closing brace.");
+    this.expect(TokenType.CloseBrace, "ParserError: Object literal missing closing brace.");
     return { kind: "ObjectLiteral", properties } as ObjectLiteral;
   }
 
@@ -320,14 +321,14 @@ export default class Parser {
   }
 
   private parse_args(): Expr[] {
-    this.expect(TokenType.OpenParen, "Expected open parenthesis");
+    this.expect(TokenType.OpenParen, "ParserError: Expected open parenthesis");
     const args = this.at().type == TokenType.CloseParen
       ? []
       : this.parse_arguments_list();
 
     this.expect(
       TokenType.CloseParen,
-      "Missing closing parenthesis inside arguments list",
+      "ParserError: Missing closing parenthesis inside arguments list",
     );
     return args;
   }
@@ -395,9 +396,44 @@ export default class Parser {
 
     // Determine which token we are currently at and return literal value
     switch (tk) {
-      // User defined values.
+      // User-defined local variables
       case TokenType.Identifier:
         return { kind: "Identifier", symbol: this.consume().value } as Identifier;
+
+      case TokenType.GlobalIdentifier:
+        // consume the token
+        let globalVarToken = this.consume();
+        // check if the name is '$'
+        // then the var acts as an untracked global var i.e. it doesnt appear in the debugger
+        if(globalVarToken.value === "$") {
+          // Add a warning
+          // member expressions on $ can lead to unexpected behavior, for instance:
+          // $[2] = $;
+          // lol = $[2];
+          // results in a proxy error (502) and apache server exceptions from agents
+          console.warn("ParserWarning: '$' should not be used as an identifier. It behaves like an untracked global variable and may cause unexpected behaviour including agent-level exceptions when used in complex expressions");
+        }
+        // check if system variable
+        let sysVar = getSystemVar(globalVarToken.value);
+        if(sysVar !== undefined) 
+          return {
+            kind: "GlobalIdentifier",
+            symbol: globalVarToken.value,
+            type: "system" 
+          } as GlobalIdentifier;
+        else {
+          if(globalVarToken.value.substring(0, 11) === "$jitterbit.") {
+            // Add a warning:
+            // Global variable names should not begin with '$jitterbit.', it is a reserved namespace.
+            console.warn("ParserWarning: Global variable names should not begin with '$jitterbit.', it is a reserved namespace.");
+          }
+
+          return {
+            kind: "GlobalIdentifier",
+            symbol: globalVarToken.value,
+            type: "global"
+          } as GlobalIdentifier;
+        }
 
       // Constants and Numeric Constants
       case TokenType.Integer:
@@ -451,7 +487,8 @@ export default class Parser {
       default:
         console.error("ParserError: Unexpected token found during parsing!", this.at());
         // TODO: add an error/error detail for every other token type here
-        // TODO: fix the loop
+        // consume the token to prevent infinite loops
+        this.consume()
         return { kind: "Program" };
     }
   }

@@ -17,7 +17,7 @@ export function MK_NULL() {
 }
 
 /**
- * Runtime value that has access to the raw native javascript boolean.
+ * Runtime value that has access to native javascript boolean.
  */
 export interface BooleanVal extends RuntimeVal {
   type: "bool";
@@ -29,7 +29,7 @@ export function MK_BOOL(b = true) {
 }
 
 /**
- * Runtime value that has access to the raw native javascript number.
+ * Runtime value that has access to native javascript number.
  */
 export interface NumberVal extends RuntimeVal {
   type: "number";
@@ -41,16 +41,23 @@ export function MK_NUMBER(n = 0) {
 }
 
 /**
+ * Runtime value that has access to native javascript string.
+ */
+export interface StringVal extends RuntimeVal {
+  type: "string";
+  value: string;
+}
+
+export function MK_STRING(s = "") {
+  return { type: "string", value: s } as StringVal;
+}
+
+/**
  * Runtime value that has access to the raw native javascript object property map.
  */
 export interface ObjectVal extends RuntimeVal {
   type: "object";
   properties: Map<string, RuntimeVal>;
-}
-
-export interface StringVal extends RuntimeVal {
-  type: "string";
-  value: string;
 }
 
 /**

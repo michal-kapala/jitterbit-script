@@ -12,6 +12,7 @@ export enum TokenType {
   Integer,
   Float,
   Identifier,
+  GlobalIdentifier,
   SingleQuoteString,
   DoubleQuoteString,
   // Keywords
@@ -69,7 +70,7 @@ function token(value = "", type: TokenType): Token {
  * Returns whether the character passed in alphabetic -> [a-zA-Z]
  */
 // to be changed
-function isalpha(src: string) {
+function isAlpha(src: string): boolean {
   return src.toUpperCase() != src.toLowerCase();
 }
 
@@ -77,14 +78,14 @@ function isalpha(src: string) {
  * Returns true if the character is whitespace like -> [\s, \t, \n]
  */
 // to be changed to support positioning (newline)
-function isskippable(str: string) {
+function isSkippable(str: string): boolean {
   return str == " " || str == "\n" || str == "\t" || str == "\r";
 }
 
 /**
  Return whether the character is a valid integer -> [0-9]
  */
-function isnumber(str: string) {
+function isNumber(str: string): boolean {
   const c = str.charCodeAt(0);
   const bounds = ["0".charCodeAt(0), "9".charCodeAt(0)];
   return c >= bounds[0] && c <= bounds[1];
@@ -95,10 +96,10 @@ function isnumber(str: string) {
  * @param char Checked character
  * @returns
  */
-function isunknown(char: string) {
+function isUnknown(char: string): boolean {
   // '(' returns unrecognized in JB
   let undefinedTokens = ['`', '~', '@', '#', '$', '%', '_', ':', '?', '('];
-  if(undefinedTokens.includes(char) || isalpha(char))
+  if(undefinedTokens.includes(char) || isAlpha(char))
     return true;
   return false;
 }
@@ -108,11 +109,11 @@ function isunknown(char: string) {
  * @param char Checked character
  * @returns
  */
-function isundefined(char: string) {
+function isUndefined(char: string): boolean {
   // '(' returns unrecognized in JB
   // <integer part>.. results in undefined too
   let undefinedTokens = ['`', '~', '@', '#', '$', '%', '_', ':', '?', '.', '('];
-  if(undefinedTokens.includes(char) || isalpha(char))
+  if(undefinedTokens.includes(char) || isAlpha(char))
     return true;
   return false;
 }
@@ -122,8 +123,8 @@ function isundefined(char: string) {
  * @param char Checked char
  * @returns
  */
-function isintlike(char: string) {
-  return isnumber(char) || isunknown(char);
+function isIntlike(char: string): boolean {
+  return isNumber(char) || isUnknown(char);
 }
 
 /**
@@ -131,11 +132,22 @@ function isintlike(char: string) {
  * @param char 
  * @returns
  */
-function isfloatlike(char: string) {
-  return isnumber(char) || isundefined(char);
+function isFloatlike(char: string): boolean {
+  return isNumber(char) || isUndefined(char);
 }
 
-function resolve_escaped(escChar: string) {
+/**
+ * Checks if a character is valid for a global/system variable symbol.
+ * @param char Checked character
+ * @returns 
+ */
+function isGlobalVarChar(char: string): boolean {
+  // allowed special characters
+  let allowed = ['`', '~', '@', '#', '$', '%', '_', ':', '.', '?'];
+  return (allowed.includes(char) || isAlpha(char) || isNumber(char));
+}
+
+function resolve_escaped(escChar: string): string {
   switch(escChar) {
     case "b":
       return "\b";
@@ -323,14 +335,27 @@ export function tokenize(sourceCode: string): Token[] {
       tokens.push(token(src.shift(), TokenType.Comma));
     } else if (src[0] == ".") {
       tokens.push(token(src.shift(), TokenType.Dot));
+    } else if(src[0] == "$") {
+      // HANDLE GLOBAL/SYSTEM VAR IDENTIFIERS
+      // Note: extendable sys variables can include hyphens but they have to be referenced as string literals
+      // e.g. jitterbit.networking.http.request.header.content-type
+
+      // consume $
+      let globalVar = src.shift() as string;
+
+      // read global var name ident
+      while(src.length > 0 && isGlobalVarChar(src[0])) {
+        globalVar += src.shift();
+      }
+      tokens.push(token(globalVar, TokenType.GlobalIdentifier));
     } // HANDLE MULTICHARACTER KEYWORDS, TOKENS, IDENTIFIERS ETC...
     else {
       // Handle numeric literals
-      if (isnumber(src[0])) {
+      if (isNumber(src[0])) {
         let num = "";
-        let isUnk = isunknown(src[0]);
-        while (src.length > 0 && isintlike(src[0])) {
-          if(isunknown(src[0]))
+        let isUnk = isUnknown(src[0]);
+        while (src.length > 0 && isIntlike(src[0])) {
+          if(isUnknown(src[0]))
             isUnk = true;
           num += src.shift();
         }
@@ -350,11 +375,11 @@ export function tokenize(sourceCode: string): Token[] {
           // <integer part>. literals are valid
           num += src.shift();
           // read the optional fraction part or undefined token
-          if(isfloatlike(src[0])) {
+          if(isFloatlike(src[0])) {
             // handle 'Undefined token' JB error for numeric literals
-            let isUndef = isundefined(src[0]);
-            while (src.length > 0 && isfloatlike(src[0])) {
-              if(isundefined(src[0]))
+            let isUndef = isUndefined(src[0]);
+            while (src.length > 0 && isFloatlike(src[0])) {
+              if(isUndefined(src[0]))
                 isUndef = true;
               num += src.shift();
             }
@@ -374,9 +399,15 @@ export function tokenize(sourceCode: string): Token[] {
             tokens.push(token(num, TokenType.Float));
         }        
       } // Handle Identifier & Keyword Tokens.
-      else if (isalpha(src[0])) {
+      else if (isAlpha(src[0]) || src[0] === "_") {
         let ident = "";
-        while (src.length > 0 && isalpha(src[0])) {
+        while (src.length > 0 
+          && (
+            isAlpha(src[0])
+            || isNumber(src[0])
+            || src[0] === "_"
+          )
+        ) {
           ident += src.shift();
         }
 
@@ -391,7 +422,7 @@ export function tokenize(sourceCode: string): Token[] {
           // Unrecognized name must mean user defined symbol.
           tokens.push(token(ident, TokenType.Identifier));
         }
-      } else if (isskippable(src[0])) {
+      } else if (isSkippable(src[0])) {
         // Skip unneeded chars.
         src.shift();
       } // Handle unrecognized characters.

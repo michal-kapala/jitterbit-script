@@ -10,9 +10,10 @@ export function eval_program(program: Program, env: Scope): RuntimeVal {
       lastEvaluated = evaluate(statement, env);
     }
   }
-  catch {
+  catch(e) {
     // this should be added as an error
-    console.error("\nInterpreterError: Could not evaluate the program.\nLast evaluated statement: ", lastEvaluated, "\n");
+    console.error("\nInterpreterError: Could not evaluate the program.\nLast evaluated statement: ", lastEvaluated);
+    console.error("InterpreterError:", e);
   }
   
   return lastEvaluated;

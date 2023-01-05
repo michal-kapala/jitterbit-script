@@ -3,6 +3,7 @@ import {
   AssignmentExpr,
   BinaryExpr,
   BooleanLiteral,
+  GlobalIdentifier,
   Identifier,
   NumericLiteral,
   ObjectLiteral,
@@ -39,6 +40,14 @@ export function evaluate(astNode: Stmt, scope: Scope): RuntimeVal {
         type: "string"
       } as StringVal;
     case "Identifier":
+      return eval_identifier(astNode as Identifier, scope);
+    case "GlobalIdentifier":
+      const global = astNode as GlobalIdentifier;
+      // null-init global variables on first appearance, before the evaluation
+      // globals are script-scoped, there's nothing like a script call stack available here
+      // which also makes project variables unsupported
+       const globalScope = scope.getGlobal();
+       globalScope.initGlobalVar(global);
       return eval_identifier(astNode as Identifier, scope);
     case "ObjectLiteral":
       return eval_object_expr(astNode as ObjectLiteral, scope);

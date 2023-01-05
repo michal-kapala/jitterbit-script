@@ -18,6 +18,7 @@ export type NodeType =
   | "StringLiteral"
   | "BooleanLiteral"
   | "Identifier"
+  | "GlobalIdentifier"
   | "BinaryExpr";
 
 /**
@@ -83,10 +84,15 @@ export interface MemberExpr extends Expr {
 /**
  * Represents a user-defined variable or symbol in source.
  */
-// to be changed to support local/global/system vars
 export interface Identifier extends Expr {
-  kind: "Identifier";
+  kind: "Identifier" | "GlobalIdentifier";
   symbol: string;
+}
+
+export interface GlobalIdentifier extends Identifier {
+  kind: "GlobalIdentifier";
+  // project variables are currently unsupported as they require project-scoped knowledge
+  type: "global" | "project" | "system";
 }
 
 /**

@@ -110,8 +110,8 @@ export function eval_assignment(
   node: AssignmentExpr,
   scope: Scope,
 ): RuntimeVal {
-  if (node.assignee.kind !== "Identifier") {
-    throw `Invalid LHS inaide assignment expr ${JSON.stringify(node.assignee)}`;
+  if (node.assignee.kind !== "Identifier" && node.assignee.kind !== "GlobalIdentifier") {
+    throw `Invalid LHS inside assignment expr ${JSON.stringify(node.assignee)}`;
   }
 
   const varname = (node.assignee as Identifier).symbol;
