@@ -2,69 +2,20 @@
 // ---------------          LEXER          -------------------
 // ---  Responsible for producing tokens from the source   ---
 // -----------------------------------------------------------
-
-// Represents tokens that our language understands in parsing.
-export enum TokenType {
-  // Script scope tag
-  OpenTransTag,
-  CloseTransTag,
-  // Literal Types
-  Integer,
-  Float,
-  Identifier,
-  GlobalIdentifier,
-  SingleQuoteString,
-  DoubleQuoteString,
-  // Keywords
-  Let,
-  Const,
-  True,
-  False,
-  // Grouping * Operators
-  BinaryOperator,
-  Assignment,
-  Comma,
-  Dot,
-  Colon,
-  Semicolon,
-  OpenParen, // (
-  CloseParen, // )
-  OpenBrace, // {
-  CloseBrace, // }
-  OpenBracket, // [
-  CloseBracket, //]
-  EOF, // Signified the end of file
-  UnknownToken // Token parsing error
-}
+import Position from "./types/Position";
+import { Token, TokenType } from "./types/Token";
 
 /**
  * Constant lookup for keywords and known identifiers + symbols.
+ * 
+ * Var types to be yoinked.
  */
-// to be yoinked
 const KEYWORDS: Record<string, TokenType> = {
   let: TokenType.Let,
   const: TokenType.Const,
   true: TokenType.True,
   false: TokenType.False,
 };
-
-/**
- * Represents a single token from the source-code.
- */
-export interface Token {
-  value: string; // contains the raw value as seen inside the source code.
-  type: TokenType; // tagged structure.
-}
-
-/**
- * Returns a token of a given type and value
- * @param value token literal
- * @param type token type
- * @returns 
- */
-function token(value = "", type: TokenType): Token {
-  return { value, type };
-}
 
 /**
  * Returns whether the character passed in alphabetic -> [a-zA-Z]
@@ -75,11 +26,18 @@ function isAlpha(src: string): boolean {
 }
 
 /**
- * Returns true if the character is whitespace like -> [\s, \t, \n]
+ * Returns true if the character is whitespace like -> [\s, \t, \r]
  */
 // to be changed to support positioning (newline)
 function isSkippable(str: string): boolean {
-  return str == " " || str == "\n" || str == "\t" || str == "\r";
+  return str == " " || str == "\t" || str == "\r";
+}
+
+/**
+ * Returns true if the character is end of line character - `\n`.
+ */
+function isEOL(str: string): boolean {
+  return str == "\n";
 }
 
 /**
@@ -179,13 +137,16 @@ function resolve_escaped(escChar: string): string {
  * - Returns an array of tokens.
  * - Does not modify the incoming string.
  */
-export function tokenize(sourceCode: string): Token[] {
+export function tokenize(sourceCode: string, curPos: Position): Token[] {
   const tokens = new Array<Token>();
+  // source code
   const src = sourceCode.split("");
-
+  // token marker
+  let beginPos: Position;
+  // might be useless after global position changes
   let skippedChar;
   let currChar;
-  let nextChar;
+  // global scope checkers
   let transTagOpened = false;
   let transTagClosed = false;
 
@@ -194,24 +155,35 @@ export function tokenize(sourceCode: string): Token[] {
     // BEGIN PARSING MULTICHARACTER TOKENS - OPERATORS, TAGS, COMMENTS
 
     // SKIP DOUBLEDASH COMMENTS
-    if(src[0] == "/" && src[1] == "/") {
+    if(src[0] == '/' && src[1] == '/') {
       src.shift();
+      curPos.advance();
+
       skippedChar = src.shift();
-      while(skippedChar != "\n") {
+      curPos.advance();
+
+      while(skippedChar != '\n') {
         skippedChar = src.shift();
+        if(skippedChar === '\n')
+          curPos.nextLine();
+        else
+          curPos.advance();
       }
     }
     // SKIP MULTILINE COMMENTS
     else if(src[0] == "/" && src[1] == "*") {
       src.shift();
+      curPos.advance();
+
       skippedChar = src.shift();
+      curPos.advance();
+
       currChar = src[0];
-      nextChar = src[1];
       if(currChar == "/") {
         // JB throws 'Unknown token */' if the first commented character
         // in a valid comment is a slash
         // 'self closing comment' problem
-        // this should add an error/warning
+        // this should add an error/warning, use curPos
         console.warn("Warning: JB throws 'Unknown token */' with comment content that begins with a slash");
       }
       
@@ -221,9 +193,17 @@ export function tokenize(sourceCode: string): Token[] {
         // script scope tag validation should return
         // 'Missing closing tag </trans>' error
         skippedChar = src.shift();
-        if(skippedChar === "*" && src[0] === "/"){
-          // consume the ending slash
+
+        // update position
+        if(skippedChar === '\n')
+          curPos.nextLine();
+        else
+          curPos.advance();
+
+        // consume the ending slash
+        if(skippedChar === "*" && src[0] === "/"){  
           src.shift();
+          curPos.advance();
           break;
         }
       }
@@ -238,8 +218,21 @@ export function tokenize(sourceCode: string): Token[] {
       src[5] == "s" &&
       src[6] == ">"
     ) {
-      for(let i = 0; i < 7; i++) src.shift();
-      tokens.push(token("<trans>", TokenType.OpenTransTag));
+      // save begin position
+      beginPos = { line: curPos.line, character: curPos.character } as Position;
+      // consume
+      for(let i = 0; i < 7; i++) {
+        src.shift();
+        curPos.advance();
+      }
+      tokens.push(new Token(
+        "<trans>",
+        TokenType.OpenTransTag,
+        // ts/js pass objects by reference :/
+        // subtract 1 to indicate the position of the last character
+        { line: beginPos.line, character: beginPos.character } as Position,
+        { line: curPos.line, character: curPos.character - 1 } as Position
+      ));
       // only try to parse 1 trans tag opening
       // the subsequent ones will result in an operator expr error
       transTagOpened = true;
@@ -256,25 +249,54 @@ export function tokenize(sourceCode: string): Token[] {
       src[6] == "s" &&
       src[7] == ">"
     ) {
-      for(let i = 0; i< 8; i++) src.shift();
-      tokens.push(token("</trans>", TokenType.CloseTransTag));
+      // save begin position
+      beginPos = { line: curPos.line, character: curPos.character } as Position;
+      // consume
+      for(let i = 0; i< 8; i++) {
+        src.shift();
+        curPos.advance();
+      }
+      tokens.push(new Token(
+        "</trans>",
+        TokenType.CloseTransTag,
+        { line: beginPos.line, character: beginPos.character } as Position,
+        { line: curPos.line, character: curPos.character - 1 } as Position
+      ));
       // only try to parse the first trans tag closing
       // the subsequent ones will be ignored
       transTagClosed = true;
     }
     // STRINGS
     else if(src[0] == "'") {
+      // save begin position
+      beginPos = { line: curPos.line, character: curPos.character } as Position;
       // consume opening '
       skippedChar = src.shift()
+      curPos.advance();
       // make string literal
       let sqString = "";
       let escapedChar = "";
       // consume string characters and omit escapes (\')
       while(src.length > 0 && src[0] !== "'") {
         skippedChar = src.shift();
+        // update position for multiline strings correctly
+        if(skippedChar === '\n') {
+          // ignore EOLs
+          skippedChar = '';
+          curPos.nextLine();
+        }
+        else if(skippedChar === '\r') {
+          // resolve \r\n to a space
+          skippedChar = ' ';
+          curPos.advance();
+        }
+        else
+          curPos.advance();
+
         // handle escaped characters
         if(skippedChar == "\\" && src.length > 1) {
           escapedChar = src.shift() as string;
+          curPos.advance();
           sqString += resolve_escaped(escapedChar);
         } else {
           sqString += skippedChar;
@@ -282,19 +304,35 @@ export function tokenize(sourceCode: string): Token[] {
       }
       // consume closing '
       src.shift();
-      tokens.push(token(sqString, TokenType.SingleQuoteString));
-    } else if(src[0] == "\"") {
+      curPos.advance();
+      tokens.push(new Token(
+        sqString,
+        TokenType.SingleQuoteString,
+        { line: beginPos.line, character: beginPos.character } as Position,
+        { line: curPos.line, character: curPos.character - 1 } as Position
+      ));
+    }
+    else if(src[0] == "\"") {
+      // save begin position
+      beginPos = { line: curPos.line, character: curPos.character } as Position;
       // consume opening "
-      skippedChar = src.shift()
+      skippedChar = src.shift();
+      curPos.advance();
       // make string literal
       let dqString = "";
       let escapedChar = "";
       // consume string characters and omit escapes (\')
       while(src.length > 0 && src[0] !== "\"" ) {
         skippedChar = src.shift();
+        // update position for multiline strings correctly
+        if(skippedChar === '\n')
+          curPos.nextLine();
+        else
+          curPos.advance();
         // handle escaped characters
         if(skippedChar == "\\" && src.length > 1) {
           escapedChar = src.shift() as string;
+          curPos.advance();
           dqString += resolve_escaped(escapedChar);
         } else {
           dqString += skippedChar;
@@ -302,54 +340,143 @@ export function tokenize(sourceCode: string): Token[] {
       }
       // consume closing "
       src.shift();
-      tokens.push(token(dqString, TokenType.DoubleQuoteString));
+      curPos.advance();
+      tokens.push(new Token(
+        dqString,
+        TokenType.DoubleQuoteString,
+        { line: beginPos.line, character: beginPos.character } as Position,
+        { line: curPos.line, character: curPos.character - 1 } as Position
+      ));
     }
     // BEGIN PARSING ONE CHARACTER TOKENS
     else if (src[0] == "(") {
-      tokens.push(token(src.shift(), TokenType.OpenParen));
+      tokens.push(new Token(
+        src.shift() ?? src[0],
+        TokenType.OpenParen,
+        { line: curPos.line, character: curPos.character } as Position,
+        { line: curPos.line, character: curPos.character } as Position
+      ));
+      curPos.advance();
     } else if (src[0] == ")") {
-      tokens.push(token(src.shift(), TokenType.CloseParen));
+      tokens.push(new Token(
+        src.shift() ?? src[0],
+        TokenType.CloseParen,
+        { line: curPos.line, character: curPos.character } as Position,
+        { line: curPos.line, character: curPos.character } as Position
+      ));
+      curPos.advance();
     } else if (src[0] == "{") {
-      tokens.push(token(src.shift(), TokenType.OpenBrace));
+      tokens.push(new Token(
+        src.shift() ?? src[0],
+        TokenType.OpenBrace,
+        { line: curPos.line, character: curPos.character } as Position,
+        { line: curPos.line, character: curPos.character } as Position
+      ));
+      curPos.advance();
     } else if (src[0] == "}") {
-      tokens.push(token(src.shift(), TokenType.CloseBrace));
+      tokens.push(new Token(
+        src.shift() ?? src[0],
+        TokenType.CloseBrace,
+        { line: curPos.line, character: curPos.character } as Position,
+        { line: curPos.line, character: curPos.character } as Position
+      ));
+      curPos.advance();
     } else if (src[0] == "[") {
-      tokens.push(token(src.shift(), TokenType.OpenBracket));
+      tokens.push(new Token(
+        src.shift() ?? src[0],
+        TokenType.OpenBracket,
+        { line: curPos.line, character: curPos.character } as Position,
+        { line: curPos.line, character: curPos.character } as Position
+      ));
+      curPos.advance();
     } else if (src[0] == "]") {
-      tokens.push(token(src.shift(), TokenType.CloseBracket));
+      tokens.push(new Token(
+        src.shift() ?? src[0],
+        TokenType.CloseBracket,
+        { line: curPos.line, character: curPos.character } as Position,
+        { line: curPos.line, character: curPos.character } as Position
+      ));
+      curPos.advance();
     } // HANDLE BINARY OPERATORS
     else if (
       src[0] == "+" || src[0] == "-" || src[0] == "*" || src[0] == "/" ||
       src[0] == "%"
     ) {
-      tokens.push(token(src.shift(), TokenType.BinaryOperator));
+      tokens.push(new Token(
+        src.shift() ?? src[0],
+        TokenType.BinaryOperator,
+        { line: curPos.line, character: curPos.character } as Position,
+        { line: curPos.line, character: curPos.character } as Position
+      ));
+      curPos.advance();
     } // Handle Conditional & Assignment Tokens
     else if (src[0] == "=") {
-      tokens.push(token(src.shift(), TokenType.Assignment));
+      tokens.push(new Token(
+        src.shift() ?? src[0],
+        TokenType.Assignment,
+        { line: curPos.line, character: curPos.character } as Position,
+        { line: curPos.line, character: curPos.character } as Position
+      ));
+      curPos.advance();
     } else if (src[0] == ";") {
-      tokens.push(token(src.shift(), TokenType.Semicolon));
+      tokens.push(new Token(
+        src.shift() ?? src[0],
+        TokenType.Semicolon,
+        { line: curPos.line, character: curPos.character } as Position,
+        { line: curPos.line, character: curPos.character } as Position
+      ));
+      curPos.advance();
     } else if (src[0] == ":") {
       // Unsupported token
-      tokens.push(token(src.shift(), TokenType.Colon));
+      tokens.push(new Token(
+        src.shift() ?? src[0],
+        TokenType.Colon,
+        { line: curPos.line, character: curPos.character } as Position,
+        { line: curPos.line, character: curPos.character } as Position
+      ));
+      curPos.advance();
     } else if (src[0] == ",") {
-      tokens.push(token(src.shift(), TokenType.Comma));
+      tokens.push(new Token(
+        src.shift() ?? src[0],
+        TokenType.Comma,
+        { line: curPos.line, character: curPos.character } as Position,
+        { line: curPos.line, character: curPos.character } as Position  
+      ));
+      curPos.advance();
     } else if (src[0] == ".") {
-      tokens.push(token(src.shift(), TokenType.Dot));
+      tokens.push(new Token(
+        src.shift() ?? src[0],
+        TokenType.Dot,
+        { line: curPos.line, character: curPos.character } as Position,
+        { line: curPos.line, character: curPos.character } as Position
+      ));
+      curPos.advance();
     } else if(src[0] == "$") {
       // HANDLE GLOBAL/SYSTEM VAR IDENTIFIERS
       // Note: extendable sys variables can include hyphens but they have to be referenced as string literals
       // e.g. jitterbit.networking.http.request.header.content-type
 
+      // save begin position
+      beginPos = { line: curPos.line, character: curPos.character } as Position;
+      console.log('found $ at:', beginPos);
       // consume $
       let globalVar = src.shift() as string;
-
+      curPos.advance();
       // read global var name ident
       while(src.length > 0 && isGlobalVarChar(src[0])) {
         globalVar += src.shift();
+        curPos.advance();
       }
-      tokens.push(token(globalVar, TokenType.GlobalIdentifier));
+      tokens.push(new Token(
+        globalVar,
+        TokenType.GlobalIdentifier,
+        { line: beginPos.line, character: beginPos.character } as Position,
+        { line: curPos.line, character: curPos.character - 1 } as Position
+      ));
     } // HANDLE MULTICHARACTER KEYWORDS, TOKENS, IDENTIFIERS ETC...
     else {
+      // save begin position
+      beginPos = { line: curPos.line, character: curPos.character } as Position;
       // Handle numeric literals
       if (isNumber(src[0])) {
         let num = "";
@@ -358,22 +485,34 @@ export function tokenize(sourceCode: string): Token[] {
           if(isUnknown(src[0]))
             isUnk = true;
           num += src.shift();
+          curPos.advance();
         }
 
         // Add JB error:
         // 'Unknown token: <int-like literal>'
         if(isUnk) {
           console.error("Unknown token: ", num);
-          tokens.push(token(num, TokenType.UnknownToken));
+          tokens.push(new Token(
+            num,
+            TokenType.UnknownToken,
+            { line: beginPos.line, character: beginPos.character } as Position,
+            { line: curPos.line, character: curPos.character - 1 } as Position
+          ));
         }
         // push the integer
         else if(src[0] !== ".")
-          tokens.push(token(num, TokenType.Integer));
+          tokens.push(new Token(
+            num,
+            TokenType.Integer,
+            { line: beginPos.line, character: beginPos.character } as Position,
+            { line: curPos.line, character: curPos.character - 1 } as Position
+          ));
         // read the floating point part
         else if(src[0] === "."){
           // read the dot
           // <integer part>. literals are valid
           num += src.shift();
+          curPos.advance();
           // read the optional fraction part or undefined token
           if(isFloatlike(src[0])) {
             // handle 'Undefined token' JB error for numeric literals
@@ -382,21 +521,37 @@ export function tokenize(sourceCode: string): Token[] {
               if(isUndefined(src[0]))
                 isUndef = true;
               num += src.shift();
+              curPos.advance();
             }
 
             // Add JB error:
             // 'Undefined token: <float-like literal>'
             if(isUndef) {
               console.error("Undefined token: ", num);
-              tokens.push(token(num, TokenType.UnknownToken));
+              tokens.push(new Token(
+                num,
+                TokenType.UnknownToken,
+                { line: beginPos.line, character: beginPos.character } as Position,
+                { line: curPos.line, character: curPos.character - 1 } as Position
+              ));
             }
             else
-              tokens.push(token(num, TokenType.Float));
+              tokens.push(new Token(
+                num,
+                TokenType.Float,
+                { line: beginPos.line, character: beginPos.character } as Position,
+                { line: curPos.line, character: curPos.character - 1 } as Position
+              ));
           }
           // other known/defined token character found after <integer part>.
           // push as float token
           else
-            tokens.push(token(num, TokenType.Float));
+            tokens.push(new Token(
+              num,
+              TokenType.Float,
+              { line: beginPos.line, character: beginPos.character } as Position,
+              { line: curPos.line, character: curPos.character - 1 } as Position
+            ));
         }        
       } // Handle Identifier & Keyword Tokens.
       else if (isAlpha(src[0]) || src[0] === "_") {
@@ -409,6 +564,7 @@ export function tokenize(sourceCode: string): Token[] {
           )
         ) {
           ident += src.shift();
+          curPos.advance();
         }
 
         // to be yoinked
@@ -417,15 +573,30 @@ export function tokenize(sourceCode: string): Token[] {
         // If value is not undefined then the identifier is
         // recognized keyword
         if (typeof reserved == "number") {
-          tokens.push(token(ident, reserved));
+          tokens.push(new Token(
+            ident,
+            reserved,
+            { line: beginPos.line, character: beginPos.character } as Position,
+            { line: curPos.line, character: curPos.character - 1 } as Position
+          ));
         } else {
           // Unrecognized name must mean user defined symbol.
-          tokens.push(token(ident, TokenType.Identifier));
+          tokens.push(new Token(
+            ident,
+            TokenType.Identifier,
+            { line: beginPos.line, character: beginPos.character } as Position,
+            { line: curPos.line, character: curPos.character - 1 } as Position
+          ));
         }
       } else if (isSkippable(src[0])) {
         // Skip unneeded chars.
         src.shift();
-      } // Handle unrecognized characters.
+        curPos.advance();
+      } else if(isEOL(src[0])) {
+        src.shift();
+        curPos.nextLine();
+      }
+      // Handle unrecognized characters.
       // TODO: Implement better errors and error recovery.
       else {
         // only parse the unknown characters inside of the script scope
@@ -435,11 +606,17 @@ export function tokenize(sourceCode: string): Token[] {
             src[0].charCodeAt(0),
             src,
           );
-          tokens.push({ type: TokenType.EOF, value: "UnexpectedEndOfFile" });
+          tokens.push(new Token(
+            "UnexpectedEndOfFile",
+            TokenType.EOF,
+            { line: beginPos.line, character: beginPos.character } as Position,
+            { line: curPos.line, character: curPos.character - 1 } as Position
+          ));
         }
         // pre-scope unhandled characters
         else {
           src.shift();
+          curPos.advance();
         }
       }
     }

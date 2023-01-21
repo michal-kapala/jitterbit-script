@@ -18,7 +18,9 @@ import {
   VarDeclaration,
 } from "./ast";
 
-import { Token, tokenize, TokenType } from "./lexer";
+import { tokenize } from "./lexer";
+import Position from "./types/Position";
+import { Token, TokenType } from "./types/Token";
 
 /**
  * Frontend for producing a valid AST from source code.
@@ -66,7 +68,9 @@ export default class Parser {
   }
 
   public produceAST(sourceCode: string): Program {
-    this.tokens = tokenize(sourceCode);
+    // global current tokenizer position, starts at 1,1
+    let curPos = new Position();
+    this.tokens = tokenize(sourceCode, curPos);
 
     // find the evaluation scope - <trans>...</trans>
     let openIdx = null;
@@ -86,14 +90,15 @@ export default class Parser {
     if(openIdx === null) {
       // Add warning:
       // 'No <trans> tag, script returns its content as string.'
+      // pos 1,1
       console.log('Warning: No <trans> tag, script returns its content as string.');
       
       // return the script source as a string
-      // TODO: string literals
 
     } else if(closeIdx === null) {
       // Add JB error:
       // 'The expression <expr> is missing closing tag </trans>'
+      // curPos
       console.log("tokens:", JSON.stringify(this.tokens));
       console.log(`JB error: The expression is missing </trans> closing tag:\n${sourceCode}\n`);
     }
@@ -101,6 +106,7 @@ export default class Parser {
       if(openIdx !== 0) {
         // Add warning:
         // 'Script content before <trans> is not evaluated and may result in unexpected behaviour.'
+        // pos 1,1 - trans tag pos
         console.log("Warning: Script content before <trans> is not evaluated and may result in unexpected behaviour.");
 
         // Remove the front tail
@@ -113,6 +119,7 @@ export default class Parser {
         // Add warning:
         // 'Script content after </trans> is not evaluated and may result in unexpected behaviour.'
         // ignore the eof token
+        // </trans> pos - curPos
         if(closeIdx != this.tokens.length - 2)
           console.log("Warning: Script content after </trans> is not evaluated and may result in unexpected behaviour.");
 
@@ -127,7 +134,7 @@ export default class Parser {
       // Remove <trans> and </trans> then restore EOF into the evaluated token set
       this.tokens.shift();
       this.tokens.pop();
-      this.tokens.push({ type: TokenType.EOF, value: "EndOfFile" } as Token);
+      this.tokens.push(new Token("EndOfFile", TokenType.EOF, curPos, curPos));
 
       console.log("tokens:", JSON.stringify(this.tokens));
 
