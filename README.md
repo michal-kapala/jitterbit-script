@@ -51,8 +51,8 @@ The tables below shows the lexer's symbol support.
 
 | Symbol | jitterbit-interpreter | Jitterbit Studio |
 |---|---|---|
-| Integer        |  | ✔️ |
-| Float          |  | ✔️ |
+| Integer        | ✔️ | ✔️ |
+| Float          | ✔️ | ✔️ |
 | String         | ✔️ | ✔️ |
 | `true`/`false` | ✔️ | ✔️ |
 | `null`         | ❌ | ❌ |
@@ -89,8 +89,8 @@ The list of recognized operator tokens.
 | `=`   |  | ✔️ |
 | `+=`  |  | ✔️ |
 | `-=`  |  | ✔️ |
-| `*=`  |  | ❌ |
-| `/=`  |  | ❌ |
+| `*=`  | ❌ | ❌ |
+| `/=`  | ❌ | ❌ |
 
 #### Other binary operators
 
@@ -100,7 +100,7 @@ The list of recognized operator tokens.
 | `-`     |  | ✔️ |
 | `*`     |  | ✔️ |
 | `/`     |  | ✔️ |
-| `%`     |  | ❌ |
+| `%`     | ❌ | ❌ |
 | `&&`    |  | ✔️ |
 | `\|\|`    |  | ✔️ |
 
