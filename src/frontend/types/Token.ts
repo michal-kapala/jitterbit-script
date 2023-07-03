@@ -24,14 +24,42 @@ export enum TokenType {
   Dot,
   Colon,
   Semicolon,
-  OpenParen, // (
-  CloseParen, // )
-  OpenBrace, // {
-  CloseBrace, // }
-  OpenBracket, // [
-  CloseBracket, //]
-  EOF, // Signified the end of file
-  UnknownToken // Token parsing error
+  /**
+   * `(`
+   */
+  OpenParen,
+  /**
+   * `)`
+   */
+  CloseParen,
+  /**
+   * `{`
+   */
+  OpenBrace,
+  /**
+   * `{`
+   */
+  CloseBrace,
+  /**
+   * `[`
+   */
+  OpenBracket,
+  /**
+   * `]`
+   */
+  CloseBracket,
+  /**
+   * `%`
+   */
+  Percent,
+  /**
+   * End of file.
+   */
+  EOF,
+  /**
+   * Token parsing error.
+   */
+  UnknownToken 
 }
 
 /**

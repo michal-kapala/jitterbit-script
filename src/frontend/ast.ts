@@ -56,7 +56,7 @@ export interface AssignmentExpr extends Expr {
 /**
  * A operation with two sides seperated by a operator.
  * Both sides can be ANY Complex Expression.
- * - Supported Operators -> + | - | / | * | %
+ * - Supported Operators -> + | - | / | * | % (modulo unsupported by interpreter)
  * - Leftover operators -> <, >, <=, >=, ==, !=, &&, ||
  */
 export interface BinaryExpr extends Expr {

@@ -10,13 +10,11 @@ export function createGlobalScope() {
 export default class Scope {
   private parent?: Scope;
   private variables: Map<string, RuntimeVal>;
-  private constants: Set<string>;
 
   constructor(parentScope?: Scope) {
     const global = parentScope ? false : true;
     this.parent = parentScope;
     this.variables = new Map();
-    this.constants = new Set();
     if(global) {
       // Initialize static system variables
       systemVars.static.forEach((value) => {
@@ -49,31 +47,19 @@ export default class Scope {
     }
   }
 
-  public declareVar(
-    varname: string,
-    value: RuntimeVal,
-    constant: boolean,
-  ): RuntimeVal {
-    if (this.variables.has(varname)) {
-      throw `Cannot declare variable ${varname} as it already is defined.`;
-    }
-
+  public declareVar(varname: string, value: RuntimeVal): RuntimeVal {
     this.variables.set(varname, value);
-    if (constant) {
-      this.constants.add(varname);
-    }
     return value;
   }
 
   public assignVar(varname: string, value: RuntimeVal): RuntimeVal {
-    const scope = this.resolve(varname);
-
-    // Cannot assign to constant
-    if (scope.constants.has(varname)) {
-      throw `Cannot reassign to variable ${varname} as it was declared constant.`;
-    }
-
-    scope.variables.set(varname, value);
+    // global var assignment
+    if(varname[0] === "$")
+      this.getGlobal().variables.set(varname, value);
+    // local variable assignment (initial assignments are declarations)
+    else
+      this.variables.set(varname, value);
+    
     return value;
   }
 

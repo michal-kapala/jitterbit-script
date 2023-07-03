@@ -28,10 +28,12 @@ function eval_numeric_binary_expr(
   } else if (operator == "*") {
     result = lhs.value * rhs.value;
   } else if (operator == "/") {
-    // TODO: Division by zero checks
+    // Division by 0
+    if (rhs.value == 0)
+      throw "Division by 0"
     result = lhs.value / rhs.value;
   } else {
-    result = lhs.value % rhs.value;
+    throw `Unsupported operator ${operator}`
   }
 
   return { value: result, type: "number" };

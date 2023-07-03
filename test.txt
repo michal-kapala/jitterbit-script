@@ -1,7 +1,8 @@
 <trans>
   // user-defined system variable null-initialization test
-  let niceTokenLol = $jitterbit.api.request.headers.Authentication;
+  niceTokenLol = $jitterbit.api.request.headers.Authentication
   // default value-initialized system variable assigned to a global var
   $niceTokenLol = '$jitterbit.web_service_call.sync_response
   lol nice'
+  result = 4 - 5
 </trans>

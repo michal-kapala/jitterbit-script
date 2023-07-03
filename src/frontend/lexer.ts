@@ -30,14 +30,14 @@ function isAlpha(src: string): boolean {
  */
 // to be changed to support positioning (newline)
 function isSkippable(str: string): boolean {
-  return str == " " || str == "\t" || str == "\r";
+  return str === " " || str === "\t" || str === "\r";
 }
 
 /**
  * Returns true if the character is end of line character - `\n`.
  */
 function isEOL(str: string): boolean {
-  return str == "\n";
+  return str === "\n";
 }
 
 /**
@@ -155,14 +155,14 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
     // BEGIN PARSING MULTICHARACTER TOKENS - OPERATORS, TAGS, COMMENTS
 
     // SKIP DOUBLEDASH COMMENTS
-    if(src[0] == '/' && src[1] == '/') {
+    if(src[0] === '/' && src[1] === '/') {
       src.shift();
       curPos.advance();
 
       skippedChar = src.shift();
       curPos.advance();
 
-      while(skippedChar != '\n') {
+      while(skippedChar !== '\n') {
         skippedChar = src.shift();
         if(skippedChar === '\n')
           curPos.nextLine();
@@ -171,7 +171,7 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
       }
     }
     // SKIP MULTILINE COMMENTS
-    else if(src[0] == "/" && src[1] == "*") {
+    else if(src[0] === "/" && src[1] === "*") {
       src.shift();
       curPos.advance();
 
@@ -179,7 +179,7 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
       curPos.advance();
 
       currChar = src[0];
-      if(currChar == "/") {
+      if(currChar === "/") {
         // JB throws 'Unknown token */' if the first commented character
         // in a valid comment is a slash
         // 'self closing comment' problem
@@ -210,13 +210,13 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
     } else if(
       !transTagOpened &&
       src.length >= 7 &&
-      src[0] == "<" &&
-      src[1] == "t" &&
-      src[2] == "r" &&
-      src[3] == "a" &&
-      src[4] == "n" &&
-      src[5] == "s" &&
-      src[6] == ">"
+      src[0] === "<" &&
+      src[1] === "t" &&
+      src[2] === "r" &&
+      src[3] === "a" &&
+      src[4] === "n" &&
+      src[5] === "s" &&
+      src[6] === ">"
     ) {
       // save begin position
       beginPos = { line: curPos.line, character: curPos.character } as Position;
@@ -240,14 +240,14 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
     else if(
       !transTagClosed && transTagOpened &&
       src.length >= 8 &&
-      src[0] == "<" &&
-      src[1] == "/" &&
-      src[2] == "t" &&
-      src[3] == "r" &&
-      src[4] == "a" &&
-      src[5] == "n" &&
-      src[6] == "s" &&
-      src[7] == ">"
+      src[0] === "<" &&
+      src[1] === "/" &&
+      src[2] === "t" &&
+      src[3] === "r" &&
+      src[4] === "a" &&
+      src[5] === "n" &&
+      src[6] === "s" &&
+      src[7] === ">"
     ) {
       // save begin position
       beginPos = { line: curPos.line, character: curPos.character } as Position;
@@ -267,7 +267,7 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
       transTagClosed = true;
     }
     // STRINGS
-    else if(src[0] == "'") {
+    else if(src[0] === "'") {
       // save begin position
       beginPos = { line: curPos.line, character: curPos.character } as Position;
       // consume opening '
@@ -312,7 +312,7 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
         { line: curPos.line, character: curPos.character - 1 } as Position
       ));
     }
-    else if(src[0] == "\"") {
+    else if(src[0] === "\"") {
       // save begin position
       beginPos = { line: curPos.line, character: curPos.character } as Position;
       // consume opening "
@@ -349,7 +349,7 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
       ));
     }
     // BEGIN PARSING ONE CHARACTER TOKENS
-    else if (src[0] == "(") {
+    else if (src[0] === "(") {
       tokens.push(new Token(
         src.shift() ?? src[0],
         TokenType.OpenParen,
@@ -357,7 +357,7 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
         { line: curPos.line, character: curPos.character } as Position
       ));
       curPos.advance();
-    } else if (src[0] == ")") {
+    } else if (src[0] === ")") {
       tokens.push(new Token(
         src.shift() ?? src[0],
         TokenType.CloseParen,
@@ -365,7 +365,7 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
         { line: curPos.line, character: curPos.character } as Position
       ));
       curPos.advance();
-    } else if (src[0] == "{") {
+    } else if (src[0] === "{") {
       tokens.push(new Token(
         src.shift() ?? src[0],
         TokenType.OpenBrace,
@@ -373,7 +373,7 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
         { line: curPos.line, character: curPos.character } as Position
       ));
       curPos.advance();
-    } else if (src[0] == "}") {
+    } else if (src[0] === "}") {
       tokens.push(new Token(
         src.shift() ?? src[0],
         TokenType.CloseBrace,
@@ -381,7 +381,7 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
         { line: curPos.line, character: curPos.character } as Position
       ));
       curPos.advance();
-    } else if (src[0] == "[") {
+    } else if (src[0] === "[") {
       tokens.push(new Token(
         src.shift() ?? src[0],
         TokenType.OpenBracket,
@@ -389,7 +389,7 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
         { line: curPos.line, character: curPos.character } as Position
       ));
       curPos.advance();
-    } else if (src[0] == "]") {
+    } else if (src[0] === "]") {
       tokens.push(new Token(
         src.shift() ?? src[0],
         TokenType.CloseBracket,
@@ -399,8 +399,7 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
       curPos.advance();
     } // HANDLE BINARY OPERATORS
     else if (
-      src[0] == "+" || src[0] == "-" || src[0] == "*" || src[0] == "/" ||
-      src[0] == "%"
+      src[0] === "+" || src[0] === "-" || src[0] === "*" || src[0] === "/"
     ) {
       tokens.push(new Token(
         src.shift() ?? src[0],
@@ -410,7 +409,7 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
       ));
       curPos.advance();
     } // Handle Conditional & Assignment Tokens
-    else if (src[0] == "=") {
+    else if (src[0] === "=") {
       tokens.push(new Token(
         src.shift() ?? src[0],
         TokenType.Assignment,
@@ -418,7 +417,7 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
         { line: curPos.line, character: curPos.character } as Position
       ));
       curPos.advance();
-    } else if (src[0] == ";") {
+    } else if (src[0] === ";") {
       tokens.push(new Token(
         src.shift() ?? src[0],
         TokenType.Semicolon,
@@ -426,7 +425,7 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
         { line: curPos.line, character: curPos.character } as Position
       ));
       curPos.advance();
-    } else if (src[0] == ":") {
+    } else if (src[0] === ":") {
       // Unsupported token
       tokens.push(new Token(
         src.shift() ?? src[0],
@@ -435,7 +434,7 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
         { line: curPos.line, character: curPos.character } as Position
       ));
       curPos.advance();
-    } else if (src[0] == ",") {
+    } else if (src[0] === ",") {
       tokens.push(new Token(
         src.shift() ?? src[0],
         TokenType.Comma,
@@ -443,7 +442,7 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
         { line: curPos.line, character: curPos.character } as Position  
       ));
       curPos.advance();
-    } else if (src[0] == ".") {
+    } else if (src[0] === ".") {
       tokens.push(new Token(
         src.shift() ?? src[0],
         TokenType.Dot,
@@ -451,7 +450,15 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
         { line: curPos.line, character: curPos.character } as Position
       ));
       curPos.advance();
-    } else if(src[0] == "$") {
+    } else if (src[0] === "%") {
+      tokens.push(new Token(
+        src.shift() ?? src[0],
+        TokenType.Percent,
+        { line: curPos.line, character: curPos.character } as Position,
+        { line: curPos.line, character: curPos.character } as Position
+      ));
+      curPos.advance();
+    } else if(src[0] === "$") {
       // HANDLE GLOBAL/SYSTEM VAR IDENTIFIERS
       // Note: extendable sys variables can include hyphens but they have to be referenced as string literals
       // e.g. jitterbit.networking.http.request.header.content-type
@@ -612,6 +619,7 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
             { line: beginPos.line, character: beginPos.character } as Position,
             { line: curPos.line, character: curPos.character - 1 } as Position
           ));
+          return tokens;
         }
         // pre-scope unhandled characters
         else {

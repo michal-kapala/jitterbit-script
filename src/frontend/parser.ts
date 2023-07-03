@@ -151,10 +151,6 @@ export default class Parser {
   private parse_stmt(): Stmt {
     // skip to parse_expr
     switch (this.at().type) {
-      // to be removed
-      case TokenType.Let:
-      case TokenType.Const:
-        return this.parse_var_declaration();
       default:
         return this.parse_expr();
     }
@@ -285,9 +281,8 @@ export default class Parser {
   private parse_multiplicitave_expr(): Expr {
     let left = this.parse_call_member_expr();
 
-    // to be changed: modulo operator is unsupported
     while (
-      this.at().value == "/" || this.at().value == "*" || this.at().value == "%"
+      this.at().value === "/" || this.at().value === "*" || this.at().value === "%"
     ) {
       const operator = this.consume().value;
       const right = this.parse_call_member_expr();
