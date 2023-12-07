@@ -15,6 +15,7 @@ import {
   Property,
   Stmt,
   StringLiteral,
+  UnaryExpr,
   VarDeclaration,
 } from "./ast";
 
@@ -43,7 +44,7 @@ export default class Parser {
   }
 
   /**
-   * Returns the previous token and then advances the tokens array to the next value.
+   * Advances the tokens array to the next value and returns the removed one.
    */
   private consume() {
     const prev = this.tokens.shift() as Token;
@@ -52,12 +53,12 @@ export default class Parser {
 
   /**
    *  Returns the previous token and then advances the tokens array to the next value.
-   *  Also checks the type of expected token and throws if the values dnot match.
+   *  Also checks the type of expected token and throws if the values dont match.
    */
   private expect(type: TokenType, err: any) {
     const prev = this.tokens.shift() as Token;
     if (!prev || prev.type != type) {
-      console.error("Parser Error:\n", err, prev, " - Expecting: ", type);
+      console.error("ParserError:\n", err, prev, " - Expecting: ", type);
       return {
         type: prev ? prev.type : TokenType.UnknownToken,
         value: prev ? prev.value : null
@@ -115,12 +116,12 @@ export default class Parser {
         }
       }
 
-      if(closeIdx != this.tokens.length - 1) {
+      if(closeIdx !== this.tokens.length - 1) {
         // Add warning:
         // 'Script content after </trans> is not evaluated and may result in unexpected behaviour.'
         // ignore the eof token
         // </trans> pos - curPos
-        if(closeIdx != this.tokens.length - 2)
+        if(closeIdx !== this.tokens.length - 2)
           console.log("Warning: Script content after </trans> is not evaluated and may result in unexpected behaviour.");
 
         // Remove the back tail
@@ -136,15 +137,29 @@ export default class Parser {
       this.tokens.pop();
       this.tokens.push(new Token("EndOfFile", TokenType.EOF, curPos, curPos));
 
-      console.log("tokens:", JSON.stringify(this.tokens));
+      this.printTokens();
 
       // Parse until end of file
       while (this.not_eof()) {
         program.body.push(this.parse_stmt());
+
+        // top-level statement/expression semicolon
+        // the last expression can have the semicolon dropped
+        if(this.not_eof()) {
+          this.expect(
+            TokenType.Semicolon,
+            "Expected semicolon before:"
+          );
+        }
       }
     }
 
     return program;
+  }
+
+  private printTokens() {
+    for (const tkn of this.tokens)
+      console.log(`{ '${tkn.value}', ${TokenType[tkn.type]} }`);
   }
 
   // Handle complex statement types
@@ -207,9 +222,14 @@ export default class Parser {
     const left = this.parse_object_expr();
 
     if (this.at().type == TokenType.Assignment) {
-      this.consume(); // advance past equals
+      let operator = this.consume(); // advance past equals
       const value = this.parse_assignment_expr();
-      return { value, assignee: left, kind: "AssignmentExpr" } as AssignmentExpr;
+      return { 
+        value,
+        assignee: left,
+        kind: "AssignmentExpr",
+        operator
+      } as AssignmentExpr;
     }
 
     return left;
@@ -218,7 +238,7 @@ export default class Parser {
   private parse_object_expr(): Expr {
     // { Prop[] }
     if (this.at().type !== TokenType.OpenBrace) {
-      return this.parse_additive_expr();
+      return this.parse_logical_expr();
     }
 
     this.consume(); // advance past open brace.
@@ -259,13 +279,55 @@ export default class Parser {
     return { kind: "ObjectLiteral", properties } as ObjectLiteral;
   }
 
+  /**
+   * Parses logical operator expressions.
+   * @returns
+   */
+  private parse_logical_expr(): Expr {
+      // binary expr
+      let left = this.parse_comparative_expr();
+      while(this.at().type === TokenType.LogicalOperator) {
+        const operator = this.consume().value;
+        const right = this.parse_comparative_expr();
+
+        left = {
+          kind: "BinaryExpr",
+          left,
+          right,
+          operator,
+        } as BinaryExpr;
+      }
+
+      return left;
+  }
+
+  /**
+   * Parses conditional operator expressions.
+   * @returns 
+   */
+  private parse_comparative_expr(): Expr {
+    let left = this.parse_additive_expr();
+    while (this.at().type === TokenType.ComparisonOperator) {
+      const operator = this.consume().value;
+      const right = this.parse_additive_expr();
+      left = {
+        kind: "BinaryExpr",
+        left,
+        right,
+        operator,
+      } as BinaryExpr;
+    }
+
+    return left;
+  }
+
   // Handle Addition & Subtraction Operations
   private parse_additive_expr(): Expr {
-    let left = this.parse_multiplicitave_expr();
+    let left = this.parse_multiplicative_expr();
 
-    while (this.at().value == "+" || this.at().value == "-") {
+    while (this.at().value === "+" || this.at().value === "-") {
       const operator = this.consume().value;
-      const right = this.parse_multiplicitave_expr();
+      const right = this.parse_multiplicative_expr();
       left = {
         kind: "BinaryExpr",
         left,
@@ -278,14 +340,14 @@ export default class Parser {
   }
 
   // Handle Multiplication, Division & Modulo Operations
-  private parse_multiplicitave_expr(): Expr {
-    let left = this.parse_call_member_expr();
+  private parse_multiplicative_expr(): Expr {
+    let left = this.parse_negation_expr();
 
     while (
       this.at().value === "/" || this.at().value === "*" || this.at().value === "%"
     ) {
       const operator = this.consume().value;
-      const right = this.parse_call_member_expr();
+      const right = this.parse_negation_expr();
       left = {
         kind: "BinaryExpr",
         left,
@@ -295,6 +357,75 @@ export default class Parser {
     }
 
     return left;
+  }
+
+  // !(a || b)
+  private parse_negation_expr(): Expr {
+    // LHS unary operator expr
+    // for some reason Jitterbit dont parse this with other unary expressions
+    if(this.at().value === "!") {
+      let operator = this.consume().value;
+      return {
+        kind: "UnaryExpr",
+        // could be parse_object_expr() as assignments cant be negated directly (like any other binary expr)
+        value: this.parse_assignment_expr(),
+        operator,
+        lhs: true
+      } as UnaryExpr;
+    } else {
+      return this.parse_power_expr();
+    }
+  }
+
+  // 3 ^ 4
+  private parse_power_expr(): Expr {
+    let left = this.parse_unary_expr();
+
+    while (this.at().value === "^") {
+      const operator = this.consume().value;
+      const right = this.parse_unary_expr();
+      left = {
+        kind: "BinaryExpr",
+        left,
+        right,
+        operator,
+      } as BinaryExpr;
+    }
+
+    return left;
+  }
+
+  // ++a, b--
+  private parse_unary_expr(): Expr {
+    // LHS operators (pre-)
+    // -x, --x, ++x
+    if(
+      this.at().type === TokenType.UnaryOperator ||
+      this.at().type === TokenType.Minus
+    ) {
+      const operator = this.consume().value;
+      return {
+        kind: "UnaryExpr",
+        value: this.parse_call_member_expr(),
+        operator,
+        lhs: true
+      } as UnaryExpr;
+    } else {
+      // RHS operators (post-)
+      let left = this.parse_call_member_expr();
+
+      if(this.at().value === "++" || this.at().value === "--") {
+        const operator = this.consume().value;
+        left = {
+          kind: "UnaryExpr",
+          value: left,
+          operator,
+          lhs: false
+        } as UnaryExpr;
+      }
+      
+      return left;
+    }
   }
 
   // foo.x()()
@@ -386,8 +517,13 @@ export default class Parser {
   // Orders Of Precedence
   // Assignment
   // Object
+  // LogicalExpr
+  // ComparativeExpr
   // AdditiveExpr
   // MultiplicitaveExpr
+  // NegationExpr
+  // PowerExpr
+  // UnaryExpr
   // Call
   // Member
   // PrimaryExpr

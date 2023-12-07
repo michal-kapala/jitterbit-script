@@ -69,3 +69,69 @@ export interface CallVal extends RuntimeVal {
   // 'ObjectVal' to be changed to array type
   result: NullVal | BooleanVal | NumberVal | ObjectVal | StringVal;
 }
+
+/**
+ * Performs Jitterbit's string2number conversion (float-based).
+ * 
+ * If there's a number at the beginning of the string, Jitterbit truncates the string and tries to parse the longest possible number literal.
+ * When successful, the value is returned, otherwise returns 0.
+ * @param strVal 
+ * @returns 
+ */
+export function jbStringToNumber(strVal: StringVal): number {
+  // regular strings evaluate to 0, e.g. 0 == "abcd1234"
+  // strings beginning with a parsable number are truncated and parsed
+  // for example the below expressions return true:
+  // 1234 == "1234abcd5"
+  // -0.8 == "-.8abc.-.5"
+  const pattern = /^(-{0,1}[0-9]|\.)+/g;
+  const matches = strVal.value.match(pattern);
+  
+  // regular strings evaluate to 0, e.g. 0 == "abcd1234" is true
+  if(matches === null) {
+    return 0;
+  }
+
+  // always parsable
+  return parseFloat(matches[0]);
+}
+
+/**
+ * Performs Jitterbit's string2bool conversion.
+ * @param strVal 
+ * @returns 
+ */
+export function jbStringToBool(strVal: StringVal): boolean {
+  let parseResult = parseFloat(strVal.value);
+  return (!Number.isNaN(parseResult) && parseResult !== 0) || strVal.value === "true";
+}
+
+/**
+ * Performs Jitterbit's string2bool and bool2int conversions to evaluate <, >, <= and >= cross-type binary expressions.
+ * 
+ * `strVal` is always LHS.
+ * 
+ * In lt/gt comparisons, Jitterbit evaluates "true" string to `false`, as well as negative numbers and fractions.
+ * @param strVal 
+ * @param boolVal
+ * @returns 
+ */
+export function jbCompareStringToBool(strVal: StringVal, operator: string, boolVal: BooleanVal): boolean {
+  let parseResult = parseFloat(strVal.value);
+  let strBoolVal = !Number.isNaN(parseResult) && parseResult >= 1;
+  let strIntVal = strBoolVal ? 1 : 0;
+  let boolIntVal = boolVal.value ? 1: 0;
+
+  switch(operator) {
+    case "<":
+      return strIntVal < boolIntVal;
+    case ">":
+      return strIntVal > boolIntVal;
+    case "<=":
+      return strIntVal <= boolIntVal;
+    case ">=":
+      return strIntVal >= boolIntVal;
+    default:
+      throw `[jbCompareStringToBool] Unsupported operator ${operator}`;
+  } 
+}

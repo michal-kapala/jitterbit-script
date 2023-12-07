@@ -1,8 +1,9 @@
 <trans>
   // user-defined system variable null-initialization test
-  niceTokenLol = $jitterbit.api.request.headers.Authentication
+  niceTokenLol = $jitterbit.api.request.headers.Authentication;
   // default value-initialized system variable assigned to a global var
-  $niceTokenLol = '$jitterbit.web_service_call.sync_response
-  lol nice'
-  result = 4 - 5
+  $niceTokenLol = '$jitterbit.web_service_call.sync_response;
+  lol nice';
+  $a = "-69.69gdkfdkn5345njkdfg.";
+  b = ++$a;
 </trans>

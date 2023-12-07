@@ -3,6 +3,8 @@
 // ---     Defines the structure of our languages AST      ---
 // -----------------------------------------------------------
 
+import { Token } from "./types/Token";
+
 export type NodeType =
   // STATEMENTS
   | "Program"
@@ -11,6 +13,8 @@ export type NodeType =
   | "AssignmentExpr"
   | "MemberExpr"
   | "CallExpr"
+  | "BinaryExpr"
+  | "UnaryExpr"
   // Literals
   | "Property"
   | "ObjectLiteral"
@@ -18,8 +22,7 @@ export type NodeType =
   | "StringLiteral"
   | "BooleanLiteral"
   | "Identifier"
-  | "GlobalIdentifier"
-  | "BinaryExpr";
+  | "GlobalIdentifier";
 
 /**
  * Statements do not result in a value at runtime.
@@ -51,6 +54,7 @@ export interface AssignmentExpr extends Expr {
   kind: "AssignmentExpr";
   assignee: Expr;
   value: Expr;
+  operator: Token;
 }
 
 /**
@@ -138,4 +142,11 @@ export interface StringLiteral extends Expr {
 export interface BooleanLiteral extends Expr {
   kind: "BooleanLiteral",
   value: boolean
+}
+
+export interface UnaryExpr extends Expr {
+  kind: "UnaryExpr",
+  value: Expr,
+  operator: string,
+  lhs: boolean
 }

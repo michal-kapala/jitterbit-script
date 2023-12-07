@@ -399,65 +399,99 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
       curPos.advance();
     } // HANDLE BINARY OPERATORS
     else if (
-      src[0] === "+" || src[0] === "-" || src[0] === "*" || src[0] === "/"
+      src[0] === "+" || 
+      src[0] === "-" ||
+      src[0] === "*" ||
+      src[0] === "/"
     ) {
-      tokens.push(new Token(
-        src.shift() ?? src[0],
-        TokenType.BinaryOperator,
-        { line: curPos.line, character: curPos.character } as Position,
-        { line: curPos.line, character: curPos.character } as Position
-      ));
-      curPos.advance();
+      // ++, --
+      if(
+        src.length >= 2 &&
+        ((src[0] === "+" && src[1] === "+") || (src[0] === "-" && src[1] === "-"))
+      ) {
+        let operator = src.shift() ?? src[0];
+        operator += src.shift() ?? src[1];
+        addToken(tokens, operator, TokenType.UnaryOperator, curPos);
+      } else if(
+        // +=, -=
+        src.length >= 2 &&
+        ((src[0] === "+" && src[1] === "=") || (src[0] === "-" && src[1] === "="))
+      ) {
+        let operator = src.shift() ?? src[0];
+        operator += src.shift() ?? src[1];
+        addToken(tokens, operator, TokenType.Assignment, curPos);
+      } else {
+        src[0] === "-"
+          ? addToken(tokens, src.shift() ?? src[0], TokenType.Minus, curPos)
+          : addToken(tokens, src.shift() ?? src[0], TokenType.MathOperator, curPos);
+      }
+      
+    } else if (src[0] === "<" || src[0] === ">") {
+      // <= or >=
+      if (src.length >= 2 && src[1] === "=") {
+        let operator = (src.shift() ?? src[0]);
+        operator += (src.shift() ?? src[1]);
+        addToken(tokens, operator, TokenType.ComparisonOperator, curPos);
+      } else {
+        addToken(tokens, src.shift() ?? src[0], TokenType.ComparisonOperator, curPos);
+      }
     } // Handle Conditional & Assignment Tokens
     else if (src[0] === "=") {
-      tokens.push(new Token(
-        src.shift() ?? src[0],
-        TokenType.Assignment,
-        { line: curPos.line, character: curPos.character } as Position,
-        { line: curPos.line, character: curPos.character } as Position
-      ));
-      curPos.advance();
+      // ==
+      if(src.length >= 2 && src[1] === "=") {
+        let operator = src.shift() ?? src[0];
+        operator += src.shift() ?? src[1]
+        addToken(tokens, operator, TokenType.ComparisonOperator, curPos);
+      } else {
+        addToken(tokens, src.shift() ?? src[0], TokenType.Assignment, curPos);
+      }
+    } else if (src[0] === "&") {
+      let operator: string;
+      // &&
+      if(src.length >= 2 && src[1] === "&") {
+         operator = src.shift() ?? src[0]
+         operator += src.shift() ?? src[1]
+         addToken(tokens, operator, TokenType.LogicalOperator, curPos);
+      } else {
+        // & is an alias for && (logical AND)
+        operator = src.shift() ?? src[0]
+        addToken(tokens, operator, TokenType.LogicalOperator, curPos);
+      }
+    } else if (src[0] === "|") {
+      let operator: string;
+      // &&
+      if(src.length >= 2 && src[1] === "|") {
+         operator = src.shift() ?? src[0]
+         operator += src.shift() ?? src[1]
+         addToken(tokens, operator, TokenType.LogicalOperator, curPos);
+      } else {
+        // | is an alias for || (logical OR)
+        operator = src.shift() ?? src[0]
+        addToken(tokens, operator, TokenType.LogicalOperator, curPos);
+      }
     } else if (src[0] === ";") {
-      tokens.push(new Token(
-        src.shift() ?? src[0],
-        TokenType.Semicolon,
-        { line: curPos.line, character: curPos.character } as Position,
-        { line: curPos.line, character: curPos.character } as Position
-      ));
-      curPos.advance();
+      addToken(tokens, src.shift() ?? src[0], TokenType.Semicolon, curPos);
     } else if (src[0] === ":") {
       // Unsupported token
-      tokens.push(new Token(
-        src.shift() ?? src[0],
-        TokenType.Colon,
-        { line: curPos.line, character: curPos.character } as Position,
-        { line: curPos.line, character: curPos.character } as Position
-      ));
-      curPos.advance();
+      addToken(tokens, src.shift() ?? src[0], TokenType.Colon, curPos);
     } else if (src[0] === ",") {
-      tokens.push(new Token(
-        src.shift() ?? src[0],
-        TokenType.Comma,
-        { line: curPos.line, character: curPos.character } as Position,
-        { line: curPos.line, character: curPos.character } as Position  
-      ));
-      curPos.advance();
+      addToken(tokens, src.shift() ?? src[0], TokenType.Comma, curPos);
     } else if (src[0] === ".") {
-      tokens.push(new Token(
-        src.shift() ?? src[0],
-        TokenType.Dot,
-        { line: curPos.line, character: curPos.character } as Position,
-        { line: curPos.line, character: curPos.character } as Position
-      ));
-      curPos.advance();
+      addToken(tokens, src.shift() ?? src[0], TokenType.Dot, curPos);
+    } else if (src[0] === "^") {
+      addToken(tokens, src.shift() ?? src[0], TokenType.MathOperator, curPos);
     } else if (src[0] === "%") {
-      tokens.push(new Token(
-        src.shift() ?? src[0],
-        TokenType.Percent,
-        { line: curPos.line, character: curPos.character } as Position,
-        { line: curPos.line, character: curPos.character } as Position
-      ));
-      curPos.advance();
+      // Unsupported token
+      addToken(tokens, src.shift() ?? src[0], TokenType.Percent, curPos);
+    } else if(src[0] === "!") {
+      // !=
+      if(src.length >= 2 && src[1] === "=") {
+        let operator = src.shift() ?? src[0];
+        operator += src.shift() ?? src[1];
+        addToken(tokens, operator, TokenType.ComparisonOperator, curPos);
+      } else {
+        addToken(tokens, src.shift() ?? src[0], TokenType.UnaryOperator, curPos);
+      }
     } else if(src[0] === "$") {
       // HANDLE GLOBAL/SYSTEM VAR IDENTIFIERS
       // Note: extendable sys variables can include hyphens but they have to be referenced as string literals
@@ -465,7 +499,6 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
 
       // save begin position
       beginPos = { line: curPos.line, character: curPos.character } as Position;
-      console.log('found $ at:', beginPos);
       // consume $
       let globalVar = src.shift() as string;
       curPos.advance();
@@ -631,4 +664,33 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
   }
 
   return tokens;
+}
+
+/**
+ * Replaces Minus token types with either UnaryOperator or BinaryOperator based on context.
+ */
+// export function replaceMinus(tokens: Token[]): Token[] {
+//   for(let idx = 0; idx < tokens.length; idx++)  {
+
+//   }
+// }
+
+/**
+ * Appends a token to `tokens` and updates the current position.
+ * @param tokens 
+ * @param value 
+ * @param type 
+ * @param curPos 
+ */
+function addToken(tokens: Token[], value: string, type: TokenType, curPos: Position) {
+  tokens.push(new Token(
+    value,
+    type,
+    { line: curPos.line, character: curPos.character } as Position,
+    { line: curPos.line, character: curPos.character + value.length - 1 } as Position
+  ));
+
+  for(let i = 0; i< value.length; i++) {
+    curPos.advance();
+  }
 }

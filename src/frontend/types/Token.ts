@@ -18,8 +18,16 @@ export enum TokenType {
   True,
   False,
   // Grouping * Operators
-  BinaryOperator,
+  MathOperator,
+  ComparisonOperator,
+  LogicalOperator,
   Assignment,
+  // Other
+  UnaryOperator,
+  /**
+   * `-` (either a unary or binary operator).
+   */
+  Minus,
   Comma,
   Dot,
   Colon,

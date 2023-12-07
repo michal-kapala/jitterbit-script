@@ -1,7 +1,7 @@
 # Overview
 This is an experimental standalone community interpreter shell for [Jitterbit Script Language](https://success.jitterbit.com/design-studio/design-studio-reference/scripts/jitterbit-script-language/) created for dedicated [LSP server](https://github.com/michal-kapala/vscode-jitterbit). It aims to provide editor support for Jitterbit Script outside of proprietary [Jitterbit Studio (Jitterbit Harmony Design Studio)](https://success.jitterbit.com/design-studio/) and extend the script-scoped error handling.
  
- This repo is a fork of [tlaceby/guide-to-interpreters-series](https://github.com/tlaceby/guide-to-interpreters-series).
+This repo is a fork of [tlaceby/guide-to-interpreters-series](https://github.com/tlaceby/guide-to-interpreters-series).
  
 <table>
   <tr>
@@ -57,14 +57,6 @@ The tables below shows the lexer's symbol support.
 | `true`/`false` | ✔️ | ✔️ |
 | `null`         | ❌ | ❌ |
 
-
-#### Objects
-
-| Symbol | jitterbit-interpreter | Jitterbit Studio |
-|----|---|---|
-| `{}` |  | ✔️ |
-| `[]` |  | ✔️ |
-
 ### Keywords
 As of current version, no keywords are supported by Jitterbit Script Language. Control statements like branching and loops are implemented as [Logical Functions](https://success.jitterbit.com/design-studio/design-studio-reference/formula-builder/logical-functions/).
 
@@ -75,61 +67,62 @@ The list of recognized operator tokens.
 
 | Symbol | jitterbit-interpreter | Jitterbit Studio |
 |-----|---|---|
-| `<`   |  | ✔️ |
-| `>`   |  | ✔️ |
-| `<=`  |  | ✔️ |
-| `>=`  |  | ✔️ |
-| `==`  |  | ✔️ |
-| `!=`  |  | ✔️ |
+| `<`   | ✔️ | ✔️ |
+| `>`   | ✔️ | ✔️ |
+| `<=`  | ✔️ | ✔️ |
+| `>=`  | ✔️ | ✔️ |
+| `==`  | ✔️ | ✔️ |
+| `!=`  | ✔️ | ✔️ |
 
 #### Assignment
 
 | Symbol | jitterbit-interpreter | Jitterbit Studio |
 |-----|---|---|
-| `=`   |  | ✔️ |
-| `+=`  |  | ✔️ |
-| `-=`  |  | ✔️ |
+| `=`   | ✔️ | ✔️ |
+| `+=`  | ✔️ | ✔️ |
+| `-=`  | ✔️ | ✔️ |
 | `*=`  | ❌ | ❌ |
 | `/=`  | ❌ | ❌ |
+| `^=`  | ❌ | ❌ |
 
 #### Other binary operators
 
 | Symbol | jitterbit-interpreter | Jitterbit Studio |
 |-------|---|---|
-| `+`     |  | ✔️ |
-| `-`     |  | ✔️ |
-| `*`     |  | ✔️ |
-| `/`     |  | ✔️ |
+| `+`     | ✔️ | ✔️ |
+| `-`     | ✔️ | ✔️ |
+| `*`     | ✔️ | ✔️ |
+| `/`     | ✔️ | ✔️ |
+| `^`     | ✔️ | ✔️ |
 | `%`     | ❌ | ❌ |
-| `&&`    |  | ✔️ |
-| `\|\|`    |  | ✔️ |
+| `&&`/`&`    | ✔️ | ✔️ |
+| `\|\|`/`\|`    | ✔️ | ✔️ |
 
 #### Unary
 
 | Symbol | jitterbit-interpreter | Jitterbit Studio |
 |----|---|---|
-| `!`  |  | ✔️ |
-| `++` |  | ✔️ |
-| `--` |  | ✔️ |
+| `!`  | ✔️ | ✔️ |
+| `-`  | ✔️ | ✔️ |
+| `++` | ✔️ | ✔️ |
+| `--` | ✔️ | ✔️ |
 
+#### Objects
 
-## Statements/Expressions
+| Symbol | jitterbit-interpreter | Jitterbit Studio |
+|----|---|---|
+| `{}` |  | ✔️ |
+| `[]` |  | ✔️ |
+
+## Other expressions
 
 The list of statements and expressions supported by the interpreter.
 
 | Expr | jitterbit-interpreter | Jitterbit Studio |
 |---|---|---|
 | `<trans></trans>`  | ✔️ | ✔️ |
-| `()`                 |  | ✔️ |
-| `[]`                 |  | ✔️ |
-| Simple expressions   |  | ✔️ |
-| Assignments          |  | ✔️ |
+| `()`                 | ✔️ | ✔️ |
 | Function calls       |  | ✔️ |
-| Preincrementation    |  | ✔️ |
-| Postincrementation   |  | ✔️ |
-| Predecrementation    |  | ✔️ |
-| Postdecrementation   |  | ✔️ |
-| Logical              |  | ✔️ |
 
 ## APIs
 
