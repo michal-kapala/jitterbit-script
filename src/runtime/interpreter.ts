@@ -11,18 +11,21 @@ import {
   Stmt,
   StringLiteral,
   UnaryExpr,
-  VarDeclaration,
 } from "../frontend/ast";
 import Scope from "./scope";
-import { eval_program, eval_var_declaration } from "./eval/statements";
-import {
-  eval_assignment_expr,
-  eval_binary_expr,
-  eval_identifier,
-  eval_object_expr,
-  eval_unary_expr,
-} from "./eval/expressions";
+import { eval_program } from "./eval/statements";
+import { eval_assignment_expr } from "./eval/expressions/assignment";
+import { eval_binary_expr } from "./eval/expressions/binary";
+import { eval_identifier } from "./eval/expressions/identifier";
+import { eval_object_expr } from "./eval/expressions/object";
+import { eval_unary_expr } from "./eval/expressions/unary";
 
+/**
+ * Evaluates a statement or expression.
+ * @param astNode `Stmt` or `Expr`
+ * @param scope the current scope
+ * @returns 
+ */
 export function evaluate(astNode: Stmt, scope: Scope): RuntimeVal {
   switch (astNode.kind) {
     // handles both integer and float literals
@@ -57,14 +60,10 @@ export function evaluate(astNode: Stmt, scope: Scope): RuntimeVal {
       return eval_assignment_expr(astNode as AssignmentExpr, scope);
     case "BinaryExpr":
       return eval_binary_expr(astNode as BinaryExpr, scope);
-    case "Program":
-      return eval_program(astNode as Program, scope);
-    // Handle statements
-    case "VarDeclaration":
-      return eval_var_declaration(astNode as VarDeclaration, scope);
     case "UnaryExpr":
       return eval_unary_expr(astNode as UnaryExpr, scope);
-    // Handle unimplimented ast types as error.
+    case "Program":
+      return eval_program(astNode as Program, scope);
     default:
       console.error(
         "This AST Node has not yet been setup for interpretation.",

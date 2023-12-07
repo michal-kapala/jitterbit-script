@@ -8,7 +8,6 @@ import { Token } from "./types/Token";
 export type NodeType =
   // STATEMENTS
   | "Program"
-  | "VarDeclaration"
   // EXPRESSIONS
   | "AssignmentExpr"
   | "MemberExpr"
@@ -40,14 +39,7 @@ export interface Program extends Stmt {
   body: Stmt[];
 }
 
-export interface VarDeclaration extends Stmt {
-  kind: "VarDeclaration";
-  constant: boolean;
-  identifier: string;
-  value?: Expr;
-}
-
-/**  Expressions will result in a value at runtime unlike Statements */
+/**  Expressions result in a value at runtime unlike statements.*/
 export interface Expr extends Stmt {}
 
 export interface AssignmentExpr extends Expr {
@@ -58,10 +50,7 @@ export interface AssignmentExpr extends Expr {
 }
 
 /**
- * A operation with two sides seperated by a operator.
- * Both sides can be ANY Complex Expression.
- * - Supported Operators -> + | - | / | * | % (modulo unsupported by interpreter)
- * - Leftover operators -> <, >, <=, >=, ==, !=, &&, ||
+ * Expressions with LHS/RHS operands and a binary operator.
  */
 export interface BinaryExpr extends Expr {
   kind: "BinaryExpr";

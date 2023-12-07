@@ -7,12 +7,8 @@ import { Token, TokenType } from "./types/Token";
 
 /**
  * Constant lookup for keywords and known identifiers + symbols.
- * 
- * Var types to be yoinked.
  */
 const KEYWORDS: Record<string, TokenType> = {
-  let: TokenType.Let,
-  const: TokenType.Const,
   true: TokenType.True,
   false: TokenType.False,
 };
@@ -131,11 +127,8 @@ function resolve_escaped(escChar: string): string {
 }
 
 /**
- * Given a string representing source code: Produce tokens and handles
+ * Given a string representing source code, produces tokens and handles
  * possible unidentified characters.
- *
- * - Returns an array of tokens.
- * - Does not modify the incoming string.
  */
 export function tokenize(sourceCode: string, curPos: Position): Token[] {
   const tokens = new Array<Token>();
@@ -607,11 +600,8 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
           curPos.advance();
         }
 
-        // to be yoinked
-        // CHECK FOR RESERVED KEYWORDS
+        // keywords
         const reserved = KEYWORDS[ident];
-        // If value is not undefined then the identifier is
-        // recognized keyword
         if (typeof reserved == "number") {
           tokens.push(new Token(
             ident,
@@ -620,7 +610,7 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
             { line: curPos.line, character: curPos.character - 1 } as Position
           ));
         } else {
-          // Unrecognized name must mean user defined symbol.
+          // identifiers
           tokens.push(new Token(
             ident,
             TokenType.Identifier,
@@ -629,7 +619,6 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
           ));
         }
       } else if (isSkippable(src[0])) {
-        // Skip unneeded chars.
         src.shift();
         curPos.advance();
       } else if(isEOL(src[0])) {
@@ -665,15 +654,6 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
 
   return tokens;
 }
-
-/**
- * Replaces Minus token types with either UnaryOperator or BinaryOperator based on context.
- */
-// export function replaceMinus(tokens: Token[]): Token[] {
-//   for(let idx = 0; idx < tokens.length; idx++)  {
-
-//   }
-// }
 
 /**
  * Appends a token to `tokens` and updates the current position.

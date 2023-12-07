@@ -16,7 +16,6 @@ import {
   Stmt,
   StringLiteral,
   UnaryExpr,
-  VarDeclaration,
 } from "./ast";
 
 import { tokenize } from "./lexer";
@@ -169,48 +168,6 @@ export default class Parser {
       default:
         return this.parse_expr();
     }
-  }
-
-  // LET IDENT;
-  // ( LET | CONST ) IDENT = EXPR;
-  parse_var_declaration(): Stmt {
-    const isConstant = this.consume().type == TokenType.Const;
-    const identifier = this.expect(
-      TokenType.Identifier,
-      "Expected identifier name following let | const keywords.",
-    ).value;
-
-    if (this.at().type == TokenType.Semicolon) {
-      this.consume(); // expect semicolon
-      if (isConstant) {
-        throw "Must assign a value to constant expression. No value provided.";
-      }
-
-      return {
-        kind: "VarDeclaration",
-        identifier,
-        constant: false,
-      } as VarDeclaration;
-    }
-
-    this.expect(
-      TokenType.Assignment,
-      "Expected equals token following identifier in var declaration.",
-    );
-
-    const declaration = {
-      kind: "VarDeclaration",
-      value: this.parse_expr(),
-      identifier,
-      constant: isConstant,
-    } as VarDeclaration;
-
-    this.expect(
-      TokenType.Semicolon,
-      "Variable declaration statement must end with semicolon.",
-    );
-
-    return declaration;
   }
 
   // Handle expressions
@@ -514,21 +471,21 @@ export default class Parser {
     return object;
   }
 
-  // Orders Of Precedence
+  // Expression precedence (lowest to highest):
   // Assignment
   // Object
-  // LogicalExpr
-  // ComparativeExpr
-  // AdditiveExpr
-  // MultiplicitaveExpr
-  // NegationExpr
-  // PowerExpr
-  // UnaryExpr
+  // Logical
+  // Comparative
+  // Additive
+  // Multiplicitave
+  // Negation
+  // Power
+  // Unary
   // Call
   // Member
-  // PrimaryExpr
+  // Primary
 
-  // Parse Literal Values & Grouping Expressions
+  // Parse literals and grouping expressions
   private parse_primary_expr(): Expr {
     const tk = this.at().type;
 
