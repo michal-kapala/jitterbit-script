@@ -1,12 +1,13 @@
 import { BooleanVal, NullVal, NumberVal, RuntimeVal, StringVal } from "./values";
 import {
+  ArrayLiteral,
   AssignmentExpr,
   BinaryExpr,
   BooleanLiteral,
   GlobalIdentifier,
   Identifier,
+  MemberExpr,
   NumericLiteral,
-  ObjectLiteral,
   Program,
   Stmt,
   StringLiteral,
@@ -17,8 +18,9 @@ import { eval_program } from "./eval/statements";
 import { eval_assignment_expr } from "./eval/expressions/assignment";
 import { eval_binary_expr } from "./eval/expressions/binary";
 import { eval_identifier } from "./eval/expressions/identifier";
-import { eval_object_expr } from "./eval/expressions/object";
 import { eval_unary_expr } from "./eval/expressions/unary";
+import { eval_array_expr } from "./eval/expressions/array";
+import { eval_member_expr } from "./eval/expressions/member";
 
 /**
  * Evaluates a statement or expression.
@@ -54,8 +56,10 @@ export function evaluate(astNode: Stmt, scope: Scope): RuntimeVal {
        const globalScope = scope.getGlobal();
        globalScope.initGlobalVar(global);
       return eval_identifier(astNode as Identifier, scope);
-    case "ObjectLiteral":
-      return eval_object_expr(astNode as ObjectLiteral, scope);
+    case "ArrayLiteral":
+      return eval_array_expr(astNode as ArrayLiteral, scope);
+    case "MemberExpr":
+      return eval_member_expr(astNode as MemberExpr, scope);
     case "AssignmentExpr":
       return eval_assignment_expr(astNode as AssignmentExpr, scope);
     case "BinaryExpr":

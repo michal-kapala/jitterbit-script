@@ -1,5 +1,6 @@
 import { getSystemVar } from "../api/sysvars";
 import {
+  ArrayLiteral,
   AssignmentExpr,
   BinaryExpr,
   BooleanLiteral,
@@ -10,9 +11,7 @@ import {
   Identifier,
   IntegerLiteral,
   MemberExpr,
-  ObjectLiteral,
   Program,
-  Property,
   Stmt,
   StringLiteral,
   UnaryExpr,
@@ -176,7 +175,7 @@ export default class Parser {
   }
 
   private parse_assignment_expr(): Expr {
-    const left = this.parse_object_expr();
+    const left = this.parse_logical_expr();
 
     if (this.at().type == TokenType.Assignment) {
       let operator = this.consume(); // advance past equals
@@ -190,50 +189,6 @@ export default class Parser {
     }
 
     return left;
-  }
-
-  private parse_object_expr(): Expr {
-    // { Prop[] }
-    if (this.at().type !== TokenType.OpenBrace) {
-      return this.parse_logical_expr();
-    }
-
-    this.consume(); // advance past open brace.
-    const properties = new Array<Property>();
-
-    while (this.not_eof() && this.at().type != TokenType.CloseBrace) {
-      const key =
-        this.expect(TokenType.Identifier, "Object literal key expected").value;
-
-      // Allows shorthand key: pair -> { key, }
-      if (this.at().type == TokenType.Comma) {
-        this.consume(); // advance past comma
-        properties.push({ key, kind: "Property" } as Property);
-        continue;
-      } // Allows shorthand key: pair -> { key }
-      else if (this.at().type == TokenType.CloseBrace) {
-        properties.push({ key, kind: "Property" });
-        continue;
-      }
-
-      // { key: val }
-      this.expect(
-        TokenType.Colon,
-        "ParserError: Missing colon following identifier in ObjectExpr",
-      );
-      const value = this.parse_expr();
-
-      properties.push({ kind: "Property", value, key });
-      if (this.at().type != TokenType.CloseBrace) {
-        this.expect(
-          TokenType.Comma,
-          "ParserError: Expected comma or closing bracket following property",
-        );
-      }
-    }
-
-    this.expect(TokenType.CloseBrace, "ParserError: Object literal missing closing brace.");
-    return { kind: "ObjectLiteral", properties } as ObjectLiteral;
   }
 
   /**
@@ -433,42 +388,54 @@ export default class Parser {
     return args;
   }
 
+  // a[++b], c[true][Int("2")] etc.
   private parse_member_expr(): Expr {
-    let object = this.parse_primary_expr();
+    let object = this.parse_array_expr();
 
-    while (
-      this.at().type == TokenType.Dot || this.at().type == TokenType.OpenBracket
-    ) {
-      const operator = this.consume();
-      let property: Expr;
-      let computed: boolean;
+    while (this.at().type === TokenType.OpenBracket) {
+      // [
+      this.consume();
 
-      // non-computed values aka obj.expr
-      if (operator.type == TokenType.Dot) {
-        computed = false;
-        // get identifier
-        property = this.parse_primary_expr();
-        if (property.kind != "Identifier") {
-          throw `ParserError: Cannot use dot operator without right hand side being a identifier`;
-        }
-      } else { // this allows obj[computedValue]
-        computed = true;
-        property = this.parse_expr();
-        this.expect(
-          TokenType.CloseBracket,
-          "ParserError: Missing closing bracket in computed value.",
-        );
-      }
+      // this allows obj[computedValue]
+      let key = this.parse_expr();
+      this.expect(
+        TokenType.CloseBracket,
+        "ParserError: Missing closing bracket in computed value.",
+      );
 
       object = {
         kind: "MemberExpr",
         object,
-        property,
-        computed,
+        key,
+        computed: true,
       } as MemberExpr;
     }
 
     return object;
+  }
+
+  // { 1, -2, true, "", Null(), ... }
+  private parse_array_expr(): Expr {
+    if(this.at().type !== TokenType.OpenBrace) {
+      return this.parse_primary_expr();
+    }
+
+    // {
+    this.consume();
+
+    // empty array
+    if(this.at().type === TokenType.CloseBrace) {
+      this.consume();
+      return { kind: "ArrayLiteral", members: [] } as ArrayLiteral;
+    }
+
+    const members = this.parse_arguments_list();
+
+    this.expect(
+      TokenType.CloseBrace,
+      "ParserError: Array literal missing closing brace."
+    );
+    return { kind: "ArrayLiteral", members} as ArrayLiteral;
   }
 
   // Expression precedence (lowest to highest):
@@ -483,6 +450,7 @@ export default class Parser {
   // Unary
   // Call
   // Member
+  // Array
   // Primary
 
   // Parse literals and grouping expressions

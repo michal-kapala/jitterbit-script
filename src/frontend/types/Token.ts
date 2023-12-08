@@ -45,7 +45,7 @@ export enum TokenType {
    */
   OpenBrace,
   /**
-   * `{`
+   * `}`
    */
   CloseBrace,
   /**

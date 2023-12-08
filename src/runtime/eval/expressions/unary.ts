@@ -30,7 +30,7 @@ export function eval_unary_expr(unop: UnaryExpr, scope: Scope): RuntimeVal {
             return { type: "bool", value: jbStringToNumber(operand as StringVal) === 0 } as BooleanVal;
           case "null":
             return { type: "bool", value: true } as BooleanVal;
-          case "object":
+          case "array":
             // TODO
           default:
             throw `Unsupported type for ${unop.operator} unary operator: ${operand.type}`;
@@ -75,7 +75,7 @@ export function eval_unary_expr(unop: UnaryExpr, scope: Scope): RuntimeVal {
             // at line <x>
             // a = -
             throw `Transform Error: UNKNOWN_DE_TYPE\nThe problematic token is at the end of the following expression: ${unop.operator}`;
-          case "object":
+          case "array":
             // TODO
           default:
             throw `Unsupported type for ${unop.operator} unary operator: ${operand.type}`;
@@ -156,7 +156,7 @@ export function eval_unary_expr(unop: UnaryExpr, scope: Scope): RuntimeVal {
             }
           case "null":
             throw `Transform Error: UNKNOWN_DE_TYPE\nThe problematic token is at the end of the following expression: ${unop.operator}`;
-          case "object":
+          case "array":
             // TODO
           default:
             throw `Unsupported type for ${unop.operator} LHS unary operator: ${operand.type}`;
@@ -248,7 +248,7 @@ export function eval_unary_expr(unop: UnaryExpr, scope: Scope): RuntimeVal {
             }
           case "null":
             throw `Transform Error: UNKNOWN_DE_TYPE\nThe problematic token is at the end of the following expression: ${unop.operator}`;
-          case "object":
+          case "array":
             // TODO
           default:
             throw `Unsupported type for ${unop.operator} RHS unary operator: ${operand.type}`;
@@ -326,7 +326,7 @@ export function eval_unary_expr(unop: UnaryExpr, scope: Scope): RuntimeVal {
             }
           case "null":
             throw `Transform Error: UNKNOWN_DE_TYPE\nThe problematic token is at the end of the following expression: ${unop.operator}`;
-          case "object":
+          case "array":
             // TODO
           default:
             throw `Unsupported type for ${unop.operator} LHS unary operator: ${operand.type}`;
@@ -418,7 +418,7 @@ export function eval_unary_expr(unop: UnaryExpr, scope: Scope): RuntimeVal {
             }
           case "null":
             throw `Transform Error: UNKNOWN_DE_TYPE\nThe problematic token is at the end of the following expression: ${unop.operator}`;
-          case "object":
+          case "array":
             // TODO
           default:
             throw `Unsupported type for ${unop.operator} RHS unary operator: ${operand.type}`;

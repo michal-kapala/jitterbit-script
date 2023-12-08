@@ -21,7 +21,8 @@ export type NodeType =
   | "StringLiteral"
   | "BooleanLiteral"
   | "Identifier"
-  | "GlobalIdentifier";
+  | "GlobalIdentifier"
+  | "ArrayLiteral";
 
 /**
  * Statements do not result in a value at runtime.
@@ -69,7 +70,7 @@ export interface CallExpr extends Expr {
 export interface MemberExpr extends Expr {
   kind: "MemberExpr";
   object: Expr;
-  property: Expr;
+  key: Expr;
   computed: boolean;
 }
 
@@ -107,20 +108,9 @@ export interface IntegerLiteral extends NumericLiteral {}
  */
 export interface FloatLiteral extends NumericLiteral {}
 
-// to be yoinked, global/system variable identifiers to be changed
-export interface Property extends Expr {
-  kind: "Property";
-  key: string;
-  value?: Expr;
-}
-
-// to be changed to suppport arrays and dictionaries
-export interface ObjectLiteral extends Expr {
-  kind: "ObjectLiteral";
-  // To be changed:
-  // arrays: Expr[]
-  // dictionaries: Map<string, Expr>
-  properties: Property[];
+export interface ArrayLiteral extends Expr {
+  kind: "ArrayLiteral";
+  members: Expr[];
 }
 
 export interface StringLiteral extends Expr {

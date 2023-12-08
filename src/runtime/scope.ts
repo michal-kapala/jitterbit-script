@@ -87,7 +87,8 @@ export default class Scope {
               // unsupported
               case "string":
                 throw `Illegal operation, SUBTRACT with incompatible data types: unknown - string`
-              case "object":
+              case "array":
+                // TODO: list handling
                 throw `Illegal operation, SUBTRACT with incompatible data types: unknown - object`
               case "call":
                 throw `Illegal operation, SUBTRACT with incompatible data types: unknown - call`
@@ -146,7 +147,7 @@ export default class Scope {
               case "string":
                 this.getGlobal().variables.set(varName, value);
                 return value;
-              case "object":
+              case "array":
                 // TODO: list handling
                 throw `Illegal operation, ADDITION with incompatible data types: unknown - object`
               case "call":

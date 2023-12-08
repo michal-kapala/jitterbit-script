@@ -1,4 +1,4 @@
-export type ValueType = "null" | "number" | "bool" | "object" | "string" | "call";
+export type ValueType = "null" | "number" | "bool" | "string" | "call" | "array";
 
 export interface RuntimeVal {
   type: ValueType;
@@ -53,21 +53,22 @@ export function MK_STRING(s = "") {
 }
 
 /**
- * Runtime value that has access to the raw native javascript object property map.
- */
-export interface ObjectVal extends RuntimeVal {
-  type: "object";
-  properties: Map<string, RuntimeVal>;
-}
-
-/**
  * Runtime value of a function call, which can result in different runtime values.
  */
 export interface CallVal extends RuntimeVal {
   type: "call";
   // calls dont return other calls (only simple type or object type literals)
-  // 'ObjectVal' to be changed to array type
-  result: NullVal | BooleanVal | NumberVal | ObjectVal | StringVal;
+  // DictVal to be added
+  result: NullVal | BooleanVal | NumberVal | StringVal | ArrayVal;
+}
+
+/**
+ * Runtime value of an array literal or an array function call.
+ */
+export interface ArrayVal extends RuntimeVal {
+  type: "array",
+  // evaluated elements
+  members: RuntimeVal[]
 }
 
 /**
