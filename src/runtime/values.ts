@@ -1,4 +1,4 @@
-export type ValueType = "null" | "number" | "bool" | "string" | "call" | "array";
+export type ValueType = "null" | "number" | "bool" | "string" | "call" | "array" | "dictionary";
 
 export interface RuntimeVal {
   type: ValueType;
@@ -50,6 +50,10 @@ export interface StringVal extends RuntimeVal {
 
 export function MK_STRING(s = "") {
   return { type: "string", value: s } as StringVal;
+}
+
+export function MK_ARRAY(m: RuntimeVal[] = []) {
+  return { type: "array", members: m } as ArrayVal;
 }
 
 /**

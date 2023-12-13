@@ -1,7 +1,22 @@
-import { ArrayLiteral, MemberExpr } from "../../../frontend/ast";
+import { 
+  ArrayLiteral,
+  AssignmentExpr,
+  Identifier,
+  MemberExpr
+} from "../../../frontend/ast";
 import { evaluate } from "../../interpreter";
 import Scope from "../../scope";
-import { ArrayVal, BooleanVal, NullVal, NumberVal, RuntimeVal, StringVal } from "../../values";
+import {
+  ArrayVal,
+  BooleanVal,
+  MK_NULL,
+  NullVal,
+  NumberVal,
+  RuntimeVal,
+  StringVal,
+} from "../../values";
+import { checkArrayIndex, setMember } from "./array";
+import { evalAssignment } from "./assignment";
 
 /**
  * Evaluates a member expression (x[y]).
@@ -13,35 +28,85 @@ export function eval_member_expr(memExp: MemberExpr, scope: Scope): RuntimeVal {
   let key = evaluate(memExp.key, scope);
 
   switch(memExp.object.kind) {
+    // {1,2,3}[1]
     case "ArrayLiteral":
-      return eval_array_member_expr(memExp.object as ArrayLiteral, key, scope);
+      return eval_array_lit_member_expr(memExp.object as ArrayLiteral, key, scope);
+    // a[1], $a[1]
+    case "Identifier":
+    case "GlobalIdentifier":
+      const name = (memExp.object as Identifier).symbol;
+      const val = scope.lookupVar(name);
+      // check the value type
+      switch (val.type) {
+        case "array":
+          return eval_array_ident_member_expr(val as ArrayVal, key);
+        // TODO: dict handling
+        default:
+          throw `[] operator applied to a ${memExp.object.kind} data element of unsupported type: ${val.type}`;
+      }
+    // a[1][1]
+    case "MemberExpr":
+      const left = evaluate(memExp.object, scope);
+      switch(left.type) {
+        case "array":
+          return eval_array_ident_member_expr(left as ArrayVal, key);
+        // TODO: dict handling
+        default:
+          throw `[] operator applied to a ${memExp.object.kind} data element of unsupported type: ${left.type}`;
+      }
     default:
       throw `[] operator applied to a ${memExp.object.kind} data element.\nIf in the script testing screen, try clicking 'Reset' and run again`;
   }
 }
 
-function eval_array_member_expr(arrayExpr: ArrayLiteral, key: RuntimeVal, scope: Scope): RuntimeVal {
-  // TODO: set a sensible limit and an error to prevent allocation errors on the agent
+function eval_array_lit_member_expr(arrayExpr: ArrayLiteral, key: RuntimeVal, scope: Scope): RuntimeVal {
   const index = keyValueToNumber(key);
   
   // non-empty strings evaluate to NaN and dont affect the array size
-  if(Number.isNaN(index)) {
+  if (checkArrayIndex(index)) {
     return { type: "null", value: null} as NullVal;
   }
 
   let array = evaluate(arrayExpr, scope) as ArrayVal;
+
   // computed index out of bounds
   if (index >= array.members.length) {
-    // TODO: insert the null values and mutate the scope
-    // resize to index of elements with null values
-    // the returned null value does not get inserted
-    // this should return a warning
+    // Resizing is skipped for literals since they dont exist in the scope anyway
+    console.warn(`InterpreterWarning: Specified index value out of bounds, the original array is resized to ${index} with null values`);
     return { type: "null", value: null } as NullVal;
   }
 
   return array.members[index];
 }
 
+function eval_array_ident_member_expr(array: ArrayVal, key: RuntimeVal, lhs = false): RuntimeVal {
+  const index = keyValueToNumber(key);
+
+  if (!checkArrayIndex(index)) {
+    return { type: "null", value: null} as NullVal;
+  }
+  
+  // computed index out of bounds
+  if (index >= array.members.length) {
+    if(lhs) {
+      console.warn(`InterpreterWarning: Specified index value out of bounds, the original array is resized to ${index} with null values`);
+      // Inserts the null values and mutates the scope
+      // Resizes to index of elements with null values
+      for(let i = index; i >= array.members.length; i--)
+        array.members.push(MK_NULL());
+    }
+
+    return { type: "null", value: null } as NullVal;
+  }
+  
+  return array.members[index];
+}
+
+/**
+ * Converts a key value of any type to a number.
+ * @param key 
+ * @returns 
+ */
 function keyValueToNumber(key: RuntimeVal): number {
   switch (key.type) {
     case "number":
@@ -52,7 +117,42 @@ function keyValueToNumber(key: RuntimeVal): number {
       return (key as StringVal).value === "" ? 0 : NaN;
     case "null":
       return 0;
+    case "array":
+      // same for dict
+      throw `Evaluation of array index error`;
     default:
       throw `Unsupported member expression key type: ${key.type}`;
+  }
+}
+
+/**
+ * Performs an assignment to a LHS member expression.
+ * @param memExp 
+ * @param assignment 
+ * @param scope 
+ * @returns 
+ */
+export function eval_member_assignment(memExp: MemberExpr, assignment: AssignmentExpr, scope: Scope): RuntimeVal {
+  const kind = memExp.object.kind;
+  // only identifiers allowed
+  if(kind !== "Identifier" && kind !== "GlobalIdentifier" && kind !== "MemberExpr")
+    throw `Invalid LHS inside assignment expr ${JSON.stringify(assignment.assignee)}; must be a local or global data element identifier or member expression`;
+
+  // for a[1][2] expr, this evaluates a[1]
+  const lhs = evaluate(memExp.object, scope);
+
+  switch (lhs.type) {
+    case "array":
+      const index = keyValueToNumber(evaluate(memExp.key, scope));
+      let rhs = checkArrayIndex(index)
+        ? evaluate(assignment.value, scope)
+        : MK_NULL();
+
+      const newValue = evalAssignment(evaluate(memExp, scope), rhs, assignment.operator.value);
+      // setMember appends null values if index is out of bounds
+      return setMember(lhs as ArrayVal, newValue, index);      
+    // TODO: dict
+    default:
+      throw `[] operator applied to a ${lhs.type} data element.\nIf in the script testing screen, try clicking 'Reset' and run again`;
   }
 }
