@@ -5,8 +5,8 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for member expressions and array assignment operators
-  a = {{"xd", true}, 16};
-  a += {"ZZZ", {"YYY"}};
-  a[0]
+  // test for array unary expression
+  a = {1, false, "69", "0", {7, 0}};
+  b = ++a[4];
+  a[4];
 </trans>

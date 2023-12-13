@@ -2,6 +2,7 @@ import { BinaryExpr } from "../../../frontend/ast";
 import Scope from "../../scope";
 import { evaluate } from "../../interpreter";
 import { 
+  ArrayVal,
   BooleanVal,
   MK_NULL,
   NullVal,
@@ -179,7 +180,7 @@ function eval_bool_binary_expr(lhs: BooleanVal, rhs: BooleanVal, operator: strin
 
 
 /**
- * Evaluates binary expressions on null values.
+ * Evaluaes binary expressions on null values.
  * @param lhs 
  * @param rhs 
  * @param operator 
@@ -216,7 +217,7 @@ function eval_null_binary_expr(lhs: NullVal, rhs: NullVal, operator: string): Nu
 
 
 /**
- * Evalutates binary expressions for number-string operand types.
+ * Evaluates binary expressions for number-string operand types.
  * 
  * For the supported operators, the string is converted to a number depending on whether there's a parsable number in its beginning.
  * @param lhs 
@@ -300,7 +301,7 @@ function eval_numstring_binary_expr(lhs: NumberVal | StringVal, rhs: NumberVal |
 
 
 /**
- * Evalutates binary expressions for bool-string operand types.
+ * Evaluates binary expressions for bool-string operand types.
  * @param lhs 
  * @param rhs 
  * @param operator 
@@ -386,7 +387,7 @@ function eval_boolstring_binary_expr(lhs: BooleanVal | StringVal, rhs: BooleanVa
 }
 
 /**
- * Evalutates binary expressions for number-bool operand types.
+ * Evaluates binary expressions for number-bool operand types.
  * @param lhs 
  * @param rhs 
  * @param operator 
@@ -526,7 +527,7 @@ function eval_numbool_binary_expr(lhs: BooleanVal | NumberVal, rhs: BooleanVal |
 }
 
 /**
- * Evalutates binary expressions for null-string operand types.
+ * Evaluates binary expressions for null-string operand types.
  * @param lhs 
  * @param rhs 
  * @param operator 
@@ -564,13 +565,13 @@ function eval_nullstring_binary_expr(lhs: NullVal | StringVal, rhs: NullVal | St
 }
 
 /**
- * Evalutates binary expressions for null-number operand types.
+ * Evaluates binary expressions for null-number operand types.
  * @param lhs 
  * @param rhs 
  * @param operator 
  * @returns 
  */
-function eval_nullnumber_binary_expr(lhs: NullVal | NumberVal, rhs: NullVal | NumberVal, operator: string): NumberVal | BooleanVal {
+function eval_numnull_binary_expr(lhs: NullVal | NumberVal, rhs: NullVal | NumberVal, operator: string): NumberVal | BooleanVal {
   switch (operator) {
     case "+":
       return lhs.type === "null"
@@ -612,7 +613,7 @@ function eval_nullnumber_binary_expr(lhs: NullVal | NumberVal, rhs: NullVal | Nu
 }
 
 /**
- * Evalutates binary expressions for null-bool operand types.
+ * Evaluates binary expressions for null-bool operand types.
  * @param lhs 
  * @param rhs 
  * @param operator 
@@ -653,7 +654,425 @@ function eval_nullbool_binary_expr(lhs: NullVal | BooleanVal, rhs: NullVal | Boo
 }
 
 /**
- * Evaulates expressions following the binary operation type.
+ * Evaluates binary expressions for array-array operand types.
+ * @param lhs 
+ * @param rhs 
+ * @param operator 
+ * @returns 
+ */
+function eval_array_binary_expr(lhs: ArrayVal, rhs: ArrayVal, operator: string): ArrayVal {
+  if(lhs.members.length !== rhs.members.length)
+    throw `The operator ${operator} operating on two array data elements with inconsistent sizes n1/n2: ${lhs.members.length}/${rhs.members.length}`;
+
+  const lMembers = lhs.members;
+  const rMembers = rhs.members;
+
+  for(const idx in lMembers) {
+    switch (lMembers[idx].type) {
+      case "number":
+        switch (rMembers[idx].type) {
+          case "number":
+            lMembers[idx] = eval_numeric_binary_expr(
+              lMembers[idx] as NumberVal,
+              rMembers[idx] as NumberVal,
+              operator);
+            break;
+          case "bool":
+            lMembers[idx] = eval_numbool_binary_expr(
+              lMembers[idx] as NumberVal,
+              rMembers[idx] as BooleanVal,
+              operator);
+            break;
+          case "string":
+            lMembers[idx] = eval_numstring_binary_expr(
+              lMembers[idx] as NumberVal,
+              rMembers[idx] as StringVal,
+              operator);
+            break;
+          case "null":
+            lMembers[idx] = eval_numnull_binary_expr(
+              lMembers[idx] as NumberVal,
+              rMembers[idx] as NullVal,
+              operator);
+            break;
+          case "array":
+            lMembers[idx] = eval_arraynum_binary_expr(
+              lMembers[idx] as NumberVal,
+              rMembers[idx] as ArrayVal,
+              operator);
+            break;
+          case "dictionary":
+            // TODO
+          default:
+            throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
+        }
+        break;
+      case "bool":
+        switch (rMembers[idx].type) {
+          case "number":
+            lMembers[idx] = eval_numbool_binary_expr(
+              lMembers[idx] as BooleanVal,
+              rMembers[idx] as NumberVal,
+              operator);
+            break;
+          case "bool":
+            lMembers[idx] = eval_bool_binary_expr(
+              lMembers[idx] as BooleanVal,
+              rMembers[idx] as BooleanVal,
+              operator);
+            break;
+          case "string":
+            lMembers[idx] = eval_boolstring_binary_expr(
+              lMembers[idx] as BooleanVal,
+              rMembers[idx] as StringVal,
+              operator);
+            break;
+          case "null":
+            lMembers[idx] = eval_nullbool_binary_expr(
+              lMembers[idx] as BooleanVal,
+              rMembers[idx] as NullVal,
+              operator);
+            break;
+          case "array":
+            lMembers[idx] = eval_arraybool_binary_expr(
+              lMembers[idx] as BooleanVal,
+              rMembers[idx] as ArrayVal,
+              operator);
+            break;
+          case "dictionary":
+            // TODO
+          default:
+            throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
+        }
+        break;
+      case "string":
+        switch (rMembers[idx].type) {
+          case "number":
+            lMembers[idx] = eval_numstring_binary_expr(
+              lMembers[idx] as StringVal,
+              rMembers[idx] as NumberVal,
+              operator);
+            break;
+          case "bool":
+            lMembers[idx] = eval_boolstring_binary_expr(
+              lMembers[idx] as StringVal,
+              rMembers[idx] as BooleanVal,
+              operator);
+            break;
+          case "string":
+            lMembers[idx] = eval_string_binary_expr(
+              lMembers[idx] as StringVal,
+              rMembers[idx] as StringVal,
+              operator);
+            break;
+          case "null":
+            lMembers[idx] = eval_nullstring_binary_expr(
+              lMembers[idx] as StringVal,
+              rMembers[idx] as NullVal,
+              operator);
+            break;
+          case "array":
+            lMembers[idx] = eval_arraystring_binary_expr(
+              lMembers[idx] as StringVal,
+              rMembers[idx] as ArrayVal,
+              operator);
+            break;
+          case "dictionary":
+            // TODO
+          default:
+            throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
+        }
+        break;
+      case "null":
+        switch (rMembers[idx].type) {
+          case "number":
+            lMembers[idx] = eval_numnull_binary_expr(
+              lMembers[idx] as NullVal,
+              rMembers[idx] as NumberVal,
+              operator);
+            break;
+          case "bool":
+            lMembers[idx] = eval_nullbool_binary_expr(
+              lMembers[idx] as NullVal,
+              rMembers[idx] as BooleanVal,
+              operator);
+            break;
+          case "string":
+            lMembers[idx] = eval_nullstring_binary_expr(
+              lMembers[idx] as NullVal,
+              rMembers[idx] as StringVal,
+              operator);
+            break;
+          case "null":
+            lMembers[idx] = eval_null_binary_expr(
+              lMembers[idx] as NullVal,
+              rMembers[idx] as NullVal,
+              operator);
+            break;
+          case "array":
+            lMembers[idx] = eval_arraynull_binary_expr(
+              lMembers[idx] as NullVal,
+              rMembers[idx] as ArrayVal,
+              operator);
+            break;
+          case "dictionary":
+            // TODO
+          default:
+            throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
+        }
+        break;
+      case "array":
+        switch (rMembers[idx].type) {
+          case "number":
+            lMembers[idx] = eval_arraynum_binary_expr(
+              lMembers[idx] as ArrayVal,
+              rMembers[idx] as NumberVal,
+              operator);
+            break;
+          case "bool":
+            lMembers[idx] = eval_arraybool_binary_expr(
+              lMembers[idx] as ArrayVal,
+              rMembers[idx] as BooleanVal,
+              operator);
+            break;
+          case "string":
+            lMembers[idx] = eval_arraystring_binary_expr(
+              lMembers[idx] as ArrayVal,
+              rMembers[idx] as StringVal,
+              operator);
+            break;
+          case "null":
+            lMembers[idx] = eval_arraynull_binary_expr(
+              lMembers[idx] as ArrayVal,
+              rMembers[idx] as NullVal,
+              operator);
+            break;
+          case "array":
+            lMembers[idx] = eval_array_binary_expr(
+              lMembers[idx] as ArrayVal,
+              rMembers[idx] as ArrayVal,
+              operator);
+            break;
+          case "dictionary":
+            // TODO
+          default:
+            throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
+        }
+        break;
+      case "dictionary":
+        // TODO
+      default:
+        throw `Unsupported LHS array member type: ${lMembers[idx].type}`;
+    }
+  }
+  return lhs;
+}
+
+/**
+ * Evaluates binary expressions for array-number operand types.
+ * @param lhs 
+ * @param rhs 
+ * @param operator 
+ * @returns 
+ */
+function eval_arraynum_binary_expr(lhs: ArrayVal | NumberVal, rhs: ArrayVal | NumberVal, operator: string): ArrayVal {
+  const isLhs = lhs.type === "number";
+  const numVal = (isLhs ? lhs : rhs) as NumberVal;
+  const arrVal = (isLhs ? rhs : lhs) as ArrayVal;
+  const members = arrVal.members;
+
+  for(const idx in members) {
+    switch (members[idx].type) {
+      case "number":
+        members[idx] = isLhs
+          ? eval_numeric_binary_expr(numVal, members[idx] as NumberVal, operator)
+          : eval_numeric_binary_expr(members[idx] as NumberVal, numVal, operator);
+        break;
+      case "bool":
+        members[idx] = isLhs
+          ? eval_numbool_binary_expr(numVal, members[idx] as BooleanVal, operator)
+          : eval_numbool_binary_expr(members[idx] as BooleanVal, numVal, operator);
+        break;
+      case "string":
+        members[idx] = isLhs
+          ? eval_numstring_binary_expr(numVal, members[idx] as StringVal, operator)
+          : eval_numstring_binary_expr(members[idx] as StringVal, numVal, operator);
+        break;
+      case "null":
+        members[idx] = isLhs
+          ? eval_numnull_binary_expr(numVal, members[idx] as NullVal, operator)
+          : eval_numnull_binary_expr(members[idx] as NullVal, numVal, operator);
+        break;
+      case "array":
+        members[idx] = isLhs
+          ? eval_arraynum_binary_expr(numVal, members[idx] as ArrayVal, operator)
+          : eval_arraynum_binary_expr(members[idx] as ArrayVal, numVal, operator);
+        break;
+      case "dictionary":
+        // TODO
+      default:
+        throw `Unsupported array member type: ${members[idx].type}`;
+    }
+  }
+
+  return arrVal;
+}
+
+/**
+ * Evaluates binary expressions for array-bool operand types.
+ * @param lhs 
+ * @param rhs 
+ * @param operator 
+ * @returns 
+ */
+function eval_arraybool_binary_expr(lhs: ArrayVal | BooleanVal, rhs: ArrayVal | BooleanVal, operator: string): ArrayVal {
+  const isLhs = lhs.type === "bool";
+  const boolVal = (isLhs ? lhs : rhs) as BooleanVal;
+  const arrVal = (isLhs ? rhs : lhs) as ArrayVal;
+  const members = arrVal.members;
+
+  for(const idx in members) {
+    switch (members[idx].type) {
+      case "number":
+        members[idx] = isLhs
+          ? eval_numbool_binary_expr(boolVal, members[idx] as NumberVal, operator)
+          : eval_numbool_binary_expr(members[idx] as NumberVal, boolVal, operator);
+        break;
+      case "bool":
+        members[idx] = isLhs
+          ? eval_bool_binary_expr(boolVal, members[idx] as BooleanVal, operator)
+          : eval_bool_binary_expr(members[idx] as BooleanVal, boolVal, operator);
+        break;
+      case "string":
+        members[idx] = isLhs
+          ? eval_boolstring_binary_expr(boolVal, members[idx] as StringVal, operator)
+          : eval_boolstring_binary_expr(members[idx] as StringVal, boolVal, operator);
+        break;
+      case "null":
+        members[idx] = isLhs
+          ? eval_nullbool_binary_expr(boolVal, members[idx] as NullVal, operator)
+          : eval_nullbool_binary_expr(members[idx] as NullVal, boolVal, operator);
+        break;
+      case "array":
+        members[idx] = isLhs
+          ? eval_arraybool_binary_expr(boolVal, members[idx] as ArrayVal, operator)
+          : eval_arraybool_binary_expr(members[idx] as ArrayVal, boolVal, operator);
+        break;
+      case "dictionary":
+        // TODO
+      default:
+        throw `Unsupported array member type: ${members[idx].type}`;
+    }
+  }
+
+  return arrVal;
+}
+
+/**
+ * Evaluates binary expressions for array-string operand types.
+ * @param lhs 
+ * @param rhs 
+ * @param operator 
+ * @returns 
+ */
+function eval_arraystring_binary_expr(lhs: ArrayVal | StringVal, rhs: ArrayVal | StringVal, operator: string): ArrayVal {
+  const isLhs = lhs.type === "string";
+  const strVal = (isLhs ? lhs : rhs) as StringVal;
+  const arrVal = (isLhs ? rhs : lhs) as ArrayVal;
+  const members = arrVal.members;
+
+  for(const idx in members) {
+    switch (members[idx].type) {
+      case "number":
+        members[idx] = isLhs
+          ? eval_numstring_binary_expr(strVal, members[idx] as NumberVal, operator)
+          : eval_numstring_binary_expr(members[idx] as NumberVal, strVal, operator);
+        break;
+      case "bool":
+        members[idx] = isLhs
+          ? eval_boolstring_binary_expr(strVal, members[idx] as BooleanVal, operator)
+          : eval_boolstring_binary_expr(members[idx] as BooleanVal, strVal, operator);
+        break;
+      case "string":
+        members[idx] = isLhs
+          ? eval_string_binary_expr(strVal, members[idx] as StringVal, operator)
+          : eval_string_binary_expr(members[idx] as StringVal, strVal, operator);
+        break;
+      case "null":
+        members[idx] = isLhs
+          ? eval_nullstring_binary_expr(strVal, members[idx] as NullVal, operator)
+          : eval_nullstring_binary_expr(members[idx] as NullVal, strVal, operator);
+        break;
+      case "array":
+        members[idx] = isLhs
+          ? eval_arraystring_binary_expr(strVal, members[idx] as ArrayVal, operator)
+          : eval_arraystring_binary_expr(members[idx] as ArrayVal, strVal, operator);
+        break;
+      case "dictionary":
+        // TODO
+      default:
+        throw `Unsupported array member type: ${members[idx].type}`;
+    }
+  }
+
+  return arrVal;
+}
+
+/**
+ * Evaluates binary expressions for array-null operand types.
+ * @param lhs 
+ * @param rhs 
+ * @param operator 
+ * @returns 
+ */
+function eval_arraynull_binary_expr(lhs: ArrayVal | NullVal, rhs: ArrayVal | NullVal, operator: string): ArrayVal {
+  const isLhs = lhs.type === "null";
+  const nullVal = (isLhs ? lhs : rhs) as NullVal;
+  const arrVal = (isLhs ? rhs : lhs) as ArrayVal;
+  const members = arrVal.members;
+
+  for(const idx in members) {
+    switch (members[idx].type) {
+      case "number":
+        members[idx] = isLhs
+          ? eval_numnull_binary_expr(nullVal, members[idx] as NumberVal, operator)
+          : eval_numnull_binary_expr(members[idx] as NumberVal, nullVal, operator);
+        break;
+      case "bool":
+        members[idx] = isLhs
+          ? eval_nullbool_binary_expr(nullVal, members[idx] as BooleanVal, operator)
+          : eval_nullbool_binary_expr(members[idx] as BooleanVal, nullVal, operator);
+        break;
+      case "string":
+        members[idx] = isLhs
+          ? eval_nullstring_binary_expr(nullVal, members[idx] as StringVal, operator)
+          : eval_nullstring_binary_expr(members[idx] as StringVal, nullVal, operator);
+        break;
+      case "null":
+        members[idx] = isLhs
+          ? eval_null_binary_expr(nullVal, members[idx] as NullVal, operator)
+          : eval_null_binary_expr(members[idx] as NullVal, nullVal, operator);
+        break;
+      case "array":
+        members[idx] = isLhs
+          ? eval_arraynull_binary_expr(nullVal, members[idx] as ArrayVal, operator)
+          : eval_arraynull_binary_expr(members[idx] as ArrayVal, nullVal, operator);
+        break;
+      case "dictionary":
+        // TODO
+      default:
+        throw `Unsupported array member type: ${members[idx].type}`;
+    }
+  }
+
+  return arrVal;
+}
+
+/**
+ * Evaluates expressions following the binary operation type.
+ * @param binop 
+ * @param scope 
+ * @returns 
  */
 export function eval_binary_expr(
   binop: BinaryExpr,
@@ -784,13 +1203,13 @@ export function eval_binary_expr(
     (lhs.type == "number" && rhs.type == "null")
   ) {
     if (lhs.type === "null")
-      return eval_nullnumber_binary_expr(
+      return eval_numnull_binary_expr(
         lhs as NullVal,
         rhs as NumberVal,
         binop.operator,
       );
 
-    return eval_nullnumber_binary_expr(
+    return eval_numnull_binary_expr(
       lhs as NumberVal,
       rhs as NullVal,
       binop.operator,
@@ -812,6 +1231,93 @@ export function eval_binary_expr(
     return eval_nullbool_binary_expr(
       lhs as BooleanVal,
       rhs as NullVal,
+      binop.operator,
+    );
+  }
+
+  // arrays
+
+  // array-array
+  if(lhs.type == "array" && rhs.type == "array") {
+    return eval_array_binary_expr(
+      lhs as ArrayVal,
+      rhs as ArrayVal,
+      binop.operator,
+    );
+  }
+
+  // array-number
+  if(
+    (lhs.type == "array" && rhs.type == "number") ||
+    (lhs.type == "number" && rhs.type == "array")
+  ) {
+    if (lhs.type === "array")
+      return eval_arraynum_binary_expr(
+        lhs as ArrayVal,
+        rhs as NumberVal,
+        binop.operator,
+      );
+
+    return eval_arraynum_binary_expr(
+      lhs as NumberVal,
+      rhs as ArrayVal,
+      binop.operator,
+    );
+  }
+
+  // array-bool
+  if(
+    (lhs.type == "array" && rhs.type == "bool") ||
+    (lhs.type == "bool" && rhs.type == "array")
+  ) {
+    if (lhs.type === "array")
+      return eval_arraybool_binary_expr(
+        lhs as ArrayVal,
+        rhs as BooleanVal,
+        binop.operator,
+      );
+
+    return eval_arraybool_binary_expr(
+      lhs as BooleanVal,
+      rhs as ArrayVal,
+      binop.operator,
+    );
+  }
+
+  // array-string
+  if(
+    (lhs.type == "array" && rhs.type == "string") ||
+    (lhs.type == "string" && rhs.type == "array")
+  ) {
+    if (lhs.type === "array")
+      return eval_arraystring_binary_expr(
+        lhs as ArrayVal,
+        rhs as StringVal,
+        binop.operator,
+      );
+
+    return eval_arraystring_binary_expr(
+      lhs as StringVal,
+      rhs as ArrayVal,
+      binop.operator,
+    );
+  }
+
+  // array-null
+  if(
+    (lhs.type == "array" && rhs.type == "null") ||
+    (lhs.type == "null" && rhs.type == "array")
+  ) {
+    if (lhs.type === "array")
+      return eval_arraynull_binary_expr(
+        lhs as ArrayVal,
+        rhs as NullVal,
+        binop.operator,
+      );
+
+    return eval_arraynull_binary_expr(
+      lhs as NullVal,
+      rhs as ArrayVal,
       binop.operator,
     );
   }
