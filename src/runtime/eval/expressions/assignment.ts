@@ -4,6 +4,7 @@ import { evaluate } from "../../interpreter";
 import { ArrayVal, BooleanVal, NullVal, NumberVal, RuntimeVal, StringVal } from "../../values";
 import { eval_member_assignment } from "./member";
 import { 
+  eval_array_assignment,
   eval_bool_assignment,
   eval_null_assignment,
   eval_number_assignment,
@@ -39,6 +40,7 @@ export function evalAssignment(lhs: RuntimeVal, rhs: RuntimeVal, operator: strin
     case "=":
       return rhs;
     case "-=":
+      // number -= number
       if(lhs.type === rhs.type && lhs.type === "number") {
         let newValue = rhs as NumberVal;
         newValue.value = (lhs as NumberVal).value - (rhs as NumberVal).value;
@@ -84,6 +86,12 @@ export function evalAssignment(lhs: RuntimeVal, rhs: RuntimeVal, operator: strin
       }
 
       // arrays
+
+      // array -= array
+      else if (lhs.type === rhs.type && lhs.type === "array") {
+        lhs = eval_array_assignment(lhs as ArrayVal, rhs as ArrayVal, operator);
+        return lhs;
+      }
 
       // null -= array
       // array -= null
@@ -217,6 +225,11 @@ export function evalAssignment(lhs: RuntimeVal, rhs: RuntimeVal, operator: strin
 
       // arrays
       
+      // array += array
+      else if (lhs.type === rhs.type && lhs.type === "array") {
+        lhs = eval_array_assignment(lhs as ArrayVal, rhs as ArrayVal, operator);
+        return lhs;
+      }
       // null += array
       // array += null
       else if (

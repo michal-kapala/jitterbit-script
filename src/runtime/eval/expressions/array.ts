@@ -102,8 +102,12 @@ export function eval_number_assignment(nested: ArrayVal, numVal: NumberVal, oper
         // if(Number.isNaN(parseFloat((members[idx] as StringVal).value)) && (members[idx] as StringVal).value !== "")
         //   throw `Cannot set the data element of array type with a string: "<array literal>"`;
 
-        if(operator === "+=")
-          (members[idx] as StringVal).value += numVal.value.toString();
+        if(operator === "+=") {
+          if(lhs)
+            (members[idx] as StringVal).value = numVal.value.toString() + (members[idx] as StringVal).value;
+          else
+            (members[idx] as StringVal).value += numVal.value.toString();
+        } 
         else
           throw `Illegal operation, SUBTRACT with incompatible data types: ${lhs ? numVal.type : members[idx].type } - ${lhs ? members[idx].type : numVal.type }`;
         break;
@@ -184,7 +188,7 @@ export function eval_bool_assignment(nested: ArrayVal, boolVal: BooleanVal, oper
       case "number":
         throw `Illegal operation: ${lhs ? members[idx].type : boolVal.type} ${operator} ${lhs ? boolVal.type : members[idx].type}`;
       case "bool":
-        throw `Illegal operation, ADDITION with incompatible data types: bool ${operator === "+=" ? "+" : "-"} bool`;
+        throw `Illegal operation, ${operator === "+=" ? "ADDITION" : "SUBTRACT"} with incompatible data types: bool ${operator === "+=" ? "+" : "-"} bool`;
       case "string":
         if(operator === "+=")
           (members[idx] as StringVal).value += boolVal.value ? "1" : "0";
@@ -277,4 +281,340 @@ export function eval_string_assignment(nested: ArrayVal, strVal: StringVal, oper
     }
   }
   return nested;
+}
+
+export function eval_array_assignment(lhs: ArrayVal, rhs: ArrayVal, operator: string): ArrayVal {
+  if(lhs.members.length !== rhs.members.length)
+    throw `The operator ${operator} operating on two array data elements with inconsistent sizes n1/n2: ${lhs.members.length}/${rhs.members.length}`;
+
+  switch (operator) {
+    case "-=":
+      return eval_array_subtraction_assignment(lhs, rhs);
+    case "+=":
+      return eval_array_addition_assignment(lhs, rhs);
+    default:
+      throw `Unsupported array assignment operator: ${operator}`;
+  }
+}
+
+/**
+ * Evaluates array -= array expressions.
+ * @param lhs 
+ * @param rhs 
+ * @returns
+ */
+function eval_array_subtraction_assignment(lhs: ArrayVal, rhs: ArrayVal): ArrayVal {
+  const lMembers = lhs.members;
+  const rMembers = rhs.members;
+  for (const idx in lMembers) {
+    switch (lMembers[idx].type) { 
+      case "number":
+        switch (rMembers[idx].type) {
+          case "number":
+            (lMembers[idx] as NumberVal).value -= (rMembers[idx] as NumberVal).value;
+            break;
+          case "bool":
+          case "string":
+            throw `Illegal operation, SUBTRACT with incompatible data types: ${lMembers[idx].type} - ${rMembers[idx].type}`;
+          case "null":
+            break;
+          case "array":
+            lMembers[idx] = eval_number_assignment(
+              rMembers[idx] as ArrayVal,
+              lMembers[idx] as NumberVal,
+              "-=");
+            break;
+          case "dictionary":
+            throw `Transform Error: DE_TYPE_CONVERT_FAILED`;
+          default:
+            throw `Unsupported RHS array member type: ${lMembers[idx].type}`;
+        }
+        break;
+      case "bool":
+        switch (rMembers[idx].type) {
+          case "number":
+          case "bool":
+          case "string":
+          case "null":
+          case "dictionary":
+            throw `Illegal operation, SUBTRACT with incompatible data types: ${lMembers[idx].type} - ${rMembers[idx].type}`;
+          case "array":
+            lMembers[idx] = eval_bool_assignment(
+              rMembers[idx] as ArrayVal,
+              lMembers[idx] as BooleanVal,
+              "-=");
+            break;
+          default:
+            throw `Unsupported RHS array member type: ${lMembers[idx].type}`;
+        }
+        break;
+      case "string":
+        switch (rMembers[idx].type) {
+          case "number":
+          case "bool":
+          case "string":
+          case "dictionary":
+            throw `Illegal operation, SUBTRACT with incompatible data types: ${lMembers[idx].type} - ${rMembers[idx].type}`;
+          case "null":
+            break;
+          case "array":
+            lMembers[idx] = eval_string_assignment(
+              rMembers[idx] as ArrayVal,
+              lMembers[idx] as StringVal,
+              "-=");
+            break;
+          default:
+            throw `Unsupported RHS array member type: ${lMembers[idx].type}`;
+        }
+        break;
+      case "null":
+        switch (rMembers[idx].type) {
+          case "number":
+            lMembers[idx] = {type : "number", value: -1 * (rMembers[idx] as NumberVal).value} as NumberVal;
+            break;
+          case "bool":
+          case "string":
+            throw `Illegal operation, SUBTRACT with incompatible data types: ${lMembers[idx].type} - ${rMembers[idx].type}`;
+          case "null":
+            break;
+          case "array":
+            lMembers[idx] = eval_null_assignment(
+              rMembers[idx] as ArrayVal,
+              lMembers[idx] as NullVal,
+              "-=");
+            break;
+          case "dictionary":
+            throw `Transform Error: DE_TYPE_CONVERT_FAILED`;
+          default:
+            throw `Unsupported RHS array member type: ${lMembers[idx].type}`;
+        }
+        break;
+      case "array":
+        switch (rMembers[idx].type) {
+          case "number":
+            lMembers[idx] = eval_number_assignment(
+              lMembers[idx] as ArrayVal,
+              rMembers[idx] as NumberVal,
+              "-=", false);
+            break;
+          case "bool":
+            lMembers[idx] = eval_bool_assignment(
+              lMembers[idx] as ArrayVal,
+              rMembers[idx] as BooleanVal,
+              "-=", false);
+            break;
+          case "string":
+            lMembers[idx] = eval_string_assignment(
+              lMembers[idx] as ArrayVal,
+              rMembers[idx] as StringVal,
+              "-=", false);
+            break;
+          case "null":
+            lMembers[idx] = eval_null_assignment(
+              lMembers[idx] as ArrayVal,
+              rMembers[idx] as NullVal,
+              "-=", false);
+            break;
+          case "array":
+            lMembers[idx] = eval_array_subtraction_assignment(
+              lMembers[idx] as ArrayVal,
+              rMembers[idx] as ArrayVal);
+            break;
+          case "dictionary":
+            throw `Transform Error: DE_TYPE_CONVERT_FAILED`;
+          default:
+            throw `Unsupported RHS array member type: ${lMembers[idx].type}`;
+        }
+        break;
+      case "dictionary":
+        switch (rMembers[idx].type) {
+          case "bool":
+          case "string":
+            throw `Illegal operation, SUBTRACT with incompatible data types: ${lMembers[idx].type} - ${rMembers[idx].type}`;
+          case "number":
+          case "null":
+          case "dictionary":
+            throw `Transform Error: DE_TYPE_CONVERT_FAILED`;
+          case "array":
+            // TODO: recursive function for dict +- array
+            throw `Handling for dictionary -= array not yet implemented`;
+          default:
+            throw `Unsupported RHS array member type: ${lMembers[idx].type}`;
+        }
+        break;
+      default:
+        throw `Unsupported LHS array member type: ${lMembers[idx].type}`;
+    }
+  }
+  return lhs;
+}
+
+/**
+ * Evaluates array += array expressions.
+ * @param lhs 
+ * @param rhs 
+ * @returns
+ */
+function eval_array_addition_assignment(lhs: ArrayVal, rhs: ArrayVal): ArrayVal {
+  const lMembers = lhs.members;
+  const rMembers = rhs.members;
+  for (const idx in lMembers) {
+    switch (lMembers[idx].type) { 
+      case "number":
+        switch (rMembers[idx].type) {
+          case "number":
+            (lMembers[idx] as NumberVal).value += (rMembers[idx] as NumberVal).value;
+            break;
+          case "bool":
+            throw `Illegal operation: ${lMembers[idx].type} += ${rMembers[idx].type}`;
+          case "string":
+            lMembers[idx] = {
+              type: "string",
+              value: (lMembers[idx] as NumberVal).value.toString() + (rMembers[idx] as StringVal).value
+            } as StringVal;
+            break;
+          case "null":
+            break;
+          case "array":
+            lMembers[idx] = eval_number_assignment(
+              rMembers[idx] as ArrayVal,
+              lMembers[idx] as NumberVal,
+              "+=");
+            break;
+          case "dictionary":
+            throw `Transform Error: DE_TYPE_CONVERT_FAILED`;
+          default:
+            throw `Unsupported RHS array member type: ${lMembers[idx].type}`;
+        }
+        break;
+      case "bool":
+        switch (rMembers[idx].type) {
+          case "number":
+          case "dictionary":
+            throw `Illegal operation: ${lMembers[idx].type} += ${rMembers[idx].type}`;
+          case "bool":
+            throw `Illegal operation, ADDITION with incompatible data types: ${lMembers[idx].type} + ${rMembers[idx].type}`;
+          case "string":
+            lMembers[idx] = {
+              type: "string",
+              value: ((lMembers[idx] as BooleanVal).value ? "1" : "0") + (rMembers[idx] as StringVal).value
+            } as StringVal;
+            break;
+          case "null":
+            break;
+          case "array":
+            lMembers[idx] = eval_bool_assignment(
+              rMembers[idx] as ArrayVal,
+              lMembers[idx] as BooleanVal,
+              "+=");
+            break;
+          default:
+            throw `Unsupported RHS array member type: ${lMembers[idx].type}`;
+        }
+        break;
+      case "string":
+        switch (rMembers[idx].type) {
+          case "number":
+            (lMembers[idx] as StringVal).value += (rMembers[idx] as NumberVal).value.toString();
+            break;
+          case "bool":
+            (lMembers[idx] as StringVal).value += (rMembers[idx] as BooleanVal).value ? "1" : "0";
+            break;
+          case "string":
+            (lMembers[idx] as StringVal).value += (rMembers[idx] as StringVal).value;
+            break;
+          case "null":
+            break;
+          case "array":
+            lMembers[idx] = eval_string_assignment(
+              rMembers[idx] as ArrayVal,
+              lMembers[idx] as StringVal,
+              "+=");
+            break;
+          case "dictionary":
+            throw `Transform Error: DE_TYPE_CONVERT_FAILED`;
+          default:
+            throw `Unsupported RHS array member type: ${lMembers[idx].type}`;
+        }
+        break;
+      case "null":
+        switch (rMembers[idx].type) {
+          case "number":
+          case "bool":
+          case "string":
+            lMembers[idx] = rMembers[idx];
+            break;
+          case "null":
+            break;
+          case "array":
+            lMembers[idx] = eval_null_assignment(
+              rMembers[idx] as ArrayVal,
+              lMembers[idx] as NullVal,
+              "+=");
+            break;
+          case "dictionary":
+            throw `Transform Error: DE_TYPE_CONVERT_FAILED`;
+          default:
+            throw `Unsupported RHS array member type: ${lMembers[idx].type}`;
+        }
+        break;
+      case "array":
+        switch (rMembers[idx].type) {
+          case "number":
+            lMembers[idx] = eval_number_assignment(
+              lMembers[idx] as ArrayVal,
+              rMembers[idx] as NumberVal,
+              "+=", false);
+            break;
+          case "bool":
+            lMembers[idx] = eval_bool_assignment(
+              lMembers[idx] as ArrayVal,
+              rMembers[idx] as BooleanVal,
+              "+=", false);
+            break;
+          case "string":
+            console.log("called")
+            lMembers[idx] = eval_string_assignment(
+              lMembers[idx] as ArrayVal,
+              rMembers[idx] as StringVal,
+              "+=", false);
+            break;
+          case "null":
+            lMembers[idx] = eval_null_assignment(
+              lMembers[idx] as ArrayVal,
+              rMembers[idx] as NullVal,
+              "+=", false);
+            break;
+          case "array":
+            lMembers[idx] = eval_array_addition_assignment(
+              lMembers[idx] as ArrayVal,
+              rMembers[idx] as ArrayVal);
+            break;
+          case "dictionary":
+            throw `Transform Error: DE_TYPE_CONVERT_FAILED`;
+          default:
+            throw `Unsupported RHS array member type: ${lMembers[idx].type}`;
+        }
+        break;
+      case "dictionary":
+        switch (rMembers[idx].type) {
+          case "bool":
+          case "string":
+            throw `Illegal operation, SUBTRACT with incompatible data types: ${lMembers[idx].type} - ${rMembers[idx].type}`;
+          case "number":
+          case "null":
+          case "dictionary":
+            throw `Transform Error: DE_TYPE_CONVERT_FAILED`;
+          case "array":
+            // TODO: recursive function for dict +- array
+            throw `Handling for dictionary += array not yet implemented`;
+          default:
+            throw `Unsupported RHS array member type: ${lMembers[idx].type}`;
+        }
+        break;
+      default:
+        throw `Unsupported LHS array member type: ${lMembers[idx].type}`;
+    }
+  }
+  return lhs;
 }

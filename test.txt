@@ -6,8 +6,7 @@
   lol nice';
 
   // test for member expressions and array assignment operators
-  a = {17, {"ab", 5}, $b};
-  a += "xx";
-  a[4] = "nice";
-  b = {a[0], a[1][0], a[1][1], a[2], a[3], a[4]};
+  a = {{"xd", true}, 16};
+  a += {"ZZZ", {"YYY"}};
+  a[0]
 </trans>
