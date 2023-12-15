@@ -29,7 +29,7 @@ export function eval_assignment_expr(
     case "MemberExpr":
       return eval_member_assignment(node.assignee as MemberExpr, node, scope);
     default:
-      // the original error:
+      // POD: the original error:
       // The left hand side of the assignment operator '=' must be a local or global data element, such as x=... or $x=... error occured
       throw `Invalid LHS inside assignment expr ${JSON.stringify(node.assignee)}`;
   }
@@ -279,7 +279,7 @@ export function evalAssignment(lhs: RuntimeVal, rhs: RuntimeVal, operator: strin
         return arrVal;
       }
       else
-        // currently returns interpreter types rather than strict JB types (e.g. 'number' instead of int/double)
+        // POD: currently returns interpreter types rather than strict JB types (e.g. 'number' instead of int/double)
         // call types should not be here, it should be their return value
         // TODO: dictionary and binary type handling
         throw `Illegal operation, ADDITION with incompatible data types: ${lhs.type} + ${rhs.type}`

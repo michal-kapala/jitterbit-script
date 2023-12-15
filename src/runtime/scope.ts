@@ -1,4 +1,4 @@
-import { systemVars } from "../api/sysvars";
+import { Api } from "../api";
 import { GlobalIdentifier } from "../frontend/ast";
 import { evalAssignment } from "./eval/expressions/assignment";
 import { 
@@ -26,7 +26,7 @@ export default class Scope {
     this.variables = new Map();
     if(global) {
       // Initialize static system variables
-      systemVars.static.forEach((value) => {
+      Api.sysVars.static.forEach((value) => {
         // parse default value
         if(value.default !== undefined) {
           let def = {} as RuntimeVal;
@@ -91,8 +91,8 @@ export default class Scope {
             case "null":
               this.getGlobal().variables.set(varName, value);
               return value;
-            // TODO
             case "dictionary":
+              // TODO
             default:
               throw `Unsupported type: ${value.type}`;
           }
@@ -112,8 +112,8 @@ export default class Scope {
               // new value assigned
               this.getGlobal().variables.set(varName, value);
               return value;
-            // TODO
             case "dictionary":
+              // TODO
             default:
               throw `Unsupported type: ${value.type}`;
           }
@@ -158,8 +158,6 @@ export default class Scope {
       if(varname[0] === "$")
         return this;
       else
-        // Add JB error
-        // Local variable <varname> hasn't been initialized
         throw `Local variable '${varname}' hasn't been initialized`;
     }
 

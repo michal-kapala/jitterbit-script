@@ -62,10 +62,11 @@ export function checkArrayIndex(index: number): boolean {
 export function setMember(array: ArrayVal, newValue: RuntimeVal, index: number): RuntimeVal {
   // handle out-of-bounds index
   if (index >= array.members.length) {
-    console.warn(`InterpreterWarning: Specified index value out of bounds, the original array is resized to ${index+1} with null values`);
     
-    for(let i = index; i > array.members.length; i--)
+    for(let i = index; i > array.members.length; i--) {
+      console.warn(`InterpreterWarning: Specified index value out of bounds, the original array is resized to ${index+1} with null values`);
       array.members.push(MK_NULL());
+    }
 
     array.members.push(newValue);
     return newValue;

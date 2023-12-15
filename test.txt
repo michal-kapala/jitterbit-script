@@ -5,8 +5,15 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for array unary expression
-  a = {1, false, "69", "0", {7, 0}};
-  b = ++a[4];
-  a[4];
+  // test for function calls and null value insertions
+  arr = Collection();
+  arr[1] = "first";
+  arr[2] = "second";
+  arr[3] = 17;
+  arr[4] = "true";
+  arr[5] = -9;
+  arr[6] = false;
+  a = arr[10];
+  SortArray(arr, true);
+  arr;
 </trans>

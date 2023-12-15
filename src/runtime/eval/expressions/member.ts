@@ -40,7 +40,8 @@ export function eval_member_expr(memExp: MemberExpr, scope: Scope): RuntimeVal {
       switch (val.type) {
         case "array":
           return eval_array_ident_member_expr(val as ArrayVal, key);
-        // TODO: dict handling
+        case "dictionary":
+          // TODO
         default:
           throw `[] operator applied to a ${memExp.object.kind} data element of unsupported type: ${val.type}`;
       }
@@ -50,7 +51,8 @@ export function eval_member_expr(memExp: MemberExpr, scope: Scope): RuntimeVal {
       switch(left.type) {
         case "array":
           return eval_array_ident_member_expr(left as ArrayVal, key);
-        // TODO: dict handling
+        case "dictionary":
+          // TODO
         default:
           throw `[] operator applied to a ${memExp.object.kind} data element of unsupported type: ${left.type}`;
       }
@@ -72,7 +74,8 @@ function eval_array_lit_member_expr(arrayExpr: ArrayLiteral, key: RuntimeVal, sc
   // computed index out of bounds
   if (index >= array.members.length) {
     // Resizing is skipped for literals since they dont exist in the scope anyway
-    console.warn(`InterpreterWarning: Specified index value out of bounds, the original array is resized to ${index} with null values`);
+    if (index > array.members.length)
+      console.warn(`InterpreterWarning: Specified index value out of bounds, the original array is resized to ${index} with null values`);
     return { type: "null", value: null } as NullVal;
   }
 
@@ -88,13 +91,13 @@ function eval_array_ident_member_expr(array: ArrayVal, key: RuntimeVal, lhs = fa
   
   // computed index out of bounds
   if (index >= array.members.length) {
-    if(lhs) {
+    array.members.push(MK_NULL());
+    // Inserts the null values and mutates the scope
+    // Resizes to index of elements with null values
+    if(index >= array.members.length)
       console.warn(`InterpreterWarning: Specified index value out of bounds, the original array is resized to ${index} with null values`);
-      // Inserts the null values and mutates the scope
-      // Resizes to index of elements with null values
-      for(let i = index; i >= array.members.length; i--)
-        array.members.push(MK_NULL());
-    }
+    for(let i = index; i >= array.members.length; i--)
+      array.members.push(MK_NULL());
 
     return { type: "null", value: null } as NullVal;
   }
@@ -118,6 +121,7 @@ function keyValueToNumber(key: RuntimeVal): number {
     case "null":
       return 0;
     case "array":
+    case "dictionary":
       // same for dict
       throw `Evaluation of array index error`;
     default:

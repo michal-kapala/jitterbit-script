@@ -3,7 +3,7 @@
 // ---     Defines the structure of our languages AST      ---
 // -----------------------------------------------------------
 
-import { Token } from "./types/Token";
+import { Token } from "./types";
 
 export type NodeType =
   // STATEMENTS
@@ -15,8 +15,6 @@ export type NodeType =
   | "BinaryExpr"
   | "UnaryExpr"
   // Literals
-  | "Property"
-  | "ObjectLiteral"
   | "NumericLiteral"
   | "StringLiteral"
   | "BooleanLiteral"
@@ -63,8 +61,7 @@ export interface BinaryExpr extends Expr {
 export interface CallExpr extends Expr {
   kind: "CallExpr";
   args: Expr[];
-  // caller is Expr only because of MemberExpr calls feature (to be changed as jb only suports API calls)
-  caller: Expr;
+  caller: Identifier;
 }
 
 export interface MemberExpr extends Expr {

@@ -1,4 +1,11 @@
-export type ValueType = "null" | "number" | "bool" | "string" | "call" | "array" | "dictionary";
+export type ValueType = 
+  "null" |
+  "number" |
+  "bool" |
+  "string" |
+  "array" |
+  "dictionary" |
+  "void";
 
 export interface RuntimeVal {
   type: ValueType;
@@ -57,22 +64,31 @@ export function MK_ARRAY(m: RuntimeVal[] = []) {
 }
 
 /**
- * Runtime value of a function call, which can result in different runtime values.
- */
-export interface CallVal extends RuntimeVal {
-  type: "call";
-  // calls dont return other calls (only simple type or object type literals)
-  // DictVal to be added
-  result: NullVal | BooleanVal | NumberVal | StringVal | ArrayVal;
-}
-
-/**
  * Runtime value of an array literal or an array function call.
  */
 export interface ArrayVal extends RuntimeVal {
   type: "array",
   // evaluated elements
   members: RuntimeVal[]
+}
+
+/**
+ * Only returned by void function calls.
+ * 
+ * Void function calls are in fact assignable and return null values.
+ */
+export interface VoidVal extends RuntimeVal {
+  type: "void";
+  value: NullVal;
+}
+
+/**
+ * Performs Jitterbit's int2bool or float2bool conversion.
+ * @param numVal 
+ * @returns 
+ */
+export function jbNumberToBool(numVal: NumberVal) {
+  return numVal.value !== 0;
 }
 
 /**
@@ -108,6 +124,16 @@ export function jbStringToNumber(strVal: StringVal): number {
  */
 export function jbStringToBool(strVal: StringVal): boolean {
   let parseResult = parseFloat(strVal.value);
+  return (!Number.isNaN(parseResult) && parseResult !== 0) || strVal.value === "true";
+}
+
+/**
+ * Similar to `jbStringToBool` but truncates text behind a number literal before parsing.
+ * @param strVal 
+ * @returns 
+ */
+export function jbString2Int2Bool(strVal: StringVal): boolean {
+  let parseResult = jbStringToNumber(strVal);
   return (!Number.isNaN(parseResult) && parseResult !== 0) || strVal.value === "true";
 }
 

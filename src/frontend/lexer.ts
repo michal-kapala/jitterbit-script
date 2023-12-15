@@ -2,8 +2,7 @@
 // ---------------          LEXER          -------------------
 // ---  Responsible for producing tokens from the source   ---
 // -----------------------------------------------------------
-import Position from "./types/Position";
-import { Token, TokenType } from "./types/Token";
+import { Position, Token, TokenType } from "./types";
 
 /**
  * Constant lookup for keywords and known identifiers + symbols.
@@ -15,29 +14,37 @@ const KEYWORDS: Record<string, TokenType> = {
 
 /**
  * Returns whether the character passed in alphabetic -> [a-zA-Z]
+ * @param src 
+ * @returns 
  */
-// to be changed
 function isAlpha(src: string): boolean {
+  // to be changed
   return src.toUpperCase() != src.toLowerCase();
 }
 
 /**
  * Returns true if the character is whitespace like -> [\s, \t, \r]
+ * @param str 
+ * @returns 
  */
-// to be changed to support positioning (newline)
 function isSkippable(str: string): boolean {
+  // to be changed to support positioning (newline)
   return str === " " || str === "\t" || str === "\r";
 }
 
 /**
  * Returns true if the character is end of line character - `\n`.
+ * @param str 
+ * @returns 
  */
 function isEOL(str: string): boolean {
   return str === "\n";
 }
 
 /**
- Return whether the character is a valid integer -> [0-9]
+ * Return whether the character is a valid integer -> [0-9]
+ * @param str 
+ * @returns 
  */
 function isNumber(str: string): boolean {
   const c = str.charCodeAt(0);
@@ -129,6 +136,9 @@ function resolve_escaped(escChar: string): string {
 /**
  * Given a string representing source code, produces tokens and handles
  * possible unidentified characters.
+ * @param sourceCode 
+ * @param curPos 
+ * @returns 
  */
 export function tokenize(sourceCode: string, curPos: Position): Token[] {
   const tokens = new Array<Token>();

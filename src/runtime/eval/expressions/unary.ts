@@ -23,14 +23,14 @@ export function eval_unary_expr(unop: UnaryExpr, scope: Scope): RuntimeVal {
     case "!":
       if(unop.lhs)
         return negate(operand);
-      // Jitterbit Studio supports RHS ! for ArrayLiteral (only), this is unsupported
-      // original error:
+      // POD: Jitterbit Studio supports RHS ! for ArrayLiteral (only), this is unsupported
+      // POD: original error:
       // Operator ! cannot be proceeded with an operand: X
       throw `RHS unary operator ${unop.operator} unsupported`;
     case "-":
       if(unop.lhs)
         return negative(operand);
-      // the original error for a = Null()-;
+      // POD: the original error for a = Null()-;
       // Not enough operands for the operation: ";"
       throw `RHS unary operator ${unop.operator} unsupported`;
     case "--":
@@ -42,7 +42,7 @@ export function eval_unary_expr(unop: UnaryExpr, scope: Scope): RuntimeVal {
           case "MemberExpr":
             return decrement(operand);
           default:
-            // original error:
+            // POD: original error:
             // Invalid argument to operator ++/--
             throw `Unsupported argument type for ${unop.operator} LHS unary operator: ${unop.value.kind}`;
         }
@@ -57,7 +57,7 @@ export function eval_unary_expr(unop: UnaryExpr, scope: Scope): RuntimeVal {
           case "MemberExpr":
             // post-decrementation is not supported for member expressions, e.g. b = a[4]--;
           default:
-            // original error:
+            // POD: original error:
             // Invalid argument to operator ++/--
             throw `Unsupported argument type for ${unop.operator} RHS unary operator: ${unop.value.kind}`;
         }
@@ -71,7 +71,7 @@ export function eval_unary_expr(unop: UnaryExpr, scope: Scope): RuntimeVal {
           case "MemberExpr":
             return increment(operand);
           default:
-            // original error:
+            // POD: original error:
             // Invalid argument to operator ++/--
             throw `Unsupported argument type for ${unop.operator} LHS unary operator: ${unop.value.kind}`;
         }
@@ -86,7 +86,7 @@ export function eval_unary_expr(unop: UnaryExpr, scope: Scope): RuntimeVal {
           case "MemberExpr":
             // post-incrementation is not supported for member expressions, e.g. b = a[4]++;
           default:
-            // original error:
+            // POD: original error:
             // Invalid argument to operator ++/--
             throw `Unsupported argument type for ${unop.operator} RHS unary operator: ${unop.value.kind}`;
         }

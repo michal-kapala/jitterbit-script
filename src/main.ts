@@ -14,7 +14,7 @@ async function run(filename: string) {
     if (err) {
       return console.log(err);
     }
-    const program = parser.produceAST(data);
+    const program = parser.parse(data);
     const result = evaluate(program, globalScope);
     console.log("\nScript result:\n", result);
   });
@@ -36,7 +36,7 @@ function repl() {
     }
 
     // Produce AST From source-code
-    const program = parser.produceAST(input ?? "");
+    const program = parser.parse(input ?? "");
 
     const result = evaluate(program, globalScope);
     console.log(result);

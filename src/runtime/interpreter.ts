@@ -4,6 +4,7 @@ import {
   AssignmentExpr,
   BinaryExpr,
   BooleanLiteral,
+  CallExpr,
   GlobalIdentifier,
   Identifier,
   MemberExpr,
@@ -21,6 +22,7 @@ import { eval_identifier } from "./eval/expressions/identifier";
 import { eval_unary_expr } from "./eval/expressions/unary";
 import { eval_array_expr } from "./eval/expressions/array";
 import { eval_member_expr } from "./eval/expressions/member";
+import { eval_call_expr } from "./eval/expressions/call";
 
 /**
  * Evaluates a statement or expression.
@@ -51,7 +53,7 @@ export function evaluate(astNode: Stmt, scope: Scope): RuntimeVal {
     case "GlobalIdentifier":
       const global = astNode as GlobalIdentifier;
       // null-init global variables on first appearance, before the evaluation
-      // globals are script-scoped, there's nothing like a script call stack available here
+      // POD: globals are script-scoped, there's nothing like a script call stack available here
       // which also makes project variables unsupported
        const globalScope = scope.getGlobal();
        globalScope.initGlobalVar(global);
@@ -66,6 +68,8 @@ export function evaluate(astNode: Stmt, scope: Scope): RuntimeVal {
       return eval_binary_expr(astNode as BinaryExpr, scope);
     case "UnaryExpr":
       return eval_unary_expr(astNode as UnaryExpr, scope);
+    case "CallExpr":
+      return eval_call_expr(astNode as CallExpr, scope);
     case "Program":
       return eval_program(astNode as Program, scope);
     default:

@@ -11,7 +11,7 @@ export function eval_program(program: Program, env: Scope): RuntimeVal {
     }
   }
   catch(e) {
-    // this should be added as an error
+    // TODO: this should be added as an error
     console.error(`InterpreterError: ${e}\nLast evaluated expression:\n`, lastEvaluated);
   }
   
