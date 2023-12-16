@@ -12,7 +12,7 @@ export abstract class Func {
   maxArgs!: number;
 
   /**
-   * Validates argument list and executes the implementation.
+   * Validates argument list and executes the function's implementation.
    * @returns
    */
   abstract call(args: RuntimeVal[]): RuntimeVal;

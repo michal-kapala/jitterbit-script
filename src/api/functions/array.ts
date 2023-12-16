@@ -1,9 +1,8 @@
-import assert from "assert";
 import { ArrayVal, BooleanVal, MK_ARRAY, NumberVal, RuntimeVal, StringVal, jbNumberToBool, jbString2Int2Bool, jbStringToNumber } from "../../runtime/values";
 import { Func, Parameter, Signature } from "../types";
 
 /**
- * The implementation of `Array()` function.
+ * The implementation of `Array` function.
  * 
  * Creates an empty array. Though arrays don't need to be initialized prior to use, this method can be used to be explicit or to reset an already-existing array. Arrays are zero-based, and values are retrieved using indexes.
  */
@@ -29,7 +28,7 @@ export class ArrayFunc extends Func {
 }
 
 /**
- * The implementation of `Collection()` function.
+ * The implementation of `Collection` function.
  * 
  * An alias for `Array`. See the function `Array`.
  */
@@ -81,6 +80,7 @@ export class SortArrayFunc extends Func  {
   } 
 
   call(args: RuntimeVal[]): RuntimeVal {
+    // TODO: this error should be thrown by type checker (too)
     if(args[0].type !== "array")
       throw new Error(`SortArray can only be called on array data elements. The 'array' argument is of type ${args[0].type}`);
 

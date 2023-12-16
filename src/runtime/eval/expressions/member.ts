@@ -9,6 +9,7 @@ import Scope from "../../scope";
 import {
   ArrayVal,
   BooleanVal,
+  DictVal,
   MK_NULL,
   NullVal,
   NumberVal,
@@ -17,6 +18,7 @@ import {
 } from "../../values";
 import { checkArrayIndex, setMember } from "./array";
 import { evalAssignment } from "./assignment";
+import { getDictMember, keyValueToString, setDictMember } from "./dict";
 
 /**
  * Evaluates a member expression (x[y]).
@@ -25,7 +27,7 @@ import { evalAssignment } from "./assignment";
  * @returns 
  */
 export function eval_member_expr(memExp: MemberExpr, scope: Scope): RuntimeVal {
-  let key = evaluate(memExp.key, scope);
+  const key = evaluate(memExp.key, scope);
 
   switch(memExp.object.kind) {
     // {1,2,3}[1]
@@ -41,7 +43,7 @@ export function eval_member_expr(memExp: MemberExpr, scope: Scope): RuntimeVal {
         case "array":
           return eval_array_ident_member_expr(val as ArrayVal, key);
         case "dictionary":
-          // TODO
+          return getDictMember(val as DictVal, key);
         default:
           throw `[] operator applied to a ${memExp.object.kind} data element of unsupported type: ${val.type}`;
       }
@@ -52,7 +54,7 @@ export function eval_member_expr(memExp: MemberExpr, scope: Scope): RuntimeVal {
         case "array":
           return eval_array_ident_member_expr(left as ArrayVal, key);
         case "dictionary":
-          // TODO
+          return getDictMember(left as DictVal, key);
         default:
           throw `[] operator applied to a ${memExp.object.kind} data element of unsupported type: ${left.type}`;
       }
@@ -151,11 +153,17 @@ export function eval_member_assignment(memExp: MemberExpr, assignment: Assignmen
       let rhs = checkArrayIndex(index)
         ? evaluate(assignment.value, scope)
         : MK_NULL();
-
       const newValue = evalAssignment(evaluate(memExp, scope), rhs, assignment.operator.value);
       // setMember appends null values if index is out of bounds
-      return setMember(lhs as ArrayVal, newValue, index);      
-    // TODO: dict
+      return setMember(lhs as ArrayVal, newValue, index);
+    case "dictionary":
+      const key = keyValueToString(evaluate(memExp.key, scope));
+      const newVal = evalAssignment(
+        evaluate(memExp, scope),
+        evaluate(assignment.value, scope),
+        assignment.operator.value
+      );
+      return setDictMember(lhs as DictVal, newVal, key);
     default:
       throw `[] operator applied to a ${lhs.type} data element.\nIf in the script testing screen, try clicking 'Reset' and run again`;
   }

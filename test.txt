@@ -5,15 +5,8 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for function calls and null value insertions
-  arr = Collection();
-  arr[1] = "first";
-  arr[2] = "second";
-  arr[3] = 17;
-  arr[4] = "true";
-  arr[5] = -9;
-  arr[6] = false;
-  a = arr[10];
-  SortArray(arr, true);
-  arr;
+  // test for basic dict usage
+  dict = Map();
+  dict[true] = "nice";
+  dict[1];
 </trans>

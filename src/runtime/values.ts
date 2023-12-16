@@ -19,8 +19,8 @@ export interface NullVal extends RuntimeVal {
   value: null;
 }
 
-export function MK_NULL() {
-  return { type: "null", value: null } as NullVal;
+export function MK_NULL(): NullVal {
+  return { type: "null", value: null };
 }
 
 /**
@@ -31,8 +31,8 @@ export interface BooleanVal extends RuntimeVal {
   value: boolean;
 }
 
-export function MK_BOOL(b = true) {
-  return { type: "bool", value: b } as BooleanVal;
+export function MK_BOOL(b = true): BooleanVal {
+  return { type: "bool", value: b };
 }
 
 /**
@@ -43,8 +43,8 @@ export interface NumberVal extends RuntimeVal {
   value: number;
 }
 
-export function MK_NUMBER(n = 0) {
-  return { type: "number", value: n } as NumberVal;
+export function MK_NUMBER(n = 0): NumberVal {
+  return { type: "number", value: n };
 }
 
 /**
@@ -55,21 +55,32 @@ export interface StringVal extends RuntimeVal {
   value: string;
 }
 
-export function MK_STRING(s = "") {
-  return { type: "string", value: s } as StringVal;
-}
-
-export function MK_ARRAY(m: RuntimeVal[] = []) {
-  return { type: "array", members: m } as ArrayVal;
+export function MK_STRING(s = ""): StringVal {
+  return { type: "string", value: s };
 }
 
 /**
  * Runtime value of an array literal or an array function call.
  */
 export interface ArrayVal extends RuntimeVal {
-  type: "array",
-  // evaluated elements
-  members: RuntimeVal[]
+  type: "array";
+  members: RuntimeVal[];
+}
+
+export function MK_ARRAY(m: RuntimeVal[] = []): ArrayVal {
+  return { type: "array", members: m };
+}
+
+/**
+ * Runtime value of a dictionary object.
+ */
+export interface DictVal extends RuntimeVal {
+  type: "dictionary";
+  members: Map<string, RuntimeVal>;
+}
+
+export function MK_DICT(m: Map<string, RuntimeVal> = new Map<string, RuntimeVal>()): DictVal {
+  return { type: "dictionary", members: m };
 }
 
 /**
