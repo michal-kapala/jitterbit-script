@@ -104,6 +104,7 @@ The list of recognized operator tokens.
 |----|---|---|
 | `!`  | ✔️ | ✔️ |
 | `-`  | ✔️ | ✔️ |
+| `+`  |  | ✔️ (unofficial support) |
 | `++` | ✔️ | ✔️ |
 | `--` | ✔️ | ✔️ |
 
@@ -111,8 +112,8 @@ The list of recognized operator tokens.
 
 | Symbol | jitterbit-interpreter | Jitterbit Studio |
 |----|---|---|
-| `{}` |  | ✔️ |
-| `[]` |  | ✔️ |
+| `{}` | ✔️ | ✔️ |
+| `[]` | ✔️ | ✔️ |
 
 ## Other expressions
 
@@ -122,10 +123,10 @@ The list of statements and expressions supported by the interpreter.
 |---|---|---|
 | `<trans></trans>`  | ✔️ | ✔️ |
 | `()`                 | ✔️ | ✔️ |
-| Function calls       |  | ✔️ |
+| Function calls       | ✔️ | ✔️ |
 
 ## APIs
 
-Currently supported Jitterbit API members are defined in separate files:
-- [system variables](https://github.com/michal-kapala/jitterbit-interpreter/blob/main/src/api/sysvars.ts)
-- [functions]()
+[System variables](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/variables/jitterbit-variables/) and [functions](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/) were implemented as specified by the documentation:
+- [system variables](https://github.com/michal-kapala/jitterbit-interpreter/blob/main/src/api.ts)
+- [functions](https://github.com/michal-kapala/jitterbit-interpreter/tree/main/src/api/functions)

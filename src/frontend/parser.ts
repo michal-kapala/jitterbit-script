@@ -7,11 +7,10 @@ import {
   BooleanLiteral,
   CallExpr,
   Expr,
-  FloatLiteral,
   GlobalIdentifier,
   Identifier,
-  IntegerLiteral,
   MemberExpr,
+  NumericLiteral,
   Program,
   Stmt,
   StringLiteral,
@@ -76,10 +75,7 @@ export default class Parser {
    * @returns 
    */
   public parse(sourceCode: string): Program {
-    const program: Program = {
-      kind: "Program",
-      body: [],
-    };
+    const program = new Program()
 
     // global current tokenizer position, starts at 1,1
     let curPos = new Position();
@@ -213,12 +209,7 @@ export default class Parser {
     if (this.at().type == TokenType.Assignment) {
       let operator = this.consume();
       const value = this.parse_assignment_expr();
-      return { 
-        value,
-        assignee: left,
-        kind: "AssignmentExpr",
-        operator
-      } as AssignmentExpr;
+      return new AssignmentExpr(left, value, operator);
     }
 
     return left;
@@ -234,6 +225,7 @@ export default class Parser {
         const operator = this.consume().value;
         const right = this.parse_comparative_expr();
 
+        // TODO: to be changed
         left = {
           kind: "BinaryExpr",
           left,
@@ -254,6 +246,7 @@ export default class Parser {
     while (this.at().type === TokenType.ComparisonOperator) {
       const operator = this.consume().value;
       const right = this.parse_additive_expr();
+      // TODO: to be changed
       left = {
         kind: "BinaryExpr",
         left,
@@ -275,6 +268,7 @@ export default class Parser {
     while (this.at().value === "+" || this.at().value === "-") {
       const operator = this.consume().value;
       const right = this.parse_multiplicative_expr();
+      // TODO: to be changed
       left = {
         kind: "BinaryExpr",
         left,
@@ -298,6 +292,7 @@ export default class Parser {
     ) {
       const operator = this.consume().value;
       const right = this.parse_negation_expr();
+      // TODO: to be changed
       left = {
         kind: "BinaryExpr",
         left,
@@ -318,13 +313,7 @@ export default class Parser {
     // for some reason Jitterbit dont parse this with other unary expressions
     if(this.at().value === "!") {
       let operator = this.consume().value;
-      return {
-        kind: "UnaryExpr",
-        // TODO: could be parse_logical_expr() as assignments cant be negated directly (like any other binary expr)
-        value: this.parse_assignment_expr(),
-        operator,
-        lhs: true
-      } as UnaryExpr;
+      return new UnaryExpr(this.parse_assignment_expr(), operator, true);
     } else {
       return this.parse_power_expr();
     }
@@ -340,6 +329,7 @@ export default class Parser {
     while (this.at().value === "^") {
       const operator = this.consume().value;
       const right = this.parse_unary_expr();
+      // TODO: to be changed
       left = {
         kind: "BinaryExpr",
         left,
@@ -363,24 +353,14 @@ export default class Parser {
       this.at().type === TokenType.Minus
     ) {
       const operator = this.consume().value;
-      return {
-        kind: "UnaryExpr",
-        value: this.parse_call_member_expr(),
-        operator,
-        lhs: true
-      } as UnaryExpr;
+      return new UnaryExpr(this.parse_call_member_expr(), operator, true);
     } else {
       // RHS operators (post-)
       let left = this.parse_call_member_expr();
 
       if(this.at().value === "++" || this.at().value === "--") {
         const operator = this.consume().value;
-        left = {
-          kind: "UnaryExpr",
-          value: left,
-          operator,
-          lhs: false
-        } as UnaryExpr;
+        left = new UnaryExpr(left, operator, false);
       }
       
       return left;
@@ -419,11 +399,7 @@ export default class Parser {
     if(func === undefined)
       throw `Function '${funcName}' does not exist, refer to Jitterbit function API docs`;
 
-    let call_expr: Expr = {
-      kind: "CallExpr",
-      caller,
-      args: this.parse_args(),
-    } as CallExpr;
+    let call_expr: Expr = new CallExpr(this.parse_args(), caller as Identifier);
 
     // invalid number of arguments
     if(
@@ -490,12 +466,7 @@ export default class Parser {
         "Missing closing bracket in computed value.",
       );
 
-      object = {
-        kind: "MemberExpr",
-        object,
-        key,
-        computed: true,
-      } as MemberExpr;
+      object = new MemberExpr(object, key, true);
     }
 
     return object;
@@ -516,7 +487,7 @@ export default class Parser {
     // empty array
     if(this.at().type === TokenType.CloseBrace) {
       this.consume();
-      return { kind: "ArrayLiteral", members: [] } as ArrayLiteral;
+      return new ArrayLiteral();
     }
 
     const members = this.parse_arguments_list();
@@ -525,7 +496,7 @@ export default class Parser {
       TokenType.CloseBrace,
       "Array literal missing closing brace."
     );
-    return { kind: "ArrayLiteral", members} as ArrayLiteral;
+    return new ArrayLiteral(members);
   }
 
   // Expression precedence (lowest to highest):
@@ -554,7 +525,7 @@ export default class Parser {
     switch (tk) {
       // User-defined local variables
       case TokenType.Identifier:
-        return { kind: "Identifier", symbol: this.consume().value } as Identifier;
+        return new Identifier(this.consume().value)
 
       case TokenType.GlobalIdentifier:
         // consume the token
@@ -571,12 +542,8 @@ export default class Parser {
         }
         // check if system variable
         let sysVar = Api.getSysVar(globalVarToken.value);
-        if(sysVar !== undefined) 
-          return {
-            kind: "GlobalIdentifier",
-            symbol: globalVarToken.value,
-            type: "system" 
-          } as GlobalIdentifier;
+        if(sysVar !== undefined)
+          return new GlobalIdentifier(globalVarToken.value, "system");
         else {
           if(globalVarToken.value.substring(0, 11) === "$jitterbit.") {
             // Add a warning:
@@ -584,39 +551,23 @@ export default class Parser {
             console.warn("ParserWarning: Global variable names should not begin with '$jitterbit.', it is a reserved namespace.");
           }
 
-          return {
-            kind: "GlobalIdentifier",
-            symbol: globalVarToken.value,
-            type: "global"
-          } as GlobalIdentifier;
+          return new GlobalIdentifier(globalVarToken.value, "global");
         }
 
       // Constants and Numeric Constants
       case TokenType.Integer:
-        return {
-          kind: "NumericLiteral",
-          value: parseInt(this.consume().value),
-        } as IntegerLiteral;
+        return new NumericLiteral(parseInt(this.consume().value));
       
       case TokenType.Float:
-        return {
-          kind: "NumericLiteral",
-          value: parseFloat(this.consume().value),
-        } as FloatLiteral;
+        return new NumericLiteral(parseFloat(this.consume().value));
 
       case TokenType.True:
         this.consume();
-        return {
-          kind: "BooleanLiteral",
-          value: true,
-        } as BooleanLiteral;
+        return new BooleanLiteral(true);
 
       case TokenType.False:
         this.consume();
-        return {
-          kind: "BooleanLiteral",
-          value: false,
-        } as BooleanLiteral;
+        return new BooleanLiteral(false);
 
       // Grouping Expressions
       case TokenType.OpenParen: {
@@ -630,22 +581,17 @@ export default class Parser {
       }
 
       // '' string literal
-      case TokenType.SingleQuoteString: {
-        return { kind: "StringLiteral", value: this.consume().value } as StringLiteral;
-      }
-
-      // "" string literal
-      case TokenType.DoubleQuoteString: {
-        return { kind: "StringLiteral", value: this.consume().value } as StringLiteral;
-      }
+      case TokenType.SingleQuoteString:
+      case TokenType.DoubleQuoteString:
+        return new StringLiteral(this.consume().value);
 
       // TODO: error message to be unified
       default:
-        console.error("ParserError: Unexpected token found during parsing!", this.at());
+        const error = "Unexpected token found during parsing: " + this.at().value;
         // TODO: add an error/error detail for every other token type here
         // consume the token to prevent infinite loops
         this.consume()
-        return { kind: "Program" };
+        throw error;
     }
   }
 }
