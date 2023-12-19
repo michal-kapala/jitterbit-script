@@ -1,4 +1,5 @@
-import { ArrayVal, BooleanVal, MK_ARRAY, NumberVal, RuntimeVal, StringVal, jbNumberToBool, jbString2Int2Bool, jbStringToNumber } from "../../runtime/values";
+import { Array, JbBool, JbNumber, JbString } from "../../runtime/types";
+import { RuntimeVal } from "../../runtime/values";
 import { Func, Parameter, Signature } from "../types";
 
 /**
@@ -17,9 +18,9 @@ export class ArrayFunc extends Func {
     this.maxArgs = 0;
   }
 
-  call(args: RuntimeVal[]): ArrayVal {
+  call(args: RuntimeVal[]) {
     this.chooseSignature(args);
-    return MK_ARRAY();
+    return new Array();
   }
 
   protected chooseSignature(args: RuntimeVal[]): void {
@@ -99,7 +100,7 @@ export class SortArrayFunc extends Func  {
     // where applicable, order precedence applies
     // if descending, the array is reversed at the end
 
-    const array = args[0] as ArrayVal;
+    const array = args[0] as Array;
     let isAscending = true;
 
     // empty array
@@ -129,7 +130,7 @@ export class SortArrayFunc extends Func  {
     // SortArray(array, index, [isAscending])
 
     // the converted number is floored if float
-    const index = Math.floor(this.toInt(args[1]));
+    const index = Math.floor(args[1].toNumber());
 
     // multi-dimensional array validation
     this.checkElements(array, index);
@@ -139,7 +140,7 @@ export class SortArrayFunc extends Func  {
       this.sort(array, index);
     // SortArray(array, index, isAscending)
     else {
-      isAscending = this.toBool(args[2]);
+      isAscending = args[2].toBool();
         this.sort(array, index);
         // descending sort
         // POD: jitterbit messed it up for multi-dimensional arrays too
@@ -151,7 +152,7 @@ export class SortArrayFunc extends Func  {
   }
 
   protected chooseSignature(args: RuntimeVal[]): void {
-    const array = args[0] as ArrayVal;
+    const array = args[0] as Array;
     const members = array.members;
 
     switch (args.length) {
@@ -184,7 +185,7 @@ export class SortArrayFunc extends Func  {
    * @param array 
    * @param index 
    */
-  private sort(array: ArrayVal, index?: number) {
+  private sort(array: Array, index?: number) {
     // not that much in-place
     let evaluations: Evaluation[] = index === undefined
     ? this.evalOneDimArray(array)
@@ -210,26 +211,26 @@ export class SortArrayFunc extends Func  {
    * @param array 
    * @returns 
    */
-  private evalOneDimArray(array: ArrayVal): Evaluation[] {
+  private evalOneDimArray(array: Array): Evaluation[] {
     const result: Evaluation[] = [];
     
     for(const mem of array.members) {
       switch(mem.type) {
         case "number":
           result.push({
-            eval: (mem as NumberVal).value,
+            eval: (mem as JbNumber).value,
             elem: mem
           });
           break;
         case "bool":
           result.push({
-            eval: (mem as BooleanVal).value ? 1 : 0,
+            eval: (mem as JbBool).toNumber(),
             elem: mem
           });
           break;
         case "string":
           result.push({
-            eval: jbStringToNumber(mem as StringVal),
+            eval: (mem as JbString).toNumber(),
             elem: mem
           });
           break;
@@ -258,27 +259,27 @@ export class SortArrayFunc extends Func  {
    * @param index 
    * @returns 
    */
-  private evalMultiDimArray(array: ArrayVal, index: number): Evaluation[] {
+  private evalMultiDimArray(array: Array, index: number): Evaluation[] {
     const result: Evaluation[] = [];
     
-    for(const mem of array.members as ArrayVal[]) {
+    for(const mem of array.members as Array[]) {
       const value = mem.members[index];
       switch(value.type) {
         case "number":
           result.push({
-            eval: (value as NumberVal).value,
+            eval: (value as JbNumber).value,
             elem: mem
           });
           break;
         case "bool":
           result.push({
-            eval: (value as BooleanVal).value ? 1 : 0,
+            eval: (value as JbBool).toNumber(),
             elem: mem
           });
           break;
         case "string":
           result.push({
-            eval: jbStringToNumber(value as StringVal),
+            eval: (value as JbString).toNumber(),
             elem: mem
           });
           break;
@@ -301,20 +302,18 @@ export class SortArrayFunc extends Func  {
 
   /**
    * Converts any `RuntimeVal` to a boolean.
-   * 
-   * This could be moved to a value class later (if needed).
    * @param val 
    * @returns 
    */
   private toBool(val: RuntimeVal): boolean {
     switch (val.type) {
       case "number":
-        return jbNumberToBool(val as NumberVal);
+        return (val as JbNumber).toBool();
       case "bool":
-        return (val as BooleanVal).value;
+        return (val as JbBool).toBool();
       case "string":
         // string2int2bool happens
-        return jbString2Int2Bool(val as StringVal);
+        return (val as JbString).toBoolAsNumber();
       case "null":
       case "void":
         return false;
@@ -322,34 +321,6 @@ export class SortArrayFunc extends Func  {
       case "dictionary":
         throw `[${this.name}] Transform Error: DE_TYPE_CONVERT_FAILED`;
       default:
-        // TODO: to be changed if moved to a method
-        throw `[${this.name}] Unsupported argument type: ${val.type}`;
-    }
-  }
-
-  /**
-   * Converts any `RuntimeVal` to a boolean.
-   * 
-   * This could be moved to a value class later (if needed).
-   * @param val 
-   * @returns 
-   */
-  private toInt(val: RuntimeVal): number {
-    switch (val.type) {
-      case "number":
-        return (val as NumberVal).value;
-      case "bool":
-        return (val as BooleanVal).value ? 1 : 0;
-      case "string":
-        return jbStringToNumber(val as StringVal);
-      case "null":
-      case "void":
-        return 0;
-      case "array":
-      case "dictionary":
-        throw `[${this.name}] Transform Error: DE_TYPE_CONVERT_FAILED`;
-      default:
-        // TODO: to be changed if moved to a method
         throw `[${this.name}] Unsupported argument type: ${val.type}`;
     }
   }
@@ -359,13 +330,13 @@ export class SortArrayFunc extends Func  {
    * @param array 
    * @param index 
    */
-  private checkElements(array: ArrayVal, index: number): void {
+  private checkElements(array: Array, index: number): void {
     for(const elem of array.members) {
       if(elem.type !== "array")
         // POD: the orginal error:
         // SortArray error, array index is out of range: <index>
         throw `[${this.name}] The sorted array is expected to contain array elements only`;
-      if(index < 0 || index >= (elem as ArrayVal).members.length)
+      if(index < 0 || index >= (elem as Array).members.length)
         throw `[${this.name}] Array index is out of range: ${index}`;
     }
   }

@@ -1,4 +1,4 @@
-import { BooleanVal, NullVal, NumberVal, RuntimeVal, StringVal } from "./values";
+import { RuntimeVal } from "./values";
 import {
   ArrayLiteral,
   AssignmentExpr,
@@ -20,9 +20,10 @@ import { eval_assignment_expr } from "./eval/expressions/assignment";
 import { eval_binary_expr } from "./eval/expressions/binary";
 import { eval_identifier } from "./eval/expressions/identifier";
 import { eval_unary_expr } from "./eval/expressions/unary";
-import { eval_array_expr } from "./eval/expressions/array";
+import { eval_array_literal_expr } from "./eval/expressions/array";
 import { eval_member_expr } from "./eval/expressions/member";
 import { eval_call_expr } from "./eval/expressions/call";
+import { JbNull, JbNumber, JbBool, JbString } from "./types";
 
 /**
  * Evaluates a statement or expression.
@@ -34,20 +35,11 @@ export function evaluate(astNode: Stmt, scope: Scope): RuntimeVal {
   switch (astNode.kind) {
     // handles both integer and float literals
     case "NumericLiteral":
-      return {
-        value: ((astNode as NumericLiteral).value),
-        type: "number",
-      } as NumberVal;
+      return new JbNumber((astNode as NumericLiteral).value);
     case "BooleanLiteral":
-      return {
-        value: ((astNode as BooleanLiteral).value),
-        type: "bool"
-      } as BooleanVal;
+      return new JbBool((astNode as BooleanLiteral).value);
     case "StringLiteral":
-      return {
-        value: ((astNode as StringLiteral).value),
-        type: "string"
-      } as StringVal;
+      return new JbString((astNode as StringLiteral).value);
     case "Identifier":
       return eval_identifier(astNode as Identifier, scope);
     case "GlobalIdentifier":
@@ -59,7 +51,7 @@ export function evaluate(astNode: Stmt, scope: Scope): RuntimeVal {
        globalScope.initGlobalVar(global);
       return eval_identifier(astNode as Identifier, scope);
     case "ArrayLiteral":
-      return eval_array_expr(astNode as ArrayLiteral, scope);
+      return eval_array_literal_expr(astNode as ArrayLiteral, scope);
     case "MemberExpr":
       return eval_member_expr(astNode as MemberExpr, scope);
     case "AssignmentExpr":
@@ -77,6 +69,6 @@ export function evaluate(astNode: Stmt, scope: Scope): RuntimeVal {
         "This AST Node has not yet been setup for interpretation.",
         astNode,
       );
-      return { type: "null" } as NullVal;
+      return new JbNull();
   }
 }

@@ -1,15 +1,15 @@
 import { AssignmentExpr, Identifier, MemberExpr } from "../../../frontend/ast";
 import Scope from "../../scope";
 import { evaluate } from "../../interpreter";
-import { ArrayVal, BooleanVal, NullVal, NumberVal, RuntimeVal, StringVal } from "../../values";
+import { RuntimeVal } from "../../values";
 import { eval_member_assignment } from "./member";
 import { 
-  eval_array_assignment,
-  eval_bool_assignment,
-  eval_null_assignment,
-  eval_number_assignment,
-  eval_string_assignment
-} from "./array";
+  Array,
+  JbBool,
+  JbString,
+  JbNumber,
+  JbNull
+} from "../../types";
 
 /**
  * Executes assignment expressions (excluding incrementation/decrementation).
@@ -42,8 +42,8 @@ export function evalAssignment(lhs: RuntimeVal, rhs: RuntimeVal, operator: strin
     case "-=":
       // number -= number
       if(lhs.type === rhs.type && lhs.type === "number") {
-        let newValue = rhs as NumberVal;
-        newValue.value = (lhs as NumberVal).value - (rhs as NumberVal).value;
+        let newValue = rhs as JbNumber;
+        newValue.value = (lhs as JbNumber).value - (rhs as JbNumber).value;
         return newValue;
       }
       // simple type null interactions
@@ -66,8 +66,8 @@ export function evalAssignment(lhs: RuntimeVal, rhs: RuntimeVal, operator: strin
             case "number":
               let newValue = {
                 ...rhs,
-                value: (rhs as NumberVal).value * -1
-              } as NumberVal;
+                value: (rhs as JbNumber).value * -1
+              } as JbNumber;
               return newValue;
             case "bool":
             case "string":
@@ -89,7 +89,7 @@ export function evalAssignment(lhs: RuntimeVal, rhs: RuntimeVal, operator: strin
 
       // array -= array
       else if (lhs.type === rhs.type && lhs.type === "array") {
-        lhs = eval_array_assignment(lhs as ArrayVal, rhs as ArrayVal, operator);
+        lhs = (lhs as Array).assignArray(rhs as Array, operator);
         return lhs;
       }
 
@@ -103,10 +103,10 @@ export function evalAssignment(lhs: RuntimeVal, rhs: RuntimeVal, operator: strin
         //   console.warn(`InterpreterWarning: Expression of type ${lhs.type} -= ${rhs.type} on a global variable. This and further operations on this array can result in errors and unstable behaviour.`);
 
         const isLhs = lhs.type === "null";
-        const nullVal = (isLhs ? lhs : rhs) as NullVal;
-        let arrVal = (isLhs ? rhs : lhs) as ArrayVal;
-        arrVal = eval_null_assignment(arrVal, nullVal, operator, isLhs);
-        return arrVal;
+        const nullVal = (isLhs ? lhs : rhs) as JbNull;
+        let arr = (isLhs ? rhs : lhs) as Array;
+        arr = arr.assignNull(nullVal, operator, isLhs);
+        return arr;
       }
       // number -= array
       // array -= number
@@ -115,10 +115,10 @@ export function evalAssignment(lhs: RuntimeVal, rhs: RuntimeVal, operator: strin
         lhs.type === "array" && rhs.type === "number"
       ) {
         const isLhs = lhs.type === "number";
-        const numVal = (isLhs ? lhs : rhs) as NumberVal;
-        let arrVal = (isLhs ? rhs : lhs) as ArrayVal;
-        arrVal = eval_number_assignment(arrVal, numVal, operator, isLhs);
-        return arrVal;
+        const numVal = (isLhs ? lhs : rhs) as JbNumber;
+        let arr = (isLhs ? rhs : lhs) as Array;
+        arr = arr.assignNumber(numVal, operator, isLhs);
+        return arr;
       }
       // bool -= array
       // array -= bool
@@ -127,10 +127,10 @@ export function evalAssignment(lhs: RuntimeVal, rhs: RuntimeVal, operator: strin
         lhs.type === "array" && rhs.type === "bool"
       ) {
         const isLhs = lhs.type === "bool";
-        const boolVal = (isLhs ? lhs : rhs) as BooleanVal;
-        let arrVal = (isLhs ? rhs : lhs) as ArrayVal;
-        arrVal = eval_bool_assignment(arrVal, boolVal, operator, isLhs);
-        return arrVal;
+        const boolVal = (isLhs ? lhs : rhs) as JbBool;
+        let arr = (isLhs ? rhs : lhs) as Array;
+        arr = arr.assignBool(boolVal, operator, isLhs);
+        return arr;
       }
       // string -= array
       // array -= string
@@ -139,10 +139,10 @@ export function evalAssignment(lhs: RuntimeVal, rhs: RuntimeVal, operator: strin
         lhs.type === "array" && rhs.type === "string"
       ) {
         const isLhs = lhs.type === "string";
-        const strVal = (isLhs ? lhs : rhs) as StringVal;
-        let arrVal = (isLhs ? rhs : lhs) as ArrayVal;
-        arrVal = eval_string_assignment(arrVal, strVal, operator, isLhs);
-        return arrVal;
+        const strVal = (isLhs ? lhs : rhs) as JbString;
+        let arr = (isLhs ? rhs : lhs) as Array;
+        arr = arr.assignString(strVal, operator, isLhs);
+        return arr;
       }
       else
         // currently returns interpreter types rather than strict JB types (e.g. 'number' instead of int/double)
@@ -160,14 +160,14 @@ export function evalAssignment(lhs: RuntimeVal, rhs: RuntimeVal, operator: strin
     case "+=":
       // number += number
       if(lhs.type === rhs.type && rhs.type === "number") {
-        let newValue = rhs as NumberVal;
-        newValue.value = (lhs as NumberVal).value + (rhs as NumberVal).value;
+        let newValue = rhs as JbNumber;
+        newValue.value = (lhs as JbNumber).value + (rhs as JbNumber).value;
         return newValue;
       }
       // string += string
       else if (lhs.type === rhs.type && rhs.type === "string") {
-        let newValue = rhs as StringVal;
-        newValue.value = (lhs as StringVal).value + (rhs as StringVal).value;
+        let newValue = rhs as JbString;
+        newValue.value = (lhs as JbString).value + (rhs as JbString).value;
         return newValue;
       }
       // bool + bool (unsupported)
@@ -176,42 +176,38 @@ export function evalAssignment(lhs: RuntimeVal, rhs: RuntimeVal, operator: strin
       }
       // string += bool - implicit type conversion to string
       else if (lhs.type === "string" && rhs.type === "bool") {
-        let stringVal = (lhs as StringVal).value;
-        let boolValue = (rhs as BooleanVal).value;
+        let stringVal = (lhs as JbString).value;
+        let boolValue = (rhs as JbBool).value;
         let newValue = {
           type: "string",
           value: stringVal + (boolValue ? "1" : "0")
-        } as StringVal;
+        } as JbString;
         return newValue;
       }
       // bool += string - implicit type conversion to string
       else if (lhs.type === "bool" && rhs.type === "string") {
-        let boolValue = (lhs as BooleanVal).value;
-        let stringVal = (rhs as StringVal).value;
         let newValue = {
           type: "string",
-          value: (boolValue ? "1" : "0") + stringVal
-        } as StringVal;
+          value: (lhs as JbBool).toString() + (rhs as JbString).value
+        } as JbString;
         return newValue;
       }
       // string += number - implicit type conversion to string
       else if (lhs.type === "string" && rhs.type === "number") {
-        let stringVal = (lhs as StringVal).value;
-        let numberValue = (rhs as NumberVal).value;
         let newValue = {
           type: "string",
-          value: stringVal + numberValue.toString()
-        } as StringVal;
+          value: (lhs as JbString).value + (rhs as JbNumber).toString()
+        } as JbString;
         return newValue;
       }
       // number += string - implicit type conversion to string
       else if (lhs.type === "number" && rhs.type === "string") {
-        let numberValue = (lhs as NumberVal).value;
-        let stringVal = (rhs as StringVal).value;
+        let numberValue = (lhs as JbNumber).value;
+        let stringVal = (rhs as JbString).value;
         let newValue = {
           type: "string",
           value: numberValue.toString() + stringVal
-        } as StringVal;
+        } as JbString;
         return newValue;
       }
       // number += bool (unsupported)
@@ -227,7 +223,7 @@ export function evalAssignment(lhs: RuntimeVal, rhs: RuntimeVal, operator: strin
       
       // array += array
       else if (lhs.type === rhs.type && lhs.type === "array") {
-        lhs = eval_array_assignment(lhs as ArrayVal, rhs as ArrayVal, operator);
+        lhs = (lhs as Array).assignArray(rhs as Array, operator);
         return lhs;
       }
       // null += array
@@ -237,10 +233,10 @@ export function evalAssignment(lhs: RuntimeVal, rhs: RuntimeVal, operator: strin
         lhs.type === "array" && rhs.type === "null"
       ) {
         const isLhs = lhs.type === "null";
-        const nullVal = (isLhs ? lhs : rhs) as NullVal;
-        let arrVal = (isLhs ? rhs : lhs) as ArrayVal;
-        arrVal = eval_null_assignment(arrVal, nullVal, operator, isLhs);
-        return arrVal;
+        const nullVal = (isLhs ? lhs : rhs) as JbNull;
+        let arr = (isLhs ? rhs : lhs) as Array;
+        arr = arr.assignNull(nullVal, operator, isLhs);
+        return arr;
       }
       // number += array
       // array += number
@@ -249,10 +245,10 @@ export function evalAssignment(lhs: RuntimeVal, rhs: RuntimeVal, operator: strin
         lhs.type === "array" && rhs.type === "number"
       ) {
         const isLhs = lhs.type === "number";
-        const numVal = (isLhs ? lhs : rhs) as NumberVal;
-        let arrVal = (isLhs ? rhs : lhs) as ArrayVal;
-        arrVal = eval_number_assignment(arrVal, numVal, operator, isLhs);
-        return arrVal;
+        const numVal = (isLhs ? lhs : rhs) as JbNumber;
+        let arr = (isLhs ? rhs : lhs) as Array;
+        arr = arr.assignNumber(numVal, operator, isLhs);
+        return arr;
       }
       // bool += array
       // array += bool
@@ -261,10 +257,10 @@ export function evalAssignment(lhs: RuntimeVal, rhs: RuntimeVal, operator: strin
         lhs.type === "array" && rhs.type === "bool"
       ) {
         const isLhs = lhs.type === "bool";
-        const boolVal = (isLhs ? lhs : rhs) as BooleanVal;
-        let arrVal = (isLhs ? rhs : lhs) as ArrayVal;
-        arrVal = eval_bool_assignment(arrVal, boolVal, operator, isLhs);
-        return arrVal;
+        const boolVal = (isLhs ? lhs : rhs) as JbBool;
+        let arr = (isLhs ? rhs : lhs) as Array;
+        arr = arr.assignBool(boolVal, operator, isLhs);
+        return arr;
       }
       // string += array
       // array += string
@@ -273,10 +269,10 @@ export function evalAssignment(lhs: RuntimeVal, rhs: RuntimeVal, operator: strin
         lhs.type === "array" && rhs.type === "string"
       ) {
         const isLhs = lhs.type === "string";
-        const strVal = (isLhs ? lhs : rhs) as StringVal;
-        let arrVal = (isLhs ? rhs : lhs) as ArrayVal;
-        arrVal = eval_string_assignment(arrVal, strVal, operator, isLhs);
-        return arrVal;
+        const strVal = (isLhs ? lhs : rhs) as JbString;
+        let arr = (isLhs ? rhs : lhs) as Array;
+        arr = arr.assignString(strVal, operator, isLhs);
+        return arr;
       }
       else
         // POD: currently returns interpreter types rather than strict JB types (e.g. 'number' instead of int/double)

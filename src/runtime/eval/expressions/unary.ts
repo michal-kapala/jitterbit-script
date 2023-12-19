@@ -1,14 +1,7 @@
 import { UnaryExpr } from "../../../frontend/ast";
 import Scope from "../../scope";
 import { evaluate } from "../../interpreter";
-import { 
-  RuntimeVal,
-  clone,
-  decrement,
-  increment,
-  negate,
-  negative
-} from "../../values";
+import { RuntimeVal } from "../../values";
 
 /**
  * Evaluates unary operator expressions (!, -, --, ++).
@@ -22,14 +15,14 @@ export function eval_unary_expr(unop: UnaryExpr, scope: Scope): RuntimeVal {
   switch(unop.operator) {
     case "!":
       if(unop.lhs)
-        return negate(operand);
+        return operand.negate();
       // POD: Jitterbit Studio supports RHS ! for ArrayLiteral (only), this is unsupported
       // POD: original error:
       // Operator ! cannot be proceeded with an operand: X
       throw `RHS unary operator ${unop.operator} unsupported`;
     case "-":
       if(unop.lhs)
-        return negative(operand);
+        return operand.negative();
       // POD: the original error for a = Null()-;
       // Not enough operands for the operation: ";"
       throw `RHS unary operator ${unop.operator} unsupported`;
@@ -40,7 +33,7 @@ export function eval_unary_expr(unop: UnaryExpr, scope: Scope): RuntimeVal {
           case "Identifier":
           case "GlobalIdentifier":
           case "MemberExpr":
-            return decrement(operand);
+            return operand.decrement();
           default:
             // POD: original error:
             // Invalid argument to operator ++/--
@@ -51,8 +44,8 @@ export function eval_unary_expr(unop: UnaryExpr, scope: Scope): RuntimeVal {
         switch (unop.value.kind) {
           case "Identifier":
           case "GlobalIdentifier":            
-            const oldValue = clone(operand);
-            decrement(operand);
+            const oldValue = operand.clone();
+            operand.decrement();
             return oldValue;
           case "MemberExpr":
             // post-decrementation is not supported for member expressions, e.g. b = a[4]--;
@@ -69,7 +62,7 @@ export function eval_unary_expr(unop: UnaryExpr, scope: Scope): RuntimeVal {
           case "Identifier":
           case "GlobalIdentifier":
           case "MemberExpr":
-            return increment(operand);
+            return operand.increment();
           default:
             // POD: original error:
             // Invalid argument to operator ++/--
@@ -80,8 +73,8 @@ export function eval_unary_expr(unop: UnaryExpr, scope: Scope): RuntimeVal {
         switch (unop.value.kind) {
           case "Identifier":
           case "GlobalIdentifier":            
-            const oldValue = clone(operand);
-            increment(operand);
+            const oldValue = operand.clone();
+            operand.increment();
             return oldValue;
           case "MemberExpr":
             // post-incrementation is not supported for member expressions, e.g. b = a[4]++;

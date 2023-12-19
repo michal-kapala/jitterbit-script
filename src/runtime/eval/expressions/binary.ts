@@ -1,18 +1,14 @@
 import { BinaryExpr } from "../../../frontend/ast";
 import Scope from "../../scope";
 import { evaluate } from "../../interpreter";
-import { 
-  ArrayVal,
-  BooleanVal,
-  MK_NULL,
-  NullVal,
-  NumberVal,
-  RuntimeVal,
-  StringVal,
-  jbCompareStringToBool,
-  jbStringToBool,
-  jbStringToNumber
-} from "../../values";
+import { RuntimeVal } from "../../values";
+import {
+  Array,
+  JbNull,
+  JbBool,
+  JbNumber,
+  JbString
+} from "../../types";
 
 /**
  * Evaluates binary expressions on numeric literals.
@@ -22,10 +18,10 @@ import {
  * @returns 
  */
 function eval_numeric_binary_expr(
-  lhs: NumberVal,
-  rhs: NumberVal,
+  lhs: JbNumber,
+  rhs: JbNumber,
   operator: string,
-): NumberVal | BooleanVal {
+): JbNumber | JbBool {
   let result: number;
   switch(operator) {
     case "+":
@@ -47,32 +43,32 @@ function eval_numeric_binary_expr(
       result = lhs.value ** rhs.value;
       break;
     case "<":
-      return { type: "bool", value: lhs.value < rhs.value };
+      return new JbBool(lhs.value < rhs.value);
     case ">":
-      return { type: "bool", value: lhs.value > rhs.value };
+      return new JbBool(lhs.value > rhs.value);
     case "<=":
-      return { type: "bool", value: lhs.value <= rhs.value };
+      return new JbBool(lhs.value <= rhs.value);
     case ">=":
-      return { type: "bool", value: lhs.value >= rhs.value };
+      return new JbBool(lhs.value >= rhs.value);
     case "==":
-      return { type: "bool", value: lhs.value === rhs.value };
+      return new JbBool(lhs.value === rhs.value);
     case "!=":
-      return { type: "bool", value: lhs.value !== rhs.value };
+      return new JbBool(lhs.value !== rhs.value);
     case "&&":
     case "&":
       // 'This is always a short-circuit operator, meaning that if the left-hand argument evaluates to false, the right-hand argument is not evaluated.'
       // This executes after expression evaluation
-      return { type: "bool", value: (lhs.value !== 0) && (rhs.value !== 0) };
+      return new JbBool(lhs.value !== 0 && rhs.value !== 0);
     case "||":
     case "|":
       // 'This is always a short-circuit operator, meaning that if the left-hand argument evaluates to true, the right-hand argument is not evaluated.'
       // This executes after expression evaluation
-      return { type: "bool", value: (lhs.value !== 0) || (rhs.value !== 0) };
+      return new JbBool(lhs.value !== 0 || rhs.value !== 0);
     default:
       throw `Unsupported operator ${operator}`;
   }
 
-  return { value: result, type: "number" };
+  return new JbNumber(result);
 }
 
 
@@ -83,15 +79,15 @@ function eval_numeric_binary_expr(
  * @param operator Binary operator.
  */
 function eval_string_binary_expr(
-  lhs: StringVal,
-  rhs: StringVal,
+  lhs: JbString,
+  rhs: JbString,
   operator: string,
-): StringVal | BooleanVal | NullVal {
+): JbString | JbBool | JbNull {
   let result: string | boolean;
   switch (operator) {
     case "+":
       result = lhs.value + rhs.value;
-      return { type: "string", value: result };
+      return new JbString(result);
     case "-":
       throw `Illegal operation, SUBTRACT with incompatible data types: ${lhs.type} ${operator} ${rhs.type}`;
     case "*":
@@ -102,28 +98,28 @@ function eval_string_binary_expr(
       throw `Illegal operation, POW with incompatible data types: ${lhs.type} ${operator} ${rhs.type}`;
     case "<":
       result = lhs.value < rhs.value;
-      return { type: "bool", value: result };
+      return new JbBool(result);
     case ">":
       result = lhs.value > rhs.value;
-      return { type: "bool", value: result };
+      return new JbBool(result);
     case "<=":
       result = lhs.value <= rhs.value;
-      return { type: "bool", value: result };
+      return new JbBool(result);
     case ">=":
       result = lhs.value >= rhs.value;
-      return { type: "bool", value: result };
+      return new JbBool(result);
     case "==":
       result = lhs.value === rhs.value;
-      return { type: "bool", value: result };
+      return new JbBool(result);
     case "!=":
       result = lhs.value !== rhs.value;
-      return { type: "bool", value: result };
+      return new JbBool(result);
     // Logical operators are valid but the expressions like str1 || str2 always return false (unless negated)
     case "&&":
     case "&":
     case "||":
     case "|":
-      return { type: "bool", value: false };
+      return new JbBool(false);
     default:
       // Add JB error:
       // Illegal operation, <operation name, ex. SUBTRACT> with incompatible data types: string <operator> string
@@ -139,7 +135,7 @@ function eval_string_binary_expr(
  * @param operator 
  * @returns 
  */
-function eval_bool_binary_expr(lhs: BooleanVal, rhs: BooleanVal, operator: string): BooleanVal {
+function eval_bool_binary_expr(lhs: JbBool, rhs: JbBool, operator: string): JbBool {
   let result: boolean;
   switch(operator) {
     case "+":
@@ -175,7 +171,7 @@ function eval_bool_binary_expr(lhs: BooleanVal, rhs: BooleanVal, operator: strin
     default:
       throw `Unsupported operator ${operator}`;
   }
-  return { value: result, type: "bool" };
+  return new JbBool(result);
 }
 
 
@@ -186,11 +182,11 @@ function eval_bool_binary_expr(lhs: BooleanVal, rhs: BooleanVal, operator: strin
  * @param operator 
  * @returns 
  */
-function eval_null_binary_expr(lhs: NullVal, rhs: NullVal, operator: string): NullVal | BooleanVal {
+function eval_null_binary_expr(lhs: JbNull, rhs: JbNull, operator: string): JbNull | JbBool {
   switch (operator) {
     case "+":
     case "-":
-      return MK_NULL();
+      return new JbNull();
     case "*":
       throw `Illegal operation, MULTIPLICATION with incompatible types: ${lhs.type} ${operator} ${rhs.type}`;
     case "/":
@@ -206,10 +202,10 @@ function eval_null_binary_expr(lhs: NullVal, rhs: NullVal, operator: string): Nu
     case "&":
     case "||":
     case "|":
-      return { type: "bool", value: false };
+      return new JbBool(false);
     case "!=":
       // nulls are individuals
-      return { type: "bool", value: true };
+      return new JbBool(true);
     default:
       throw `Unsupported operator ${operator}`;
   }
@@ -225,12 +221,12 @@ function eval_null_binary_expr(lhs: NullVal, rhs: NullVal, operator: string): Nu
  * @param operator 
  * @returns 
  */
-function eval_numstring_binary_expr(lhs: NumberVal | StringVal, rhs: NumberVal | StringVal, operator: string): StringVal | BooleanVal {
+function eval_numstring_binary_expr(lhs: JbNumber | JbString, rhs: JbNumber | JbString, operator: string): JbString | JbBool {
   switch (operator) {
     case "+":
       // here it's the number gets converted for concat
       // consistency is key
-      return { type: "string", value: lhs.value.toString() + rhs.value.toString() };
+      return new JbString(lhs.value.toString() + rhs.value.toString());
     case "-":
       throw `Illegal operation, SUBTRACT with incompatible types: ${lhs.type} ${operator} ${rhs.type}`;
     case "*":
@@ -242,58 +238,46 @@ function eval_numstring_binary_expr(lhs: NumberVal | StringVal, rhs: NumberVal |
     // 'Comparing arguments of different data types is not supported.'
     case "<":
       if(lhs.type === "number")
-        return { type: "bool", value: lhs.value < jbStringToNumber(rhs as StringVal) };
+        return new JbBool(lhs.value < (rhs as JbString).toNumber());
 
-      return { type: "bool", value: jbStringToNumber(lhs) < (rhs as NumberVal).value };
+      return new JbBool((lhs as JbString).toNumber() < (rhs as JbNumber).value);
     case ">":
       if(lhs.type === "number")
-        return { type: "bool", value: lhs.value > jbStringToNumber(rhs as StringVal) };
+        return new JbBool(lhs.value > (rhs as JbString).toNumber());
 
-      return { type: "bool", value: jbStringToNumber(lhs) > (rhs as NumberVal).value };
+      return new JbBool((lhs as JbString).toNumber() > (rhs as JbNumber).value);
     case "<=":
       if(lhs.type === "number")
-        return { type: "bool", value: lhs.value <= jbStringToNumber(rhs as StringVal) };
+        return new JbBool(lhs.value <= (rhs as JbString).toNumber());
 
-      return { type: "bool", value: jbStringToNumber(lhs) <= (rhs as NumberVal).value };
+      return new JbBool((lhs as JbString).toNumber() <= (rhs as JbNumber).value);
     case ">=":
       if(lhs.type === "number")
-        return { type: "bool", value: lhs.value >= jbStringToNumber(rhs as StringVal) };
+        return new JbBool(lhs.value >= (rhs as JbString).toNumber());
       
-      return { type: "bool", value: jbStringToNumber(lhs) >= (rhs as NumberVal).value };
+      return new JbBool((lhs as JbString).toNumber() >= (rhs as JbNumber).value);
     case "==":
       if(lhs.type === "number")
-        return { type: "bool", value: lhs.value === jbStringToNumber(rhs as StringVal) };
+        return new JbBool(lhs.value === (rhs as JbString).toNumber());
 
-      return { type: "bool", value: jbStringToNumber(lhs) === (rhs as NumberVal).value };
+      return new JbBool((lhs as JbString).toNumber() === (rhs as JbNumber).value);
     case "!=":
-      if(lhs.type === "number") 
-        return { type: "bool", value: lhs.value !== jbStringToNumber(rhs as StringVal) };
+      if(lhs.type === "number")
+        return new JbBool(lhs.value !== (rhs as JbString).toNumber());
       
-      return { type: "bool", value: jbStringToNumber(lhs) !== (rhs as NumberVal).value };
+      return new JbBool((lhs as JbString).toNumber() !== (rhs as JbNumber).value);
     case "&&":
     case "&":
       if(lhs.type === "number") 
-        return { 
-          type: "bool",
-          value: lhs.value !== 0 && jbStringToNumber(rhs as StringVal) !== 0
-        };
+        return new JbBool(lhs.value !== 0 && (rhs as JbString).toNumber() !== 0);
       
-      return {
-        type: "bool",
-        value: jbStringToNumber(lhs) !== 0 && (rhs as NumberVal).value !== 0
-      };
+      return new JbBool(lhs.toNumber() !== 0 && (rhs as JbNumber).value !== 0);
     case "||":
     case "|":
-      if(lhs.type === "number") 
-        return { 
-          type: "bool",
-          value: lhs.value !== 0 || jbStringToNumber(rhs as StringVal) !== 0
-        };
+      if(lhs.type === "number")
+        return new JbBool(lhs.value !== 0 || (rhs as JbString).toNumber() !== 0);
 
-      return {
-        type: "bool",
-        value: jbStringToNumber(lhs) !== 0 || (rhs as NumberVal).value !== 0
-      };
+      return new JbBool(lhs.toNumber() !== 0 || (rhs as JbNumber).value !== 0);
     default:
       throw `Unsupported operator ${operator}`;
   }
@@ -307,12 +291,12 @@ function eval_numstring_binary_expr(lhs: NumberVal | StringVal, rhs: NumberVal |
  * @param operator 
  * @returns 
  */
-function eval_boolstring_binary_expr(lhs: BooleanVal | StringVal, rhs: BooleanVal | StringVal, operator: string): StringVal | BooleanVal {
+function eval_boolstring_binary_expr(lhs: JbBool | JbString, rhs: JbBool | JbString, operator: string): JbString | JbBool {
   switch (operator) {
     case "+":
       return lhs.type === "bool"
-        ? { type: "string", value: (lhs.value ? "1" : "0") + (rhs as StringVal).value }
-        : { type: "string", value: lhs.value + ((rhs as BooleanVal).value ? "1" : "0") };
+        ? new JbString(lhs.toString() + (rhs as JbString).value)
+        : new JbString(lhs.value + ((rhs as JbBool).toString()))
     case "-":
       throw `Illegal operation, SUBTRACT with incompatible types: ${lhs.type} ${operator} ${rhs.type}`;
     case "*":
@@ -325,62 +309,62 @@ function eval_boolstring_binary_expr(lhs: BooleanVal | StringVal, rhs: BooleanVa
     // logical and comparison operators follow Jitterbit's implementation
     case "<":
       if(lhs.type === "bool")
-        return { type: "bool", value: jbCompareStringToBool(rhs as StringVal, ">", lhs) };
+        return new JbBool((rhs as JbString).compareWithBool(">", lhs));
       
-      return { type: "bool", value: jbCompareStringToBool(lhs, "<", rhs as BooleanVal) };
+      return new JbBool((lhs as JbString).compareWithBool("<", rhs as JbBool));
     case ">":
       if(lhs.type === "bool")
-        return { type: "bool", value: jbCompareStringToBool(rhs as StringVal, "<", lhs) };
+        return new JbBool((rhs as JbString).compareWithBool("<", lhs));
       
-      return { type: "bool", value: jbCompareStringToBool(lhs, ">", rhs as BooleanVal) };
+      return new JbBool((lhs as JbString).compareWithBool(">", rhs as JbBool));
     case "<=":
       if(lhs.type === "bool")
-        return { type: "bool", value: jbCompareStringToBool(rhs as StringVal, ">=", lhs) };
+        return new JbBool((rhs as JbString).compareWithBool(">=", lhs));
       
-      return { type: "bool", value: jbCompareStringToBool(lhs, "<=", rhs as BooleanVal) };
+      return new JbBool((lhs as JbString).compareWithBool("<=", rhs as JbBool));
     case ">=":
       if(lhs.type === "bool")
-        return { type: "bool", value: jbCompareStringToBool(rhs as StringVal, "<=", lhs) };
+        return new JbBool((rhs as JbString).compareWithBool("<=", lhs));
       
-      return { type: "bool", value: jbCompareStringToBool(lhs, ">=", rhs as BooleanVal) };
+      return new JbBool((lhs as JbString).compareWithBool(">=", rhs as JbBool));
     case "==":
       if(lhs.type === "bool")
-        return { type: "bool", value: lhs.value === jbStringToBool(rhs as StringVal) };
+        return new JbBool(lhs.value === (rhs as JbString).toBool());
       
-      return { type: "bool", value: jbStringToBool(lhs) === (rhs as BooleanVal).value };
+      return new JbBool(lhs.toBool() === (rhs as JbBool).value);
     case "!=":
       if(lhs.type === "bool")
-        return { type: "bool", value: lhs.value !== jbStringToBool(rhs as StringVal) };
+        return new JbBool(lhs.value !== (rhs as JbString).toBool());
       
-      return { type: "bool", value: jbStringToBool(lhs) !== (rhs as BooleanVal).value };
+      return new JbBool(lhs.toBool() !== (rhs as JbBool).value);
     case "&&":
     case "&":
       // bool || string
       if(lhs.type === "bool") {
-        if(jbStringToBool(rhs as StringVal) && lhs.value)
-          return { type: "bool", value: true };
+        if((rhs as JbString).toBool() && lhs.value)
+          return new JbBool(true);
         
-        return { type: "bool", value: false };
+        return new JbBool(false);
       }
       // string || bool
-      if(jbStringToBool(lhs) && (rhs as BooleanVal).value)
-        return { type: "bool", value: true };
+      if(lhs.toBool() && (rhs as JbBool).value)
+        return new JbBool(true);
       
-      return { type: "bool", value: false };
+      return new JbBool(false);
     case "||":
     case "|":
       // bool || string
       if(lhs.type === "bool") {
-        if(jbStringToBool(rhs as StringVal) || lhs.value)
-          return { type: "bool", value: true };
+        if((rhs as JbString).toBool() || lhs.value)
+          return new JbBool(true);
         
-        return { type: "bool", value: false };
+        return new JbBool(false);
       }
       // string || bool
-      if(jbStringToBool(lhs) || (rhs as BooleanVal).value)
-        return { type: "bool", value: true };
+      if(lhs.toBool() || (rhs as JbBool).value)
+        return new JbBool(true);
       
-      return { type: "bool", value: false };
+      return new JbBool(false);
     default:
       throw `Unsupported operator ${operator}`;
   }
@@ -393,7 +377,7 @@ function eval_boolstring_binary_expr(lhs: BooleanVal | StringVal, rhs: BooleanVa
  * @param operator 
  * @returns 
  */
-function eval_numbool_binary_expr(lhs: BooleanVal | NumberVal, rhs: BooleanVal | NumberVal, operator: string): StringVal | BooleanVal {
+function eval_numbool_binary_expr(lhs: JbBool | JbNumber, rhs: JbBool | JbNumber, operator: string): JbString | JbBool {
   switch (operator) {
     case "+":
       throw `Illegal operation: ${lhs.type} Add {${rhs.type}}`
@@ -409,118 +393,82 @@ function eval_numbool_binary_expr(lhs: BooleanVal | NumberVal, rhs: BooleanVal |
     // logical and comparison operators follow Jitterbit's implementation
     case "<":
       if(lhs.type === "bool")
-        return {
-          type: "bool",
-          value: lhs.value 
-            ? 1 < (rhs as NumberVal).value
-            : 0 < (rhs as NumberVal).value
-        };
+        return new JbBool(lhs.value
+          ? 1 < (rhs as JbNumber).value
+          : 0 < (rhs as JbNumber).value
+        );
       
-      return { 
-        type: "bool",
-        value: (rhs as BooleanVal).value
-          ? (lhs as NumberVal).value < 1
-          : (lhs as NumberVal).value < 0
-      };
+      return new JbBool((rhs as JbBool).value
+        ? lhs.value < 1
+        : lhs.value < 0
+      );
     case ">":
       if(lhs.type === "bool")
-        return {
-          type: "bool",
-          value: lhs.value 
-            ? 1 > (rhs as NumberVal).value
-            : 0 > (rhs as NumberVal).value
-        };
+        return new JbBool(lhs.value
+          ? 1 > (rhs as JbNumber).value
+          : 0 > (rhs as JbNumber).value
+        );
       
-      return {
-        type: "bool",
-        value: (rhs as BooleanVal).value
-          ? (lhs as NumberVal).value > 1
-          : (lhs as NumberVal).value > 0
-      };
+      return new JbBool((rhs as JbBool).value
+        ? lhs.value > 1
+        : lhs.value > 0
+      );
     case "<=":
       if(lhs.type === "bool")
-        return {
-          type: "bool",
-          value: lhs.value 
-            ? 1 <= (rhs as NumberVal).value
-            : 0 <= (rhs as NumberVal).value
-        };
+        return new JbBool(lhs.value
+          ? 1 <= (rhs as JbNumber).value
+          : 0 <= (rhs as JbNumber).value
+        );
       
-      return {
-        type: "bool",
-        value: (rhs as BooleanVal).value
-          ? (lhs as NumberVal).value <= 1
-          : (lhs as NumberVal).value <= 0
-      };
+      return new JbBool((rhs as JbBool).value
+        ? lhs.value <= 1
+        : lhs.value <= 0
+      );
     case ">=":
       if(lhs.type === "bool")
-        return {
-          type: "bool",
-          value: lhs.value 
-            ? 1 >= (rhs as NumberVal).value
-            : 0 >= (rhs as NumberVal).value
-        };
+        return new JbBool(lhs.value
+          ? 1 >= (rhs as JbNumber).value
+          : 0 >= (rhs as JbNumber).value
+        );
       
-      return {
-        type: "bool",
-        value: (rhs as BooleanVal).value
-          ? (lhs as NumberVal).value >= 1
-          : (lhs as NumberVal).value >= 0
-      };
+      return new JbBool((rhs as JbBool).value
+        ? lhs.value >= 1
+        : lhs.value >= 0
+      );
     case "==":
       if(lhs.type === "bool")
-        return {
-          type: "bool",
-          value: lhs.value 
-            ? 1 === (rhs as NumberVal).value
-            : 0 === (rhs as NumberVal).value
-        };
+        return new JbBool(lhs.value
+          ? 1 === (rhs as JbNumber).value
+          : 0 === (rhs as JbNumber).value
+        );
       
-      return {
-        type: "bool",
-        value: (rhs as BooleanVal).value
-          ? (lhs as NumberVal).value === 1
-          : (lhs as NumberVal).value === 0
-      };
+      return new JbBool((rhs as JbBool).value
+        ? lhs.value === 1
+        : lhs.value === 0
+      );
     case "!=":
       if(lhs.type === "bool")
-        return {
-          type: "bool",
-          value: lhs.value 
-            ? 1 !== (rhs as NumberVal).value
-            : 0 !== (rhs as NumberVal).value
-        };
+        return new JbBool(lhs.value
+          ? 1 !== (rhs as JbNumber).value
+          : 0 !== (rhs as JbNumber).value
+        );
       
-      return {
-        type: "bool",
-        value: (rhs as BooleanVal).value
-          ? (lhs as NumberVal).value !== 1
-          : (lhs as NumberVal).value !== 0
-      };
+      return new JbBool((rhs as JbBool).value
+        ? lhs.value !== 1
+        : lhs.value !== 0
+      );
     case "&&":
     case "&":
       if(lhs.type === "bool")
-        return {
-          type: "bool",
-          value: lhs.value && (rhs as NumberVal).value !== 0
-        };
-      
-      return {
-        type: "bool",
-        value: (lhs as NumberVal).value !== 0 && (rhs as BooleanVal).value
-      };
+        return new JbBool(lhs.value && (rhs as JbNumber).toBool());
+
+      return new JbBool(lhs.toBool() && (rhs as JbBool).value);
     case "||":
     case "|":
       if(lhs.type === "bool")
-        return {
-          type: "bool",
-          value: lhs.value || (rhs as NumberVal).value !== 0
-        };
+        return new JbBool(lhs.value || (rhs as JbNumber).toBool());
       
-      return {
-        type: "bool",
-        value: (lhs as NumberVal).value !== 0 || (rhs as BooleanVal).value
-      };
+      return new JbBool(lhs.toBool() || (rhs as JbBool).value);
     default:
       throw `Unsupported operator ${operator}`;
   }
@@ -533,12 +481,12 @@ function eval_numbool_binary_expr(lhs: BooleanVal | NumberVal, rhs: BooleanVal |
  * @param operator 
  * @returns 
  */
-function eval_nullstring_binary_expr(lhs: NullVal | StringVal, rhs: NullVal | StringVal, operator: string): StringVal | BooleanVal {
+function eval_nullstring_binary_expr(lhs: JbNull | JbString, rhs: JbNull | JbString, operator: string): JbString | JbBool {
   switch (operator) {
     case "+":
       return lhs.type === "null"
-        ? { type: "string", value: (rhs as StringVal).value }
-        : { type: "string", value: lhs.value };
+        ? new JbString((rhs as JbString).value)
+        : new JbString(lhs.value);
     case "-":
       throw `Illegal operation, SUBTRACT with incompatible types: ${lhs.type} ${operator} ${rhs.type}`;
     case "*":
@@ -556,9 +504,9 @@ function eval_nullstring_binary_expr(lhs: NullVal | StringVal, rhs: NullVal | St
     case "&":
     case "||":
     case "|":
-      return { type: "bool", value: false };
+      return new JbBool(false);
     case "!=":
-      return { type: "bool", value: true };
+      return new JbBool(true);
     default:
       throw `Unsupported operator ${operator}`;
   }
@@ -571,23 +519,23 @@ function eval_nullstring_binary_expr(lhs: NullVal | StringVal, rhs: NullVal | St
  * @param operator 
  * @returns 
  */
-function eval_numnull_binary_expr(lhs: NullVal | NumberVal, rhs: NullVal | NumberVal, operator: string): NumberVal | BooleanVal {
+function eval_numnull_binary_expr(lhs: JbNull | JbNumber, rhs: JbNull | JbNumber, operator: string): JbNumber | JbBool {
   switch (operator) {
     case "+":
       return lhs.type === "null"
-        ? { type: "number", value: (rhs as NumberVal).value }
-        : { type: "number", value: lhs.value };
+        ? new JbNumber((rhs as JbNumber).value)
+        : new JbNumber(lhs.value);
     case "-":
       if (lhs.type === "null")
-        return { type: "number", value: 0 - (rhs as NumberVal).value };
-      return { type: "number", value: lhs.value };
+        return new JbNumber(0 - (rhs as JbNumber).value);
+      return new JbNumber(lhs.value);
     case "*":
-      return { type: "number", value: 0 };
+      return new JbNumber();
     case "/":
       if(lhs.type === "null") {
-        if((rhs as NumberVal).value === 0)
+        if((rhs as JbNumber).value === 0)
           throw `Illegal operation: division by 0`;
-        return { type: "number", value: 0 };
+        return new JbNumber();
       }
       throw `Illegal operation, division by Null`;
     case "^":
@@ -599,14 +547,14 @@ function eval_numnull_binary_expr(lhs: NullVal | NumberVal, rhs: NullVal | Numbe
     case "==":
     case "&&":
     case "&":
-      return { type: "bool", value: false };
+      return new JbBool(false);
     case "!=":
-      return { type: "bool", value: true };
+      return new JbBool(true);
     case "||":
     case "|":
       if(lhs.type === "null")
-        return { type: "bool", value: (rhs as NumberVal).value !== 0 };
-      return { type: "bool", value: lhs.value !== 0 };
+        return new JbBool((rhs as JbNumber).toBool());
+      return new JbBool(lhs.toBool());
     default:
       throw `Unsupported operator ${operator}`;
   }
@@ -619,12 +567,12 @@ function eval_numnull_binary_expr(lhs: NullVal | NumberVal, rhs: NullVal | Numbe
  * @param operator 
  * @returns 
  */
-function eval_nullbool_binary_expr(lhs: NullVal | BooleanVal, rhs: NullVal | BooleanVal, operator: string): NumberVal | BooleanVal {
+function eval_nullbool_binary_expr(lhs: JbNull | JbBool, rhs: JbNull | JbBool, operator: string): JbNumber | JbBool {
   switch (operator) {
     case "+":
       return lhs.type === "null"
-        ? { type: "number", value: (rhs as BooleanVal).value ? 1 : 0 }
-        : { type: "number", value: lhs.value ? 1 : 0 };
+        ? new JbNumber((rhs as JbBool).toNumber())
+        : new JbNumber(lhs.toNumber());
     case "-":
       throw `Illegal operation, SUBTRACT with incompatible types: ${lhs.type} ${operator} ${rhs.type}`;
     case "*":
@@ -640,14 +588,14 @@ function eval_nullbool_binary_expr(lhs: NullVal | BooleanVal, rhs: NullVal | Boo
     case "==":
     case "&&":
     case "&":
-      return { type: "bool", value: false };
+      return new JbBool(false);
     case "!=":
-      return { type: "bool", value: true };
+      return new JbBool(true);
     case "||":
     case "|":
       if(lhs.type === "null")
-        return { type: "bool", value: (rhs as BooleanVal).value };
-      return { type: "bool", value: lhs.value };
+        return new JbBool((rhs as JbBool).value);
+      return new JbBool(lhs.value);
     default:
       throw `Unsupported operator ${operator}`;
   }
@@ -660,7 +608,7 @@ function eval_nullbool_binary_expr(lhs: NullVal | BooleanVal, rhs: NullVal | Boo
  * @param operator 
  * @returns 
  */
-function eval_array_binary_expr(lhs: ArrayVal, rhs: ArrayVal, operator: string): ArrayVal {
+function eval_array_binary_expr(lhs: Array, rhs: Array, operator: string) {
   if(lhs.members.length !== rhs.members.length)
     throw `The operator ${operator} operating on two array data elements with inconsistent sizes n1/n2: ${lhs.members.length}/${rhs.members.length}`;
 
@@ -673,32 +621,32 @@ function eval_array_binary_expr(lhs: ArrayVal, rhs: ArrayVal, operator: string):
         switch (rMembers[idx].type) {
           case "number":
             lMembers[idx] = eval_numeric_binary_expr(
-              lMembers[idx] as NumberVal,
-              rMembers[idx] as NumberVal,
+              lMembers[idx] as JbNumber,
+              rMembers[idx] as JbNumber,
               operator);
             break;
           case "bool":
             lMembers[idx] = eval_numbool_binary_expr(
-              lMembers[idx] as NumberVal,
-              rMembers[idx] as BooleanVal,
+              lMembers[idx] as JbNumber,
+              rMembers[idx] as JbBool,
               operator);
             break;
           case "string":
             lMembers[idx] = eval_numstring_binary_expr(
-              lMembers[idx] as NumberVal,
-              rMembers[idx] as StringVal,
+              lMembers[idx] as JbNumber,
+              rMembers[idx] as JbString,
               operator);
             break;
           case "null":
             lMembers[idx] = eval_numnull_binary_expr(
-              lMembers[idx] as NumberVal,
-              rMembers[idx] as NullVal,
+              lMembers[idx] as JbNumber,
+              rMembers[idx] as JbNull,
               operator);
             break;
           case "array":
             lMembers[idx] = eval_arraynum_binary_expr(
-              lMembers[idx] as NumberVal,
-              rMembers[idx] as ArrayVal,
+              lMembers[idx] as JbNumber,
+              rMembers[idx] as Array,
               operator);
             break;
           case "dictionary":
@@ -711,32 +659,32 @@ function eval_array_binary_expr(lhs: ArrayVal, rhs: ArrayVal, operator: string):
         switch (rMembers[idx].type) {
           case "number":
             lMembers[idx] = eval_numbool_binary_expr(
-              lMembers[idx] as BooleanVal,
-              rMembers[idx] as NumberVal,
+              lMembers[idx] as JbBool,
+              rMembers[idx] as JbNumber,
               operator);
             break;
           case "bool":
             lMembers[idx] = eval_bool_binary_expr(
-              lMembers[idx] as BooleanVal,
-              rMembers[idx] as BooleanVal,
+              lMembers[idx] as JbBool,
+              rMembers[idx] as JbBool,
               operator);
             break;
           case "string":
             lMembers[idx] = eval_boolstring_binary_expr(
-              lMembers[idx] as BooleanVal,
-              rMembers[idx] as StringVal,
+              lMembers[idx] as JbBool,
+              rMembers[idx] as JbString,
               operator);
             break;
           case "null":
             lMembers[idx] = eval_nullbool_binary_expr(
-              lMembers[idx] as BooleanVal,
-              rMembers[idx] as NullVal,
+              lMembers[idx] as JbBool,
+              rMembers[idx] as JbNull,
               operator);
             break;
           case "array":
             lMembers[idx] = eval_arraybool_binary_expr(
-              lMembers[idx] as BooleanVal,
-              rMembers[idx] as ArrayVal,
+              lMembers[idx] as JbBool,
+              rMembers[idx] as Array,
               operator);
             break;
           case "dictionary":
@@ -749,32 +697,32 @@ function eval_array_binary_expr(lhs: ArrayVal, rhs: ArrayVal, operator: string):
         switch (rMembers[idx].type) {
           case "number":
             lMembers[idx] = eval_numstring_binary_expr(
-              lMembers[idx] as StringVal,
-              rMembers[idx] as NumberVal,
+              lMembers[idx] as JbString,
+              rMembers[idx] as JbNumber,
               operator);
             break;
           case "bool":
             lMembers[idx] = eval_boolstring_binary_expr(
-              lMembers[idx] as StringVal,
-              rMembers[idx] as BooleanVal,
+              lMembers[idx] as JbString,
+              rMembers[idx] as JbBool,
               operator);
             break;
           case "string":
             lMembers[idx] = eval_string_binary_expr(
-              lMembers[idx] as StringVal,
-              rMembers[idx] as StringVal,
+              lMembers[idx] as JbString,
+              rMembers[idx] as JbString,
               operator);
             break;
           case "null":
             lMembers[idx] = eval_nullstring_binary_expr(
-              lMembers[idx] as StringVal,
-              rMembers[idx] as NullVal,
+              lMembers[idx] as JbString,
+              rMembers[idx] as JbNull,
               operator);
             break;
           case "array":
             lMembers[idx] = eval_arraystring_binary_expr(
-              lMembers[idx] as StringVal,
-              rMembers[idx] as ArrayVal,
+              lMembers[idx] as JbString,
+              rMembers[idx] as Array,
               operator);
             break;
           case "dictionary":
@@ -787,32 +735,32 @@ function eval_array_binary_expr(lhs: ArrayVal, rhs: ArrayVal, operator: string):
         switch (rMembers[idx].type) {
           case "number":
             lMembers[idx] = eval_numnull_binary_expr(
-              lMembers[idx] as NullVal,
-              rMembers[idx] as NumberVal,
+              lMembers[idx] as JbNull,
+              rMembers[idx] as JbNumber,
               operator);
             break;
           case "bool":
             lMembers[idx] = eval_nullbool_binary_expr(
-              lMembers[idx] as NullVal,
-              rMembers[idx] as BooleanVal,
+              lMembers[idx] as JbNull,
+              rMembers[idx] as JbBool,
               operator);
             break;
           case "string":
             lMembers[idx] = eval_nullstring_binary_expr(
-              lMembers[idx] as NullVal,
-              rMembers[idx] as StringVal,
+              lMembers[idx] as JbNull,
+              rMembers[idx] as JbString,
               operator);
             break;
           case "null":
             lMembers[idx] = eval_null_binary_expr(
-              lMembers[idx] as NullVal,
-              rMembers[idx] as NullVal,
+              lMembers[idx] as JbNull,
+              rMembers[idx] as JbNull,
               operator);
             break;
           case "array":
             lMembers[idx] = eval_arraynull_binary_expr(
-              lMembers[idx] as NullVal,
-              rMembers[idx] as ArrayVal,
+              lMembers[idx] as JbNull,
+              rMembers[idx] as Array,
               operator);
             break;
           case "dictionary":
@@ -825,32 +773,32 @@ function eval_array_binary_expr(lhs: ArrayVal, rhs: ArrayVal, operator: string):
         switch (rMembers[idx].type) {
           case "number":
             lMembers[idx] = eval_arraynum_binary_expr(
-              lMembers[idx] as ArrayVal,
-              rMembers[idx] as NumberVal,
+              lMembers[idx] as Array,
+              rMembers[idx] as JbNumber,
               operator);
             break;
           case "bool":
             lMembers[idx] = eval_arraybool_binary_expr(
-              lMembers[idx] as ArrayVal,
-              rMembers[idx] as BooleanVal,
+              lMembers[idx] as Array,
+              rMembers[idx] as JbBool,
               operator);
             break;
           case "string":
             lMembers[idx] = eval_arraystring_binary_expr(
-              lMembers[idx] as ArrayVal,
-              rMembers[idx] as StringVal,
+              lMembers[idx] as Array,
+              rMembers[idx] as JbString,
               operator);
             break;
           case "null":
             lMembers[idx] = eval_arraynull_binary_expr(
-              lMembers[idx] as ArrayVal,
-              rMembers[idx] as NullVal,
+              lMembers[idx] as Array,
+              rMembers[idx] as JbNull,
               operator);
             break;
           case "array":
             lMembers[idx] = eval_array_binary_expr(
-              lMembers[idx] as ArrayVal,
-              rMembers[idx] as ArrayVal,
+              lMembers[idx] as Array,
+              rMembers[idx] as Array,
               operator);
             break;
           case "dictionary":
@@ -875,38 +823,38 @@ function eval_array_binary_expr(lhs: ArrayVal, rhs: ArrayVal, operator: string):
  * @param operator 
  * @returns 
  */
-function eval_arraynum_binary_expr(lhs: ArrayVal | NumberVal, rhs: ArrayVal | NumberVal, operator: string): ArrayVal {
+function eval_arraynum_binary_expr(lhs: Array | JbNumber, rhs: Array | JbNumber, operator: string) {
   const isLhs = lhs.type === "number";
-  const numVal = (isLhs ? lhs : rhs) as NumberVal;
-  const arrVal = (isLhs ? rhs : lhs) as ArrayVal;
-  const members = arrVal.members;
+  const numVal = (isLhs ? lhs : rhs) as JbNumber;
+  const arr = (isLhs ? rhs : lhs) as Array;
+  const members = arr.members;
 
   for(const idx in members) {
     switch (members[idx].type) {
       case "number":
         members[idx] = isLhs
-          ? eval_numeric_binary_expr(numVal, members[idx] as NumberVal, operator)
-          : eval_numeric_binary_expr(members[idx] as NumberVal, numVal, operator);
+          ? eval_numeric_binary_expr(numVal, members[idx] as JbNumber, operator)
+          : eval_numeric_binary_expr(members[idx] as JbNumber, numVal, operator);
         break;
       case "bool":
         members[idx] = isLhs
-          ? eval_numbool_binary_expr(numVal, members[idx] as BooleanVal, operator)
-          : eval_numbool_binary_expr(members[idx] as BooleanVal, numVal, operator);
+          ? eval_numbool_binary_expr(numVal, members[idx] as JbBool, operator)
+          : eval_numbool_binary_expr(members[idx] as JbBool, numVal, operator);
         break;
       case "string":
         members[idx] = isLhs
-          ? eval_numstring_binary_expr(numVal, members[idx] as StringVal, operator)
-          : eval_numstring_binary_expr(members[idx] as StringVal, numVal, operator);
+          ? eval_numstring_binary_expr(numVal, members[idx] as JbString, operator)
+          : eval_numstring_binary_expr(members[idx] as JbString, numVal, operator);
         break;
       case "null":
         members[idx] = isLhs
-          ? eval_numnull_binary_expr(numVal, members[idx] as NullVal, operator)
-          : eval_numnull_binary_expr(members[idx] as NullVal, numVal, operator);
+          ? eval_numnull_binary_expr(numVal, members[idx] as JbNull, operator)
+          : eval_numnull_binary_expr(members[idx] as JbNull, numVal, operator);
         break;
       case "array":
         members[idx] = isLhs
-          ? eval_arraynum_binary_expr(numVal, members[idx] as ArrayVal, operator)
-          : eval_arraynum_binary_expr(members[idx] as ArrayVal, numVal, operator);
+          ? eval_arraynum_binary_expr(numVal, members[idx] as Array, operator)
+          : eval_arraynum_binary_expr(members[idx] as Array, numVal, operator);
         break;
       case "dictionary":
         // TODO
@@ -915,7 +863,7 @@ function eval_arraynum_binary_expr(lhs: ArrayVal | NumberVal, rhs: ArrayVal | Nu
     }
   }
 
-  return arrVal;
+  return arr;
 }
 
 /**
@@ -925,38 +873,38 @@ function eval_arraynum_binary_expr(lhs: ArrayVal | NumberVal, rhs: ArrayVal | Nu
  * @param operator 
  * @returns 
  */
-function eval_arraybool_binary_expr(lhs: ArrayVal | BooleanVal, rhs: ArrayVal | BooleanVal, operator: string): ArrayVal {
+function eval_arraybool_binary_expr(lhs: Array | JbBool, rhs: Array | JbBool, operator: string) {
   const isLhs = lhs.type === "bool";
-  const boolVal = (isLhs ? lhs : rhs) as BooleanVal;
-  const arrVal = (isLhs ? rhs : lhs) as ArrayVal;
-  const members = arrVal.members;
+  const boolVal = (isLhs ? lhs : rhs) as JbBool;
+  const arr = (isLhs ? rhs : lhs) as Array;
+  const members = arr.members;
 
   for(const idx in members) {
     switch (members[idx].type) {
       case "number":
         members[idx] = isLhs
-          ? eval_numbool_binary_expr(boolVal, members[idx] as NumberVal, operator)
-          : eval_numbool_binary_expr(members[idx] as NumberVal, boolVal, operator);
+          ? eval_numbool_binary_expr(boolVal, members[idx] as JbNumber, operator)
+          : eval_numbool_binary_expr(members[idx] as JbNumber, boolVal, operator);
         break;
       case "bool":
         members[idx] = isLhs
-          ? eval_bool_binary_expr(boolVal, members[idx] as BooleanVal, operator)
-          : eval_bool_binary_expr(members[idx] as BooleanVal, boolVal, operator);
+          ? eval_bool_binary_expr(boolVal, members[idx] as JbBool, operator)
+          : eval_bool_binary_expr(members[idx] as JbBool, boolVal, operator);
         break;
       case "string":
         members[idx] = isLhs
-          ? eval_boolstring_binary_expr(boolVal, members[idx] as StringVal, operator)
-          : eval_boolstring_binary_expr(members[idx] as StringVal, boolVal, operator);
+          ? eval_boolstring_binary_expr(boolVal, members[idx] as JbString, operator)
+          : eval_boolstring_binary_expr(members[idx] as JbString, boolVal, operator);
         break;
       case "null":
         members[idx] = isLhs
-          ? eval_nullbool_binary_expr(boolVal, members[idx] as NullVal, operator)
-          : eval_nullbool_binary_expr(members[idx] as NullVal, boolVal, operator);
+          ? eval_nullbool_binary_expr(boolVal, members[idx] as JbNull, operator)
+          : eval_nullbool_binary_expr(members[idx] as JbNull, boolVal, operator);
         break;
       case "array":
         members[idx] = isLhs
-          ? eval_arraybool_binary_expr(boolVal, members[idx] as ArrayVal, operator)
-          : eval_arraybool_binary_expr(members[idx] as ArrayVal, boolVal, operator);
+          ? eval_arraybool_binary_expr(boolVal, members[idx] as Array, operator)
+          : eval_arraybool_binary_expr(members[idx] as Array, boolVal, operator);
         break;
       case "dictionary":
         // TODO
@@ -965,7 +913,7 @@ function eval_arraybool_binary_expr(lhs: ArrayVal | BooleanVal, rhs: ArrayVal | 
     }
   }
 
-  return arrVal;
+  return arr;
 }
 
 /**
@@ -975,38 +923,38 @@ function eval_arraybool_binary_expr(lhs: ArrayVal | BooleanVal, rhs: ArrayVal | 
  * @param operator 
  * @returns 
  */
-function eval_arraystring_binary_expr(lhs: ArrayVal | StringVal, rhs: ArrayVal | StringVal, operator: string): ArrayVal {
+function eval_arraystring_binary_expr(lhs: Array | JbString, rhs: Array | JbString, operator: string) {
   const isLhs = lhs.type === "string";
-  const strVal = (isLhs ? lhs : rhs) as StringVal;
-  const arrVal = (isLhs ? rhs : lhs) as ArrayVal;
-  const members = arrVal.members;
+  const strVal = (isLhs ? lhs : rhs) as JbString;
+  const arr = (isLhs ? rhs : lhs) as Array;
+  const members = arr.members;
 
   for(const idx in members) {
     switch (members[idx].type) {
       case "number":
         members[idx] = isLhs
-          ? eval_numstring_binary_expr(strVal, members[idx] as NumberVal, operator)
-          : eval_numstring_binary_expr(members[idx] as NumberVal, strVal, operator);
+          ? eval_numstring_binary_expr(strVal, members[idx] as JbNumber, operator)
+          : eval_numstring_binary_expr(members[idx] as JbNumber, strVal, operator);
         break;
       case "bool":
         members[idx] = isLhs
-          ? eval_boolstring_binary_expr(strVal, members[idx] as BooleanVal, operator)
-          : eval_boolstring_binary_expr(members[idx] as BooleanVal, strVal, operator);
+          ? eval_boolstring_binary_expr(strVal, members[idx] as JbBool, operator)
+          : eval_boolstring_binary_expr(members[idx] as JbBool, strVal, operator);
         break;
       case "string":
         members[idx] = isLhs
-          ? eval_string_binary_expr(strVal, members[idx] as StringVal, operator)
-          : eval_string_binary_expr(members[idx] as StringVal, strVal, operator);
+          ? eval_string_binary_expr(strVal, members[idx] as JbString, operator)
+          : eval_string_binary_expr(members[idx] as JbString, strVal, operator);
         break;
       case "null":
         members[idx] = isLhs
-          ? eval_nullstring_binary_expr(strVal, members[idx] as NullVal, operator)
-          : eval_nullstring_binary_expr(members[idx] as NullVal, strVal, operator);
+          ? eval_nullstring_binary_expr(strVal, members[idx] as JbNull, operator)
+          : eval_nullstring_binary_expr(members[idx] as JbNull, strVal, operator);
         break;
       case "array":
         members[idx] = isLhs
-          ? eval_arraystring_binary_expr(strVal, members[idx] as ArrayVal, operator)
-          : eval_arraystring_binary_expr(members[idx] as ArrayVal, strVal, operator);
+          ? eval_arraystring_binary_expr(strVal, members[idx] as Array, operator)
+          : eval_arraystring_binary_expr(members[idx] as Array, strVal, operator);
         break;
       case "dictionary":
         // TODO
@@ -1015,7 +963,7 @@ function eval_arraystring_binary_expr(lhs: ArrayVal | StringVal, rhs: ArrayVal |
     }
   }
 
-  return arrVal;
+  return arr;
 }
 
 /**
@@ -1025,38 +973,38 @@ function eval_arraystring_binary_expr(lhs: ArrayVal | StringVal, rhs: ArrayVal |
  * @param operator 
  * @returns 
  */
-function eval_arraynull_binary_expr(lhs: ArrayVal | NullVal, rhs: ArrayVal | NullVal, operator: string): ArrayVal {
+function eval_arraynull_binary_expr(lhs: Array | JbNull, rhs: Array | JbNull, operator: string) {
   const isLhs = lhs.type === "null";
-  const nullVal = (isLhs ? lhs : rhs) as NullVal;
-  const arrVal = (isLhs ? rhs : lhs) as ArrayVal;
-  const members = arrVal.members;
+  const nullVal = (isLhs ? lhs : rhs) as JbNull;
+  const arr = (isLhs ? rhs : lhs) as Array;
+  const members = arr.members;
 
   for(const idx in members) {
     switch (members[idx].type) {
       case "number":
         members[idx] = isLhs
-          ? eval_numnull_binary_expr(nullVal, members[idx] as NumberVal, operator)
-          : eval_numnull_binary_expr(members[idx] as NumberVal, nullVal, operator);
+          ? eval_numnull_binary_expr(nullVal, members[idx] as JbNumber, operator)
+          : eval_numnull_binary_expr(members[idx] as JbNumber, nullVal, operator);
         break;
       case "bool":
         members[idx] = isLhs
-          ? eval_nullbool_binary_expr(nullVal, members[idx] as BooleanVal, operator)
-          : eval_nullbool_binary_expr(members[idx] as BooleanVal, nullVal, operator);
+          ? eval_nullbool_binary_expr(nullVal, members[idx] as JbBool, operator)
+          : eval_nullbool_binary_expr(members[idx] as JbBool, nullVal, operator);
         break;
       case "string":
         members[idx] = isLhs
-          ? eval_nullstring_binary_expr(nullVal, members[idx] as StringVal, operator)
-          : eval_nullstring_binary_expr(members[idx] as StringVal, nullVal, operator);
+          ? eval_nullstring_binary_expr(nullVal, members[idx] as JbString, operator)
+          : eval_nullstring_binary_expr(members[idx] as JbString, nullVal, operator);
         break;
       case "null":
         members[idx] = isLhs
-          ? eval_null_binary_expr(nullVal, members[idx] as NullVal, operator)
-          : eval_null_binary_expr(members[idx] as NullVal, nullVal, operator);
+          ? eval_null_binary_expr(nullVal, members[idx] as JbNull, operator)
+          : eval_null_binary_expr(members[idx] as JbNull, nullVal, operator);
         break;
       case "array":
         members[idx] = isLhs
-          ? eval_arraynull_binary_expr(nullVal, members[idx] as ArrayVal, operator)
-          : eval_arraynull_binary_expr(members[idx] as ArrayVal, nullVal, operator);
+          ? eval_arraynull_binary_expr(nullVal, members[idx] as Array, operator)
+          : eval_arraynull_binary_expr(members[idx] as Array, nullVal, operator);
         break;
       case "dictionary":
         // TODO
@@ -1065,7 +1013,7 @@ function eval_arraynull_binary_expr(lhs: ArrayVal | NullVal, rhs: ArrayVal | Nul
     }
   }
 
-  return arrVal;
+  return arr;
 }
 
 /**
@@ -1084,8 +1032,8 @@ export function eval_binary_expr(
   // math
   if (lhs.type == "number" && rhs.type == "number") {
     return eval_numeric_binary_expr(
-      lhs as NumberVal,
-      rhs as NumberVal,
+      lhs as JbNumber,
+      rhs as JbNumber,
       binop.operator,
     );
   }
@@ -1093,8 +1041,8 @@ export function eval_binary_expr(
   // string concatenation
   if (lhs.type == "string" && rhs.type == "string") {
     return eval_string_binary_expr(
-      lhs as StringVal,
-      rhs as StringVal,
+      lhs as JbString,
+      rhs as JbString,
       binop.operator,
     );
   }
@@ -1102,8 +1050,8 @@ export function eval_binary_expr(
   // booleans
   if (lhs.type == "bool" && rhs.type == "bool") {
     return eval_bool_binary_expr(
-      lhs as BooleanVal,
-      rhs as BooleanVal,
+      lhs as JbBool,
+      rhs as JbBool,
       binop.operator,
     );
   }
@@ -1118,14 +1066,14 @@ export function eval_binary_expr(
   ) {
     if (lhs.type === "number")
       return eval_numstring_binary_expr(
-        lhs as NumberVal,
-        rhs as StringVal,
+        lhs as JbNumber,
+        rhs as JbString,
         binop.operator,
       );
 
     return eval_numstring_binary_expr(
-      lhs as StringVal,
-      rhs as NumberVal,
+      lhs as JbString,
+      rhs as JbNumber,
       binop.operator,
     );
   }
@@ -1137,14 +1085,14 @@ export function eval_binary_expr(
   ) {
     if (lhs.type === "bool")
       return eval_boolstring_binary_expr(
-        lhs as BooleanVal,
-        rhs as StringVal,
+        lhs as JbBool,
+        rhs as JbString,
         binop.operator,
       );
 
     return eval_boolstring_binary_expr(
-      lhs as StringVal,
-      rhs as BooleanVal,
+      lhs as JbString,
+      rhs as JbBool,
       binop.operator,
     );
   }
@@ -1156,14 +1104,14 @@ export function eval_binary_expr(
   ) {
     if (lhs.type === "bool")
       return eval_numbool_binary_expr(
-        lhs as BooleanVal,
-        rhs as NumberVal,
+        lhs as JbBool,
+        rhs as JbNumber,
         binop.operator,
       );
 
     return eval_numbool_binary_expr(
-      lhs as NumberVal,
-      rhs as BooleanVal,
+      lhs as JbNumber,
+      rhs as JbBool,
       binop.operator,
     );
   }
@@ -1173,8 +1121,8 @@ export function eval_binary_expr(
   // null-null
   if (lhs.type === "null" && lhs.type === rhs.type)
     return eval_null_binary_expr(
-      lhs as NullVal,
-      rhs as NullVal,
+      lhs as JbNull,
+      rhs as JbNull,
       binop.operator,
     );
 
@@ -1185,14 +1133,14 @@ export function eval_binary_expr(
   ) {
     if (lhs.type === "null")
       return eval_nullstring_binary_expr(
-        lhs as NullVal,
-        rhs as StringVal,
+        lhs as JbNull,
+        rhs as JbString,
         binop.operator,
       );
 
     return eval_nullstring_binary_expr(
-      lhs as StringVal,
-      rhs as NullVal,
+      lhs as JbString,
+      rhs as JbNull,
       binop.operator,
     );
   }
@@ -1204,14 +1152,14 @@ export function eval_binary_expr(
   ) {
     if (lhs.type === "null")
       return eval_numnull_binary_expr(
-        lhs as NullVal,
-        rhs as NumberVal,
+        lhs as JbNull,
+        rhs as JbNumber,
         binop.operator,
       );
 
     return eval_numnull_binary_expr(
-      lhs as NumberVal,
-      rhs as NullVal,
+      lhs as JbNumber,
+      rhs as JbNull,
       binop.operator,
     );
   }
@@ -1223,14 +1171,14 @@ export function eval_binary_expr(
   ) {
     if (lhs.type === "null")
       return eval_nullbool_binary_expr(
-        lhs as NullVal,
-        rhs as BooleanVal,
+        lhs as JbNull,
+        rhs as JbBool,
         binop.operator,
       );
 
     return eval_nullbool_binary_expr(
-      lhs as BooleanVal,
-      rhs as NullVal,
+      lhs as JbBool,
+      rhs as JbNull,
       binop.operator,
     );
   }
@@ -1240,8 +1188,8 @@ export function eval_binary_expr(
   // array-array
   if(lhs.type == "array" && rhs.type == "array") {
     return eval_array_binary_expr(
-      lhs as ArrayVal,
-      rhs as ArrayVal,
+      lhs as Array,
+      rhs as Array,
       binop.operator,
     );
   }
@@ -1253,14 +1201,14 @@ export function eval_binary_expr(
   ) {
     if (lhs.type === "array")
       return eval_arraynum_binary_expr(
-        lhs as ArrayVal,
-        rhs as NumberVal,
+        lhs as Array,
+        rhs as JbNumber,
         binop.operator,
       );
 
     return eval_arraynum_binary_expr(
-      lhs as NumberVal,
-      rhs as ArrayVal,
+      lhs as JbNumber,
+      rhs as Array,
       binop.operator,
     );
   }
@@ -1272,14 +1220,14 @@ export function eval_binary_expr(
   ) {
     if (lhs.type === "array")
       return eval_arraybool_binary_expr(
-        lhs as ArrayVal,
-        rhs as BooleanVal,
+        lhs as Array,
+        rhs as JbBool,
         binop.operator,
       );
 
     return eval_arraybool_binary_expr(
-      lhs as BooleanVal,
-      rhs as ArrayVal,
+      lhs as JbBool,
+      rhs as Array,
       binop.operator,
     );
   }
@@ -1291,14 +1239,14 @@ export function eval_binary_expr(
   ) {
     if (lhs.type === "array")
       return eval_arraystring_binary_expr(
-        lhs as ArrayVal,
-        rhs as StringVal,
+        lhs as Array,
+        rhs as JbString,
         binop.operator,
       );
 
     return eval_arraystring_binary_expr(
-      lhs as StringVal,
-      rhs as ArrayVal,
+      lhs as JbString,
+      rhs as Array,
       binop.operator,
     );
   }
@@ -1310,14 +1258,14 @@ export function eval_binary_expr(
   ) {
     if (lhs.type === "array")
       return eval_arraynull_binary_expr(
-        lhs as ArrayVal,
-        rhs as NullVal,
+        lhs as Array,
+        rhs as JbNull,
         binop.operator,
       );
 
     return eval_arraynull_binary_expr(
-      lhs as NullVal,
-      rhs as ArrayVal,
+      lhs as JbNull,
+      rhs as Array,
       binop.operator,
     );
   }

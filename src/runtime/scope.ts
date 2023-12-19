@@ -2,14 +2,13 @@ import { Api } from "../api";
 import { GlobalIdentifier } from "../frontend/ast";
 import { evalAssignment } from "./eval/expressions/assignment";
 import { 
-  MK_ARRAY,
-  MK_BOOL,
-  MK_NULL,
-  MK_NUMBER,
-  MK_STRING,
-  NumberVal,
-  RuntimeVal,
-} from "./values";
+  Array,
+  JbBool,
+  JbNull,
+  JbNumber,
+  JbString
+} from "./types";
+import { RuntimeVal } from "./values";
 
 export function createGlobalScope() {
   const scope = new Scope();
@@ -32,28 +31,28 @@ export default class Scope {
           let def = {} as RuntimeVal;
           switch(value.dataType) {
             case "Boolean":
-              def = MK_BOOL(value.default === "true" ? true : false);
+              def = new JbBool(value.default === "true");
               break;
             case "Integer":
-              def = MK_NUMBER(parseInt(value.default));
+              def = new JbNumber(parseInt(value.default));
               break;
             case "String":
-              def = MK_STRING(value.default);
+              def = new JbString(value.default);
               break;
             case "Array":
-              def = MK_ARRAY();
+              def = new Array();
               break;
             default:
               // This can happen only if you modify system vars types
               console.error(`ScopeError: Unsupported system variable type for ${value.name}:`, value.dataType);
-              def = MK_NULL();
+              def = new JbNull();
               break;
           }
           this.variables.set(value.name, def);
         }
         // initialize with null value
         else
-          this.variables.set(value.name, MK_NULL());
+          this.variables.set(value.name, new JbNull());
       });
     }
   }
@@ -78,7 +77,7 @@ export default class Scope {
               throw `Illegal operation, SUBTRACT with incompatible data types: unknown - bool`
             // zero-initialized
             case "number":
-              let newValue = value as NumberVal;
+              let newValue = value as JbNumber;
               newValue.value = 0 - newValue.value;
               this.getGlobal().variables.set(varName, newValue);
               return newValue;
@@ -86,7 +85,7 @@ export default class Scope {
               throw `Illegal operation, SUBTRACT with incompatible data types: unknown - ${value.type}`;
             case "array":
               // eval as null-initialized
-              oldValue = MK_NULL();
+              oldValue = new JbNull();
               break;
             case "null":
               this.getGlobal().variables.set(varName, value);
@@ -100,7 +99,7 @@ export default class Scope {
           switch(value.type) {
             // zero-initialized
             case "number":
-              let newValue = value as NumberVal;
+              let newValue = value as JbNumber;
               newValue.value = 0 + newValue.value;
               this.getGlobal().variables.set(varName, newValue);
               return newValue;
@@ -122,7 +121,7 @@ export default class Scope {
       }
     }
 
-    let newValue = evalAssignment(oldValue ?? MK_NULL(), value, operator);
+    let newValue = evalAssignment(oldValue ?? new JbNull(), value, operator);
     return this.setVar(varName, newValue);
   }
 
@@ -184,7 +183,7 @@ export default class Scope {
     if(this.parent === undefined) {
       const value = this.lookupVar(global.symbol);
       if(value === undefined)
-        this.variables.set(global.symbol, MK_NULL());
+        this.variables.set(global.symbol, new JbNull());
     }
     else
       // This is a development-only warning, users cant cause it

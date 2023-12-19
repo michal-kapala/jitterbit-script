@@ -85,7 +85,7 @@ export class Signature {
 /**
  * Available Jitterbit/system variable modules.
  */
-type Module = "api" 
+type SysVarModule = "api" 
 | "networking" 
 | "netsuite"
 | "operation"
@@ -106,7 +106,7 @@ export interface SystemVariable {
    * Variable name.
    */
   name: string;
-  module: Module;
+  module: SysVarModule;
   /**
    * Variable's intended usage:
    * 

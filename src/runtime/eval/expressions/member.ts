@@ -6,19 +6,9 @@ import {
 } from "../../../frontend/ast";
 import { evaluate } from "../../interpreter";
 import Scope from "../../scope";
-import {
-  ArrayVal,
-  BooleanVal,
-  DictVal,
-  MK_NULL,
-  NullVal,
-  NumberVal,
-  RuntimeVal,
-  StringVal,
-} from "../../values";
-import { checkArrayIndex, setMember } from "./array";
+import { RuntimeVal } from "../../values";
 import { evalAssignment } from "./assignment";
-import { getDictMember, keyValueToString, setDictMember } from "./dict";
+import { Dictionary, Array, JbNull } from "../../types";
 
 /**
  * Evaluates a member expression (x[y]).
@@ -41,9 +31,9 @@ export function eval_member_expr(memExp: MemberExpr, scope: Scope): RuntimeVal {
       // check the value type
       switch (val.type) {
         case "array":
-          return eval_array_ident_member_expr(val as ArrayVal, key);
+          return (val as Array).get(key);
         case "dictionary":
-          return getDictMember(val as DictVal, key);
+          return (val as Dictionary).get(key);
         default:
           throw `[] operator applied to a ${memExp.object.kind} data element of unsupported type: ${val.type}`;
       }
@@ -52,9 +42,9 @@ export function eval_member_expr(memExp: MemberExpr, scope: Scope): RuntimeVal {
       const left = evaluate(memExp.object, scope);
       switch(left.type) {
         case "array":
-          return eval_array_ident_member_expr(left as ArrayVal, key);
+          return (left as Array).get(key);
         case "dictionary":
-          return getDictMember(left as DictVal, key);
+          return (left as Dictionary).get(key);
         default:
           throw `[] operator applied to a ${memExp.object.kind} data element of unsupported type: ${left.type}`;
       }
@@ -64,71 +54,24 @@ export function eval_member_expr(memExp: MemberExpr, scope: Scope): RuntimeVal {
 }
 
 function eval_array_lit_member_expr(arrayExpr: ArrayLiteral, key: RuntimeVal, scope: Scope): RuntimeVal {
-  const index = keyValueToNumber(key);
+  const index = Array.keyValueToNumber(key);
   
   // non-empty strings evaluate to NaN and dont affect the array size
-  if (checkArrayIndex(index)) {
-    return { type: "null", value: null} as NullVal;
+  if (Array.checkIndex(index)) {
+    return new JbNull();
   }
 
-  let array = evaluate(arrayExpr, scope) as ArrayVal;
+  let array = evaluate(arrayExpr, scope) as Array;
 
   // computed index out of bounds
   if (index >= array.members.length) {
     // Resizing is skipped for literals since they dont exist in the scope anyway
     if (index > array.members.length)
       console.warn(`InterpreterWarning: Specified index value out of bounds, the original array is resized to ${index} with null values`);
-    return { type: "null", value: null } as NullVal;
+    return new JbNull();
   }
 
   return array.members[index];
-}
-
-function eval_array_ident_member_expr(array: ArrayVal, key: RuntimeVal, lhs = false): RuntimeVal {
-  const index = keyValueToNumber(key);
-
-  if (!checkArrayIndex(index)) {
-    return { type: "null", value: null} as NullVal;
-  }
-  
-  // computed index out of bounds
-  if (index >= array.members.length) {
-    array.members.push(MK_NULL());
-    // Inserts the null values and mutates the scope
-    // Resizes to index of elements with null values
-    if(index >= array.members.length)
-      console.warn(`InterpreterWarning: Specified index value out of bounds, the original array is resized to ${index} with null values`);
-    for(let i = index; i >= array.members.length; i--)
-      array.members.push(MK_NULL());
-
-    return { type: "null", value: null } as NullVal;
-  }
-  
-  return array.members[index];
-}
-
-/**
- * Converts a key value of any type to a number.
- * @param key 
- * @returns 
- */
-function keyValueToNumber(key: RuntimeVal): number {
-  switch (key.type) {
-    case "number":
-      return (key as NumberVal).value;
-    case "bool":
-      return (key as BooleanVal).value ? 1 : 0;
-    case "string":
-      return (key as StringVal).value === "" ? 0 : NaN;
-    case "null":
-      return 0;
-    case "array":
-    case "dictionary":
-      // same for dict
-      throw `Evaluation of array index error`;
-    default:
-      throw `Unsupported member expression key type: ${key.type}`;
-  }
 }
 
 /**
@@ -149,21 +92,21 @@ export function eval_member_assignment(memExp: MemberExpr, assignment: Assignmen
 
   switch (lhs.type) {
     case "array":
-      const index = keyValueToNumber(evaluate(memExp.key, scope));
-      let rhs = checkArrayIndex(index)
+      const index = Array.keyValueToNumber(evaluate(memExp.key, scope));
+      let rhs = Array.checkIndex(index)
         ? evaluate(assignment.value, scope)
-        : MK_NULL();
+        : new JbNull();
       const newValue = evalAssignment(evaluate(memExp, scope), rhs, assignment.operator.value);
       // setMember appends null values if index is out of bounds
-      return setMember(lhs as ArrayVal, newValue, index);
+      return  (lhs as Array).set(index, newValue);
     case "dictionary":
-      const key = keyValueToString(evaluate(memExp.key, scope));
+      const key = evaluate(memExp.key, scope);
       const newVal = evalAssignment(
         evaluate(memExp, scope),
         evaluate(assignment.value, scope),
         assignment.operator.value
       );
-      return setDictMember(lhs as DictVal, newVal, key);
+      return (lhs as Dictionary).set(key, newVal);
     default:
       throw `[] operator applied to a ${lhs.type} data element.\nIf in the script testing screen, try clicking 'Reset' and run again`;
   }

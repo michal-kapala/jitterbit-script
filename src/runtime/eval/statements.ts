@@ -1,10 +1,11 @@
 import { Program } from "../../frontend/ast";
 import Scope from "../scope";
 import { evaluate } from "../interpreter";
-import { MK_NULL, RuntimeVal } from "../values";
+import { RuntimeVal } from "../values";
+import { JbNull } from "../types";
 
 export function eval_program(program: Program, env: Scope): RuntimeVal {
-  let lastEvaluated: RuntimeVal = MK_NULL();
+  let lastEvaluated: RuntimeVal = new JbNull();
   try {
     for (const statement of program.body) {
       lastEvaluated = evaluate(statement, env);

@@ -1,4 +1,5 @@
-import { DictVal, MK_DICT, RuntimeVal } from "../../runtime/values";
+import { RuntimeVal } from "../../runtime/values";
+import { Dictionary } from "../../runtime/types";
 import { Func, Signature } from "../types";
 
 /**
@@ -21,9 +22,9 @@ export class DictFunc extends Func {
     this.maxArgs = 0;
   }
 
-  call(args: RuntimeVal[]): DictVal {
+  call(args: RuntimeVal[]) {
     this.chooseSignature(args);
-    return MK_DICT();
+    return new Dictionary();
   }
 
   protected chooseSignature(args: RuntimeVal[]): void {
