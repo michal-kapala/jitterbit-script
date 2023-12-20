@@ -1,6 +1,6 @@
 import { Func, SystemVariable } from "./api/types";
-import { ArrayFunc, CollectionFunc, SortArrayFunc } from "./api/functions/array";
-import { DictFunc, MapFunc } from "./api/functions/dict";
+import * as Arrays from "./api/functions/array";
+import * as Dicts from "./api/functions/dict";
 
 type SystemVariables = {
   static: SystemVariable[];
@@ -975,11 +975,12 @@ export class Api {
     };
     Api.functions = [
       // dict/array
-      new ArrayFunc(),
-      new CollectionFunc(),
-      new DictFunc(),
-      new MapFunc(),
-      new SortArrayFunc()
+      new Arrays.ArrayFunc(),
+      new Arrays.CollectionFunc(),
+      new Dicts.DictFunc(),
+      new Dicts.MapFunc(),
+      new Arrays.ReduceDimensionFunc(),
+      new Arrays.SortArrayFunc()
     ];
   }
 

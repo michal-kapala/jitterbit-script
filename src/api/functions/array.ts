@@ -80,12 +80,13 @@ export class SortArrayFunc extends Func  {
     this.maxArgs = 3;
   } 
 
-  call(args: RuntimeVal[]): RuntimeVal {
+  call(args: RuntimeVal[]) {
+    this.chooseSignature(args);
+
     // TODO: this error should be thrown by type checker (too)
     if(args[0].type !== "array")
-      throw new Error(`SortArray can only be called on array data elements. The 'array' argument is of type ${args[0].type}`);
+      throw new Error(`SortArray can only be called on array data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
-    this.chooseSignature(args);
     // comparison evaluation rules:
     // generally, toInt (applies across signatures):
     // - integers as-are
@@ -147,7 +148,6 @@ export class SortArrayFunc extends Func  {
         if(!isAscending)
           array.members.reverse();
     }
-
     return array;
   }
 
@@ -339,5 +339,138 @@ export class SortArrayFunc extends Func  {
       if(index < 0 || index >= (elem as Array).members.length)
         throw `[${this.name}] Array index is out of range: ${index}`;
     }
+  }
+}
+
+/**
+ * The implementation of `ReduceDimension` function.
+ * 
+ * Given a multi-dimensional array with `n` dimensions, the function returns an array with `n-1` dimensions. The lowest dimension of the input array will disappear, and their members will be collected to the next level dimension.
+ */
+export class ReduceDimensionFunc extends Func {
+  constructor() {
+    super();
+    this.name = "ReduceDimension";
+    this.module = "dict/array";
+    this.minArgs = 1;
+    this.maxArgs = 1;
+    this.signatures = [
+      new Signature("array", [
+        new Parameter("array", "arrayMultiD")
+      ])
+    ];
+  }
+  
+  call(args: RuntimeVal[]) {
+    this.chooseSignature(args);
+
+    // TODO: this error should be thrown by type checker (too)
+    // POD: the original error:
+    // ReduceDimension failed, err:array dimension <2.
+    if(args[0].type !== "array")
+      throw new Error(`ReduceDimension can only be called on array data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+
+    const array = args[0] as Array;
+    if(array.members.length === 0)
+      throw new Error("ReduceDimension failed, the array does not have enough dimensions for reduction (at least 2).");
+
+    let dimension = 1;
+    dimension = this.getDimension(array, dimension);
+
+    // no nested arrays
+    if (dimension === 1)
+      throw new Error("ReduceDimension failed, the array does not have enough dimensions for reduction (at least 2).");
+
+    this.checkDimensionality(array, dimension, 1);
+    return this.reduce(array, dimension);
+  }
+
+  protected chooseSignature(args: RuntimeVal[]): void {
+    this.signature = this.signatures[0];
+  }
+
+  /**
+   * Returns the array nesting level present in the array.
+   * @param array 
+   * @returns
+   */
+  private getDimension(array: Array, dim: number): number {
+    // the first element defines uniform dimensionality
+    const mem = array.members.at(0);
+    if (mem !== undefined && mem.type === "array")
+      return this.getDimension(array.members.at(0) as Array, ++dim);
+    else 
+      return dim;
+  }
+
+  /**
+   * Validates for uniform array dimensions across all elements.
+   * 
+   * Throws if the array contains elements of varying dimensions.
+   * @param array 
+   * @param validDim 
+   */
+  private checkDimensionality(array: Array, validDim: number, dim: number) {
+    const members = array.members;
+    if(members.length === 0) {
+      if(dim + 1 !== validDim) {
+        throw new Error(`ReduceDimension failed, the array contains element ${array.toString()} of non-uniform dimensionality: ${dim}`);
+      }
+    }
+    
+    for(const mem of members) {
+      let curDim = dim;
+      if(mem.type === "array")
+        this.checkDimensionality(mem as Array, validDim, ++dim);
+      else {
+        // POD: Jitterbit's implementation allows for certain dimensionality mismatches (at the cost of data loss)
+        // example proof:
+        // arr = {
+        //   { "a", "b", "c"},
+        //   { {1}, {2, "xd"} },
+        //   { {3}, {4} },
+        // };
+        // arr = ReduceDimension(arr);
+        //
+        // results in: {{}, {1,2,xd}, {3,4}}
+        // this implementation throws on any dimensionality mismatch
+
+        if(dim !== validDim)
+          throw new Error(`ReduceDimension failed, the array contains element '${mem.toString()}' of non-uniform dimensionality: ${dim}`);
+      }
+      // restore the shallow value
+      dim = curDim;
+    }
+  }
+
+  /**
+   * Performs the dimensionality reduction.
+   * @param array 
+   * @param dim 
+   */
+  private reduce(array: Array, dim: number): Array {
+    for(let idx = 0; idx < array.members.length; idx++) {
+      // navigate to the inner elements
+      if (dim > 2) {
+        const inserts = this.reduce(array.members[idx] as Array, dim - 1);
+        array.members[idx] = inserts;
+      }
+      else {
+        // only arrays of simple value arrays here
+        let newArr = new Array();
+        for(const mem of array.members) {
+          // array of simple values
+          if(mem.type == "array") {
+            for(const m of (mem as Array).members)
+              newArr.members.push(m);
+          }
+          // a simple value
+          else
+            newArr.members.push(mem);
+        }
+        return newArr;
+      }
+    }
+    return array;
   }
 }

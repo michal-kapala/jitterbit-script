@@ -5,8 +5,12 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for basic dict usage
-  dict = Map();
-  dict[true] = "nice";
-  dict[1];
+  // test for ReduceDimension function
+  arr = {
+    { {1}, {2, "xd"} },
+    { {3}, {4}, {5} }
+  };
+
+  arr = ReduceDimension(arr);
+  
 </trans>

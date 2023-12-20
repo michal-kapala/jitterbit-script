@@ -263,7 +263,14 @@ export class CallExpr implements Expr {
     if(func === undefined)
       throw `Function ${this.caller.symbol} does not exist, refer to Jitterbit function API docs`;
 
-    return func.call(args);
+    try {
+      return func.call(args);
+    }
+    catch(e) {
+      // TODO: add an error
+      console.error(`${e}`);
+      return new JbNull();
+    }
   }
 
   /**

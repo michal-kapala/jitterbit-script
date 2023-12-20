@@ -71,7 +71,7 @@ export class Array implements ArrayVal {
     for(const mem of this.members) {
       result = result.concat(
         result.length === 1 ? "": ",",
-        `${mem.toString()}"`
+        `${mem.toString()}`
       );
     }
     result += "}";

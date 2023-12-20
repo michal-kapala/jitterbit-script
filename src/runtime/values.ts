@@ -1,3 +1,6 @@
+/**
+ * Runtime value type.
+ */
 export type ValueType = 
   "null" |
   "number" |
