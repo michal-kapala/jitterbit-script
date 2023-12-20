@@ -1,13 +1,6 @@
 import { RuntimeVal } from "./values";
-import {
-  BinaryExpr,
-  Expr,
-  GlobalIdentifier,
-  Program,
-  Stmt,
-} from "../frontend/ast";
+import { Expr, GlobalIdentifier, Program, Stmt } from "../frontend/ast";
 import Scope from "./scope";
-import { eval_binary_expr } from "./eval/expressions/binary";
 import { JbNull } from "./types";
 
 /**
@@ -20,9 +13,6 @@ export function evaluate(astNode: Stmt, scope: Scope): RuntimeVal {
   switch (astNode.kind) {
     case "Program":
       return (astNode as Program).execute(scope);
-    case "BinaryExpr":
-      // TODO: rewrite
-      return eval_binary_expr(astNode as BinaryExpr, scope);
     case "GlobalIdentifier":
       scope.getGlobal().initGlobalVar(astNode as GlobalIdentifier);
     case "NumericLiteral":
@@ -32,6 +22,7 @@ export function evaluate(astNode: Stmt, scope: Scope): RuntimeVal {
     case "ArrayLiteral":
     case "MemberExpr":
     case "AssignmentExpr":
+    case "BinaryExpr":
     case "UnaryExpr":
     case "CallExpr":
       return (astNode as Expr).eval(scope);

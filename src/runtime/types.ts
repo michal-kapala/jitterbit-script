@@ -693,6 +693,361 @@ export class Array implements ArrayVal {
     }
     return this;
   }
+
+  /**
+   * Applies a binary operator to array (always LHS).
+   * The RHS value is a number.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopNumber(operator: string, rhs: JbNumber) {
+    const members = this.members;
+    for(const idx in members) {
+      switch (members[idx].type) {
+        case "number":
+          members[idx] = (members[idx] as JbNumber).binopNumber(operator, rhs);
+          break;
+        case "bool":
+          members[idx] = (members[idx] as JbBool).binopNumber(operator, rhs);
+          break;
+        case "string":
+          members[idx] = (members[idx] as JbString).binopNumber(operator, rhs);
+          break;
+        case "null":
+          members[idx] = (members[idx] as JbNull).binopNumber(operator, rhs);
+          break;
+        case "array":
+          members[idx] = (members[idx] as Array).binopNumber(operator, rhs);
+          break;
+        case "dictionary":
+          // TODO
+        default:
+          throw `Unsupported array member type: ${members[idx].type}`;
+      }
+    }
+    return this;
+  }
+
+  /**
+   * Applies a binary operator to array (always LHS).
+   * The RHS value is a bool.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopBool(operator: string, rhs: JbBool) {
+    const members = this.members;
+    for(const idx in members) {
+      switch (members[idx].type) {
+        case "number":
+          members[idx] = (members[idx] as JbNumber).binopBool(operator, rhs);
+          break;
+        case "bool":
+          members[idx] = (members[idx] as JbBool).binopBool(operator, rhs);
+          break;
+        case "string":
+          members[idx] = (members[idx] as JbString).binopBool(operator, rhs);
+          break;
+        case "null":
+          members[idx] = (members[idx] as JbNull).binopBool(operator, rhs);
+          break;
+        case "array":
+          members[idx] = (members[idx] as Array).binopBool(operator, rhs);
+          break;
+        case "dictionary":
+          // TODO
+        default:
+          throw `Unsupported array member type: ${members[idx].type}`;
+      }
+    }
+    return this;
+  }
+
+  /**
+   * Applies a binary operator to array (always LHS).
+   * The RHS value is a string.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopString(operator: string, rhs: JbString) {
+    const members = this.members;
+    for(const idx in members) {
+      switch (members[idx].type) {
+        case "number":
+          members[idx] = (members[idx] as JbNumber).binopString(operator, rhs);
+          break;
+        case "bool":
+          members[idx] = (members[idx] as JbBool).binopString(operator, rhs);
+          break;
+        case "string":
+          members[idx] = (members[idx] as JbString).binopString(operator, rhs);
+          break;
+        case "null":
+          members[idx] = (members[idx] as JbString).binopString(operator, rhs);
+          break;
+        case "array":
+          members[idx] = (members[idx] as Array).binopString(operator, rhs);
+          break;
+        case "dictionary":
+          // TODO
+        default:
+          throw `Unsupported array member type: ${members[idx].type}`;
+      }
+    }
+    return this;
+  }
+
+  /**
+   * Applies a binary operator to array (always LHS).
+   * The RHS value is a null.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopNull(operator: string, rhs: JbNull) {
+    const members = this.members;
+    for(const idx in members) {
+      switch (members[idx].type) {
+        case "number":
+          members[idx] = (members[idx] as JbNumber).binopNull(operator, rhs);
+          break;
+        case "bool":
+          members[idx] = (members[idx] as JbBool).binopNull(operator, rhs);
+          break;
+        case "string":
+          members[idx] = (members[idx] as JbString).binopNull(operator, rhs);
+          break;
+        case "null":
+          members[idx] = (members[idx] as JbNull).binopNull(operator, rhs);
+          break;
+        case "array":
+          members[idx] = (members[idx] as Array).binopNull(operator, rhs);
+          break;
+        case "dictionary":
+          // TODO
+        default:
+          throw `Unsupported array member type: ${members[idx].type}`;
+      }
+    }
+    return this;
+  }
+
+  /**
+   * Applies a binary operator to array (always LHS).
+   * The RHS value is an array too.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopArray(operator: string, rhs: Array) {
+    if(this.members.length !== rhs.members.length)
+      throw `The operator ${operator} operating on two array data elements with inconsistent sizes n1/n2: ${this.members.length}/${rhs.members.length}`;
+  
+    const lMembers = this.members;
+    const rMembers = rhs.members;
+  
+    for(const idx in lMembers) {
+      switch (lMembers[idx].type) {
+        case "number":
+          switch (rMembers[idx].type) {
+            case "number":
+              lMembers[idx] = (lMembers[idx] as JbNumber).binopNumber(
+                operator,
+                rMembers[idx] as JbNumber
+              );
+              break;
+            case "bool":
+              lMembers[idx] = (lMembers[idx] as JbNumber).binopBool(
+                operator,
+                rMembers[idx] as JbBool
+              );
+              break;
+            case "string":
+              lMembers[idx] = (lMembers[idx] as JbNumber).binopString(
+                operator,
+                rMembers[idx] as JbString
+              );
+              break;
+            case "null":
+              lMembers[idx] = (lMembers[idx] as JbNumber).binopNull(
+                operator,
+                rMembers[idx] as JbNull
+              );
+              break;
+            case "array":
+              lMembers[idx] = (lMembers[idx] as JbNumber).binopArray(
+                operator,
+                rMembers[idx] as Array
+              );
+              break;
+            case "dictionary":
+              // TODO
+            default:
+              throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
+          }
+          break;
+        case "bool":
+          switch (rMembers[idx].type) {
+            case "number":
+              lMembers[idx] = (lMembers[idx] as JbBool).binopNumber(
+                operator,
+                rMembers[idx] as JbNumber
+              );
+              break;
+            case "bool":
+              lMembers[idx] = (lMembers[idx] as JbBool).binopBool(
+                operator,
+                rMembers[idx] as JbBool
+              );
+              break;
+            case "string":
+              lMembers[idx] = (lMembers[idx] as JbBool).binopString(
+                operator,
+                rMembers[idx] as JbString
+              );
+              break;
+            case "null":
+              lMembers[idx] = (lMembers[idx] as JbBool).binopNull(
+                operator,
+                rMembers[idx] as JbNull
+              );
+              break;
+            case "array":
+              lMembers[idx] = (lMembers[idx] as JbBool).binopArray(
+                operator,
+                rMembers[idx] as Array
+              );
+              break;
+            case "dictionary":
+              // TODO
+            default:
+              throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
+          }
+          break;
+        case "string":
+          switch (rMembers[idx].type) {
+            case "number":
+              lMembers[idx] = (lMembers[idx] as JbString).binopNumber(
+                operator,
+                rMembers[idx] as JbNumber
+              );
+              break;
+            case "bool":
+              lMembers[idx] = (lMembers[idx] as JbString).binopBool(
+                operator,
+                rMembers[idx] as JbBool
+              );
+              break;
+            case "string":
+              lMembers[idx] = (lMembers[idx] as JbString).binopString(
+                operator,
+                rMembers[idx] as JbString
+              );
+              break;
+            case "null":
+              lMembers[idx] = (lMembers[idx] as JbString).binopNull(
+                operator,
+                rMembers[idx] as JbNull
+              );
+              break;
+            case "array":
+              lMembers[idx] = (lMembers[idx] as JbString).binopArray(
+                operator,
+                rMembers[idx] as Array
+              );
+              break;
+            case "dictionary":
+              // TODO
+            default:
+              throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
+          }
+          break;
+        case "null":
+          switch (rMembers[idx].type) {
+            case "number":
+              lMembers[idx] = (lMembers[idx] as JbNull).binopNumber(
+                operator,
+                rMembers[idx] as JbNumber
+              );
+              break;
+            case "bool":
+              lMembers[idx] = (lMembers[idx] as JbNull).binopBool(
+                operator,
+                rMembers[idx] as JbBool
+              );
+              break;
+            case "string":
+              lMembers[idx] = (lMembers[idx] as JbNull).binopString(
+                operator,
+                rMembers[idx] as JbString
+              );
+              break;
+            case "null":
+              lMembers[idx] = (lMembers[idx] as JbNull).binopNull(
+                operator,
+                rMembers[idx] as JbNull
+              );
+              break;
+            case "array":
+              lMembers[idx] = (lMembers[idx] as JbNull).binopArray(
+                operator,
+                rMembers[idx] as Array
+              );
+              break;
+            case "dictionary":
+              // TODO
+            default:
+              throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
+          }
+          break;
+        case "array":
+          switch (rMembers[idx].type) {
+            case "number":
+              lMembers[idx] = (lMembers[idx] as Array).binopNumber(
+                operator,
+                rMembers[idx] as JbNumber
+              );
+              break;
+            case "bool":
+              lMembers[idx] = (lMembers[idx] as Array).binopBool(
+                operator,
+                rMembers[idx] as JbBool
+              );
+              break;
+            case "string":
+              lMembers[idx] = (lMembers[idx] as Array).binopString(
+                operator,
+                rMembers[idx] as JbString
+              );
+              break;
+            case "null":
+              lMembers[idx] = (lMembers[idx] as Array).binopNull(
+                operator,
+                rMembers[idx] as JbNull
+              );
+              break;
+            case "array":
+              lMembers[idx] = lMembers[idx] = (lMembers[idx] as Array).binopArray(
+                operator,
+                rMembers[idx] as Array
+              );
+              break;
+            case "dictionary":
+              // TODO
+            default:
+              throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
+          }
+          break;
+        case "dictionary":
+          // TODO
+        default:
+          throw `Unsupported LHS array member type: ${lMembers[idx].type}`;
+      }
+    }
+    return this;
+  }
 }
 
 /**
@@ -841,14 +1196,236 @@ export class JbBool implements BooleanVal {
     return this.value ? "1" : "0";
   }
 
-  /**
-   * Returns the integer representation.
-   * @returns 
-   */
   toNumber(): number {
     return this.value ? 1 : 0
   }
 
+  /**
+   * Applies a binary operator to bool (always LHS).
+   * The RHS value is a bool.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopBool(operator: string, rhs: JbBool) {
+    let result: boolean;
+    switch(operator) {
+      case "+":
+        throw `Illegal operation, ADDITION with incompatible data types: ${this.type} ${operator} ${rhs.type}`;
+      case "-":
+        throw `Illegal operation, SUBTRACTION with incompatible data types: ${this.type} ${operator} ${rhs.type}`;
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible data types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible data types: ${this.type} ${operator} ${rhs.type}`;
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+        throw `Illegal operation: A boolean can only be compared to another boolean using the equals or not-equals operators. You need to convert it to a type for which the less-than operator is defined.`;
+      case "==":
+        result = this.value === rhs.value;
+        break;
+      case "!=":
+        result = this.value !== rhs.value;
+        break;
+      case "&&":
+      case "&":
+        result = this.value && rhs.value;
+        break;
+      case "||":
+      case "|":
+        result = this.value || rhs.value;
+        break;
+      default:
+        throw `Unsupported operator ${operator}`;
+    }
+    return new JbBool(result);
+  }
+
+  /**
+   * Applies a binary operator to bool (always LHS).
+   * The RHS value is a string.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopString(operator: string, rhs: JbString) {
+    switch (operator) {
+      case "+":
+        new JbString(this.toString() + rhs.value);
+      case "-":
+        throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      // 'Comparing arguments of different data types is not supported.'
+      // logical and comparison operators follow Jitterbit's implementation
+      case "<":
+        return new JbBool(rhs.compareWithBool(">", this));
+      case ">":
+        return new JbBool(rhs.compareWithBool("<", this));
+      case "<=":
+        return new JbBool(rhs.compareWithBool(">=", this));
+      case ">=":
+        return new JbBool(rhs.compareWithBool("<=", this));
+      case "==":
+        return new JbBool(this.value === rhs.toBool());
+      case "!=":
+        return new JbBool(this.value !== rhs.toBool());
+      case "&&":
+      case "&":
+        if(rhs.toBool() && this.value)
+          return new JbBool(true);
+        return new JbBool(false);
+      case "||":
+      case "|":
+        if(rhs.toBool() || this.value)
+          return new JbBool(true);
+        return new JbBool(false);
+      default:
+        throw `Unsupported operator ${operator}`;
+    }
+  }
+
+  /**
+   * Applies a binary operator to bool (always LHS).
+   * The RHS value is a number.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopNumber(operator: string, rhs: JbNumber) {
+    switch (operator) {
+      case "+":
+        throw `Illegal operation: ${this.type} Add {${rhs.type}}`
+      case "-":
+        throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      // 'Comparing arguments of different data types is not supported.'
+      // logical and comparison operators follow Jitterbit's implementation
+      case "<":
+        return new JbBool(this.value
+          ? 1 < rhs.value
+          : 0 < rhs.value
+        );
+      case ">":
+        return new JbBool(this.value
+          ? 1 > rhs.value
+          : 0 > rhs.value
+        );
+      case "<=":
+        return new JbBool(this.value
+          ? 1 <= rhs.value
+          : 0 <= rhs.value
+        );
+      case ">=":
+        return new JbBool(this.value
+          ? 1 >= rhs.value
+          : 0 >= rhs.value
+        );
+      case "==":
+        return new JbBool(this.value
+          ? 1 === rhs.value
+          : 0 === rhs.value
+        );
+      case "!=":
+        return new JbBool(this.value
+          ? 1 !== rhs.value
+          : 0 !== rhs.value
+        );
+      case "&&":
+      case "&":
+        return new JbBool(this.value && rhs.toBool());
+      case "||":
+      case "|":
+        return new JbBool(this.value || rhs.toBool());
+      default:
+        throw `Unsupported operator ${operator}`;
+    }
+  }
+
+  /**
+   * Applies a binary operator to bool (always LHS).
+   * The RHS value is a null.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopNull(operator: string, rhs: JbNull) {
+    switch (operator) {
+      case "+":
+        return new JbNumber(this.toNumber());
+      case "-":
+        throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "&&":
+      case "&":
+        return new JbBool(false);
+      case "!=":
+        return new JbBool(true);
+      case "||":
+      case "|":
+        return new JbBool(this.value);
+      default:
+        throw `Unsupported operator ${operator}`;
+    }
+  }
+
+  /**
+   * Applies a binary operator to bool (always LHS).
+   * The RHS value is an array.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopArray(operator: string, rhs: Array) {
+    const members = rhs.members;
+    for(const idx in members) {
+      switch (members[idx].type) {
+        case "number":
+          members[idx] = this.binopNumber(operator, members[idx] as JbNumber);
+          break;
+        case "bool":
+          members[idx] = this.binopBool(operator, members[idx] as JbBool);
+          break;
+        case "string":
+          members[idx] = this.binopString(operator, members[idx] as JbString);
+          break;
+        case "null":
+          members[idx] = this.binopNull(operator, members[idx] as JbNull);
+          break;
+        case "array":
+          members[idx] = this.binopArray(operator, members[idx] as Array);
+          break;
+        case "dictionary":
+          // TODO
+        default:
+          throw `Unsupported array member type: ${members[idx].type}`;
+      }
+    }
+    return rhs;
+  }
 }
 
 /**
@@ -895,6 +1472,189 @@ export class JbNull implements NullVal {
 
   toString(): string {
     return "null";
+  }
+
+  /**
+   * Applies a binary operator to null (always LHS).
+   * The RHS value is a null.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopNull(operator: string, rhs: JbNull) {
+    switch (operator) {
+      case "+":
+      case "-":
+        return new JbNull();
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation: ${this.type} POW ${rhs.type}`;
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return new JbBool(false);
+      case "!=":
+        // nulls are individuals
+        return new JbBool(true);
+      default:
+        throw `Unsupported operator ${operator}`;
+    }
+  }
+
+  /**
+   * Applies a binary operator to null (always LHS).
+   * The RHS value is a string.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopString(operator: string, rhs: JbString) {
+    switch (operator) {
+      case "+":
+        return new JbString(rhs.value);
+      case "-":
+        throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return new JbBool(false);
+      case "!=":
+        return new JbBool(true);
+      default:
+        throw `Unsupported operator ${operator}`;
+    }
+  }
+
+  /**
+   * Applies a binary operator to null (always LHS).
+   * The RHS value is a number.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopNumber(operator: string, rhs: JbNumber) {
+    switch (operator) {
+      case "+":
+        return new JbNumber(rhs.value);
+      case "-":
+        return new JbNumber(0 - rhs.value);
+      case "*":
+        return new JbNumber();
+      case "/":
+        if(rhs.value === 0)
+          throw `Illegal operation: division by 0`;
+        return new JbNumber();
+      case "^":
+        throw `Illegal operation: ${this.type} POW ${rhs.type}`;
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "&&":
+      case "&":
+        return new JbBool(false);
+      case "!=":
+        return new JbBool(true);
+      case "||":
+      case "|":
+        return new JbBool(rhs.toBool());
+      default:
+        throw `Unsupported operator ${operator}`;
+    }
+  }
+
+  /**
+   * Applies a binary operator to null (always LHS).
+   * The RHS value is a bool.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopBool(operator: string, rhs: JbBool) {
+    switch (operator) {
+      case "+":
+        return new JbNumber(rhs.toNumber())
+      case "-":
+        throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "&&":
+      case "&":
+        return new JbBool(false);
+      case "!=":
+        return new JbBool(true);
+      case "||":
+      case "|":
+        return new JbBool(rhs.value);
+      default:
+        throw `Unsupported operator ${operator}`;
+    }
+  }
+
+  /**
+   * Applies a binary operator to null (always LHS).
+   * The RHS value is an array.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopArray(operator: string, rhs: Array) {
+    const members = rhs.members;
+    for(const idx in members) {
+      switch (members[idx].type) {
+        case "number":
+          members[idx] = this.binopNumber(operator, members[idx] as JbNumber);
+          break;
+        case "bool":
+          members[idx] = this.binopBool(operator, members[idx] as JbBool);
+          break;
+        case "string":
+          members[idx] = this.binopString(operator, members[idx] as JbString);
+          break;
+        case "null":
+          members[idx] = this.binopNull(operator, members[idx] as JbNull);
+          break;
+        case "array":
+          members[idx] = this.binopArray(operator, members[idx] as Array);
+          break;
+        case "dictionary":
+          // TODO
+        default:
+          throw `Unsupported array member type: ${members[idx].type}`;
+      }
+    }
+    return rhs;
   }
 }
 
@@ -947,6 +1707,243 @@ export class JbNumber implements NumberVal {
 
   toString() {
     return this.value.toString();
+  }
+
+  /**
+   * Applies a binary operator to number (always LHS).
+   * The RHS value is a number.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopNumber(operator: string, rhs: JbNumber) {
+    let result: number;
+    switch(operator) {
+      case "+":
+        result = this.value + rhs.value;
+        break;
+      case "-":
+        result = this.value - rhs.value;
+        break;
+      case "*":
+        result = this.value * rhs.value;
+        break;
+      case "/":
+        // Division by 0
+        if (rhs.value == 0)
+          throw "Division by 0";
+        result = this.value / rhs.value;
+        break;
+      case "^":
+        result = this.value ** rhs.value;
+        break;
+      case "<":
+        return new JbBool(this.value < rhs.value);
+      case ">":
+        return new JbBool(this.value > rhs.value);
+      case "<=":
+        return new JbBool(this.value <= rhs.value);
+      case ">=":
+        return new JbBool(this.value >= rhs.value);
+      case "==":
+        return new JbBool(this.value === rhs.value);
+      case "!=":
+        return new JbBool(this.value !== rhs.value);
+      case "&&":
+      case "&":
+        // 'This is always a short-circuit operator, meaning that if the left-hand argument evaluates to false, the right-hand argument is not evaluated.'
+        // This executes after expression evaluation
+        return new JbBool(this.value !== 0 && rhs.value !== 0);
+      case "||":
+      case "|":
+        // 'This is always a short-circuit operator, meaning that if the left-hand argument evaluates to true, the right-hand argument is not evaluated.'
+        // This executes after expression evaluation
+        return new JbBool(this.value !== 0 || rhs.value !== 0);
+      default:
+        throw `Unsupported operator ${operator}`;
+    }
+  
+    return new JbNumber(result);
+  }
+
+  /**
+   * Applies a binary operator to number (always LHS).
+   * The RHS value is a string.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopString(operator: string, rhs: JbString) {
+    switch (operator) {
+      case "+":
+        // here it's the number gets converted for concat
+        // consistency is key
+        return new JbString(this.value.toString() + rhs.value.toString());
+      case "-":
+        throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      // 'Comparing arguments of different data types is not supported.'
+      case "<":
+        return new JbBool(this.value < rhs.toNumber());
+      case ">":
+        return new JbBool(this.value > rhs.toNumber());
+      case "<=":
+        return new JbBool(this.value <= rhs.toNumber());
+      case ">=":
+        return new JbBool(this.value >= rhs.toNumber());
+      case "==":
+        return new JbBool(this.value === rhs.toNumber());
+      case "!=":
+        return new JbBool(this.value !== rhs.toNumber());
+      case "&&":
+      case "&":
+        return new JbBool(this.value !== 0 && rhs.toNumber() !== 0);
+      case "||":
+      case "|":
+        return new JbBool(this.value !== 0 || rhs.toNumber() !== 0);
+      default:
+        throw `Unsupported operator ${operator}`;
+    }
+  }
+
+  /**
+   * Applies a binary operator to number (always LHS).
+   * The RHS value is a bool.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopBool(operator: string, rhs: JbBool) {
+    switch (operator) {
+      case "+":
+        throw `Illegal operation: ${this.type} Add {${rhs.type}}`
+      case "-":
+        throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      // 'Comparing arguments of different data types is not supported.'
+      // logical and comparison operators follow Jitterbit's implementation
+      case "<":
+        return new JbBool(rhs.value
+          ? this.value < 1
+          : this.value < 0
+        );
+      case ">":
+        return new JbBool(rhs.value
+          ? this.value > 1
+          : this.value > 0
+        );
+      case "<=":
+        return new JbBool(rhs.value
+          ? this.value <= 1
+          : this.value <= 0
+        );
+      case ">=":
+        return new JbBool(rhs.value
+          ? this.value >= 1
+          : this.value >= 0
+        );
+      case "==":
+        return new JbBool(rhs.value
+          ? this.value === 1
+          : this.value === 0
+        );
+      case "!=":
+        return new JbBool(rhs.value
+          ? this.value !== 1
+          : this.value !== 0
+        );
+      case "&&":
+      case "&":
+        return new JbBool(this.toBool() && rhs.value);
+      case "||":
+      case "|":
+        return new JbBool(this.toBool() || rhs.value);
+      default:
+        throw `Unsupported operator ${operator}`;
+    }
+  }
+
+  /**
+   * Applies a binary operator to number (always LHS).
+   * The RHS value is a null.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopNull(operator: string, rhs: JbNull) {
+    switch (operator) {
+      case "+":
+        return new JbNumber(this.value);
+      case "-":
+        return new JbNumber(this.value);
+      case "*":
+        return new JbNumber();
+      case "/":
+        throw `Illegal operation, division by Null`;
+      case "^":
+        throw `Illegal operation: ${this.type} POW ${rhs.type}`;
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "&&":
+      case "&":
+        return new JbBool(false);
+      case "!=":
+        return new JbBool(true);
+      case "||":
+      case "|":
+        return new JbBool(this.toBool());
+      default:
+        throw `Unsupported operator ${operator}`;
+    }
+  }
+
+  /**
+   * Applies a binary operator to number (always LHS).
+   * The RHS value is an array.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopArray(operator: string, rhs: Array) {
+    const members = rhs.members;
+  
+    for(const idx in members) {
+      switch (members[idx].type) {
+        case "number":
+          members[idx] = this.binopNumber(operator, members[idx] as JbNumber);
+          break;
+        case "bool":
+          members[idx] = this.binopBool(operator, members[idx] as JbBool);
+          break;
+        case "string":
+          members[idx] = this.binopString(operator, members[idx] as JbString);
+          break;
+        case "null":
+          members[idx] = this.binopNull(operator, members[idx] as JbNull);
+          break;
+        case "array":
+          members[idx] = this.binopArray(operator, members[idx] as Array);
+          break;
+        case "dictionary":
+          // TODO
+        default:
+          throw `Unsupported array member type: ${members[idx].type}`;
+      }
+    }
+    return rhs;
   }
 }
 
@@ -1071,5 +2068,221 @@ export class JbString implements StringVal {
       default:
         throw `Unsupported comparison operator ${operator}`;
     } 
+  }
+
+  /**
+   * Applies a binary operator to string (always LHS).
+   * The RHS value is a string.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopString(operator: string, rhs: JbString) {
+    let result: string | boolean;
+    switch (operator) {
+      case "+":
+        result = this.value + rhs.value;
+        return new JbString(result);
+      case "-":
+        throw `Illegal operation, SUBTRACT with incompatible data types: ${this.type} ${operator} ${rhs.type}`;
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible data types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible data types: ${this.type} ${operator} ${rhs.type}`;
+      case "<":
+        result = this.value < rhs.value;
+        return new JbBool(result);
+      case ">":
+        result = this.value > rhs.value;
+        return new JbBool(result);
+      case "<=":
+        result = this.value <= rhs.value;
+        return new JbBool(result);
+      case ">=":
+        result = this.value >= rhs.value;
+        return new JbBool(result);
+      case "==":
+        result = this.value === rhs.value;
+        return new JbBool(result);
+      case "!=":
+        result = this.value !== rhs.value;
+        return new JbBool(result);
+      // Logical operators are valid but the expressions like str1 || str2 always return false (unless negated)
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return new JbBool(false);
+      default:
+        // Add JB error:
+        // Illegal operation, <operation name, ex. SUBTRACT> with incompatible data types: string <operator> string
+        throw `Unsupported operator ${operator}`;
+    }
+  }
+
+  /**
+   * Applies a binary operator to string (always LHS).
+   * The RHS value is a number.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopNumber(operator: string, rhs: JbNumber) {
+    switch (operator) {
+      case "+":
+        // here it's the number gets converted for concat
+        // consistency is key
+        return new JbString(this.value + rhs.value.toString());
+      case "-":
+        throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      // 'Comparing arguments of different data types is not supported.'
+      case "<":
+        return new JbBool(this.toNumber() < rhs.value);
+      case ">":
+        return new JbBool(this.toNumber() > rhs.value);
+      case "<=":
+        return new JbBool(this.toNumber() <= rhs.value);
+      case ">=":
+        return new JbBool(this.toNumber() >= rhs.value);
+      case "==":
+        return new JbBool(this.toNumber() === rhs.value);
+      case "!=":
+        return new JbBool(this.toNumber() !== rhs.value);
+      case "&&":
+      case "&":
+        return new JbBool(this.toNumber() !== 0 && rhs.value !== 0);
+      case "||":
+      case "|":
+        return new JbBool(this.toNumber() !== 0 || rhs.value !== 0);
+      default:
+        throw `Unsupported operator ${operator}`;
+    }
+  }
+
+  /**
+   * Applies a binary operator to string (always LHS).
+   * The RHS value is a bool.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopBool(operator: string, rhs: JbBool) {
+    switch (operator) {
+      case "+":
+        new JbString(this.value + rhs.toString());
+      case "-":
+        throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      // 'Comparing arguments of different data types is not supported.'
+      // logical and comparison operators follow Jitterbit's implementation
+      case "<":
+        return new JbBool(this.compareWithBool("<", rhs));
+      case ">":
+        return new JbBool(this.compareWithBool(">", rhs));
+      case "<=":
+        return new JbBool(this.compareWithBool("<=", rhs));
+      case ">=":
+        return new JbBool(this.compareWithBool(">=", rhs));
+      case "==":
+        return new JbBool(this.toBool() === rhs.value);
+      case "!=":
+        return new JbBool(this.toBool() !== rhs.value);
+      case "&&":
+      case "&":
+        if(this.toBool() && rhs.value)
+          return new JbBool(true);
+        return new JbBool(false);
+      case "||":
+      case "|":
+        if(this.toBool() || rhs.value)
+          return new JbBool(true);
+        return new JbBool(false);
+      default:
+        throw `Unsupported operator ${operator}`;
+    }
+  }
+
+  /**
+   * Applies a binary operator to string (always LHS).
+   * The RHS value is a null.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopNull(operator: string, rhs: JbNull) {
+    switch (operator) {
+      case "+":
+        return new JbString(this.value);
+      case "-":
+        throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return new JbBool(false);
+      case "!=":
+        return new JbBool(true);
+      default:
+        throw `Unsupported operator ${operator}`;
+    }
+  }
+
+  /**
+   * Applies a binary operator to string (always LHS).
+   * The RHS value is an array.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopArray(operator: string, rhs: Array) {
+    const members = rhs.members;
+    for(const idx in members) {
+      switch (members[idx].type) {
+        case "number":
+          members[idx] = this.binopNumber(operator, members[idx] as JbNumber);
+          break;
+        case "bool":
+          members[idx] = this.binopBool(operator, members[idx] as JbBool);
+          break;
+        case "string":
+          members[idx] = this.binopString(operator, members[idx] as JbString);
+          break;
+        case "null":
+          members[idx] = this.binopNull(operator, members[idx] as JbNull);
+          break;
+        case "array":
+          members[idx] = this.binopArray(operator, members[idx] as Array);
+          break;
+        case "dictionary":
+          // TODO
+        default:
+          throw `Unsupported array member type: ${members[idx].type}`;
+      }
+    }
+    return rhs;
   }
 }
