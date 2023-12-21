@@ -122,7 +122,7 @@ export class GetKeysFunc extends Func {
     this.maxArgs = 1;
   }
 
-  call(args: RuntimeVal[]): RuntimeVal {
+  call(args: RuntimeVal[]) {
     this.chooseSignature(args);
 
     // TODO: this error should be thrown by type checker (too)
@@ -167,6 +167,46 @@ export class DictFunc extends Func {
   call(args: RuntimeVal[]) {
     this.chooseSignature(args);
     return new Dictionary();
+  }
+
+  protected chooseSignature(args: RuntimeVal[]): void {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `HasKey` function.
+ * 
+ * Checks whether a dictionary contains a specified key. Returns `false` if the first argument is not a dictionary or if the key was not found.
+ * As an equivalent function that works for arrays, see the examples of the `FindValue` function.
+ */
+export class HasKeyFunc extends Func {
+  constructor() {
+    super();
+    this.name = "HasKey";
+    this.module = "dict/array";
+    this.signatures = [
+      new Signature("bool", [
+        new Parameter("dictionary", "dict"),
+        new Parameter("string", "key")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 2;
+    this.maxArgs = 2;
+  }
+
+  call(args: RuntimeVal[]) {
+    this.chooseSignature(args);
+
+    // TODO: this error should be thrown by type checker (too)
+    // POD: originally the type is not validated, the value is reassigned with a new dictionary
+    if(args[0].type !== "dictionary")
+      throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+
+    const dict = args[0] as Dictionary;
+    const result = dict.members.get(Dictionary.keyValueToString(args[1]));
+    return new JbBool(result !== undefined)
   }
 
   protected chooseSignature(args: RuntimeVal[]): void {

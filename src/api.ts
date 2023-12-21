@@ -981,6 +981,7 @@ export class Api {
       new Dicts.CollectValuesFunc(),
       new Dicts.DictFunc(),
       new Dicts.GetKeysFunc(),
+      new Dicts.HasKeyFunc(),
       new Dicts.MapFunc(),
       new Arrays.ReduceDimensionFunc(),
       new Arrays.SortArrayFunc()

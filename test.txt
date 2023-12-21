@@ -5,10 +5,10 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for CollectValues function
+  // test for HasKey function, should return true
   dict = Dict();
   dict[1] = "very";
   dict["very"] = "nice";
-  result = GetKeys(dict);
+  result = HasKey(dict, true);
   
 </trans>
