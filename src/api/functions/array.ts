@@ -225,7 +225,7 @@ export class SortArrayFunc extends Func  {
 
     // TODO: this error should be thrown by type checker (too)
     if(args[0].type !== "array")
-      throw new Error(`SortArray can only be called on array data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new Error(`${this.name} can only be called on array data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     // comparison evaluation rules:
     // generally, toInt (applies across signatures):

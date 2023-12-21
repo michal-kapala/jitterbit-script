@@ -8,6 +8,7 @@ export type ValueType =
   "string" |
   "array" |
   "dictionary" |
+  "binary" |
   // function call-only types
   "void" |
   "type" |
@@ -124,4 +125,12 @@ export interface DictVal extends RuntimeVal {
 export interface VoidVal extends RuntimeVal {
   type: "void";
   value: NullVal;
+}
+
+/**
+ * Runtime value of binary data.
+ */
+export interface BinaryVal extends RuntimeVal {
+  type: "binary";
+  value: Uint8Array;
 }

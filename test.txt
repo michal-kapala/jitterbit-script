@@ -5,10 +5,9 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // simple test for (Dictionary / JbNull) binary operator
-  // should result in 'Illegal operation, division by Null' error
-  dict = Dict();
-  dict["nice"] = "ecin";
-  a = dict / $b;
+  // test for HexToBinary
+  // should encode bytes as Uint8Array(4) [186, 77, 240, 13]
+  hex = "BA4DF00D";
+  binary = HexToBinary(hex);
   
 </trans>

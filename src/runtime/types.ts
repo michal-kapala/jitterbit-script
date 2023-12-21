@@ -1,5 +1,6 @@
 import { 
   ArrayVal,
+  BinaryVal,
   BooleanVal,
   DictVal,
   NullVal,
@@ -2813,6 +2814,187 @@ export class JbString implements StringVal {
         return new JbBool(this.toBoolAsNumber());
       default:
         throw new Error(`Unsupported operator ${operator}`);
+    }
+  }
+}
+
+export class JbBinary implements BinaryVal {
+  type: "binary";
+  value: Uint8Array;
+
+  constructor(bin: Uint8Array = new Uint8Array()) {
+    this.type = "binary";
+    this.value = bin;
+  }
+
+  clone() {
+    return new JbBinary(this.value);
+  }
+
+  decrement(): never {
+    throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED\nThe problematic token is at the end of the following expression: --");
+  }
+
+  increment(): never {
+    throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED\nThe problematic token is at the end of the following expression: ++");
+  }
+
+  negate(): never {
+    throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED\nThe problematic token is at the end of the following expression: !");
+  }
+
+  negative(): never {
+    throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED\nThe problematic token is at the end of the following expression: -");
+  }
+
+  toBool(): never {
+    throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+  }
+
+  toNumber(): never {
+    throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+  }
+
+  /**
+   * Returns a hexadecimal representation of the data.
+   * @returns 
+   */
+  toString() {
+    let result = "";
+    for(const b of this.value) {
+      result += this.byteToHex(b);
+    }
+    return result;
+  }
+
+  /**
+   * Creates an binary value instance from hex string.
+   * @param hex 
+   * @returns 
+   */
+  static fromHex(hex: string) {
+    if(hex.length % 2 !== 0)
+      throw new Error(`Invalid hex string '${hex}'. The length of the hex string has to be even.`);
+
+    const pattern = /^([a-fA-F0-9])+$/g;
+    const matches = hex.match(pattern);
+    
+    // invalid input
+    if(matches === null)
+      throw new Error(`Invalid hex string '${hex}'. A hex string can only contain hexadecimal numbers (0 through F, case insensitive).`);
+    
+    const bytes = this.hexToBytes(hex);
+    return new JbBinary(bytes);
+  }
+
+  /**
+   * Converts a hex string into a byte array.
+   * @param hex 
+   * @returns 
+   */
+  static hexToBytes(hex: string) {
+    const result = new Uint8Array(hex.length / 2);
+    let left: number;
+    let right: number;
+    let i = 0;
+    const bytes: number[] = [];
+    for(i = 0; i < hex.length; i) {
+      left = this.hexToDigit(hex[i++]) * 16;
+      right = this.hexToDigit(hex[i++]);
+      bytes.push(left+right);
+    }
+    for(i = 0; i < hex.length / 2; i++)
+      result.set([bytes[i]], i);
+
+    return result;
+  }
+
+  /**
+   * Converts a uint8 into a hex byte representation.
+   * @param num 
+   * @returns
+   */
+  private byteToHex(num: number) {
+    const right = num % 16;
+    const left = Math.floor((num - right) / 16);
+    return this.digitToHex(left) + this.digitToHex(right);
+  }
+
+  /**
+   * Converts a 0-15 number into a 0-F hex digit.
+   * @param digit 
+   * @returns
+   */
+  private digitToHex(digit: number) {
+    if (digit < 10)
+      return digit.toString();
+    else {
+      switch (digit) {
+        case 10:
+          return "A";
+        case 11:
+          return "B";
+        case 12:
+          return "C";
+        case 13:
+          return "D";
+        case 14:
+          return "E";
+        case 15:
+          return "F";
+        default:
+          throw new Error(`digitToHex internal error, the number to convert is too big`);
+      }
+    }
+  }
+
+  /**
+   * Converts a hex character into a 0-F hex digit.
+   * @param hex 
+   * @returns
+   */
+  static hexToDigit(hex: string): number {
+    switch(hex) {
+      case "0":
+        return 0;
+      case "1":
+        return 1;
+      case "2":
+        return 2;
+      case "3":
+        return 3;
+      case "4":
+        return 4;
+      case "5":
+        return 5;
+      case "6":
+        return 6;
+      case "7":
+        return 7;
+      case "8":
+        return 8;
+      case "9":
+        return 9;
+      case "a":
+      case "A":
+        return 10;
+      case "b":
+      case "B":
+        return 11;
+      case "c":
+      case "C":
+        return 12;
+      case "d":
+      case "D":
+        return 13;
+      case "e":
+      case "E":
+        return 14;
+      case "f":
+      case "F":
+        return 15;
+      default:
+        throw new Error(`hexToDigit internal error, invalid character`);
     }
   }
 }

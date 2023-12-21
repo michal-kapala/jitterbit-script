@@ -1,6 +1,7 @@
 import { Func, SystemVariable } from "./api/types";
 import * as Arrays from "./api/functions/array";
 import * as Dicts from "./api/functions/dict";
+import * as Conversion from "./api/functions/conversion";
 
 type SystemVariables = {
   static: SystemVariable[];
@@ -974,6 +975,8 @@ export class Api {
       ] as SystemVariable [],
     };
     Api.functions = [
+      // conversion
+      new Conversion.HexToBinaryFunc(),
       // dict/array
       new Dicts.AddToDictFunc(),
       new Arrays.ArrayFunc(),
