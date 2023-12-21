@@ -8,8 +8,10 @@ export type ValueType =
   "string" |
   "array" |
   "dictionary" |
+  // function call-only types
   "void" |
-  "type";
+  "type" |
+  "node";
 
 /**
  * Any runtime value.

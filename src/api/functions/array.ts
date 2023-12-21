@@ -41,6 +41,146 @@ export class CollectionFunc extends ArrayFunc {
 }
 
 /**
+ * The implementation of `GetSourceAttrNames` function.
+ * 
+ * Returns an array containing the names of the attributes of a node, in the order that the attributes appear in the node.
+ * 
+ * Compare with the function `GetSourceInstanceMap` which returns a map of the keys (the attributes) and values for a node.
+ * 
+ * To enter an n path into the function, drag and drop the desired XML node folder from the Source Objects tab of the script component palette to the script to insert its qualified path at the location of your cursor, or enter its reference path manually. For more information, see the instructions on inserting source objects.
+ */
+export class GetSourceAttrNamesFunc extends Func {
+  constructor() {
+    super();
+    this.name = "GetSourceAttrNames";
+    this.module = "dict/array";
+    this.signatures = [
+      new Signature("array", [
+        new Parameter("node", "n")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+
+  call(args: RuntimeVal[]): never {
+    this.chooseSignature(args);
+    throw new Error(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
+  }
+
+  protected chooseSignature(args: RuntimeVal[]): void {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `GetSourceElementNames` function.
+ * 
+ * Returns an array containing the names of the simple sub-elements for a node in the order that the attributes appear in the node.
+ * 
+ * Compare with the function `GetSourceInstanceElementMap` which returns a map of a node.
+ * 
+ * To enter an n path into the function, drag and drop the desired XML node folder
+ * from the Source Objects tab of the script component palette to the script
+ * to insert its qualified path at the location of your cursor, or enter its reference path manually.
+ * For more information, see the instructions on inserting source objects.
+ */
+export class GetSourceElementNamesFunc extends Func {
+  constructor() {
+    super();
+    this.name = "GetSourceElementNames";
+    this.module = "dict/array";
+    this.signatures = [
+      new Signature("array", [
+        new Parameter("node", "n")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+
+  call(args: RuntimeVal[]): never {
+    this.chooseSignature(args);
+    throw new Error(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
+  }
+
+  protected chooseSignature(args: RuntimeVal[]): void {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `GetSourceInstanceArray` function.
+ * 
+ * Returns an array containing the attribute's value from an element node. The value in the array is labeled with the attribute's name, and can be retrieved either by its index or by its name as in a dictionary data element.
+ * 
+ * As an alternative to this function, see `GetSourceInstanceMap`.
+ * 
+ * To enter an n path into the function, drag and drop the desired XML node folder from the Source Objects tab of the script component palette to the script to insert its qualified path at the location of your cursor, or enter its reference path manually.
+ * For more information, see the instructions on inserting source objects.
+ */
+export class GetSourceInstanceArrayFunc extends Func {
+  constructor() {
+    super();
+    this.name = "GetSourceInstanceArray";
+    this.module = "dict/array";
+    this.signatures = [
+      new Signature("array", [
+        new Parameter("node", "n")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+
+  call(args: RuntimeVal[]): never {
+    this.chooseSignature(args);
+    throw new Error(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
+  }
+
+  protected chooseSignature(args: RuntimeVal[]): void {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `GetSourceInstanceElementArray` function.
+ * 
+ * Returns an array containing the sub-element's value from an element node. The value in the array is labeled with the name of the sub-element, and can be retrieved either by its index or by its name as in the dictionary data element.
+ * 
+ * As an alternative to this function, see `GetSourceInstanceElementMap`.
+ * 
+ * To enter an `n` path into the function, drag and drop the desired XML node folder from the Source Objects tab of the script component palette to the script to insert its qualified path at the location of your cursor, or enter its reference path manually. For more information, see the instructions on inserting source objects.
+ */
+export class GetSourceInstanceElementArrayFunc extends Func {
+  constructor() {
+    super();
+    this.name = "GetSourceInstanceElementArray";
+    this.module = "dict/array";
+    this.signatures = [
+      new Signature("array", [
+        new Parameter("node", "n")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+
+  call(args: RuntimeVal[]): never {
+    this.chooseSignature(args);
+    throw new Error(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
+  }
+
+  protected chooseSignature(args: RuntimeVal[]): void {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
  * Internal numeric evaluation of an array element for comparison purposes when sorting.
  */
 type Evaluation = { eval: number; elem: RuntimeVal; };

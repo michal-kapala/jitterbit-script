@@ -145,6 +145,78 @@ export class GetKeysFunc extends Func {
 }
 
 /**
+ * The implementation of `GetSourceInstanceMap` function.
+ * 
+ * Returns a dictionary (map) containing the attribute name and its value from an element node.
+ * 
+ * As an alternative to this function, see `GetSourceInstanceArray`.
+ * 
+ * To enter an `n` path into the function, drag and drop the desired XML node folder from the Source Objects tab of the script component palette to the script to insert its qualified path at the location of your cursor, or enter its reference path manually. For more information, see the instructions on inserting source objects.
+ */
+export class GetSourceInstanceMapFunc extends Func {
+  constructor() {
+    super();
+    this.name = "GetSourceInstanceMap";
+    this.module = "dict/array";
+    this.signatures = [
+      new Signature("dictionary", [
+        new Parameter("node", "n")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+
+  call(args: RuntimeVal[]): never {
+    this.chooseSignature(args);
+    throw new Error(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
+  }
+
+  protected chooseSignature(args: RuntimeVal[]): void {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `GetSourceInstanceElementMap` function.
+ * 
+ * Returns a dictionary (map) containing the sub-element's value from an element node.
+ * 
+ * As an alternative to this function, see `GetSourceInstanceElementArray`.
+ * 
+ * To enter an `n` path into the function, drag and drop the desired XML node folder
+ * from the Source Objects tab of the script component palette to the script to insert
+ * its qualified path at the location of your cursor, or enter its reference path manually.
+ * 
+ * For more information, see the instructions on inserting source objects.
+ */
+export class GetSourceInstanceElementMapFunc extends Func {
+  constructor() {
+    super();
+    this.name = "GetSourceInstanceElementMap";
+    this.module = "dict/array";
+    this.signatures = [
+      new Signature("dictionary", [
+        new Parameter("node", "n")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+
+  call(args: RuntimeVal[]): never {
+    this.chooseSignature(args);
+    throw new Error(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
+  }
+
+  protected chooseSignature(args: RuntimeVal[]): void {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
  * The implementation of `Dict` function.
  * 
  * Creates an empty dictionary.
@@ -250,7 +322,7 @@ export class MapCacheFunc extends Func {
     this.maxArgs = 3;
   }
 
-  call(args: RuntimeVal[]): RuntimeVal {
+  call(args: RuntimeVal[]) {
     this.chooseSignature(args);
     
     // TODO: this error should be thrown by type checker (too)
