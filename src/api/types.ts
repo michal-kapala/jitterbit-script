@@ -70,7 +70,7 @@ export class Parameter {
 }
 
 /**
- * A single overload of a function. Allows for return type variance in polymorphic functions.
+ * A single overload of a function. Allows for return type and parameter list variance in polymorphic functions.
  */
 export class Signature {
   returnType: ValueType;

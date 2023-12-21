@@ -721,7 +721,9 @@ export class Array implements ArrayVal {
           members[idx] = (members[idx] as Array).binopNumber(operator, rhs);
           break;
         case "dictionary":
-          // TODO
+          members[idx] = (members[idx] as Dictionary).binopNumber(operator, rhs);
+          break;
+        // TODO: binary
         default:
           throw `Unsupported array member type: ${members[idx].type}`;
       }
@@ -756,7 +758,9 @@ export class Array implements ArrayVal {
           members[idx] = (members[idx] as Array).binopBool(operator, rhs);
           break;
         case "dictionary":
-          // TODO
+          members[idx] = (members[idx] as Dictionary).binopBool(operator, rhs);
+          break;
+        // TODO: binary
         default:
           throw `Unsupported array member type: ${members[idx].type}`;
       }
@@ -791,7 +795,9 @@ export class Array implements ArrayVal {
           members[idx] = (members[idx] as Array).binopString(operator, rhs);
           break;
         case "dictionary":
-          // TODO
+          members[idx] = (members[idx] as Dictionary).binopString(operator, rhs);
+          break;
+        // TODO: binary
         default:
           throw `Unsupported array member type: ${members[idx].type}`;
       }
@@ -826,7 +832,9 @@ export class Array implements ArrayVal {
           members[idx] = (members[idx] as Array).binopNull(operator, rhs);
           break;
         case "dictionary":
-          // TODO
+          members[idx] = (members[idx] as Dictionary).binopNull(operator, rhs);
+          break;
+        // TODO: binary
         default:
           throw `Unsupported array member type: ${members[idx].type}`;
       }
@@ -883,7 +891,11 @@ export class Array implements ArrayVal {
               );
               break;
             case "dictionary":
-              // TODO
+              lMembers[idx] = (lMembers[idx] as JbNumber).binopDict(
+                operator,
+                rMembers[idx] as Dictionary
+              );
+            // TODO: binary
             default:
               throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
           }
@@ -921,7 +933,11 @@ export class Array implements ArrayVal {
               );
               break;
             case "dictionary":
-              // TODO
+              lMembers[idx] = (lMembers[idx] as JbBool).binopDict(
+                operator,
+                rMembers[idx] as Dictionary
+              );
+            // TODO: binary
             default:
               throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
           }
@@ -959,7 +975,11 @@ export class Array implements ArrayVal {
               );
               break;
             case "dictionary":
-              // TODO
+              lMembers[idx] = (lMembers[idx] as JbString).binopDict(
+                operator,
+                rMembers[idx] as Dictionary
+              );
+            // TODO: binary
             default:
               throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
           }
@@ -997,7 +1017,11 @@ export class Array implements ArrayVal {
               );
               break;
             case "dictionary":
-              // TODO
+              lMembers[idx] = (lMembers[idx] as JbNull).binopDict(
+                operator,
+                rMembers[idx] as Dictionary
+              );
+            // TODO: binary
             default:
               throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
           }
@@ -1029,21 +1053,103 @@ export class Array implements ArrayVal {
               );
               break;
             case "array":
-              lMembers[idx] = lMembers[idx] = (lMembers[idx] as Array).binopArray(
+              lMembers[idx] = (lMembers[idx] as Array).binopArray(
                 operator,
                 rMembers[idx] as Array
               );
               break;
             case "dictionary":
-              // TODO
+              lMembers[idx] = (lMembers[idx] as Array).binopDict(
+                operator,
+                rMembers[idx] as Dictionary
+              );
+            // TODO: binary
             default:
               throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
           }
           break;
         case "dictionary":
-          // TODO
+          switch (rMembers[idx].type) {
+            case "number":
+              lMembers[idx] = (lMembers[idx] as Dictionary).binopNumber(
+                operator,
+                rMembers[idx] as JbNumber
+              );
+              break;
+            case "bool":
+              lMembers[idx] = (lMembers[idx] as Dictionary).binopBool(
+                operator,
+                rMembers[idx] as JbBool
+              );
+              break;
+            case "string":
+              lMembers[idx] = (lMembers[idx] as Dictionary).binopString(
+                operator,
+                rMembers[idx] as JbString
+              );
+              break;
+            case "null":
+              lMembers[idx] = (lMembers[idx] as Dictionary).binopNull(
+                operator,
+                rMembers[idx] as JbNull
+              );
+              break;
+            case "array":
+              lMembers[idx] = (lMembers[idx] as Dictionary).binopArray(
+                operator,
+                rMembers[idx] as Array
+              );
+              break;
+            case "dictionary":
+              lMembers[idx] = (lMembers[idx] as Dictionary).binopDict(
+                operator,
+                rMembers[idx] as Dictionary
+              );
+            // TODO: binary
+            default:
+              throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
+          }
+          break;
+        // TODO: binary
         default:
           throw `Unsupported LHS array member type: ${lMembers[idx].type}`;
+      }
+    }
+    return this;
+  }
+
+  /**
+   * Applies a binary operator to array (always LHS).
+   * The RHS value is a dictionary.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopDict(operator: string, rhs: Dictionary) {
+    const members = this.members;
+    for(const idx in members) {
+      switch (members[idx].type) {
+        case "number":
+          members[idx] = (members[idx] as JbNumber).binopDict(operator, rhs);
+          break;
+        case "bool":
+          members[idx] = (members[idx] as JbBool).binopDict(operator, rhs);
+          break;
+        case "string":
+          members[idx] = (members[idx] as JbString).binopDict(operator, rhs);
+          break;
+        case "null":
+          members[idx] = (members[idx] as JbNull).binopDict(operator, rhs);
+          break;
+        case "array":
+          members[idx] = (members[idx] as Array).binopDict(operator, rhs);
+          break;
+        case "dictionary":
+          members[idx] = (members[idx] as Dictionary).binopDict(operator, rhs);
+          break;
+        // TODO: binary
+        default:
+          throw `Unsupported array member type: ${members[idx].type}`;
       }
     }
     return this;
@@ -1149,6 +1255,253 @@ export class Dictionary implements DictVal {
         throw `Unsupported member expression key type: ${key.type}`;
     }
   }
+
+  /**
+   * Applies a binary operator to dictionary (always LHS).
+   * The RHS value is a number.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopNumber(operator: string, rhs: JbNumber) {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+      case "/":
+      case "^":
+        throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+      case "<":
+        // dictionary is implicitly converted to 0
+        return new JbBool(rhs.value < 0);
+      case ">":
+        // dictionary is implicitly converted to 0
+        return new JbBool(rhs.value > 0);
+      case "<=":
+        // dictionary is implicitly converted to 0
+        return new JbBool(rhs.value <= 0);
+      case ">=":
+        // dictionary is implicitly converted to 0
+        return new JbBool(rhs.value >= 0);
+      case "==":
+        // ref comparison, only true if compared with self
+        return new JbBool(false);
+      case "!=":
+        // ref comparison, only false if compared with self
+        return new JbBool(true);
+      case "&&":
+      case "&":
+        return new JbBool(false);
+      case "||":
+      case "|":
+        return new JbBool(rhs.toBool());
+      default:
+        throw new Error(`Unsupported operator ${operator}`);
+    }
+  }
+
+  /**
+   * Applies a binary operator to dictionary (always LHS).
+   * The RHS value is a bool.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopBool(operator: string, rhs: JbBool) {
+    switch(operator) {
+      case "+":
+        throw new Error(`Illegal operation: ${this.type} Add ${rhs.type}`);
+      case "-":
+        throw new Error(`Illegal operation, SUBTRACT with incompatible data types: ${this.type} - ${rhs.type}`);
+      case "*":
+        throw new Error(`Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} * ${rhs.type}`);
+      case "/":
+        throw new Error(`Illegal operation, DIVISION with incompatible data types: ${this.type} / ${rhs.type}`);
+      case "^":
+        throw new Error(`Illegal operation, POW with incompatible data types: ${this.type} ^ ${rhs.type}`);
+      case "<":
+        // dictionary is implicitly converted to 0
+        return new JbBool(0 < rhs.toNumber());
+      case ">":
+        // dictionary is implicitly converted to 0
+        return new JbBool(0 > rhs.toNumber());
+      case "<=":
+        // dictionary is implicitly converted to 0
+        return new JbBool(0 <= rhs.toNumber());
+      case ">=":
+        // dictionary is implicitly converted to 0
+        return new JbBool(0 >= rhs.toNumber());
+      case "==":
+        return new JbBool(!rhs.value);
+      case "!=":
+        return new JbBool(rhs.value);
+      case "&&":
+      case "&":
+        return new JbBool(false);
+      case "||":
+      case "|":
+        return new JbBool(rhs.value);
+      default:
+        throw new Error(`Unsupported operator ${operator}`);
+    }
+  }
+
+  /**
+   * Applies a binary operator to dictionary (always LHS).
+   * The RHS value is a string.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopString(operator: string, rhs: JbString) {
+    switch(operator) {
+      case "+":
+        throw new Error(`Transform Error: DE_TYPE_CONVERT_FAILED`);
+      case "-":
+        throw new Error(`Illegal operation, SUBTRACT with incompatible data types: ${this.type} - ${rhs.type}`);
+      case "*":
+        throw new Error(`Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} * ${rhs.type}`);
+      case "/":
+        throw new Error(`Illegal operation, DIVISION with incompatible data types: ${this.type} / ${rhs.type}`);
+      case "^":
+        throw new Error(`Illegal operation, POW with incompatible data types: ${this.type} ^ ${rhs.type}`);
+      case "<":
+        // dictionary is implicitly converted to 0
+        return new JbBool(0 < rhs.toNumber());
+      case ">":
+        // dictionary is implicitly converted to 0
+        return new JbBool(0 > rhs.toNumber());
+      case "<=":
+        // dictionary is implicitly converted to 0
+        return new JbBool(0 <= rhs.toNumber());
+      case ">=":
+        // dictionary is implicitly converted to 0
+        return new JbBool(0 >= rhs.toNumber());
+      case "==":
+        return new JbBool(false);
+      case "!=":
+        return new JbBool(true);
+      case "&&":
+      case "&":
+        return new JbBool(false);
+      case "||":
+      case "|":
+        return new JbBool(rhs.toBoolAsNumber());
+      default:
+        throw new Error(`Unsupported operator ${operator}`);
+    }
+  }
+
+  /**
+   * Applies a binary operator to dictionary (always LHS).
+   * The RHS value is a null.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopNull(operator: string, rhs: JbNull) {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+        throw new Error(`Transform Error: DE_TYPE_CONVERT_FAILED`);
+      case "/":
+        throw new Error(`Illegal operation, division by Null`);
+      case "^":
+        throw new Error(`Illegal operation: ${this.type} POW ${rhs.type}`);
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return new JbBool(false);
+      case "!=":
+        return new JbBool(true);
+      default:
+        throw new Error(`Unsupported operator ${operator}`);
+    }
+  }
+
+  /**
+   * Applies a binary operator to dictionary (always LHS).
+   * The RHS value is an array.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopArray(operator: string, rhs: Array) {
+    const rMembers = rhs.members;
+    for(const idx in rMembers) {
+      switch (rMembers[idx].type) {
+        case "number":
+          rMembers[idx] = this.binopNumber(operator, rMembers[idx] as JbNumber);
+          break;
+        case "bool":
+          rMembers[idx] = this.binopBool(operator, rMembers[idx] as JbBool);
+          break;
+        case "string":
+          rMembers[idx] = this.binopString(operator, rMembers[idx] as JbString);
+          break;
+        case "null":
+          rMembers[idx] = this.binopNull(operator, rMembers[idx] as JbNull);
+          break;
+        case "array":
+          rMembers[idx] = this.binopArray(operator, rMembers[idx] as Array);
+          break;
+        case "dictionary":
+          rMembers[idx] = this.binopDict(operator, rMembers[idx] as Dictionary);
+          break;
+        // TODO: binary
+        default:
+          throw `Unsupported LHS array member type: ${rMembers[idx].type}`;
+      }
+    }
+    return rhs;
+  }
+
+  /**
+   * Applies a binary operator to dictionary (always LHS).
+   * The RHS value is a dictionary too.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopDict(operator: string, rhs: Dictionary) {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+      case "^":
+        throw new Error("Transform Error: D_TYPE_CONVERT_FAILED");
+      // POD: original error:
+      // Illegal operation: division by 0.
+      case "/":
+        throw new Error(`Illegal operation, DIVISION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+      case "<":
+      case ">":
+        // always false
+        return new JbBool(false);
+      case "<=":
+      case ">=":
+      case "==":
+        // ref comparison, only true if compared with self
+        return new JbBool(this === rhs);
+      case "!=":
+        // ref comparison, only false if compared with self
+        return new JbBool(this !== rhs);
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return new JbBool(false);
+      default:
+        throw new Error(`Unsupported operator ${operator}`);
+    }
+  }
 }
 
 /**
@@ -1163,40 +1516,40 @@ export class JbBool implements BooleanVal {
     this.value = b;
   }
 
-  clone(): RuntimeVal {
+  clone() {
     return new JbBool(this.value);
   }
 
-  decrement(): RuntimeVal {
+  decrement() {
     this.value = !this.value;
     return this;
   }
 
-  increment(): RuntimeVal {
+  increment() {
     this.value = true;
     return this;
   }
 
-  negate(): RuntimeVal {
+  negate() {
     this.value = !this.value;
     return this;
   }
 
-  negative(): RuntimeVal {
+  negative() {
     // -true is true
     // -false is false
     return this;
   }
 
-  toBool(): boolean {
+  toBool() {
     return this.value;
   }
 
-  toString(): string {
+  toString() {
     return this.value ? "1" : "0";
   }
 
-  toNumber(): number {
+  toNumber() {
     return this.value ? 1 : 0
   }
 
@@ -1419,12 +1772,57 @@ export class JbBool implements BooleanVal {
           members[idx] = this.binopArray(operator, members[idx] as Array);
           break;
         case "dictionary":
-          // TODO
+          members[idx] = this.binopDict(operator, members[idx] as Dictionary);
+          break;
+        // TODO: binary
         default:
           throw `Unsupported array member type: ${members[idx].type}`;
       }
     }
     return rhs;
+  }
+
+  /**
+   * Applies a binary operator to bool (always LHS).
+   * The RHS value is a dictionary.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopDict(operator: string, rhs: Dictionary) {
+    switch(operator) {
+      case "+":
+        throw new Error(`Illegal operation: ${this.type} Add ${rhs.type}`);
+      case "-":
+        throw new Error(`Illegal operation, SUBTRACT with incompatible data types: ${this.type} - ${rhs.type}`);
+      case "*":
+        throw new Error(`Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} * ${rhs.type}`);
+      case "/":
+        throw new Error(`Illegal operation, DIVISION with incompatible data types: ${this.type} / ${rhs.type}`);
+      case "^":
+        throw new Error(`Illegal operation, POW with incompatible data types: ${this.type} ^ ${rhs.type}`);
+      case "<":
+        // originally always false
+        // POD: perhaps this should be changed
+        return new JbBool(false);
+      case ">":
+        // dictionary is implicitly converted to 0
+        return new JbBool(this.toNumber() > 0);
+      case "<=":
+      case ">=":
+      case "==":
+        return new JbBool(!this.value);
+      case "!=":
+        return new JbBool(this.value);
+      case "&&":
+      case "&":
+        return new JbBool(false);
+      case "||":
+      case "|":
+        return new JbBool(this.value);
+      default:
+        throw new Error(`Unsupported operator ${operator}`);
+    }
   }
 }
 
@@ -1470,7 +1868,7 @@ export class JbNull implements NullVal {
     return 0;
   }
 
-  toString(): string {
+  toString() {
     return "null";
   }
 
@@ -1649,12 +2047,50 @@ export class JbNull implements NullVal {
           members[idx] = this.binopArray(operator, members[idx] as Array);
           break;
         case "dictionary":
-          // TODO
+          members[idx] = this.binopDict(operator, members[idx] as Dictionary);
+          break;
+        // TODO: binary
         default:
           throw `Unsupported array member type: ${members[idx].type}`;
       }
     }
     return rhs;
+  }
+
+  /**
+   * Applies a binary operator to null (always LHS).
+   * The RHS value is a dictionary.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopDict(operator: string, rhs: Dictionary) {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+        throw new Error(`Transform Error: DE_TYPE_CONVERT_FAILED`);
+      // POD: original error:
+      // Illegal operation: division by 0.
+      case "/":
+        throw new Error(`Illegal operation, DIVISION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+      case "^":
+        throw new Error(`Illegal operation: ${this.type} POW ${rhs.type}`);
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return new JbBool(false);
+      case "!=":
+        return new JbBool(true);
+      default:
+        throw new Error(`Unsupported operator ${operator}`);
+    }
   }
 }
 
@@ -1938,12 +2374,58 @@ export class JbNumber implements NumberVal {
           members[idx] = this.binopArray(operator, members[idx] as Array);
           break;
         case "dictionary":
-          // TODO
+          members[idx] = this.binopDict(operator, members[idx] as Dictionary);
+          break;
+        // TODO: binary
         default:
           throw `Unsupported array member type: ${members[idx].type}`;
       }
     }
     return rhs;
+  }
+
+  /**
+   * Applies a binary operator to number (always LHS).
+   * The RHS value is a dictionary.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopDict(operator: string, rhs: Dictionary) {
+    switch (operator) {
+      case "+":
+      case "-":
+      case "*":
+      case "^":
+        throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+      // POD: original error:
+      // Illegal operation: division by 0.
+      case "/":
+        throw new Error(`Illegal operation, DIVISION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+      case "<":
+        // dictionary is implicitly converted to 0
+        return new JbBool(this.value < 0);
+      case ">":
+        // dictionary is implicitly converted to 0
+        return new JbBool(this.value > 0);
+      case "<=":
+        // dictionary is implicitly converted to 0
+        return new JbBool(this.value <= 0);
+      case ">=":
+        // dictionary is implicitly converted to 0
+        return new JbBool(this.value >= 0);
+      case "==":
+      case "&&":
+      case "&":
+        return new JbBool(false);
+      case "!=":
+        return new JbBool(true);
+      case "||":
+      case "|":
+        return new JbBool(this.toBool());
+      default:
+        throw `Unsupported operator ${operator}`;
+    }
   }
 }
 
@@ -2008,7 +2490,7 @@ export class JbString implements StringVal {
    * When successful, the value is returned, otherwise returns 0.
    * @returns 
    */
-  toNumber(): number {
+  toNumber() {
     // regular strings evaluate to 0, e.g. 0 == "abcd1234"
     // strings beginning with a parsable number are truncated and parsed
     // for example the below expressions return true:
@@ -2278,11 +2760,59 @@ export class JbString implements StringVal {
           members[idx] = this.binopArray(operator, members[idx] as Array);
           break;
         case "dictionary":
-          // TODO
+          members[idx] = this.binopDict(operator, members[idx] as Dictionary);
+          break;
+        // TODO: binary
         default:
           throw `Unsupported array member type: ${members[idx].type}`;
       }
     }
     return rhs;
+  }
+
+  /**
+   * Applies a binary operator to string (always LHS).
+   * The RHS value is a dictionary.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopDict(operator: string, rhs: Dictionary) {
+    switch(operator) {
+      case "+":
+        throw new Error(`Transform Error: DE_TYPE_CONVERT_FAILED`);
+      case "-":
+        throw new Error(`Illegal operation, SUBTRACT with incompatible data types: ${this.type} - ${rhs.type}`);
+      case "*":
+        throw new Error(`Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} * ${rhs.type}`);
+      case "/":
+        throw new Error(`Illegal operation, DIVISION with incompatible data types: ${this.type} / ${rhs.type}`);
+      case "^":
+        throw new Error(`Illegal operation, POW with incompatible data types: ${this.type} ^ ${rhs.type}`);
+      case "<":
+        // dictionary is implicitly converted to 0
+        return new JbBool(this.toNumber() < 0);
+      case ">":
+        // dictionary is implicitly converted to 0
+        return new JbBool(this.toNumber() > 0);
+      case "<=":
+        // dictionary is implicitly converted to 0
+        return new JbBool(this.toNumber() <= 0);
+      case ">=":
+        // dictionary is implicitly converted to 0
+        return new JbBool(this.toNumber() >= 0);
+      case "==":
+        return new JbBool(false);
+      case "!=":
+        return new JbBool(true);
+      case "&&":
+      case "&":
+        return new JbBool(false);
+      case "||":
+      case "|":
+        return new JbBool(this.toBoolAsNumber());
+      default:
+        throw new Error(`Unsupported operator ${operator}`);
+    }
   }
 }

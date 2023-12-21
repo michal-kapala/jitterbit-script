@@ -90,7 +90,8 @@ export default class Scope {
               this.getGlobal().variables.set(varName, value);
               return value;
             case "dictionary":
-              // TODO
+              throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+            // TODO: binary
             default:
               throw `Unsupported type: ${value.type}`;
           }
@@ -111,7 +112,8 @@ export default class Scope {
               this.getGlobal().variables.set(varName, value);
               return value;
             case "dictionary":
-              // TODO
+              throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+            // TODO: binary
             default:
               throw `Unsupported type: ${value.type}`;
           }
@@ -298,6 +300,41 @@ export default class Scope {
           arr = arr.assignString(strVal, operator, isLhs);
           return arr;
         }
+        // array -= dict
+        // dict -= array
+        else if (
+          lhs.type === "array" && rhs.type === "dictionary" ||
+          lhs.type === "dictionary" && rhs.type === "array"
+        ) {
+          const isLhs = lhs.type === "array";
+          const array = (isLhs ? lhs : rhs) as Array;
+
+          // empty arrays get assigned
+          if(array.members.length === 0)
+            return array;
+          
+          // other arrays throw
+          // POD: originally nested empty arrays work too, e.g. {{{}}}
+          throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+        }
+
+        // dicts
+
+        // dict -= dict
+        // number -= dict
+        // dict -= number
+        // null -= dict
+        // dict -= null
+        else if (
+          lhs.type === "dictionary" && rhs.type === "dictionary" ||
+          lhs.type === "number" && rhs.type === "dictionary" ||
+          lhs.type === "dictionary" && rhs.type === "number" ||
+          lhs.type === "null" && rhs.type === "dictionary" ||
+          lhs.type === "dictionary" && rhs.type === "null"
+        ) {
+          throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+        }
+
         else
           // currently returns interpreter types rather than strict JB types (e.g. 'number' instead of int/double)
           // string -= string
@@ -310,6 +347,10 @@ export default class Scope {
           // bool -= string
           // number -= bool
           // bool -= number
+          // string -= dict
+          // dict -= string
+          // bool -= dict
+          // dict -= bool
           throw `Illegal operation, SUBTRACT with incompatible data types: ${lhs.type} - ${rhs.type}`;
       case "+=":
         // number += number
@@ -330,39 +371,19 @@ export default class Scope {
         }
         // string += bool - implicit type conversion to string
         else if (lhs.type === "string" && rhs.type === "bool") {
-          let stringVal = (lhs as JbString).value;
-          let boolValue = (rhs as JbBool).value;
-          let newValue = {
-            type: "string",
-            value: stringVal + (boolValue ? "1" : "0")
-          } as JbString;
-          return newValue;
+          return new JbString((lhs as JbString).value + (rhs as JbBool).toString());
         }
         // bool += string - implicit type conversion to string
         else if (lhs.type === "bool" && rhs.type === "string") {
-          let newValue = {
-            type: "string",
-            value: (lhs as JbBool).toString() + (rhs as JbString).value
-          } as JbString;
-          return newValue;
+          return new JbString((lhs as JbBool).toString() + (rhs as JbString).value);
         }
         // string += number - implicit type conversion to string
         else if (lhs.type === "string" && rhs.type === "number") {
-          let newValue = {
-            type: "string",
-            value: (lhs as JbString).value + (rhs as JbNumber).toString()
-          } as JbString;
-          return newValue;
+          return new JbString((lhs as JbString).value + (rhs as JbNumber).toString());
         }
         // number += string - implicit type conversion to string
         else if (lhs.type === "number" && rhs.type === "string") {
-          let numberValue = (lhs as JbNumber).value;
-          let stringVal = (rhs as JbString).value;
-          let newValue = {
-            type: "string",
-            value: numberValue.toString() + stringVal
-          } as JbString;
-          return newValue;
+          return new JbString((lhs as JbString).value + (rhs as JbNumber).toString());
         }
         // number += bool (unsupported)
         // bool += number (unsupported)
@@ -428,10 +449,66 @@ export default class Scope {
           arr = arr.assignString(strVal, operator, isLhs);
           return arr;
         }
+        // array += dict
+        // dict += array
+        else if (
+          lhs.type === "array" && rhs.type === "dictionary" ||
+          lhs.type === "dictionary" && rhs.type === "array"
+        ) {
+          const isLhs = lhs.type === "array";
+          const array = (isLhs ? lhs : rhs) as Array;
+
+          // empty arrays get assigned
+          if(array.members.length === 0)
+            return array;
+          
+          // other arrays throw
+          // POD: originally nested empty arrays work too, e.g. {{{}}}
+          throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+        }
+
+        // dicts
+
+        // dict += dict
+        else if(lhs.type === "dictionary" && lhs.type === rhs.type) {
+          throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+        }
+        // dict += number
+        // number += dict
+        else if (
+          lhs.type === "number" && rhs.type === "dictionary" ||
+          lhs.type === "dictionary" && rhs.type === "number"
+        ) {
+          throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+        }
+        // dict += string
+        // string += dict
+        else if (
+          lhs.type === "string" && rhs.type === "dictionary" ||
+          lhs.type === "dictionary" && rhs.type === "string"
+        ) {
+          throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+        }
+        // dict += null
+        // null += dict
+        else if (
+          lhs.type === "null" && rhs.type === "dictionary" ||
+          lhs.type === "dictionary" && rhs.type === "null"
+        ) {
+          throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+        }
+        // dict += bool
+        // bool += dict
+        else if (
+          lhs.type === "bool" && rhs.type === "dictionary" ||
+          lhs.type === "dictionary" && rhs.type === "bool"
+        ) {
+          throw new Error(`Illegal operation: ${lhs.type} += ${rhs.type}`);
+        }
         else
           // POD: currently returns interpreter types rather than strict JB types (e.g. 'number' instead of int/double)
           // call types should not be here, it should be their return value
-          // TODO: dictionary and binary type handling
+          // TODO: binary type handling
           throw `Illegal operation, ADDITION with incompatible data types: ${lhs.type} + ${rhs.type}`
       default:
         throw `Unknown assignment operator ${operator}`;

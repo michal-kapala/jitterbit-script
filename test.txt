@@ -5,13 +5,10 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for MapCache function, should return "4"
+  // simple test for (Dictionary / JbNull) binary operator
+  // should result in 'Illegal operation, division by Null' error
   dict = Dict();
-  dict[1] = "very";
-  dict["very"] = "nice";
-  idx = 1;
-  result = MapCache(dict, true, ++idx);
-  result = MapCache(dict, result, ++idx);
-  result = MapCache(dict, result, ++idx);
+  dict["nice"] = "ecin";
+  a = dict / $b;
   
 </trans>

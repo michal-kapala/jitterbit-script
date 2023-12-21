@@ -224,14 +224,7 @@ export default class Parser {
       while(this.at().type === TokenType.LogicalOperator) {
         const operator = this.consume().value;
         const right = this.parse_comparative_expr();
-
-        // TODO: to be changed
-        left = {
-          kind: "BinaryExpr",
-          left,
-          right,
-          operator,
-        } as BinaryExpr;
+        left = new BinaryExpr(left, right, operator);
       }
 
       return left;
@@ -246,13 +239,7 @@ export default class Parser {
     while (this.at().type === TokenType.ComparisonOperator) {
       const operator = this.consume().value;
       const right = this.parse_additive_expr();
-      // TODO: to be changed
-      left = {
-        kind: "BinaryExpr",
-        left,
-        right,
-        operator,
-      } as BinaryExpr;
+      left = new BinaryExpr(left, right, operator);
     }
 
     return left;
@@ -268,13 +255,7 @@ export default class Parser {
     while (this.at().value === "+" || this.at().value === "-") {
       const operator = this.consume().value;
       const right = this.parse_multiplicative_expr();
-      // TODO: to be changed
-      left = {
-        kind: "BinaryExpr",
-        left,
-        right,
-        operator,
-      } as BinaryExpr;
+      left = new BinaryExpr(left, right, operator);
     }
 
     return left;
@@ -292,13 +273,7 @@ export default class Parser {
     ) {
       const operator = this.consume().value;
       const right = this.parse_negation_expr();
-      // TODO: to be changed
-      left = {
-        kind: "BinaryExpr",
-        left,
-        right,
-        operator,
-      } as BinaryExpr;
+      left = new BinaryExpr(left, right, operator);
     }
 
     return left;
@@ -329,13 +304,7 @@ export default class Parser {
     while (this.at().value === "^") {
       const operator = this.consume().value;
       const right = this.parse_unary_expr();
-      // TODO: to be changed
-      left = {
-        kind: "BinaryExpr",
-        left,
-        right,
-        operator,
-      } as BinaryExpr;
+      left = new BinaryExpr(left, right, operator);
     }
 
     return left;

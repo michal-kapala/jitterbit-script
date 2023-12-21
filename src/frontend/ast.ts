@@ -58,14 +58,14 @@ export class Program implements Stmt {
    */
   execute(scope: Scope): RuntimeVal {
     let lastEvaluated: RuntimeVal = new JbNull();
-    //try {
+    try {
       for (const statement of this.body)
         lastEvaluated = evaluate(statement, scope);
-    //}
-    //catch(e) {
+    }
+    catch(e) {
       // TODO: this should be added as an error
-      //console.error(`InterpreterError: ${e}\nLast evaluated expression:\n`, lastEvaluated);
-    //}
+      console.error(`InterpreterError: ${e}\nLast evaluated expression:\n`, lastEvaluated);
+    }
     return lastEvaluated;
   }
 }
@@ -134,110 +134,149 @@ export class BinaryExpr implements Expr {
 
   eval(scope: Scope): RuntimeVal {
     const lhs = evaluate(this.left, scope);
-  const rhs = evaluate(this.right, scope);
+    const rhs = evaluate(this.right, scope);
 
-  // math
-  if (lhs.type === "number" && rhs.type === "number")
-    return (lhs as JbNumber).binopNumber(this.operator, rhs as JbNumber);
+    // math
+    if (lhs.type === "number" && rhs.type === "number")
+      return (lhs as JbNumber).binopNumber(this.operator, rhs as JbNumber);
 
-  // string concatenation
-  if (lhs.type === "string" && rhs.type === "string")
-    return (lhs as JbString).binopString(this.operator, rhs as JbString);
+    // string concatenation
+    if (lhs.type === "string" && rhs.type === "string")
+      return (lhs as JbString).binopString(this.operator, rhs as JbString);
 
-  // booleans
-  if (lhs.type === "bool" && rhs.type === "bool")
-    return (lhs as JbBool).binopBool(this.operator, rhs as JbBool);
+    // booleans
+    if (lhs.type === "bool" && rhs.type === "bool")
+      return (lhs as JbBool).binopBool(this.operator, rhs as JbBool);
 
-  // wild implicit conversions and unusual behaviour
-  // all the functions below should always return a warning (except for null checks)
+    // wild implicit conversions and unusual behaviour
+    // all the functions below should always return a warning (except for null checks)
 
-  // number-string
-  if (lhs.type === "number" && rhs.type === "string")
-    return (lhs as JbNumber).binopString(this.operator, rhs as JbString);
-  
-  if (lhs.type === "string" && rhs.type === "number")
-    return (lhs as JbString).binopNumber(this.operator, rhs as JbNumber);
+    // number-string
+    if (lhs.type === "number" && rhs.type === "string")
+      return (lhs as JbNumber).binopString(this.operator, rhs as JbString);
+    
+    if (lhs.type === "string" && rhs.type === "number")
+      return (lhs as JbString).binopNumber(this.operator, rhs as JbNumber);
 
-  // bool-string
-  if (lhs.type === "bool" && rhs.type === "string")
-    return (lhs as JbBool).binopString(this.operator, rhs as JbString);
+    // bool-string
+    if (lhs.type === "bool" && rhs.type === "string")
+      return (lhs as JbBool).binopString(this.operator, rhs as JbString);
 
-  if (lhs.type === "string" && rhs.type === "bool")
-    return (lhs as JbString).binopBool(this.operator, rhs as JbBool);
+    if (lhs.type === "string" && rhs.type === "bool")
+      return (lhs as JbString).binopBool(this.operator, rhs as JbBool);
 
-  // number-bool
-  if (lhs.type === "bool" && rhs.type === "number")
-    return (lhs as JbBool).binopNumber(this.operator, rhs as JbNumber);
+    // number-bool
+    if (lhs.type === "bool" && rhs.type === "number")
+      return (lhs as JbBool).binopNumber(this.operator, rhs as JbNumber);
 
-  if (lhs.type === "number" && rhs.type === "bool")
-    return (lhs as JbNumber).binopBool(this.operator, rhs as JbBool);
+    if (lhs.type === "number" && rhs.type === "bool")
+      return (lhs as JbNumber).binopBool(this.operator, rhs as JbBool);
 
-  // null interactions
+    // null interactions
 
-  // null-null
-  if (lhs.type === "null" && lhs.type === rhs.type)
-    return (lhs as JbNull).binopNull(this.operator, rhs as JbNull);
+    // null-null
+    if (lhs.type === "null" && lhs.type === rhs.type)
+      return (lhs as JbNull).binopNull(this.operator, rhs as JbNull);
 
-  // null-string
-  if (lhs.type === "null" && rhs.type === "string")
-    return (lhs as JbNull).binopString(this.operator, rhs as JbString);
+    // null-string
+    if (lhs.type === "null" && rhs.type === "string")
+      return (lhs as JbNull).binopString(this.operator, rhs as JbString);
 
-  if (lhs.type === "string" && rhs.type === "null")
-    return (lhs as JbString).binopNull(this.operator, rhs as JbNull);
+    if (lhs.type === "string" && rhs.type === "null")
+      return (lhs as JbString).binopNull(this.operator, rhs as JbNull);
 
-  // null-number
-  if (lhs.type === "null" && rhs.type === "number") 
-    return (lhs as JbNull).binopNumber(this.operator, rhs as JbNumber);
+    // null-number
+    if (lhs.type === "null" && rhs.type === "number") 
+      return (lhs as JbNull).binopNumber(this.operator, rhs as JbNumber);
 
-  if (lhs.type === "number" && rhs.type === "null")
-    return (lhs as JbNumber).binopNull(this.operator, rhs as JbNull);
+    if (lhs.type === "number" && rhs.type === "null")
+      return (lhs as JbNumber).binopNull(this.operator, rhs as JbNull);
 
-  // null-bool
-  if (lhs.type === "null" && rhs.type === "bool")
-    return (lhs as JbNull).binopBool(this.operator, rhs as JbBool);
+    // null-bool
+    if (lhs.type === "null" && rhs.type === "bool")
+      return (lhs as JbNull).binopBool(this.operator, rhs as JbBool);
 
-  if (lhs.type === "bool" && rhs.type === "null")
-    return (lhs as JbBool).binopNull(this.operator, rhs as JbNull);
+    if (lhs.type === "bool" && rhs.type === "null")
+      return (lhs as JbBool).binopNull(this.operator, rhs as JbNull);
 
-  // arrays
+    // arrays
 
-  // array-array
-  if (lhs.type === "array" && rhs.type === "array")
-    return (lhs as Array).binopArray(this.operator, rhs as Array);
+    // array-array
+    if (lhs.type === "array" && rhs.type === "array")
+      return (lhs as Array).binopArray(this.operator, rhs as Array);
 
-  // array-number
-  if (lhs.type === "array" && rhs.type === "number")
-    return (lhs as Array).binopNumber(this.operator, rhs as JbNumber);
+    // array-number
+    if (lhs.type === "array" && rhs.type === "number")
+      return (lhs as Array).binopNumber(this.operator, rhs as JbNumber);
 
-  if (lhs.type === "number" && rhs.type === "array")
-    return (lhs as JbNumber).binopArray(this.operator, rhs as Array);
+    if (lhs.type === "number" && rhs.type === "array")
+      return (lhs as JbNumber).binopArray(this.operator, rhs as Array);
 
-  // array-bool
-  if(lhs.type === "array" && rhs.type === "bool")
-    return (lhs as Array).binopBool(this.operator, rhs as JbBool);
+    // array-bool
+    if(lhs.type === "array" && rhs.type === "bool")
+      return (lhs as Array).binopBool(this.operator, rhs as JbBool);
 
-  if (lhs.type === "bool" && rhs.type === "array")
-    return (lhs as JbBool).binopArray(this.operator, rhs as Array);
+    if (lhs.type === "bool" && rhs.type === "array")
+      return (lhs as JbBool).binopArray(this.operator, rhs as Array);
 
-  // array-string
-  if(lhs.type === "array" && rhs.type === "string")
-    return (lhs as Array).binopString(this.operator, rhs as JbString);
+    // array-string
+    if(lhs.type === "array" && rhs.type === "string")
+      return (lhs as Array).binopString(this.operator, rhs as JbString);
 
-  if (lhs.type === "string" && rhs.type === "array")
-    return (lhs as JbString).binopArray(this.operator, rhs as Array);
+    if (lhs.type === "string" && rhs.type === "array")
+      return (lhs as JbString).binopArray(this.operator, rhs as Array);
 
-  // array-null
-  if(lhs.type === "array" && rhs.type === "null")
-    return (lhs as Array).binopNull(this.operator, rhs as JbNull);
+    // array-null
+    if(lhs.type === "array" && rhs.type === "null")
+      return (lhs as Array).binopNull(this.operator, rhs as JbNull);
 
-  if (lhs.type === "null" && rhs.type === "array")
-    return (lhs as JbNull).binopArray(this.operator, rhs as Array);
+    if (lhs.type === "null" && rhs.type === "array")
+      return (lhs as JbNull).binopArray(this.operator, rhs as Array);
 
-  // TODO: dicts
+    // array-dict
+    if(lhs.type === "array" && rhs.type === "dictionary")
+      return (lhs as Array).binopDict(this.operator, rhs as Dictionary);
 
-  // Add JB error:
-  // Illegal operation, <operation name, ex. SUBTRACT> with incompatible data types: <lhs.type> <operator> <rhs.type>
-  throw `Illegal operation, ${this.operator} with incompatible data types: ${lhs.type} ${this.operator} ${rhs.type}`;
+    if (lhs.type === "dictionary" && rhs.type === "array")
+      return (lhs as Dictionary).binopArray(this.operator, rhs as Array);
+
+    // dicts
+
+    // dict-dict
+    if (lhs.type === "dictionary" && rhs.type === "dictionary")
+      return (lhs as Dictionary).binopDict(this.operator, rhs as Dictionary);
+
+    // dict-number
+    if (lhs.type === "dictionary" && rhs.type === "number")
+      return (lhs as Dictionary).binopNumber(this.operator, rhs as JbNumber);
+
+    if (lhs.type === "number" && rhs.type === "dictionary")
+      return (lhs as JbNumber).binopDict(this.operator, rhs as Dictionary);
+
+    // dict-bool
+    if (lhs.type === "dictionary" && rhs.type === "bool")
+      return (lhs as Dictionary).binopBool(this.operator, rhs as JbBool);
+
+    if (lhs.type === "bool" && rhs.type === "dictionary")
+      return (lhs as JbBool).binopDict(this.operator, rhs as Dictionary);
+
+    // dict-string
+    if (lhs.type === "dictionary" && rhs.type === "string")
+      return (lhs as Dictionary).binopString(this.operator, rhs as JbString);
+
+    if (lhs.type === "string" && rhs.type === "dictionary")
+      return (lhs as JbString).binopDict(this.operator, rhs as Dictionary);
+
+    // dict-null
+    if (lhs.type === "dictionary" && rhs.type === "null")
+      return (lhs as Dictionary).binopNull(this.operator, rhs as JbNull);
+
+    if (lhs.type === "null" && rhs.type === "dictionary")
+      return (lhs as JbNull).binopDict(this.operator, rhs as Dictionary);
+
+    // Add JB error:
+    // Illegal operation, <operation name, ex. SUBTRACT> with incompatible data types: <lhs.type> <operator> <rhs.type>
+    throw `Illegal operation, ${this.operator} with incompatible data types: ${lhs.type} ${this.operator} ${rhs.type}`;
   }
 }
 
