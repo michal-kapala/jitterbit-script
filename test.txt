@@ -9,8 +9,6 @@
   dict = Dict();
   dict[1] = "very";
   dict["very"] = "nice";
-  // names = {1,2,$x}; would throw a key error
-  names = {1,2};
-  result = CollectValues(dict, names);
+  result = GetKeys(dict);
   
 </trans>

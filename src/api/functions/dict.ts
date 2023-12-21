@@ -1,5 +1,5 @@
 import { RuntimeVal } from "../../runtime/values";
-import { Dictionary, JbBool, Array } from "../../runtime/types";
+import { Dictionary, JbBool, Array, JbString } from "../../runtime/types";
 import { Func, Parameter, Signature } from "../types";
 
 /**
@@ -51,6 +51,12 @@ export class AddToDictFunc extends Func {
   }
 }
 
+/**
+ * The implementation of `CollectValues` function.
+ * 
+ * Returns an array containing the values corresponding to the names in the argument array,
+ * returned in the same order as the keys in the array.
+ */
 export class CollectValuesFunc extends Func {
   constructor() {
     super();
@@ -87,6 +93,48 @@ export class CollectValuesFunc extends Func {
     const result = new Array();
     for(const key of (args[1] as Array).members)
       result.set(idx++, dict.get(key));
+
+    return result;
+  }
+
+  protected chooseSignature(args: RuntimeVal[]): void {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `GetKeys` function.
+ * 
+ * Returns an array of the keys in a dictionary. The argument must be an existing dictionary.
+ */
+export class GetKeysFunc extends Func {
+  constructor() {
+    super();
+    this.name = "GetKeys";
+    this.module = "dict/array";
+    this.signatures = [
+      new Signature("array", [
+        new Parameter("dictionary", "dict")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+
+  call(args: RuntimeVal[]): RuntimeVal {
+    this.chooseSignature(args);
+
+    // TODO: this error should be thrown by type checker (too)
+    // POD: originally the type is not validated, the value is reassigned with a new dictionary
+    if(args[0].type !== "dictionary")
+      throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+
+    const dict = args[0] as Dictionary;
+    const result = new Array();
+    let idx = 0;
+    for(const key of dict.members.keys())
+      result.set(idx++, new JbString(key));
 
     return result;
   }
