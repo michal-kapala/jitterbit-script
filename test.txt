@@ -5,10 +5,10 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for HasKey function, should return true
+  // test for RemoveKey function, should return true
   dict = Dict();
   dict[1] = "very";
   dict["very"] = "nice";
-  result = HasKey(dict, true);
+  result = RemoveKey(dict, true);
   
 </trans>

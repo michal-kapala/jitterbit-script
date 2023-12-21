@@ -984,6 +984,7 @@ export class Api {
       new Dicts.HasKeyFunc(),
       new Dicts.MapFunc(),
       new Arrays.ReduceDimensionFunc(),
+      new Dicts.RemoveKeyFunc(),
       new Arrays.SortArrayFunc()
     ];
   }

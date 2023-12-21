@@ -225,3 +225,44 @@ export class MapFunc extends DictFunc {
     this.name = "Map";
   }
 }
+
+/**
+ * The implementation of `RemoveKey` function.
+ * 
+ * Removes a key-value pair with a specific key from a dictionary.
+ * The key must be a string or have a string representation, and null values are not allowed.
+ * Returns `true` if the key-value pair was removed and `false` if the key didn't exist.
+ */
+export class RemoveKeyFunc extends Func {
+  constructor() {
+    super();
+    this.name = "RemoveKey";
+    this.module = "dict/array";
+    this.signatures = [
+      new Signature("bool", [
+        new Parameter("dictionary", "dict"),
+        new Parameter("string", "key")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 2;
+    this.maxArgs = 2;
+  }
+
+  call(args: RuntimeVal[]) {
+    this.chooseSignature(args);
+
+    // TODO: this error should be thrown by type checker (too)
+    // POD: originally the type is not validated, the value is reassigned with a new dictionary
+    if(args[0].type !== "dictionary")
+      throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+
+    const dict = args[0] as Dictionary;
+    const key = Dictionary.keyValueToString(args[1]);
+    return new JbBool(dict.members.delete(key));
+  }
+
+  protected chooseSignature(args: RuntimeVal[]): void {
+    this.signature = this.signatures[0];
+  }
+}
