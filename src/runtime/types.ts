@@ -1108,7 +1108,7 @@ export class Dictionary implements DictVal {
    * @returns 
    */
   get(keyVal: RuntimeVal): RuntimeVal {
-    const key = this.keyValueToString(keyVal);
+    const key = Dictionary.keyValueToString(keyVal);
     const result = this.members.get(key);
     return result ?? new JbNull();
   }
@@ -1120,7 +1120,7 @@ export class Dictionary implements DictVal {
    * @returns 
    */
   set(keyVal: RuntimeVal, newValue: RuntimeVal): RuntimeVal {
-    const key = this.keyValueToString(keyVal);
+    const key = Dictionary.keyValueToString(keyVal);
     this.members.set(key, newValue);
     return newValue;
   }
@@ -1130,7 +1130,7 @@ export class Dictionary implements DictVal {
    * @param key 
    * @returns 
    */
-  private keyValueToString(key: RuntimeVal) {
+  static keyValueToString(key: RuntimeVal) {
     switch (key.type) {
       case "number":
         return (key as JbNumber).toString();

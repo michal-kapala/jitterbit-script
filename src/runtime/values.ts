@@ -8,7 +8,8 @@ export type ValueType =
   "string" |
   "array" |
   "dictionary" |
-  "void";
+  "void" |
+  "type";
 
 /**
  * Any runtime value.

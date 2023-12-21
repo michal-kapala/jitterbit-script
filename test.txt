@@ -5,12 +5,10 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for ReduceDimension function
-  arr = {
-    { {1}, {2, "xd"} },
-    { {3}, {4}, {5} }
-  };
-
-  arr = ReduceDimension(arr);
+  // test for AddToDict function, should return false
+  dict = Dict();
+  dict[1] = "nice";
+  result = AddToDict(dict, "a key", "a value");
+  result = AddToDict(dict, result, "very nice");
   
 </trans>

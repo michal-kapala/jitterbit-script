@@ -1,6 +1,55 @@
 import { RuntimeVal } from "../../runtime/values";
-import { Dictionary } from "../../runtime/types";
-import { Func, Signature } from "../types";
+import { Dictionary, JbBool } from "../../runtime/types";
+import { Func, Parameter, Signature } from "../types";
+
+/**
+ * The implementation of `AddToDict` function.
+ * 
+ * Adds a value to a dictionary for a specific key.
+ * 
+ * The key must be a string or have a string representation, with null keys not allowed. Any value is allowed, even null values.
+ * 
+ * Returns `true` if the value was added and the new key added to the dictionary or `false` if the key already existed and the value at that key was instead updated. If the first argument is not defined or is not a dictionary, it will be initialized to an empty dictionary before the value is added.
+ * 
+ * See also the `Dict` function.
+ */
+export class AddToDictFunc extends Func {
+  constructor() {
+    super();
+    this.name = "AddToDict";
+    this.module = "dict/array";
+    this.signatures = [
+      new Signature("bool", [
+        new Parameter("dictionary", "dict"),
+        new Parameter("string", "key"),
+        new Parameter("type", "arg")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 3;
+    this.maxArgs = 3;
+  }
+
+  call(args: RuntimeVal[]) {
+    this.chooseSignature(args);
+
+    // TODO: this error should be thrown by type checker (too)
+    // POD: originally the type is not validated, the value is reassigned with a new dictionary
+    if(args[0].type !== "dictionary")
+      throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+
+    const dict = args[0] as Dictionary;
+
+    // native get needed for the result
+    const result = dict.members.get(Dictionary.keyValueToString(args[1])) === undefined;
+    dict.set(args[1], args[2]);
+    return new JbBool(result);
+  }
+
+  protected chooseSignature(args: RuntimeVal[]): void {
+    this.signature = this.signatures[0];
+  }
+}
 
 /**
  * The implementation of `Dict` function.

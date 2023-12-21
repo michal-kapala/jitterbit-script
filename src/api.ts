@@ -975,6 +975,7 @@ export class Api {
     };
     Api.functions = [
       // dict/array
+      new Dicts.AddToDictFunc(),
       new Arrays.ArrayFunc(),
       new Arrays.CollectionFunc(),
       new Dicts.DictFunc(),
