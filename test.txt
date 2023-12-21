@@ -5,10 +5,13 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for RemoveKey function, should return true
+  // test for MapCache function, should return "4"
   dict = Dict();
   dict[1] = "very";
   dict["very"] = "nice";
-  result = RemoveKey(dict, true);
+  idx = 1;
+  result = MapCache(dict, true, ++idx);
+  result = MapCache(dict, result, ++idx);
+  result = MapCache(dict, result, ++idx);
   
 </trans>

@@ -227,6 +227,51 @@ export class MapFunc extends DictFunc {
 }
 
 /**
+ * The implementation of `MapCache` function.
+ * 
+ * This function caches a key/value pair to a dictionary.
+ * If the key already exists in the dictionary, the corresponding value will be returned;
+ * otherwise, the third argument will be evaluated, and that value would be stored in the dictionary for the key.
+ */
+export class MapCacheFunc extends Func {
+  constructor() {
+    super();
+    this.name = "MapCache";
+    this.module = "dict/array";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("dictionary", "dict"),
+        new Parameter("string", "key"),
+        new Parameter("string", "value")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 3;
+    this.maxArgs = 3;
+  }
+
+  call(args: RuntimeVal[]): RuntimeVal {
+    this.chooseSignature(args);
+    
+    // TODO: this error should be thrown by type checker (too)
+    // POD: originally the type is not validated, the value is reassigned with a new dictionary
+    if(args[0].type !== "dictionary")
+      throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+
+    const dict = args[0] as Dictionary;
+    const lookup = dict.members.get(Dictionary.keyValueToString(args[1]));
+    const result = lookup !== undefined
+      ? lookup.toString()
+      : dict.set(args[1], args[2]).toString();
+    return new JbString(result);
+  }
+
+  protected chooseSignature(args: RuntimeVal[]): void {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
  * The implementation of `RemoveKey` function.
  * 
  * Removes a key-value pair with a specific key from a dictionary.

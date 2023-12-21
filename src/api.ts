@@ -983,6 +983,7 @@ export class Api {
       new Dicts.GetKeysFunc(),
       new Dicts.HasKeyFunc(),
       new Dicts.MapFunc(),
+      new Dicts.MapCacheFunc,
       new Arrays.ReduceDimensionFunc(),
       new Dicts.RemoveKeyFunc(),
       new Arrays.SortArrayFunc()
