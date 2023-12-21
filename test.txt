@@ -5,10 +5,12 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for AddToDict function, should return false
+  // test for CollectValues function
   dict = Dict();
-  dict[1] = "nice";
-  result = AddToDict(dict, "a key", "a value");
-  result = AddToDict(dict, result, "very nice");
+  dict[1] = "very";
+  dict["very"] = "nice";
+  // names = {1,2,$x}; would throw a key error
+  names = {1,2};
+  result = CollectValues(dict, names);
   
 </trans>

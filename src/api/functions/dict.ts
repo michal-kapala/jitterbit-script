@@ -1,5 +1,5 @@
 import { RuntimeVal } from "../../runtime/values";
-import { Dictionary, JbBool } from "../../runtime/types";
+import { Dictionary, JbBool, Array } from "../../runtime/types";
 import { Func, Parameter, Signature } from "../types";
 
 /**
@@ -44,6 +44,51 @@ export class AddToDictFunc extends Func {
     const result = dict.members.get(Dictionary.keyValueToString(args[1])) === undefined;
     dict.set(args[1], args[2]);
     return new JbBool(result);
+  }
+
+  protected chooseSignature(args: RuntimeVal[]): void {
+    this.signature = this.signatures[0];
+  }
+}
+
+export class CollectValuesFunc extends Func {
+  constructor() {
+    super();
+    this.name = "CollectValues";
+    this.module = "dict/array";
+    this.signatures = [
+      new Signature("array", [
+        new Parameter("dictionary", "dict"),
+        new Parameter("array", "names")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 2;
+    this.maxArgs = 2;
+  }
+
+  call(args: RuntimeVal[]) {
+    this.chooseSignature(args);
+
+    // TODO: these errors should be thrown by type checker (too)
+    // POD: original error:
+    // call CollectValues() error, argument data types must be diction, collection
+    if(args[0].type !== "dictionary")
+      throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+
+    const dict = args[0] as Dictionary;
+
+    if(args[1].type !== "array")
+      throw new Error(`${this.name} can only be called on ${this.signature.params[1].type} data elements. The '${this.signature.params[1].name}' argument is of type ${args[1].type}`);
+
+    // POD: the function will throw on null values in 'names' array
+    // originally a null value is returned
+    let idx = 0;
+    const result = new Array();
+    for(const key of (args[1] as Array).members)
+      result.set(idx++, dict.get(key));
+
+    return result;
   }
 
   protected chooseSignature(args: RuntimeVal[]): void {

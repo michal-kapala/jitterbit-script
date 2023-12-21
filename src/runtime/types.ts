@@ -1139,7 +1139,7 @@ export class Dictionary implements DictVal {
       case "string":
         return (key as JbString).value;
       case "null":
-        throw `A dictionary key can't be NULL`;
+        throw new Error(`A dictionary key can't be NULL`);
       // object types are stringified
       case "dictionary":
         return (key as Dictionary).toString();

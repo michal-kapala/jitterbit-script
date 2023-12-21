@@ -978,6 +978,7 @@ export class Api {
       new Dicts.AddToDictFunc(),
       new Arrays.ArrayFunc(),
       new Arrays.CollectionFunc(),
+      new Dicts.CollectValuesFunc(),
       new Dicts.DictFunc(),
       new Dicts.MapFunc(),
       new Arrays.ReduceDimensionFunc(),
