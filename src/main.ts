@@ -1,5 +1,5 @@
 import Parser from "./frontend/parser";
-import { createGlobalScope } from "./runtime/scope";
+import Scope from "./runtime/scope";
 import { evaluate } from "./runtime/interpreter";
 import fs from "fs";
 
@@ -8,7 +8,7 @@ run("./test.txt");
 
 async function run(filename: string) {
   const parser = new Parser();
-  const globalScope = createGlobalScope();
+  const globalScope = new Scope();
 
   fs.readFile(filename, 'utf8', function (err,data) {
     if (err) {
@@ -22,7 +22,7 @@ async function run(filename: string) {
 
 function repl() {
   const parser = new Parser();
-  const globalScope = createGlobalScope();
+  const globalScope = new Scope();
   // INITIALIZE REPL
   const prompt = require('prompt-sync')({sigint: true});
   console.log("\nRepl v0.1");

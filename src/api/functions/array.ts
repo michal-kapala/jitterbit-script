@@ -1,3 +1,4 @@
+import Scope from "../../runtime/scope";
 import { Array, JbBool, JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
 import { Func, Parameter, Signature } from "../types";
@@ -18,7 +19,7 @@ export class ArrayFunc extends Func {
     this.maxArgs = 0;
   }
 
-  call(args: RuntimeVal[]) {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     return new Array();
   }
@@ -64,7 +65,7 @@ export class GetSourceAttrNamesFunc extends Func {
     this.maxArgs = 1;
   }
 
-  call(args: RuntimeVal[]): never {
+  call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
     throw new Error(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
   }
@@ -101,7 +102,7 @@ export class GetSourceElementNamesFunc extends Func {
     this.maxArgs = 1;
   }
 
-  call(args: RuntimeVal[]): never {
+  call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
     throw new Error(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
   }
@@ -136,7 +137,7 @@ export class GetSourceInstanceArrayFunc extends Func {
     this.maxArgs = 1;
   }
 
-  call(args: RuntimeVal[]): never {
+  call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
     throw new Error(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
   }
@@ -170,7 +171,7 @@ export class GetSourceInstanceElementArrayFunc extends Func {
     this.maxArgs = 1;
   }
 
-  call(args: RuntimeVal[]): never {
+  call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
     throw new Error(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
   }
@@ -220,7 +221,7 @@ export class SortArrayFunc extends Func  {
     this.maxArgs = 3;
   } 
 
-  call(args: RuntimeVal[]) {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
 
     // TODO: this error should be thrown by type checker (too)
@@ -501,7 +502,7 @@ export class ReduceDimensionFunc extends Func {
     ];
   }
   
-  call(args: RuntimeVal[]) {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
 
     // TODO: this error should be thrown by type checker (too)

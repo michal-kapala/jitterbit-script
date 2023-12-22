@@ -247,6 +247,14 @@ export class Api {
           description: "When set, XML-formatted LdapSearch() results will include the DN attribute for each Entry."
         },
         {
+          name: "$jitterbit.scripting.hex.enable_unicode_support",
+          module: "scripting",
+          type: "Settings",
+          dataType: "Boolean",
+          description: "Set to true upstream of the HexToString or StringToHex functions to convert between UTF-8 string values and their hexadecimal representations. This variable is supported when using agent versions 10.70.1 or later or 11.8.1 or later. This implementation always sets it to true.",
+          default: "true"
+        },
+        {
           name: "$jitterbit.scripting.ldap.max_search_results",
           module: "scripting",
           type: "Settings",
@@ -979,6 +987,7 @@ export class Api {
       new Conversion.BinaryToHexFunc(),
       new Conversion.BinaryToUUIDFunc(),
       new Conversion.HexToBinaryFunc(),
+      new Conversion.HexToStringFunc(),
       new Conversion.UUIDToBinaryFunc(),
       // dict/array
       new Dicts.AddToDictFunc(),

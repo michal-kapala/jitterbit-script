@@ -2863,11 +2863,7 @@ export class JbBinary implements BinaryVal {
    * @returns 
    */
   toString() {
-    let result = "";
-    for(const b of this.value) {
-      result += this.byteToHex(b);
-    }
-    return result;
+    return Buffer.from(this.value).toString('hex');
   }
 
   /**
@@ -2913,46 +2909,7 @@ export class JbBinary implements BinaryVal {
   }
 
   /**
-   * Converts a uint8 into a hex byte representation.
-   * @param num 
-   * @returns
-   */
-  private byteToHex(num: number) {
-    const right = num % 16;
-    const left = Math.floor((num - right) / 16);
-    return this.digitToHex(left) + this.digitToHex(right);
-  }
-
-  /**
-   * Converts a 0-15 number into a 0-F hex digit.
-   * @param digit 
-   * @returns
-   */
-  private digitToHex(digit: number) {
-    if (digit < 10)
-      return digit.toString();
-    else {
-      switch (digit) {
-        case 10:
-          return "A";
-        case 11:
-          return "B";
-        case 12:
-          return "C";
-        case 13:
-          return "D";
-        case 14:
-          return "E";
-        case 15:
-          return "F";
-        default:
-          throw new Error(`digitToHex internal error, the number to convert is too big`);
-      }
-    }
-  }
-
-  /**
-   * Converts a hex character into a 0-F hex digit.
+   * Converts a 0-F hex digit into a numeric value.
    * @param hex 
    * @returns
    */
@@ -3032,5 +2989,30 @@ export class JbBinary implements BinaryVal {
     if(uuid.match(pattern) === null)
       throw new Error(`Invalid UUID string ${uuid}. A UUID has to be of the format: 2f46dad9-e5c2-457e-b1fd-ad1b49b99aff`);
     return this.fromHex(uuid.replaceAll("-", ""));
+  }
+
+  /**
+   * Encodes binary data into UTF-8 hex string.
+   * @returns
+   */
+  bytes2utf8() {
+    let result = "";
+    for(const b of this.value) {
+      // 00-7f -> 00-7f
+      if(b < 128)
+        result += b.toString(16).length === 1
+          ? `0${b.toString(16)}`
+          : b.toString(16);
+      // 80-9F -> 00
+      else if(b >= 128 && b < 160)
+        result += "00";
+      // A0-BF -> C2 A0..BF
+      else if(b >= 160 && b < 192)
+        result += `C2${b.toString(16)}`;
+      // C0-FF -> C3 80..BF
+      else
+        result += `C3${(b - 64).toString(16)}`;
+    }
+    return result;
   }
 }

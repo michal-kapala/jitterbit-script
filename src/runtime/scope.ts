@@ -9,11 +9,6 @@ import {
 } from "./types";
 import { RuntimeVal } from "./values";
 
-export function createGlobalScope() {
-  const scope = new Scope();
-  return scope;
-}
-
 export default class Scope {
   private parent?: Scope;
   private variables: Map<string, RuntimeVal>;

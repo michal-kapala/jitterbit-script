@@ -1,3 +1,4 @@
+import Scope from "../runtime/scope";
 import { RuntimeVal, ValueType } from "../runtime/values";
 
 /**
@@ -15,7 +16,7 @@ export abstract class Func {
    * Validates argument list and executes the function's implementation.
    * @returns
    */
-  abstract call(args: RuntimeVal[]): RuntimeVal;
+  abstract call(args: RuntimeVal[], scope: Scope): RuntimeVal;
 
   /**
    * Selects the target signature based on the passed argument list.

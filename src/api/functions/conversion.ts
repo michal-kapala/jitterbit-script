@@ -1,4 +1,5 @@
-import { JbBinary, JbString } from "../../runtime/types";
+import Scope from "../../runtime/scope";
+import { JbBinary, JbBool, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
 import { Func, Parameter, Signature } from "../types";
 
@@ -26,7 +27,7 @@ export class BinaryToHexFunc extends Func {
     this.maxArgs = 1;
   }
 
-  call(args: RuntimeVal[]) {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     
     // TODO: this error should be thrown by type checker (too)
@@ -66,7 +67,7 @@ export class BinaryToUUIDFunc extends Func {
     this.maxArgs = 1;
   }
 
-  call(args: RuntimeVal[]) {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
 
     // TODO: this error should be thrown by type checker (too)
@@ -106,7 +107,7 @@ export class HexToBinaryFunc extends Func {
     this.maxArgs = 1;
   }
   
-  call(args: RuntimeVal[]) {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     // TODO: this error should be thrown by type checker (too)
     // POD: originally the argument is implicitly converted to string
@@ -114,6 +115,56 @@ export class HexToBinaryFunc extends Func {
       throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
     const hex = args[0] as JbString;
     return JbBinary.fromHex(hex.value);
+  }
+
+  protected chooseSignature(args: RuntimeVal[]): void {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `HexToString` function.
+ * 
+ * Converts a hex-string to a string value. The resulting value will contain the characters represented by each pair of characters in the input string. The input string is case-insensitive. As the input characters are hex, the character pairs of the input string must be limited to the range "00" through "FF".
+ * 
+ * This implementation always uses UTF-8 encoding, the first successful call will set `$jitterbit.scripting.hex.enable_unicode_support` to `true`.
+ * 
+ * This is the reverse of the function `StringToHex`.
+ */
+export class HexToStringFunc extends Func {
+  constructor() {
+    super();
+    this.name = "HexToString";
+    this.module = "conversion";
+    this.signatures = [
+      // the signature's return type in the Jitterbit docs is wrong
+      new Signature("string", [
+        new Parameter("string", "arg")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    
+    // TODO: this error should be thrown by type checker (too)
+    // POD: originally the argument is implicitly converted to string
+    if(args[0].type !== this.signature.params[0].type)
+      throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+
+    const hex = args[0] as JbString;
+    // POD: originally UTF-8 encoding is opt-in
+    // this implementation always uses UTF-8, the first successful call enables it globally.
+    let enableUtf8 = scope.lookupVar("$jitterbit.scripting.hex.enable_unicode_support");
+    if(enableUtf8.type !== "bool" || !(enableUtf8 as JbBool).value)
+      enableUtf8 = new JbBool(true);
+
+    let bin = JbBinary.fromHex(hex.value);
+    bin = JbBinary.fromHex(bin.bytes2utf8());
+    return new JbString(Buffer.from(bin.value).toString("utf-8"));
   }
 
   protected chooseSignature(args: RuntimeVal[]): void {
@@ -149,7 +200,7 @@ export class UUIDToBinaryFunc extends Func {
     this.maxArgs = 1;
   }
 
-  call(args: RuntimeVal[]) {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     
     // TODO: this error should be thrown by type checker (too)

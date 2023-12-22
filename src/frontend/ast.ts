@@ -303,7 +303,7 @@ export class CallExpr implements Expr {
       throw `Function ${this.caller.symbol} does not exist, refer to Jitterbit function API docs`;
 
     try {
-      return func.call(args);
+      return func.call(args, scope);
     }
     catch(e) {
       // TODO: add an error

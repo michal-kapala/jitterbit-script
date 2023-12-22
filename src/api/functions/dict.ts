@@ -1,6 +1,7 @@
 import { RuntimeVal } from "../../runtime/values";
 import { Dictionary, JbBool, Array, JbString } from "../../runtime/types";
 import { Func, Parameter, Signature } from "../types";
+import Scope from "../../runtime/scope";
 
 /**
  * The implementation of `AddToDict` function.
@@ -30,7 +31,7 @@ export class AddToDictFunc extends Func {
     this.maxArgs = 3;
   }
 
-  call(args: RuntimeVal[]) {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
 
     // TODO: this error should be thrown by type checker (too)
@@ -73,7 +74,7 @@ export class CollectValuesFunc extends Func {
     this.maxArgs = 2;
   }
 
-  call(args: RuntimeVal[]) {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
 
     // TODO: these errors should be thrown by type checker (too)
@@ -122,7 +123,7 @@ export class GetKeysFunc extends Func {
     this.maxArgs = 1;
   }
 
-  call(args: RuntimeVal[]) {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
 
     // TODO: this error should be thrown by type checker (too)
@@ -168,7 +169,7 @@ export class GetSourceInstanceMapFunc extends Func {
     this.maxArgs = 1;
   }
 
-  call(args: RuntimeVal[]): never {
+  call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
     throw new Error(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
   }
@@ -206,7 +207,7 @@ export class GetSourceInstanceElementMapFunc extends Func {
     this.maxArgs = 1;
   }
 
-  call(args: RuntimeVal[]): never {
+  call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
     throw new Error(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
   }
@@ -236,7 +237,7 @@ export class DictFunc extends Func {
     this.maxArgs = 0;
   }
 
-  call(args: RuntimeVal[]) {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     return new Dictionary();
   }
@@ -268,7 +269,7 @@ export class HasKeyFunc extends Func {
     this.maxArgs = 2;
   }
 
-  call(args: RuntimeVal[]) {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
 
     // TODO: this error should be thrown by type checker (too)
@@ -322,7 +323,7 @@ export class MapCacheFunc extends Func {
     this.maxArgs = 3;
   }
 
-  call(args: RuntimeVal[]) {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     
     // TODO: this error should be thrown by type checker (too)
@@ -366,7 +367,7 @@ export class RemoveKeyFunc extends Func {
     this.maxArgs = 2;
   }
 
-  call(args: RuntimeVal[]) {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
 
     // TODO: this error should be thrown by type checker (too)
