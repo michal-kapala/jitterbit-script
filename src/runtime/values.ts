@@ -9,6 +9,7 @@ export type ValueType =
   "array" |
   "dictionary" |
   "binary" |
+  "date" |
   // function call-only types
   "void" |
   "type" |
@@ -133,4 +134,12 @@ export interface VoidVal extends RuntimeVal {
 export interface BinaryVal extends RuntimeVal {
   type: "binary";
   value: Uint8Array;
+}
+
+/**
+ * Runtime value of a date object.
+ */
+export interface DateVal extends RuntimeVal {
+  type: "date";
+  value: Date;
 }

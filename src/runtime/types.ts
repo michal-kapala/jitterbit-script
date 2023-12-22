@@ -2,6 +2,7 @@ import {
   ArrayVal,
   BinaryVal,
   BooleanVal,
+  DateVal,
   DictVal,
   NullVal,
   NumberVal,
@@ -3014,5 +3015,79 @@ export class JbBinary implements BinaryVal {
         result += `C3${(b - 64).toString(16)}`;
     }
     return result;
+  }
+}
+
+/**
+ * Runtime date type.
+ */
+export class JbDate implements DateVal {
+  type: "date";
+  value: Date;
+
+  constructor(date: Date = new Date(), truncMillis = true) {
+    this.type = "date";
+    // truncate milliseconds
+    if(truncMillis)
+      date.setMilliseconds(0)
+    this.value = date;
+  }
+
+  clone() {
+    return new JbDate(this.value);
+  }
+
+  decrement(): never {
+    // org.apache.http.NoHttpResponseException: localhost:port failed to respond
+    throw new Error("Unary operator -- is unsupported for date objects.");
+  }
+
+  increment(): never {
+    // org.apache.http.NoHttpResponseException: localhost:port failed to respond
+    throw new Error("Unary operator ++ is unsupported for date objects.");
+  }
+
+  negate(): never {
+    throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED\nThe problematic token is at the end of the following expression: !");
+  }
+
+  negative(): never {
+    // org.apache.http.NoHttpResponseException: localhost:port failed to respond
+    throw new Error("Unary operator - is unsupported for date objects.");
+  }
+
+  toBool() {
+    return false;
+  }
+
+  /**
+   * Returns the epoch timestamp in seconds.
+   * @returns 
+   */
+  toNumber() {
+    return Math.floor(this.value.getTime() / 1000);
+  }
+
+  /**
+   * Converts the date to a unified format of `YYYY-MM-DD HH:MM:SS.mmm`.
+   * @param date 
+   * @returns
+   */
+  toString() {
+    let isoStr = this.value.toISOString();
+    return isoStr.replace("T", " ").replace("Z", "");
+  }
+
+  /**
+   * Similar to `toString` but truncates the milliseconds.
+   * @returns
+   */
+  toStringTruncMillis() {
+    const result = this.toString();
+    // truncates the milliseconds
+    const matches = result.match(/(^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2})\.[0-9]{3}$/g);
+    if (!matches)
+      return result;
+    return matches[0];
   }
 }

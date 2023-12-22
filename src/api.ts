@@ -2,6 +2,7 @@ import { Func, SystemVariable } from "./api/types";
 import * as Arrays from "./api/functions/array";
 import * as Dicts from "./api/functions/dict";
 import * as Conversion from "./api/functions/conversion";
+import * as Datetime from "./api/functions/datetime";
 
 type SystemVariables = {
   static: SystemVariable[];
@@ -990,6 +991,9 @@ export class Api {
       new Conversion.HexToString(),
       new Conversion.StringToHex(),
       new Conversion.UUIDToBinary(),
+      // datetime
+      new Datetime.Now(),
+      new Datetime.Now_(),
       // dict/array
       new Dicts.AddToDict(),
       new Arrays.Array(),
