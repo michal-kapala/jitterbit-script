@@ -5,9 +5,14 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for HexToString
-  // should return 'ºMð\r' (bytes: C2 BA 4D C3 B0 0D)
-  hex = "ba4df00d";
-  result = HexToString(hex);
+  // test for HexToString, should result in 'ºMð\r' (C2 BA 4D C3 B0 0D)
+  //$jitterbit.scripting.hex.enable_unicode_support = true;
+  //hex = "ba4df00d";
+  //str = HexToString(hex);
+
+  // test for StringToHex, should result in 'ba4df00d' (C2 BA 4D C3 B0 0D)
+  $jitterbit.scripting.hex.enable_unicode_support = true;
+  str = "ºMð\r";
+  hex = StringToHex(str);
   
 </trans>

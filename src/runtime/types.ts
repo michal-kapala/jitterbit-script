@@ -2898,8 +2898,8 @@ export class JbBinary implements BinaryVal {
     let i = 0;
     const bytes: number[] = [];
     for(i = 0; i < hex.length; i) {
-      left = this.hexToDigit(hex[i++]) * 16;
-      right = this.hexToDigit(hex[i++]);
+      left = this.hexDigitToByte(hex[i++]) * 16;
+      right = this.hexDigitToByte(hex[i++]);
       bytes.push(left+right);
     }
     for(i = 0; i < hex.length / 2; i++)
@@ -2913,7 +2913,7 @@ export class JbBinary implements BinaryVal {
    * @param hex 
    * @returns
    */
-  static hexToDigit(hex: string): number {
+  static hexDigitToByte(hex: string): number {
     switch(hex) {
       case "0":
         return 0;
