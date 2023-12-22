@@ -5,10 +5,10 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for HexToBinary and BinaryToHex
-  // should return a hex string identical to the input
-  hex = "BA4DF00D";
+  // test for BinaryToUUID
+  // should return 'ba4df00d-ba4d-f00d-ba4d-f00dba4df00d'
+  hex = "BA4DF00DBA4DF00DBA4DF00DBA4DF00D";
   binary = HexToBinary(hex);
-  BinaryToHex(binary);
+  BinaryToUUID(binary);
   
 </trans>

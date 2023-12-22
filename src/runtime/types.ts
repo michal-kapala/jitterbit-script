@@ -2997,4 +2997,22 @@ export class JbBinary implements BinaryVal {
         throw new Error(`hexToDigit internal error, invalid character`);
     }
   }
+
+  /**
+   * Converts the binary data to a lowercase UUID.
+   * @returns 
+   */
+  toUUID() {
+    const hex = this.toString().toLowerCase();
+    if(this.value.length !== 16)
+      throw new Error(`Input is not 16-byte binary data. The size of your input is ${this.value.length}.`);
+
+    let result = "";
+    for (let idx = 0; idx < hex.length; idx++) {
+      if(idx === 8 || idx === 12 || idx === 16 || idx === 20)
+        result += "-";
+      result += hex[idx];
+    }
+    return result;
+  }
 }

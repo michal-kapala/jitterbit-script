@@ -14,7 +14,7 @@ export class BinaryToHexFunc extends Func {
   constructor() {
     super();
     this.name = "BinaryToHex";
-    this.module = "dict/array";
+    this.module = "conversion";
     this.signatures = [
       // the signature's return type in the Jitterbit docs is wrong
       new Signature("string", [
@@ -26,7 +26,7 @@ export class BinaryToHexFunc extends Func {
     this.maxArgs = 1;
   }
 
-  call(args: RuntimeVal[]): RuntimeVal {
+  call(args: RuntimeVal[]) {
     this.chooseSignature(args);
     
     // TODO: this error should be thrown by type checker (too)
@@ -35,6 +35,45 @@ export class BinaryToHexFunc extends Func {
 
     const bin = args[0] as JbBinary;
     return new JbString(bin.toString());
+  }
+
+  protected chooseSignature(args: RuntimeVal[]): void {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `BinaryToUUID` function.
+ * 
+ * Converts a 16-byte binary value to a string in the standard UUID format.
+ * The resulting string will always be lowercase.
+ * 
+ * This is the reverse of the function `UUIDToBinary`.
+ */
+export class BinaryToUUIDFunc extends Func {
+  constructor() {
+    super();
+    this.name = "BinaryToUUID";
+    this.module = "conversion";
+    this.signatures = [
+      // the signature's return type in the Jitterbit docs is wrong
+      new Signature("string", [
+        new Parameter("binary", "arg")  
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+
+  call(args: RuntimeVal[]) {
+    this.chooseSignature(args);
+
+    // TODO: this error should be thrown by type checker (too)
+    if(args[0].type !== this.signature.params[0].type)
+      throw new Error(`${this.name} failed, the argument must be binary data.`);
+
+    return new JbString((args[0] as JbBinary).toUUID());
   }
 
   protected chooseSignature(args: RuntimeVal[]): void {
@@ -55,7 +94,7 @@ export class HexToBinaryFunc extends Func {
   constructor() {
     super();
     this.name = "HexToBinary";
-    this.module = "dict/array";
+    this.module = "conversion";
     this.signatures = [
       // the signature's return type in the Jitterbit docs is wrong
       new Signature("binary", [
