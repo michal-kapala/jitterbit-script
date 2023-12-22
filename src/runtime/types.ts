@@ -2818,6 +2818,9 @@ export class JbString implements StringVal {
   }
 }
 
+/**
+ * Runtime type for binary data.
+ */
 export class JbBinary implements BinaryVal {
   type: "binary";
   value: Uint8Array;
@@ -3014,5 +3017,20 @@ export class JbBinary implements BinaryVal {
       result += hex[idx];
     }
     return result;
+  }
+
+  /**
+   * Creates binary data from a UUID string.
+   * @param uuid 
+   * @returns 
+   */
+  static fromUUID(uuid: string) {
+    if(uuid.length !== 36)
+      throw new Error(`Invalid UUID string '${uuid}'. A UUID string has to be 36 characters long.`);
+
+    const pattern = /^([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$/g;
+    if(uuid.match(pattern) === null)
+      throw new Error(`Invalid UUID string ${uuid}. A UUID has to be of the format: 2f46dad9-e5c2-457e-b1fd-ad1b49b99aff`);
+    return this.fromHex(uuid.replaceAll("-", ""));
   }
 }

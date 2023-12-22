@@ -120,3 +120,50 @@ export class HexToBinaryFunc extends Func {
     this.signature = this.signatures[0];
   }
 }
+
+/**
+ * The implementation of `UUIDToBinary` function.
+ * 
+ * Converts a UUID string to a binary value containing the corresponding bytes.
+ * The size of the input string must be 36 characters.
+ * 
+ * The format of the input should be `nnnnnnnn-nnnn-nnnn-nnnn-nnnnnnnnnnnn` where each pair (`nn`)
+ * is the hexadecimal representation of the corresponding byte.
+ * 
+ * The case of the input string does not matter. The returned binary value is 16 bytes long.
+ * 
+ * This is the reverse of the function `BinaryToUUID`.
+ */
+export class UUIDToBinaryFunc extends Func {
+  constructor() {
+    super();
+    this.name = "UUIDToBinary";
+    this.module = "conversion";
+    this.signatures = [
+      new Signature("binary", [
+        new Parameter("string", "arg")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+
+  call(args: RuntimeVal[]) {
+    this.chooseSignature(args);
+    
+    // TODO: this error should be thrown by type checker (too)
+    // POD: originally the argument is implicitly converted to string
+    // original error:
+    // Invalid UUID string 'x'. A UUID string has to be 36 characters long.
+    if(args[0].type !== this.signature.params[0].type)
+      throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+
+    const uuid = args[0] as JbString;
+    return JbBinary.fromUUID(uuid.value);
+  }
+
+  protected chooseSignature(args: RuntimeVal[]): void {
+    this.signature = this.signatures[0];
+  }
+}

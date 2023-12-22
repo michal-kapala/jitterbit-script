@@ -979,6 +979,7 @@ export class Api {
       new Conversion.BinaryToHexFunc(),
       new Conversion.BinaryToUUIDFunc(),
       new Conversion.HexToBinaryFunc(),
+      new Conversion.UUIDToBinaryFunc(),
       // dict/array
       new Dicts.AddToDictFunc(),
       new Arrays.ArrayFunc(),

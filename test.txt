@@ -5,10 +5,10 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for BinaryToUUID
-  // should return 'ba4df00d-ba4d-f00d-ba4d-f00dba4df00d'
-  hex = "BA4DF00DBA4DF00DBA4DF00DBA4DF00D";
-  binary = HexToBinary(hex);
+  // test for UUIDToBinary
+  // should return 'ba4df00d-ba4d-f00d-ba4d-f00dba4df00d' back
+  uuid = "ba4df00d-ba4d-f00d-ba4d-f00dba4df00d";
+  binary = UUIDToBinary(uuid);
   BinaryToUUID(binary);
   
 </trans>
