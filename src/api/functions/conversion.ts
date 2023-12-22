@@ -11,7 +11,7 @@ import { Func, Parameter, Signature } from "../types";
  * 
  * This is the reverse of the function `HexToBinary`.
  */
-export class BinaryToHexFunc extends Func {
+export class BinaryToHex extends Func {
   constructor() {
     super();
     this.name = "BinaryToHex";
@@ -50,7 +50,7 @@ export class BinaryToHexFunc extends Func {
  * 
  * This is the reverse of the function `UUIDToBinary`.
  */
-export class BinaryToUUIDFunc extends Func {
+export class BinaryToUUID extends Func {
   constructor() {
     super();
     this.name = "BinaryToUUID";
@@ -89,7 +89,7 @@ export class BinaryToUUIDFunc extends Func {
  * 
  * This is the reverse of the function `BinaryToHex`.
  */
-export class HexToBinaryFunc extends Func {
+export class HexToBinary extends Func {
   constructor() {
     super();
     this.name = "HexToBinary";
@@ -129,7 +129,7 @@ export class HexToBinaryFunc extends Func {
  * 
  * This is the reverse of the function `StringToHex`.
  */
-export class HexToStringFunc extends Func {
+export class HexToString extends Func {
   constructor() {
     super();
     this.name = "HexToString";
@@ -186,7 +186,7 @@ export class HexToStringFunc extends Func {
  * 
  * This is the reverse of the function `HexToString`.
  */
-export class StringToHexFunc extends Func {
+export class StringToHex extends Func {
   constructor() {
     super();
     this.name = "StringToHex";
@@ -242,7 +242,7 @@ export class StringToHexFunc extends Func {
  * 
  * This is the reverse of the function `BinaryToUUID`.
  */
-export class UUIDToBinaryFunc extends Func {
+export class UUIDToBinary extends Func {
   constructor() {
     super();
     this.name = "UUIDToBinary";

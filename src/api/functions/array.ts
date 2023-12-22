@@ -1,5 +1,5 @@
 import Scope from "../../runtime/scope";
-import { Array, JbBool, JbNumber, JbString } from "../../runtime/types";
+import { Array as JbArray, JbBool, JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
 import { Func, Parameter, Signature } from "../types";
 
@@ -8,7 +8,7 @@ import { Func, Parameter, Signature } from "../types";
  * 
  * Creates an empty array. Though arrays don't need to be initialized prior to use, this method can be used to be explicit or to reset an already-existing array. Arrays are zero-based, and values are retrieved using indexes.
  */
-export class ArrayFunc extends Func {
+export class Array extends Func {
   constructor() {
     super();
     this.name = "Array";
@@ -21,7 +21,7 @@ export class ArrayFunc extends Func {
 
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    return new Array();
+    return new JbArray();
   }
 
   protected chooseSignature(args: RuntimeVal[]): void {
@@ -34,7 +34,7 @@ export class ArrayFunc extends Func {
  * 
  * An alias for `Array`. See the function `Array`.
  */
-export class CollectionFunc extends ArrayFunc {
+export class Collection extends Array {
   constructor() {
     super();
     this.name = "Collection";
@@ -50,7 +50,7 @@ export class CollectionFunc extends ArrayFunc {
  * 
  * To enter an n path into the function, drag and drop the desired XML node folder from the Source Objects tab of the script component palette to the script to insert its qualified path at the location of your cursor, or enter its reference path manually. For more information, see the instructions on inserting source objects.
  */
-export class GetSourceAttrNamesFunc extends Func {
+export class GetSourceAttrNames extends Func {
   constructor() {
     super();
     this.name = "GetSourceAttrNames";
@@ -87,7 +87,7 @@ export class GetSourceAttrNamesFunc extends Func {
  * to insert its qualified path at the location of your cursor, or enter its reference path manually.
  * For more information, see the instructions on inserting source objects.
  */
-export class GetSourceElementNamesFunc extends Func {
+export class GetSourceElementNames extends Func {
   constructor() {
     super();
     this.name = "GetSourceElementNames";
@@ -122,7 +122,7 @@ export class GetSourceElementNamesFunc extends Func {
  * To enter an n path into the function, drag and drop the desired XML node folder from the Source Objects tab of the script component palette to the script to insert its qualified path at the location of your cursor, or enter its reference path manually.
  * For more information, see the instructions on inserting source objects.
  */
-export class GetSourceInstanceArrayFunc extends Func {
+export class GetSourceInstanceArray extends Func {
   constructor() {
     super();
     this.name = "GetSourceInstanceArray";
@@ -156,7 +156,7 @@ export class GetSourceInstanceArrayFunc extends Func {
  * 
  * To enter an `n` path into the function, drag and drop the desired XML node folder from the Source Objects tab of the script component palette to the script to insert its qualified path at the location of your cursor, or enter its reference path manually. For more information, see the instructions on inserting source objects.
  */
-export class GetSourceInstanceElementArrayFunc extends Func {
+export class GetSourceInstanceElementArray extends Func {
   constructor() {
     super();
     this.name = "GetSourceInstanceElementArray";
@@ -201,7 +201,7 @@ type Evaluation = { eval: number; elem: RuntimeVal; };
  * 
  * Multiple sorting of the same array is possible by applying the `SortArray` function repeatedly.
  */
-export class SortArrayFunc extends Func  {
+export class SortArray extends Func  {
   constructor() {
     super();
     this.name = "SortArray";
@@ -242,7 +242,7 @@ export class SortArrayFunc extends Func  {
     // where applicable, order precedence applies
     // if descending, the array is reversed at the end
 
-    const array = args[0] as Array;
+    const array = args[0] as JbArray;
     let isAscending = true;
 
     // empty array
@@ -293,7 +293,7 @@ export class SortArrayFunc extends Func  {
   }
 
   protected chooseSignature(args: RuntimeVal[]): void {
-    const array = args[0] as Array;
+    const array = args[0] as JbArray;
     const members = array.members;
 
     switch (args.length) {
@@ -326,7 +326,7 @@ export class SortArrayFunc extends Func  {
    * @param array 
    * @param index 
    */
-  private sort(array: Array, index?: number) {
+  private sort(array: JbArray, index?: number) {
     // not that much in-place
     let evaluations: Evaluation[] = index === undefined
     ? this.evalOneDimArray(array)
@@ -352,7 +352,7 @@ export class SortArrayFunc extends Func  {
    * @param array 
    * @returns 
    */
-  private evalOneDimArray(array: Array): Evaluation[] {
+  private evalOneDimArray(array: JbArray): Evaluation[] {
     const result: Evaluation[] = [];
     
     for(const mem of array.members) {
@@ -400,10 +400,10 @@ export class SortArrayFunc extends Func  {
    * @param index 
    * @returns 
    */
-  private evalMultiDimArray(array: Array, index: number): Evaluation[] {
+  private evalMultiDimArray(array: JbArray, index: number): Evaluation[] {
     const result: Evaluation[] = [];
     
-    for(const mem of array.members as Array[]) {
+    for(const mem of array.members as JbArray[]) {
       const value = mem.members[index];
       switch(value.type) {
         case "number":
@@ -471,13 +471,13 @@ export class SortArrayFunc extends Func  {
    * @param array 
    * @param index 
    */
-  private checkElements(array: Array, index: number): void {
+  private checkElements(array: JbArray, index: number): void {
     for(const elem of array.members) {
       if(elem.type !== "array")
         // POD: the orginal error:
         // SortArray error, array index is out of range: <index>
         throw `[${this.name}] The sorted array is expected to contain array elements only`;
-      if(index < 0 || index >= (elem as Array).members.length)
+      if(index < 0 || index >= (elem as JbArray).members.length)
         throw `[${this.name}] Array index is out of range: ${index}`;
     }
   }
@@ -488,7 +488,7 @@ export class SortArrayFunc extends Func  {
  * 
  * Given a multi-dimensional array with `n` dimensions, the function returns an array with `n-1` dimensions. The lowest dimension of the input array will disappear, and their members will be collected to the next level dimension.
  */
-export class ReduceDimensionFunc extends Func {
+export class ReduceDimension extends Func {
   constructor() {
     super();
     this.name = "ReduceDimension";
@@ -511,7 +511,7 @@ export class ReduceDimensionFunc extends Func {
     if(args[0].type !== this.signature.params[0].type)
       throw new Error(`ReduceDimension can only be called on array data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
-    const array = args[0] as Array;
+    const array = args[0] as JbArray;
     if(array.members.length === 0)
       throw new Error("ReduceDimension failed, the array does not have enough dimensions for reduction (at least 2).");
 
@@ -535,11 +535,11 @@ export class ReduceDimensionFunc extends Func {
    * @param array 
    * @returns
    */
-  private getDimension(array: Array, dim: number): number {
+  private getDimension(array: JbArray, dim: number): number {
     // the first element defines uniform dimensionality
     const mem = array.members.at(0);
     if (mem !== undefined && mem.type === "array")
-      return this.getDimension(array.members.at(0) as Array, ++dim);
+      return this.getDimension(array.members.at(0) as JbArray, ++dim);
     else 
       return dim;
   }
@@ -551,7 +551,7 @@ export class ReduceDimensionFunc extends Func {
    * @param array 
    * @param validDim 
    */
-  private checkDimensionality(array: Array, validDim: number, dim: number) {
+  private checkDimensionality(array: JbArray, validDim: number, dim: number) {
     const members = array.members;
     if(members.length === 0) {
       if(dim + 1 !== validDim) {
@@ -562,7 +562,7 @@ export class ReduceDimensionFunc extends Func {
     for(const mem of members) {
       let curDim = dim;
       if(mem.type === "array")
-        this.checkDimensionality(mem as Array, validDim, ++dim);
+        this.checkDimensionality(mem as JbArray, validDim, ++dim);
       else {
         // POD: Jitterbit's implementation allows for certain dimensionality mismatches (at the cost of data loss)
         // example proof:
@@ -589,20 +589,20 @@ export class ReduceDimensionFunc extends Func {
    * @param array 
    * @param dim 
    */
-  private reduce(array: Array, dim: number): Array {
+  private reduce(array: JbArray, dim: number): JbArray {
     for(let idx = 0; idx < array.members.length; idx++) {
       // navigate to the inner elements
       if (dim > 2) {
-        const inserts = this.reduce(array.members[idx] as Array, dim - 1);
+        const inserts = this.reduce(array.members[idx] as JbArray, dim - 1);
         array.members[idx] = inserts;
       }
       else {
         // only arrays of simple value arrays here
-        let newArr = new Array();
+        let newArr = new JbArray();
         for(const mem of array.members) {
           // array of simple values
           if(mem.type == "array") {
-            for(const m of (mem as Array).members)
+            for(const m of (mem as JbArray).members)
               newArr.members.push(m);
           }
           // a simple value

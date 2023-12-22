@@ -14,7 +14,7 @@ import Scope from "../../runtime/scope";
  * 
  * See also the `Dict` function.
  */
-export class AddToDictFunc extends Func {
+export class AddToDict extends Func {
   constructor() {
     super();
     this.name = "AddToDict";
@@ -58,7 +58,7 @@ export class AddToDictFunc extends Func {
  * Returns an array containing the values corresponding to the names in the argument array,
  * returned in the same order as the keys in the array.
  */
-export class CollectValuesFunc extends Func {
+export class CollectValues extends Func {
   constructor() {
     super();
     this.name = "CollectValues";
@@ -108,7 +108,7 @@ export class CollectValuesFunc extends Func {
  * 
  * Returns an array of the keys in a dictionary. The argument must be an existing dictionary.
  */
-export class GetKeysFunc extends Func {
+export class GetKeys extends Func {
   constructor() {
     super();
     this.name = "GetKeys";
@@ -154,7 +154,7 @@ export class GetKeysFunc extends Func {
  * 
  * To enter an `n` path into the function, drag and drop the desired XML node folder from the Source Objects tab of the script component palette to the script to insert its qualified path at the location of your cursor, or enter its reference path manually. For more information, see the instructions on inserting source objects.
  */
-export class GetSourceInstanceMapFunc extends Func {
+export class GetSourceInstanceMap extends Func {
   constructor() {
     super();
     this.name = "GetSourceInstanceMap";
@@ -192,7 +192,7 @@ export class GetSourceInstanceMapFunc extends Func {
  * 
  * For more information, see the instructions on inserting source objects.
  */
-export class GetSourceInstanceElementMapFunc extends Func {
+export class GetSourceInstanceElementMap extends Func {
   constructor() {
     super();
     this.name = "GetSourceInstanceElementMap";
@@ -226,7 +226,7 @@ export class GetSourceInstanceElementMapFunc extends Func {
  * 
  * See also the `AddToDict` function.
  */
-export class DictFunc extends Func {
+export class Dict extends Func {
   constructor() {
     super();
     this.name = "Dict";
@@ -253,7 +253,7 @@ export class DictFunc extends Func {
  * Checks whether a dictionary contains a specified key. Returns `false` if the first argument is not a dictionary or if the key was not found.
  * As an equivalent function that works for arrays, see the examples of the `FindValue` function.
  */
-export class HasKeyFunc extends Func {
+export class HasKey extends Func {
   constructor() {
     super();
     this.name = "HasKey";
@@ -292,7 +292,7 @@ export class HasKeyFunc extends Func {
  * 
  * An alias for `Dict`. See the function `Dict`.
  */
-export class MapFunc extends DictFunc {
+export class Map extends Dict {
   constructor() {
     super();
     this.name = "Map";
@@ -306,7 +306,7 @@ export class MapFunc extends DictFunc {
  * If the key already exists in the dictionary, the corresponding value will be returned;
  * otherwise, the third argument will be evaluated, and that value would be stored in the dictionary for the key.
  */
-export class MapCacheFunc extends Func {
+export class MapCache extends Func {
   constructor() {
     super();
     this.name = "MapCache";
@@ -351,7 +351,7 @@ export class MapCacheFunc extends Func {
  * The key must be a string or have a string representation, and null values are not allowed.
  * Returns `true` if the key-value pair was removed and `false` if the key didn't exist.
  */
-export class RemoveKeyFunc extends Func {
+export class RemoveKey extends Func {
   constructor() {
     super();
     this.name = "RemoveKey";
