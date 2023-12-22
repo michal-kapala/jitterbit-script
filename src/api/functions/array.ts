@@ -224,7 +224,7 @@ export class SortArrayFunc extends Func  {
     this.chooseSignature(args);
 
     // TODO: this error should be thrown by type checker (too)
-    if(args[0].type !== "array")
+    if(args[0].type !== this.signature.params[0].type)
       throw new Error(`${this.name} can only be called on array data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     // comparison evaluation rules:
@@ -507,7 +507,7 @@ export class ReduceDimensionFunc extends Func {
     // TODO: this error should be thrown by type checker (too)
     // POD: the original error:
     // ReduceDimension failed, err:array dimension <2.
-    if(args[0].type !== "array")
+    if(args[0].type !== this.signature.params[0].type)
       throw new Error(`ReduceDimension can only be called on array data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     const array = args[0] as Array;

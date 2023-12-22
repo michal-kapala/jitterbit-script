@@ -5,9 +5,10 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for HexToBinary
-  // should encode bytes as Uint8Array(4) [186, 77, 240, 13]
+  // test for HexToBinary and BinaryToHex
+  // should return a hex string identical to the input
   hex = "BA4DF00D";
   binary = HexToBinary(hex);
+  BinaryToHex(binary);
   
 </trans>

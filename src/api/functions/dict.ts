@@ -35,7 +35,7 @@ export class AddToDictFunc extends Func {
 
     // TODO: this error should be thrown by type checker (too)
     // POD: originally the type is not validated, the value is reassigned with a new dictionary
-    if(args[0].type !== "dictionary")
+    if(args[0].type !== this.signature.params[0].type)
       throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     const dict = args[0] as Dictionary;
@@ -79,12 +79,12 @@ export class CollectValuesFunc extends Func {
     // TODO: these errors should be thrown by type checker (too)
     // POD: original error:
     // call CollectValues() error, argument data types must be diction, collection
-    if(args[0].type !== "dictionary")
+    if(args[0].type !== this.signature.params[0].type)
       throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     const dict = args[0] as Dictionary;
 
-    if(args[1].type !== "array")
+    if(args[1].type !== this.signature.params[1].type)
       throw new Error(`${this.name} can only be called on ${this.signature.params[1].type} data elements. The '${this.signature.params[1].name}' argument is of type ${args[1].type}`);
 
     // POD: the function will throw on null values in 'names' array
@@ -127,7 +127,7 @@ export class GetKeysFunc extends Func {
 
     // TODO: this error should be thrown by type checker (too)
     // POD: originally the type is not validated, the value is reassigned with a new dictionary
-    if(args[0].type !== "dictionary")
+    if(args[0].type !== this.signature.params[0].type)
       throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     const dict = args[0] as Dictionary;
@@ -273,7 +273,7 @@ export class HasKeyFunc extends Func {
 
     // TODO: this error should be thrown by type checker (too)
     // POD: originally the type is not validated, the value is reassigned with a new dictionary
-    if(args[0].type !== "dictionary")
+    if(args[0].type !== this.signature.params[0].type)
       throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     const dict = args[0] as Dictionary;
@@ -327,7 +327,7 @@ export class MapCacheFunc extends Func {
     
     // TODO: this error should be thrown by type checker (too)
     // POD: originally the type is not validated, the value is reassigned with a new dictionary
-    if(args[0].type !== "dictionary")
+    if(args[0].type !== this.signature.params[0].type)
       throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     const dict = args[0] as Dictionary;
@@ -371,7 +371,7 @@ export class RemoveKeyFunc extends Func {
 
     // TODO: this error should be thrown by type checker (too)
     // POD: originally the type is not validated, the value is reassigned with a new dictionary
-    if(args[0].type !== "dictionary")
+    if(args[0].type !== this.signature.params[0].type)
       throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     const dict = args[0] as Dictionary;

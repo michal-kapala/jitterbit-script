@@ -976,6 +976,7 @@ export class Api {
     };
     Api.functions = [
       // conversion
+      new Conversion.BinaryToHexFunc(),
       new Conversion.HexToBinaryFunc(),
       // dict/array
       new Dicts.AddToDictFunc(),
