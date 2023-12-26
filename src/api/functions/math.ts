@@ -1,5 +1,5 @@
 import Scope from "../../runtime/scope";
-import { JbNumber } from "../../runtime/types";
+import { JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
 import { Func, Parameter, Signature } from "../types";
 
@@ -251,6 +251,58 @@ export class Pow extends Func {
       : args[1] as JbNumber;
 
     return new JbNumber(Math.pow(base.value, exponent.value));
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `Round` function.
+ * 
+ * Returns the given value rounded to a specified precision and then converted to a string.
+ * The argument should be a double and is first converted to a double if not.
+ * This function is designed for displaying values (not computing) as the output is a string.
+ * 
+ * This function is similar to the String `Format` function.
+ */
+export class Round extends Func {
+  constructor() {
+    super();
+    this.name = "Round";
+    this.module = "math";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("number", "d"),
+        new Parameter("number", "numPlaces", false, new JbNumber(0))
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 2;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // conversions
+    let num = args[0].type !== "number"
+      ? new JbNumber(args[0].toNumber())
+      : args[0] as JbNumber;
+
+    let numPlaces = (this.signature.params[1].defaultVal as JbNumber).value ?? 0;
+
+    // TODO: float conversion? negatives?
+    if(args.length === 2)
+      numPlaces = args[1].type !== "number"
+        ? Math.round(Math.abs(args[1].toNumber()))
+        : Math.round(Math.abs((args[1] as JbNumber).value));
+
+    num.value *= 10 ** numPlaces;
+    num.value = Math.round(num.value)
+    num.value /= 10 ** numPlaces;
+
+    return new JbString(num.toString());
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
