@@ -5,6 +5,7 @@ import * as Conversion from "./api/functions/conversion";
 import * as Datetime from "./api/functions/datetime";
 import * as Debug from "./api/functions/debug";
 import * as EnvInfo from "./api/functions/envinfo";
+import * as Math from "./api/functions/math";
 
 type SystemVariables = {
   static: SystemVariable[];
@@ -1051,7 +1052,9 @@ export class Api {
       new EnvInfo.GetEnvironmentID(),
       new EnvInfo.GetEnvironmentName(),
       new EnvInfo.GetOrganizationID(),
-      new EnvInfo.GetOrganizationName()
+      new EnvInfo.GetOrganizationName(),
+      // math
+      new Math.Ceiling(),
     ];
   }
 
