@@ -39,7 +39,7 @@ export type FuncModule =
   "dict/array" |
   "diff" |
   "email" |
-  "env info" |
+  "envinfo" |
   "file" |
   "general" |
   "instance" |

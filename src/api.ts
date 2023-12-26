@@ -4,6 +4,7 @@ import * as Dicts from "./api/functions/dict";
 import * as Conversion from "./api/functions/conversion";
 import * as Datetime from "./api/functions/datetime";
 import * as Debug from "./api/functions/debug";
+import * as EnvInfo from "./api/functions/envinfo";
 
 type SystemVariables = {
   static: SystemVariable[];
@@ -1039,7 +1040,18 @@ export class Api {
       new Dicts.MapCache,
       new Arrays.ReduceDimension(),
       new Dicts.RemoveKey(),
-      new Arrays.SortArray()
+      new Arrays.SortArray(),
+      // env info
+      new EnvInfo.GetAgentGroupID(),
+      new EnvInfo.GetAgentGroupName(),
+      new EnvInfo.GetAgentID(),
+      new EnvInfo.GetAgentName(),
+      new EnvInfo.GetAgentVersionID(),
+      new EnvInfo.GetAgentVersionName(),
+      new EnvInfo.GetEnvironmentID(),
+      new EnvInfo.GetEnvironmentName(),
+      new EnvInfo.GetOrganizationID(),
+      new EnvInfo.GetOrganizationName()
     ];
   }
 
