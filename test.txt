@@ -6,6 +6,6 @@
   lol nice';
 
   // test for Exp function, should return 99.99998140119261 (one digit of precision more than the original)
-  exp = Exp(4.60517);
+  floor = Floor(52.654);
   
 </trans>

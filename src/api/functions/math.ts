@@ -56,7 +56,7 @@ export class Exp extends Func {
     this.maxArgs = 1;
   }
 
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     // conversion
     const num = args[0].type !== "number"
@@ -64,6 +64,40 @@ export class Exp extends Func {
       : args[0] as JbNumber;
 
     return new JbNumber(Math.exp(num.value));
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `Floor` function.
+ * 
+ * Returns the mathematical floor (rounded down to the nearest integer) of a given value as an integer.
+ * The argument should be a double and is first converted to a double if not.
+ */
+export class Floor extends Func {
+  constructor() {
+    super();
+    this.name = "Floor";
+    this.module = "math";
+    this.signatures = [
+      new Signature("number", [new Parameter("number", "d")])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // conversion
+    const num = args[0].type !== "number"
+      ? new JbNumber(args[0].toNumber())
+      : args[0] as JbNumber;
+
+    return new JbNumber(Math.floor(num.value));
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
