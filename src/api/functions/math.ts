@@ -124,7 +124,7 @@ export class Log extends Func {
     this.maxArgs = 1;
   }
 
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     // conversion
     const num = args[0].type !== "number"
@@ -156,13 +156,58 @@ export class Log10 extends Func {
     this.maxArgs = 1;
   }
 
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     // conversion
     const num = args[0].type !== "number"
       ? new JbNumber(args[0].toNumber())
       : args[0] as JbNumber;
     return new JbNumber(Math.log10(num.value));
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `Mod` function.
+ * 
+ * Calculates the modulus (the remainder) of the division of the numerator by the denominator.
+ * The return value has the same sign as the numerator.
+ * If the denominator is 0, the numerator is returned.
+ */
+export class Mod extends Func {
+  constructor() {
+    super();
+    this.name = "Mod";
+    this.module = "math";
+    this.signatures = [
+      new Signature("number", [
+        new Parameter("number", "numerator"),
+        new Parameter("number", "denominator")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 2;
+    this.maxArgs = 2;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // TODO: implicit conversions to be tested
+    const numerator = args[0].type !== "number"
+      ? new JbNumber(args[0].toNumber())
+      : args[0] as JbNumber;
+
+    const denominator = args[1].type !== "number"
+      ? new JbNumber(args[1].toNumber())
+      : args[1] as JbNumber;
+
+    if(denominator.value === 0)
+      return numerator;
+
+    return new JbNumber(numerator.value % denominator.value);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {

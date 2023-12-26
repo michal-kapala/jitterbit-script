@@ -1059,6 +1059,7 @@ export class Api {
       new Math.Floor(),
       new Math.Log(),
       new Math.Log10(),
+      new Math.Mod(),
     ];
   }
 
