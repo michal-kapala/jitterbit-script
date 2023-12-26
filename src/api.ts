@@ -1063,6 +1063,7 @@ export class Api {
       new Math.Pow(),
       new Math.Round(),
       new Math.RoundToInt(),
+      new Math.Sqrt(),
     ];
   }
 

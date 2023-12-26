@@ -25,11 +25,7 @@ export class Ceiling extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     // conversion
-    const num = args[0].type !== "number"
-      ? new JbNumber(args[0].toNumber())
-      : args[0] as JbNumber;
-
-    return new JbNumber(Math.ceil(num.value));
+    return new JbNumber(Math.ceil(args[0].toNumber()));
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -59,11 +55,7 @@ export class Exp extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     // conversion
-    const num = args[0].type !== "number"
-      ? new JbNumber(args[0].toNumber())
-      : args[0] as JbNumber;
-
-    return new JbNumber(Math.exp(num.value));
+    return new JbNumber(Math.exp(args[0].toNumber()));
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -93,11 +85,7 @@ export class Floor extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     // conversion
-    const num = args[0].type !== "number"
-      ? new JbNumber(args[0].toNumber())
-      : args[0] as JbNumber;
-
-    return new JbNumber(Math.floor(num.value));
+    return new JbNumber(Math.floor(args[0].toNumber()));
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -127,10 +115,11 @@ export class Log extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     // conversion
-    const num = args[0].type !== "number"
-      ? new JbNumber(args[0].toNumber())
-      : args[0] as JbNumber;
-    return new JbNumber(Math.log(num.value));
+    const num = args[0].toNumber();
+    // TODO: the original behaviour for negative input to be checked
+    if(num <= 0)
+      throw new Error(`[${this.name}] non-positive input: ${num}`);
+    return new JbNumber(Math.log(num));
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -159,10 +148,11 @@ export class Log10 extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     // conversion
-    const num = args[0].type !== "number"
-      ? new JbNumber(args[0].toNumber())
-      : args[0] as JbNumber;
-    return new JbNumber(Math.log10(num.value));
+    const num = args[0].toNumber();
+    // TODO: the original behaviour for negative input to be checked
+    if(num <= 0)
+      throw new Error(`[${this.name}] non-positive input: ${num}`);
+    return new JbNumber(Math.log10(num));
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -196,18 +186,11 @@ export class Mod extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     // TODO: implicit conversions to be tested
-    const numerator = args[0].type !== "number"
-      ? new JbNumber(args[0].toNumber())
-      : args[0] as JbNumber;
+    const denominator = args[1].toNumber();
 
-    const denominator = args[1].type !== "number"
-      ? new JbNumber(args[1].toNumber())
-      : args[1] as JbNumber;
-
-    if(denominator.value === 0)
-      return numerator;
-
-    return new JbNumber(numerator.value % denominator.value);
+    if(denominator === 0)
+      return new JbNumber(args[0].toNumber());
+    return new JbNumber(args[0].toNumber() % denominator);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -242,15 +225,10 @@ export class Pow extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     // conversions
-    const base = args[0].type !== "number"
-      ? new JbNumber(args[0].toNumber())
-      : args[0] as JbNumber;
-
-    const exponent = args[1].type !== "number"
-      ? new JbNumber(args[1].toNumber())
-      : args[1] as JbNumber;
-
-    return new JbNumber(Math.pow(base.value, exponent.value));
+    return new JbNumber(Math.pow(
+      args[0].toNumber(),
+      args[1].toNumber()
+    ));
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -286,10 +264,7 @@ export class Round extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     // conversions
-    let num = args[0].type !== "number"
-      ? new JbNumber(args[0].toNumber())
-      : args[0] as JbNumber;
-
+    let num = args[0].toNumber();
     let numPlaces = (this.signature.params[1].defaultVal as JbNumber).value ?? 0;
 
     // TODO: float conversion? negatives?
@@ -298,9 +273,9 @@ export class Round extends Func {
         ? Math.round(Math.abs(args[1].toNumber()))
         : Math.round(Math.abs((args[1] as JbNumber).value));
 
-    num.value *= 10 ** numPlaces;
-    num.value = Math.round(num.value)
-    num.value /= 10 ** numPlaces;
+    num *= 10 ** numPlaces;
+    num = Math.round(num);
+    num /= 10 ** numPlaces;
 
     return new JbString(num.toString());
   }
@@ -334,11 +309,45 @@ export class RoundToInt extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     // conversions
-    const num = args[0].type !== "number"
-      ? new JbNumber(args[0].toNumber())
-      : args[0] as JbNumber;
+    return new JbNumber(Math.round(args[0].toNumber()));
+  }
 
-    return new JbNumber(Math.round(num.value));
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `Sqrt` function.
+ * 
+ * Returns the square root of a given value.
+ * The argument should be a double and is first converted to a double if not.
+ * 
+ * Returns 0 for negative input.
+ */
+export class Sqrt extends Func {
+  constructor() {
+    super();
+    this.name = "Sqrt";
+    this.module = "math";
+    this.signatures = [
+      new Signature("number", [
+        new Parameter("number", "d")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // conversion
+    const num = args[0].toNumber();
+    // TODO: the original behaviour for negative input to be checked
+    if(num < 0)
+      throw new Error(`[${this.name}] negative input: ${num}`);
+    return new JbNumber(Math.sqrt(num));
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
