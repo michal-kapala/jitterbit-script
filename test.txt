@@ -5,7 +5,7 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for Exp function, should return 99.99998140119261 (one digit of precision more than the original)
-  floor = Floor(52.654);
+  // test for Log function, should return 1.6094379124341003 (3 digits of precision more than the original)
+  log = Log("5a");
   
 </trans>

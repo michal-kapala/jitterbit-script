@@ -104,3 +104,36 @@ export class Floor extends Func {
     this.signature = this.signatures[0];
   }
 }
+
+/**
+ * The implementation of `Log` function.
+ * 
+ * Returns the natural log (logarithm to the base e) of a given value.
+ * The argument should be a double and is first converted to a double if not.
+ */
+export class Log extends Func {
+  constructor() {
+    super();
+    this.name = "Log";
+    this.module = "math";
+    this.signatures = [
+      new Signature("number", [new Parameter("number", "d")])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+
+  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+    this.chooseSignature(args);
+    // conversion
+    const num = args[0].type !== "number"
+      ? new JbNumber(args[0].toNumber())
+      : args[0] as JbNumber;
+    return new JbNumber(Math.log(num.value));
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}

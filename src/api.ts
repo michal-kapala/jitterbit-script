@@ -1057,6 +1057,7 @@ export class Api {
       new Math.Ceiling(),
       new Math.Exp(),
       new Math.Floor(),
+      new Math.Log(),
     ];
   }
 
