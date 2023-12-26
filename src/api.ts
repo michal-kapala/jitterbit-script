@@ -987,8 +987,15 @@ export class Api {
       // conversion
       new Conversion.BinaryToHex(),
       new Conversion.BinaryToUUID(),
+      new Conversion.Bool(),
+      new Conversion.Date(),
+      new Conversion.Double(),
+      new Conversion.Float(),
       new Conversion.HexToBinary(),
       new Conversion.HexToString(),
+      new Conversion.Int(),
+      new Conversion.Long(),
+      new Conversion.String(),
       new Conversion.StringToHex(),
       new Conversion.UUIDToBinary(),
       // datetime

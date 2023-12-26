@@ -81,6 +81,147 @@ export class BinaryToUUID extends Func {
 }
 
 /**
+ * The implementation of `Bool` function.
+ * 
+ * Converts any data type to a boolean value (true or false).
+ * If the data is an integer or a floating-point number not equal to zero, the result is true (1).
+ * 
+ * The strings "true" and "T" return true independently of case ("TRUE", "t", and "True" all return true).
+ * In all other cases, the result is false (0).
+ */
+export class Bool extends Func {
+  constructor(){
+    super();
+    this.name = "Bool";
+    this.module = "conversion";
+    this.signatures = [
+      new Signature("bool", [
+        // parameter type and description from the docs is wrong
+        new Parameter("type", "arg")  
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+    this.chooseSignature(args);
+    throw new Error("Method not implemented.");
+  }
+
+  protected chooseSignature(args: RuntimeVal[]): void {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `Date` function.
+ * 
+ * Converts the argument to a date.
+ * If the input is a string, it has to be formatted using one of the standard date formats
+ * such as `"12/25/2018 12:30"`, `"2018-12-25"`, `"2018-12-25T12:30:00"`,
+ * `"December 25, 2018"`, or `"DEC 25, 2018"`.
+ * 
+ * If the input string is not in one of the four
+ * predefined date formats (`GeneralDate`, `LongDate`, `MediumDate`, or `ShortDate`)
+ * that can be read by the `Date` function, it can be converted first to a standard format
+ * by the `CVTDate` function. Hour, minute, and second are optional.
+ * 
+ * If the input is an integer or a double, the input is interpreted as the number of seconds from 12:00:00 AM of 1/1/1970 UTC, the start of the UNIX epoch.
+ * 
+ * Note that `Date(Long(Now())) == Now()`.
+ */
+export class Date extends Func {
+  constructor(){
+    super();
+    this.name = "Date";
+    this.module = "conversion";
+    this.signatures = [
+      new Signature("date", [
+        new Parameter("type", "arg")  
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+
+  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+    this.chooseSignature(args);
+    throw new Error("Method not implemented.");
+  }
+
+  protected chooseSignature(args: RuntimeVal[]): void {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `Double` function.
+ * 
+ * A best-effort is made to convert the argument to a double.
+ * If the data type being evaluated cannot be converted to a double, the function returns 0.
+ * If the data being evaluated is a date or time record, the result is
+ * the number of seconds from 12:00:00 AM of 1/1/1970 UTC (the start of the UNIX epoch).
+ */
+export class Double extends Func {
+  constructor(){
+    super();
+    this.name = "Double";
+    this.module = "conversion";
+    this.signatures = [
+      new Signature("number", [
+        new Parameter("type", "arg")  
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+
+  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+    this.chooseSignature(args);
+    throw new Error("Method not implemented.");
+  }
+  protected chooseSignature(args: RuntimeVal[]): void {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `Float` function.
+ * 
+ * A best-effort is made to convert the argument to a float.
+ * If the data type being evaluated cannot be converted to a float the function returns 0.
+ * If the data being evaluated is a date or time record, the result is
+ * the number of seconds from 12:00:00 AM of 1/1/1970 UTC (the start of the UNIX epoch).
+ */
+export class Float extends Func {
+  constructor(){
+    super();
+    this.name = "Float";
+    this.module = "conversion";
+    this.signatures = [
+      new Signature("number", [
+        new Parameter("type", "arg")  
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+
+  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+    this.chooseSignature(args);
+    throw new Error("Method not implemented.");
+  }
+  protected chooseSignature(args: RuntimeVal[]): void {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
  * The implementation of `HexToBinary` function.
  * 
  * Converts a hex-string to a binary value.
@@ -167,6 +308,111 @@ export class HexToString extends Func {
       let bin = JbBinary.fromHex(hex.value);
       return new JbString(Buffer.from(bin.value).toString());
     }
+  }
+
+  protected chooseSignature(args: RuntimeVal[]): void {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `Int` function.
+ * 
+ * A best-effort is made to convert the argument to an integer.
+ * If the data type being evaluated cannot be converted to an integer, the function returns 0.
+ * If the data being evaluated is a date or time record, the result is
+ * the number of seconds from 12:00:00 AM of 1/1/1970 UTC (the start of the UNIX epoch).
+ */
+export class Int extends Func {
+  constructor() {
+    super();
+    this.name = "Int";
+    this.module = "conversion";
+    this.signatures = [
+      new Signature("number", [
+        new Parameter("type", "arg")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+
+  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+    this.chooseSignature(args);
+    throw new Error("Method not implemented.");
+  }
+
+  protected chooseSignature(args: RuntimeVal[]): void {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `Long` function.
+ * 
+ * A best-effort is made to convert the argument to a long integer.
+ * If the data type being evaluated cannot be converted to a long integer, the function returns 0.
+ * If the data being evaluated is a date or time record, the result is
+ * the number of seconds from 12:00:00 AM of 1/1/1970 UTC (the start of the UNIX epoch).
+ */
+export class Long extends Func {
+  constructor() {
+    super();
+    this.name = "Long";
+    this.module = "conversion";
+    this.signatures = [
+      new Signature("number", [
+        new Parameter("type", "arg")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+    this.chooseSignature(args);
+    throw new Error("Method not implemented.");
+  }
+
+  protected chooseSignature(args: RuntimeVal[]): void {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `String` function.
+ * 
+ * Converts any data type to a string. If the data being evaluated is already a string, no conversion takes place.
+ * 
+ * If the data type is a date or time record, the date is returned in ISO 8601 format (yyyy-mm-dd HH:MM:SS).
+ * For other date formats, use the functions `CVTDate` or `FormatDate`.
+ * 
+ * Binary data that contains null bytes is returned as a string representing the hexadecimal values of each byte, just as if `BinaryToHex` had been called.
+ * If the binary data contains no null bytes, then a string representation is returned with the assumption that the bytes represent a UTF-8-encoded string.
+ * If you always want a hexadecimal representation, use the `BinaryToHex` function instead.
+ * 
+ * For a boolean value, the strings "1" or "0" are returned.
+ */
+export class String extends Func {
+  constructor() {
+    super();
+    this.name = "String";
+    this.module = "conversion";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("type", "arg")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+
+  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+    this.chooseSignature(args);
+    throw new Error("Method not implemented.");
   }
 
   protected chooseSignature(args: RuntimeVal[]): void {
