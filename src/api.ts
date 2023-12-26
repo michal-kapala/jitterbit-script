@@ -1062,6 +1062,7 @@ export class Api {
       new Math.Mod(),
       new Math.Pow(),
       new Math.Round(),
+      new Math.RoundToInt(),
     ];
   }
 

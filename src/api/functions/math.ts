@@ -309,3 +309,39 @@ export class Round extends Func {
     this.signature = this.signatures[0];
   }
 }
+
+/**
+ * The implementation of `RoundToInt` function.
+ * 
+ * Returns the given value rounded to the nearest integer (no decimal places).
+ * The argument should be a double and is first converted to a double if not.
+ */
+export class RoundToInt extends Func {
+  constructor() {
+    super();
+    this.name = "RoundToInt";
+    this.module = "math";
+    this.signatures = [
+      new Signature("number", [
+        new Parameter("number", "d")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // conversions
+    const num = args[0].type !== "number"
+      ? new JbNumber(args[0].toNumber())
+      : args[0] as JbNumber;
+
+    return new JbNumber(Math.round(num.value));
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}

@@ -5,7 +5,7 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for Round function, should return "9.5354"
-  rounded = Round(9.53537465, -4.1);
+  // test for RoundToInt function, should return 10
+  rounded = RoundToInt(9.53537465);
   
 </trans>
