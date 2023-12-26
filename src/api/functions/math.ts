@@ -214,3 +214,46 @@ export class Mod extends Func {
     this.signature = this.signatures[0];
   }
 }
+
+/**
+ * The implementation of `Pow` function.
+ * 
+ * Returns the mathematical result base^exponent, or base to the power of exponent.
+ * The arguments should be doubles and are first converted to doubles if not.
+ * 
+ * `Pow(0, 0)` returns 1.
+ */
+export class Pow extends Func {
+  constructor() {
+    super();
+    this.name = "Pow";
+    this.module = "math";
+    this.signatures = [
+      new Signature("number", [
+        new Parameter("number", "base"),
+        new Parameter("number", "exponent")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 2;
+    this.maxArgs = 2;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // conversions
+    const base = args[0].type !== "number"
+      ? new JbNumber(args[0].toNumber())
+      : args[0] as JbNumber;
+
+    const exponent = args[1].type !== "number"
+      ? new JbNumber(args[1].toNumber())
+      : args[1] as JbNumber;
+
+    return new JbNumber(Math.pow(base.value, exponent.value));
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}

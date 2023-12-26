@@ -5,8 +5,7 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for Mod function, should return -2
-  denom = Mod(17, 0);
-  mod = Mod(-206, denom);
+  // test for Pow function, should return 0.5
+  pow = Pow(2, -1);
   
 </trans>
