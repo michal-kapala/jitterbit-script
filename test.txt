@@ -5,7 +5,12 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for Now function and date type
+  // test for DebugBreak function, 2 global var edge case identifiers
+  // should print a table of 5 elements (excludes system variables)
   date = Now();
+  $jitterbit.xd = "dddd?";
+  $jitterbit.scripting.hex.enable_unicode_support = true;
+  $ = 6;
+  DebugBreak(!false);
   
 </trans>

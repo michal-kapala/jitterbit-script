@@ -51,6 +51,13 @@ export default class Scope {
     }
   }
 
+  /**
+   * Performs an assignment to an identifier.
+   * @param varName 
+   * @param value 
+   * @param operator 
+   * @returns 
+   */
   public assignVar(varName: string, value: RuntimeVal, operator = "="): RuntimeVal {
     let isGlobal = varName[0] === "$";
     let oldValue = isGlobal
@@ -137,11 +144,21 @@ export default class Scope {
     return value;
   }
 
+  /**
+   * Returns a reference on an identifier's value.
+   * @param varname 
+   * @returns 
+   */
   public lookupVar(varname: string): RuntimeVal {
     const scope = this.resolve(varname);
     return scope.variables.get(varname) as RuntimeVal;
   }
 
+  /**
+   * Returns the scope of the identifier.
+   * @param varname 
+   * @returns 
+   */
   public resolve(varname: string): Scope {
     if (this.variables.has(varname)) {
       return this;
@@ -175,7 +192,7 @@ export default class Scope {
    * Static system variables are initalized before interpretation.
    * @param global A global/system variable AST node
    */
-  public initGlobalVar(global: GlobalIdentifier): void {
+  public initGlobalVar(global: GlobalIdentifier) {
     if(this.parent === undefined) {
       const value = this.lookupVar(global.symbol);
       if(value === undefined)
@@ -186,7 +203,14 @@ export default class Scope {
       console.warn("ScopeWarning: Attempt to null-initialize a global variable from a child scope.");
   }
 
-  static assign(lhs: RuntimeVal, rhs: RuntimeVal, operator: string): RuntimeVal {
+  /**
+   * Performs reference assignments for =, -=, += operators.
+   * @param lhs 
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  static assign(lhs: RuntimeVal, rhs: RuntimeVal, operator: string) {
     switch (operator) {
       case "=":
         return rhs;
@@ -508,5 +532,25 @@ export default class Scope {
       default:
         throw `Unknown assignment operator ${operator}`;
     }
+  }
+
+  /**
+   * Prints a table with all available variables as KV pairs.
+   * @param merged The result map with the variables collected from the scope and its parents.
+   */
+  public logAvailable(merged = new Map<string, RuntimeVal>()) {   
+    merged = new Map([...merged, ...this.variables]);
+    // global scope reached
+    if(this.parent === undefined) {
+      const vars = new Map<string, string | undefined>();
+      for(const key of merged.keys()) {
+        if(Api.getSysVar(key) === undefined)
+          vars.set(key, merged.get(key)?.toString());
+      }
+      console.table(vars);
+      return;
+    }
+    // traverse parent scopes
+    this.parent.logAvailable(merged);
   }
 }

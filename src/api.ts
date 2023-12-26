@@ -3,6 +3,7 @@ import * as Arrays from "./api/functions/array";
 import * as Dicts from "./api/functions/dict";
 import * as Conversion from "./api/functions/conversion";
 import * as Datetime from "./api/functions/datetime";
+import * as Debug from "./api/functions/debug";
 
 type SystemVariables = {
   static: SystemVariable[];
@@ -1018,6 +1019,8 @@ export class Api {
       new Datetime.Now_(),
       new Datetime.ShortDate(),
       new Datetime.ShortTime(),
+      // debug
+      new Debug.DebugBreak(),
       // dict/array
       new Dicts.AddToDict(),
       new Arrays.Array(),
