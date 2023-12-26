@@ -5,7 +5,7 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for Ceiling function, should return 4
-  ceil = Ceiling(3.50000000001)
+  // test for Exp function, should return 99.99998140119261 (one digit of precision more than the original)
+  exp = Exp(4.60517);
   
 </trans>

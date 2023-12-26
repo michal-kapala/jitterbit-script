@@ -1055,6 +1055,7 @@ export class Api {
       new EnvInfo.GetOrganizationName(),
       // math
       new Math.Ceiling(),
+      new Math.Exp(),
     ];
   }
 
