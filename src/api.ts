@@ -6,6 +6,7 @@ import * as Datetime from "./api/functions/datetime";
 import * as Debug from "./api/functions/debug";
 import * as EnvInfo from "./api/functions/envinfo";
 import * as Math from "./api/functions/math";
+import * as XML from "./api/functions/xml";
 
 type SystemVariables = {
   static: SystemVariable[];
@@ -1064,6 +1065,18 @@ export class Api {
       new Math.Round(),
       new Math.RoundToInt(),
       new Math.Sqrt(),
+      // xml
+      new XML.Attribute(),
+      new XML.CreateNode(),
+      new XML.GetNodeName(),
+      new XML.GetNodeValue(),
+      new XML.GetXMLString(),
+      new XML.IsNil(),
+      new XML.RunXSLT(),
+      new XML.SelectNodeFromXMLAny(),
+      new XML.SelectNodes(),
+      new XML.SelectNodesFromXMLAny(),
+      new XML.SelectSingleNode(),
     ];
   }
 
