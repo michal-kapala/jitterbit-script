@@ -5,7 +5,7 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for LDAP module stub functions
-  LDAPAdd("type", "value");
+  // test for NetSuite module stub functions
+  NetSuiteLogin("log me in pls");
   
 </trans>

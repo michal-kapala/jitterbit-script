@@ -11,6 +11,7 @@ import * as Cache from "./api/functions/cache";
 import * as Database from "./api/functions/database";
 import * as Diff from "./api/functions/diff";
 import * as LDAP from "./api/functions/ldap";
+import * as NetSuite from "./api/functions/netsuite";
 
 type SystemVariables = {
   static: SystemVariable[];
@@ -1107,6 +1108,10 @@ export class Api {
       new Math.Round(),
       new Math.RoundToInt(),
       new Math.Sqrt(),
+      // netsuite
+      new NetSuite.NetSuiteGetSelectValue(),
+      new NetSuite.NetSuiteGetServerTime(),
+      new NetSuite.NetSuiteLogin(),
       // xml
       new XML.Attribute(),
       new XML.CreateNode(),
