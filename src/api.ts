@@ -12,6 +12,7 @@ import * as Database from "./api/functions/database";
 import * as Diff from "./api/functions/diff";
 import * as LDAP from "./api/functions/ldap";
 import * as NetSuite from "./api/functions/netsuite";
+import * as Salesforce from "./api/functions/salesforce";
 
 type SystemVariables = {
   static: SystemVariable[];
@@ -1112,6 +1113,15 @@ export class Api {
       new NetSuite.NetSuiteGetSelectValue(),
       new NetSuite.NetSuiteGetServerTime(),
       new NetSuite.NetSuiteLogin(),
+      // salesforce
+      new Salesforce.GetSalesforceTimestamp(),
+      new Salesforce.LoginToSalesforceAndGetTimeStamp(),
+      new Salesforce.SalesforceLogin(),
+      new Salesforce.SetSalesforceSession(),
+      new Salesforce.SfCacheLookup(),
+      new Salesforce.SfLookup(),
+      new Salesforce.SfLookupAll(),
+      new Salesforce.SfLookupAllToFile(),
       // xml
       new XML.Attribute(),
       new XML.CreateNode(),

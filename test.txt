@@ -5,7 +5,7 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for NetSuite module stub functions
-  NetSuiteLogin("log me in pls");
+  // test for Salesforce module stub functions
+  LoginToSalesforceAndGetTimestamp("log me in pls");
   
 </trans>
