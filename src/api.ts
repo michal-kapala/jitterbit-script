@@ -7,6 +7,7 @@ import * as Debug from "./api/functions/debug";
 import * as EnvInfo from "./api/functions/envinfo";
 import * as Math from "./api/functions/math";
 import * as XML from "./api/functions/xml";
+import * as Cache from "./api/functions/cache";
 
 type SystemVariables = {
   static: SystemVariable[];
@@ -988,6 +989,9 @@ export class Api {
       ] as SystemVariable [],
     };
     Api.functions = [
+      // cache
+      new Cache.ReadCache(),
+      new Cache.WriteCache(),
       // conversion
       new Conversion.BinaryToHex(),
       new Conversion.BinaryToUUID(),
