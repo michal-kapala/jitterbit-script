@@ -10,6 +10,7 @@ import * as XML from "./api/functions/xml";
 import * as Cache from "./api/functions/cache";
 import * as Database from "./api/functions/database";
 import * as Diff from "./api/functions/diff";
+import * as LDAP from "./api/functions/ldap";
 
 type SystemVariables = {
   static: SystemVariable[];
@@ -1085,6 +1086,16 @@ export class Api {
       new EnvInfo.GetEnvironmentName(),
       new EnvInfo.GetOrganizationID(),
       new EnvInfo.GetOrganizationName(),
+      // LDAP
+      new LDAP.ArrayToMultipleValues(),
+      new LDAP.LDAPAdd(),
+      new LDAP.LDAPConnect(),
+      new LDAP.LDAPDeleteEntry(),
+      new LDAP.LDAPExecute(),
+      new LDAP.LDAPRemove(),
+      new LDAP.LDAPRename(),
+      new LDAP.LDAPReplace(),
+      new LDAP.LDAPSearch(),
       // math
       new Math.Ceiling(),
       new Math.Exp(),

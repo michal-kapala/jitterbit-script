@@ -65,7 +65,7 @@ export class CacheLookup extends Func {
  * For more information, see the instructions on inserting endpoints under the Endpoints section
  * in Jitterbit Script.
  * 
- * Supports up to 100 argument-calls.
+ * Supports up to 100-argument calls.
  */
 export class CallStoredProcedure extends Func {
   constructor() {
@@ -161,7 +161,7 @@ export class DBCloseConnection extends Func {
  * For more information, see the instructions on inserting endpoints under the Endpoints section
  * in Jitterbit Script.
  * 
- * Supports up to 100 argument-calls.
+ * Supports up to 100-argument calls.
  */
 export class DBExecute extends Func {
   constructor() {

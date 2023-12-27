@@ -95,7 +95,7 @@ export class DiffDelete extends Func {
  * Sets the list of keys to be used for uniquely identifying a record in the diff source.
  * This method is typically called in conjunction with the `InitializeDiff` function.
  * 
- * Supports up to 100 argument-calls.
+ * Supports up to 100-argument calls.
  */
 export class DiffKeyList extends Func {
   constructor() {
@@ -230,7 +230,7 @@ export class InitializeDiff extends Func {
  * In those cases, no chunk size will be used and memory use will not be an issue.
  * This method is typically called in conjunction with the `InitializeDiff` function.
  * 
- * Supports up to 100 argument-calls.
+ * Supports up to 100-argument calls.
  */
 export class OrderedDiffKeyList extends Func {
   constructor() {

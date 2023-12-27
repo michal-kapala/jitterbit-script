@@ -5,7 +5,7 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for diff module stub function
-  DiffAdd();
+  // test for LDAP module stub functions
+  LDAPAdd("type", "value");
   
 </trans>
