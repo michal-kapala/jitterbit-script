@@ -5,7 +5,7 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for Sqrt function, should return 4
-  sqrt = Sqrt(16);
+  // test for database module stub function
+  Unmap();
   
 </trans>

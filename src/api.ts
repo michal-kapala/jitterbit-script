@@ -8,6 +8,7 @@ import * as EnvInfo from "./api/functions/envinfo";
 import * as Math from "./api/functions/math";
 import * as XML from "./api/functions/xml";
 import * as Cache from "./api/functions/cache";
+import * as Database from "./api/functions/database";
 
 type SystemVariables = {
   static: SystemVariable[];
@@ -1006,6 +1007,20 @@ export class Api {
       new Conversion.String(),
       new Conversion.StringToHex(),
       new Conversion.UUIDToBinary(),
+      // database
+      new Database.CacheLookup(),
+      new Database.CallStoredProcedure(),
+      new Database.DBCloseConnection(),
+      new Database.DBExecute(),
+      new Database.DBLoad(),
+      new Database.DBLookup(),
+      new Database.DBLookupAll(),
+      new Database.DBRollbackTransaction(),
+      new Database.DBWrite(),
+      new Database.SetDBInsert(),
+      new Database.SetDBUpdate(),
+      new Database.SQLEscape(),
+      new Database.Unmap(),
       // datetime
       new Datetime.ConvertTimeZone(),
       new Datetime.CVTDate(),

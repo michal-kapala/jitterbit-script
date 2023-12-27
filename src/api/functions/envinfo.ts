@@ -22,7 +22,7 @@ export class GetAgentGroupID extends Func {
   
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of environment information API calls is currently unsupported.`);
+    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -50,7 +50,7 @@ export class GetAgentGroupName extends Func {
   
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of environment information API calls is currently unsupported.`);
+    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
   
   protected chooseSignature(args: RuntimeVal[]) {
@@ -78,7 +78,7 @@ export class GetAgentID extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of environment information API calls is currently unsupported.`);
+    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -106,7 +106,7 @@ export class GetAgentName extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of environment information API calls is currently unsupported.`);
+    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -134,7 +134,7 @@ export class GetAgentVersionID extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of environment information API calls is currently unsupported.`);
+    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -162,7 +162,7 @@ export class GetAgentVersionName extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of environment information API calls is currently unsupported.`);
+    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -190,7 +190,7 @@ export class GetEnvironmentID extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of environment information API calls is currently unsupported.\nYou can read your environment ID from 'environment.properties' local file.`);
+    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.\nYou can read your environment ID from 'environment.properties' local file.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -218,7 +218,7 @@ export class GetEnvironmentName extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of environment information API calls is currently unsupported.\nYou can read your environment name from 'environment.properties' local file.`);
+    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.\nYou can read your environment name from 'environment.properties' local file.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -246,7 +246,7 @@ export class GetOrganizationID extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of environment information API calls is currently unsupported.\nYou can read your organization ID from 'environment.properties' local file.`);
+    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.\nYou can read your organization ID from 'environment.properties' local file.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -274,7 +274,7 @@ export class GetOrganizationName extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of environment information API calls is currently unsupported.\nYou can read your organization name from 'environment.properties' local file.`);
+    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.\nYou can read your organization name from 'environment.properties' local file.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {

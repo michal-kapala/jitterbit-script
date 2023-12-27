@@ -26,7 +26,7 @@ export class Attribute extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of XML API calls is currently unsupported.`);
+    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -69,7 +69,7 @@ export class CreateNode extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of XML API calls is currently unsupported.`);
+    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -108,7 +108,7 @@ export class GetNodeName extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of XML API calls is currently unsupported.`);
+    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -147,7 +147,7 @@ export class GetNodeValue extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of XML API calls is currently unsupported.`);
+    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -186,7 +186,7 @@ export class GetXMLString extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of XML API calls is currently unsupported.`);
+    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -226,7 +226,7 @@ export class IsNil extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of XML API calls is currently unsupported.`);
+    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -271,7 +271,7 @@ export class RunXSLT extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of XML API calls is currently unsupported.`);
+    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -308,7 +308,7 @@ export class SelectNodeFromXMLAny extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of XML API calls is currently unsupported.`);
+    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -356,7 +356,7 @@ export class SelectNodes extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of XML API calls is currently unsupported.`);
+    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -401,7 +401,7 @@ export class SelectNodesFromXMLAny extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of XML API calls is currently unsupported.`);
+    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -451,7 +451,7 @@ export class SelectSingleNode extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of XML API calls is currently unsupported.`);
+    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {

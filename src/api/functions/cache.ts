@@ -27,7 +27,7 @@ export class ReadCache extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of cache API calls is currently unsupported.`);
+    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -60,7 +60,7 @@ export class WriteCache extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of cache API calls is currently unsupported.`);
+    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
