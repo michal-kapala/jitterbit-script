@@ -9,6 +9,7 @@ import * as Math from "./api/functions/math";
 import * as XML from "./api/functions/xml";
 import * as Cache from "./api/functions/cache";
 import * as Database from "./api/functions/database";
+import * as Diff from "./api/functions/diff";
 
 type SystemVariables = {
   static: SystemVariable[];
@@ -1062,6 +1063,17 @@ export class Api {
       new Arrays.ReduceDimension(),
       new Dicts.RemoveKey(),
       new Arrays.SortArray(),
+      // diff
+      new Diff.DiffAdd(),
+      new Diff.DiffComplete(),
+      new Diff.DiffDelete(),
+      new Diff.DiffKeyList(),
+      new Diff.DiffNode(),
+      new Diff.DiffUpdate(),
+      new Diff.InitializeDiff(),
+      new Diff.OrderedDiffKeyList(),
+      new Diff.ResetDiff(),
+      new Diff.SetDiffChunkSize(),
       // env info
       new EnvInfo.GetAgentGroupID(),
       new EnvInfo.GetAgentGroupName(),

@@ -5,7 +5,7 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for database module stub function
-  Unmap();
+  // test for diff module stub function
+  DiffAdd();
   
 </trans>
