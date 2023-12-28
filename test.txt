@@ -5,14 +5,7 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // tests for GeneralDate function
-  // "12/07/2017 00:00:00 AM"
-  ShortDate("2017-12-07");
-  // the current UTC-based date
-  ShortDate(Now());
-  // Invalid date string: 'not a date'
-  //ShortDate("not a date");
-  // the current UTC-based time (HH:MM)
-  ShortTime(Now());
+  // tests for MonthOfYear function, should return 12
+  MonthOfYear("12/28/2023");
   
 </trans>
