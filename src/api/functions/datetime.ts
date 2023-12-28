@@ -1,5 +1,5 @@
 import Scope from "../../runtime/scope";
-import { JbBool, JbDate } from "../../runtime/types";
+import { JbBool, JbDate, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
 import { Func, Parameter, Signature } from "../types";
 
@@ -21,7 +21,7 @@ export class ConvertTimeZone extends Func {
         new Parameter("string", "fromTZ"),
         new Parameter("string", "toTZ"),
         // TODO: the default to be determined
-        new Parameter("bool", "is_european_format", false),
+        new Parameter("bool", "is_european_format", false, new JbBool(false)),
         new Parameter("bool", "ignoreDST", false, new JbBool(false)),
       ]),
       new Signature("string", [
@@ -29,7 +29,7 @@ export class ConvertTimeZone extends Func {
         new Parameter("string", "fromTZ"),
         new Parameter("string", "toTZ"),
         // TODO: the default to be determined
-        new Parameter("bool", "is_european_format", false),
+        new Parameter("bool", "is_european_format", false, new JbBool(false)),
         new Parameter("bool", "ignoreDST", false, new JbBool(false)),
       ])
     ];
@@ -37,11 +37,11 @@ export class ConvertTimeZone extends Func {
 
   call(args: RuntimeVal[], scope: Scope): RuntimeVal {
     this.chooseSignature(args);
-    throw new Error("Method not implemented.");
+    throw new Error(`${this.name} is currently unsupported`);
   }
 
   protected chooseSignature(args: RuntimeVal[]): void {
-    throw new Error("Method not implemented.");
+    this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
 }
 
@@ -223,6 +223,10 @@ export class FormatDate extends Func {
  * The implementation of `GeneralDate` function.
  * 
  * Returns a string in the general date format for a date object or date string.
+ * 
+ * The supported string formats are shared with the JavaScript `Date` object.
+ * 
+ * In this implementation the result is always UTC-based.
  */
 export class GeneralDate extends Func {
   constructor() {
@@ -237,13 +241,30 @@ export class GeneralDate extends Func {
     ];
   }
 
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    throw new Error("Method not implemented.");
+
+    // TODO: probably uses an implicit conversion to string instead, to be tested
+    if(args[0].type !== "string" && args[0].type !== "date")
+      throw new Error(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+
+    let date: Date;
+    // POD: supports JS implementation rather than JB's
+    if(args[0].type === "string") {
+      const timestamp = Date.parse((args[0] as JbString).value)
+      if(isNaN(timestamp))
+        throw new Error(`[${this.name}] Invalid date string: '${(args[0] as JbString).value}'`);
+      date = new Date(timestamp);
+    }
+    else
+      date = (args[0] as JbDate).value;
+
+    // "MM/DD/YYYY HH:MM:SS AM/PM"
+    return new JbString(`${(date.getUTCMonth()+1).toString().padStart(2, '0')}/${date.getUTCDate().toString().padStart(2, '0')}/${date.getUTCFullYear()} ${date.getUTCHours() < 12 ? date.getUTCHours().toString().padStart(2, '0') : (date.getUTCHours()-12).toString().padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')}:${date.getUTCSeconds().toString().padStart(2, '0')} ${date.getUTCHours() < 12 ? "AM" : "PM"}`);
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
-    throw new Error("Method not implemented.");
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
 }
 

@@ -5,7 +5,12 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for file module stub functions
-  FlushAllFiles();
+  // tests for GeneralDate function
+  // "12/07/2017 00:00:00 AM"
+  GeneralDate("2017-12-07");
+  // the current UTC-based date 
+  GeneralDate(Now());
+  // Invalid date string: 'not a date'
+  GeneralDate("not a date");
   
 </trans>
