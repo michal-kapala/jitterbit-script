@@ -15,6 +15,7 @@ import * as NetSuite from "./api/functions/netsuite";
 import * as Salesforce from "./api/functions/salesforce";
 import * as Instance from "./api/functions/instance";
 import * as Email from "./api/functions/email";
+import * as File from "./api/functions/file";
 
 type SystemVariables = {
   static: SystemVariable[];
@@ -1094,6 +1095,16 @@ export class Api {
       new EnvInfo.GetEnvironmentName(),
       new EnvInfo.GetOrganizationID(),
       new EnvInfo.GetOrganizationName(),
+      // file
+      new File.ArchiveFile(),
+      new File.DeleteFile(),
+      new File.DeleteFiles(),
+      new File.DirList(),
+      new File.FileList(),
+      new File.FlushAllFiles(),
+      new File.FlushFile(),
+      new File.ReadFile(),
+      new File.WriteFile(),
       // instance
       new Instance.Count(),
       new Instance.CountSourceRecords(),
