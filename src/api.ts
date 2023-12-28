@@ -13,6 +13,7 @@ import * as Diff from "./api/functions/diff";
 import * as LDAP from "./api/functions/ldap";
 import * as NetSuite from "./api/functions/netsuite";
 import * as Salesforce from "./api/functions/salesforce";
+import * as Instance from "./api/functions/instance";
 
 type SystemVariables = {
   static: SystemVariable[];
@@ -1088,6 +1089,21 @@ export class Api {
       new EnvInfo.GetEnvironmentName(),
       new EnvInfo.GetOrganizationID(),
       new EnvInfo.GetOrganizationName(),
+      // instance
+      new Instance.Count(),
+      new Instance.CountSourceRecords(),
+      new Instance.Exist(),
+      new Instance.FindByPos(),
+      new Instance.FindValue(),
+      new Instance.GetInstance(),
+      new Instance.Max(),
+      new Instance.Min(),
+      new Instance.ResolveOneOf(),
+      new Instance.SetInstances(),
+      new Instance.SortInstances(),
+      new Instance.Sum(),
+      new Instance.SumCSV(),
+      new Instance.SumString(),
       // LDAP
       new LDAP.ArrayToMultipleValues(),
       new LDAP.LDAPAdd(),
