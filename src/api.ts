@@ -14,6 +14,7 @@ import * as LDAP from "./api/functions/ldap";
 import * as NetSuite from "./api/functions/netsuite";
 import * as Salesforce from "./api/functions/salesforce";
 import * as Instance from "./api/functions/instance";
+import * as Email from "./api/functions/email";
 
 type SystemVariables = {
   static: SystemVariable[];
@@ -1078,6 +1079,10 @@ export class Api {
       new Diff.OrderedDiffKeyList(),
       new Diff.ResetDiff(),
       new Diff.SetDiffChunkSize(),
+      // email
+      new Email.SendEmail(),
+      new Email.SendEmailMessage(),
+      new Email.SendSystemEmail(),
       // env info
       new EnvInfo.GetAgentGroupID(),
       new EnvInfo.GetAgentGroupName(),

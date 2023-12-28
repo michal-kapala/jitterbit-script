@@ -5,7 +5,7 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for instance module stub functions
-  Count({});
+  // test for email module stub functions
+  SendEmailMessage("<TAG>email:some message<TAG>");
   
 </trans>
