@@ -3090,4 +3090,19 @@ export class JbDate implements DateVal {
       return result;
     return matches[0];
   }
+
+  static parse(date: RuntimeVal) {
+    let result: Date;
+    // POD: supports JS implementation rather than JB's
+    if(date.type === "string") {
+      const timestamp = Date.parse((date as JbString).value)
+      if(isNaN(timestamp))
+        throw new Error(`[${this.name}] Invalid date string: '${(date as JbString).value}'`);
+      result = new Date(timestamp);
+    }
+    else
+      result = (date as JbDate).value;
+
+    return result;
+  }
 }

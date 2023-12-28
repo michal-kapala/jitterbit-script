@@ -582,12 +582,19 @@ export class ShortDate extends Func {
     ];
   }
 
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    throw new Error("Method not implemented.");
+    // TODO: probably uses an implicit conversion to string instead, to be tested
+    if(args[0].type !== "string" && args[0].type !== "date")
+      throw new Error(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+
+    let date = JbDate.parse(args[0]);
+
+    // "(M)M/(D)D/YY"
+    return new JbString(`${date.getUTCMonth()+1}/${date.getUTCDate()}/${date.getUTCFullYear().toString().substring(2)}`);
   }
-  protected chooseSignature(args: RuntimeVal[]): void {
-    throw new Error("Method not implemented.");
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
 }
 
@@ -609,12 +616,19 @@ export class ShortTime extends Func {
     ];
   }
 
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    throw new Error("Method not implemented.");
+    // TODO: probably uses an implicit conversion to string instead, to be tested
+    if(args[0].type !== "string" && args[0].type !== "date")
+      throw new Error(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+
+    let date = JbDate.parse(args[0]);
+
+    // "HH/MM"
+    return new JbString(`${date.getUTCHours().toString().padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')}`);
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
-    throw new Error("Method not implemented.");
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
 }
