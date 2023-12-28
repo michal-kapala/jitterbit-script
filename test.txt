@@ -5,7 +5,8 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // tests for MonthOfYear function, should return 12
-  MonthOfYear("12/28/2023");
+  // tests for DayOfMonth and DayOfWeek function (0 for Sundays)
+  DayOfMonth(Now());
+  DayOfWeek(Now());
   
 </trans>

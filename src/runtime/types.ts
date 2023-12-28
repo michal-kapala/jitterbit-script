@@ -3091,6 +3091,13 @@ export class JbDate implements DateVal {
     return matches[0];
   }
 
+  /**
+   * Creates a date from a `JbString` or `JbDate` value.
+   * 
+   * The supported strings format are identical with those of native JS `Date.parse`.
+   * @param date 
+   * @returns 
+   */
   static parse(date: RuntimeVal) {
     let result: Date;
     // POD: supports JS implementation rather than JB's
