@@ -1,5 +1,5 @@
 import Scope from "../../runtime/scope";
-import { JbBinary, JbBool, JbString } from "../../runtime/types";
+import { JbBinary, JbBool, JbDate, JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
 import { Func, Parameter, Signature } from "../types";
 
@@ -37,7 +37,7 @@ export class BinaryToHex extends Func {
     return new JbString(bin.toString());
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
+  protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
 }
@@ -75,7 +75,7 @@ export class BinaryToUUID extends Func {
     return new JbString((args[0] as JbBinary).toUUID());
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
+  protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
 }
@@ -105,12 +105,14 @@ export class Bool extends Func {
     this.maxArgs = 1;
   }
   
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    throw new Error("Method not implemented.");
+    
+    // POD: standard conversion rules, no fancy exceptions
+    return new JbBool(args[0].toBool());
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
+  protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
 }
@@ -131,8 +133,12 @@ export class Bool extends Func {
  * If the input is an integer or a double, the input is interpreted as the number of seconds from 12:00:00 AM of 1/1/1970 UTC, the start of the UNIX epoch.
  * 
  * Note that `Date(Long(Now())) == Now()`.
+ * 
+ * In this implementation, supported string formats that do not specify time will be timezone-affected.
+ * 
+ * For instance, `Date("12-12-2023")` will result in `2023-12-11 23:00:00.000` for `GMT+01:00` local timezone.
  */
-export class Date extends Func {
+export class DateFunc extends Func {
   constructor(){
     super();
     this.name = "Date";
@@ -147,12 +153,29 @@ export class Date extends Func {
     this.maxArgs = 1;
   }
 
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    throw new Error("Method not implemented.");
+
+    switch (args[0].type) {
+      case "bool":
+        throw new Error(`Cannot convert a ${args[0].type} to a date object`);
+      case "number":
+        // 'the input is interpreted as the number of seconds'
+        return new JbDate(new Date(Math.round((args[0] as JbNumber).value) * 1000));
+      case "string":
+        // POD: JbDate.parse supports the JS formats rather than JB's
+        return new JbDate(JbDate.parse(args[0] as JbString));
+      case "date":
+        return args[0] as JbDate;
+      case "array":
+      case "binary":
+      case "dictionary":
+      default:
+        throw new Error(`Cannot convert ${args[0].type} object to a date object`);
+    }
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
+  protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
 }
@@ -180,11 +203,17 @@ export class Double extends Func {
     this.maxArgs = 1;
   }
 
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    throw new Error("Method not implemented.");
+    try {
+      return new JbNumber(args[0].toNumber());
+    } catch(e) {
+      console.error(e);
+      return new JbNumber();
+    }
   }
-  protected chooseSignature(args: RuntimeVal[]): void {
+
+  protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
 }
@@ -212,11 +241,16 @@ export class Float extends Func {
     this.maxArgs = 1;
   }
 
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    throw new Error("Method not implemented.");
+    try {
+      return new JbNumber(args[0].toNumber());
+    } catch(e) {
+      console.error(e);
+      return new JbNumber();
+    }
   }
-  protected chooseSignature(args: RuntimeVal[]): void {
+  protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
 }
@@ -256,7 +290,7 @@ export class HexToBinary extends Func {
     return JbBinary.fromHex(hex.value);
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
+  protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
 }
@@ -310,7 +344,7 @@ export class HexToString extends Func {
     }
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
+  protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
 }
@@ -338,12 +372,19 @@ export class Int extends Func {
     this.maxArgs = 1;
   }
 
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    throw new Error("Method not implemented.");
+    // floating-point values obtained from
+    // number-number and string-number conversions are rounded
+    try {
+      return new JbNumber(Math.round(args[0].toNumber()));
+    } catch(e) {
+      console.error(e);
+      return new JbNumber();
+    }
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
+  protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
 }
@@ -371,12 +412,19 @@ export class Long extends Func {
     this.maxArgs = 1;
   }
   
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    throw new Error("Method not implemented.");
+    // floating-point values obtained from
+    // number-number and string-number conversions are rounded
+    try {
+      return new JbNumber(Math.round(args[0].toNumber()));
+    } catch(e) {
+      console.error(e);
+      return new JbNumber();
+    }
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
+  protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
 }
@@ -410,12 +458,14 @@ export class String extends Func {
     this.maxArgs = 1;
   }
 
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    throw new Error("Method not implemented.");
+    // POD: standard conversion rules, no fancy exceptions
+    // e.g. binary type is always returned as a hex string
+    return new JbString(args[0].toString());
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
+  protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
 }
@@ -470,7 +520,7 @@ export class StringToHex extends Func {
     return new JbString(Buffer.from(str.value, encoding).toString("hex").toLowerCase());
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
+  protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
 }
@@ -517,7 +567,7 @@ export class UUIDToBinary extends Func {
     return JbBinary.fromUUID(uuid.value);
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
+  protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
 }

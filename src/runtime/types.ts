@@ -2482,6 +2482,8 @@ export class JbString implements StringVal {
 
   toBool() {
     let parseResult = parseFloat(this.value);
+    // POD: "T"/"t" strings are not supported
+    // see: https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/conversion-functions/#description_2
     return (!Number.isNaN(parseResult) && parseResult !== 0) || this.value === "true";
   }
 

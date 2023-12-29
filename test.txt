@@ -5,8 +5,11 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // tests for LastDayOfMonth function
-  date = LastDayOfMonth(Now());
+  // tests for Date function
+  // should return '1975-08-20 01:15:30.000' (UTC)
+  datetime = Date('August 19, 1975 23:15:30 GMT-02:00');
+  // will return '2023-12-11 23:00:00.000' because of how js Date.parse works (converts to local tz)
+  date = Date("12-12-2023");
   DebugBreak();
   
 </trans>

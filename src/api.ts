@@ -1004,7 +1004,7 @@ export class Api {
       new Conversion.BinaryToHex(),
       new Conversion.BinaryToUUID(),
       new Conversion.Bool(),
-      new Conversion.Date(),
+      new Conversion.DateFunc(),
       new Conversion.Double(),
       new Conversion.Float(),
       new Conversion.HexToBinary(),
