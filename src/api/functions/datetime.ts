@@ -347,6 +347,10 @@ export class GetUTCFormattedDateTime extends Func {
  * The implementation of `LastDayOfMonth` function.
  * 
  * Returns a date object representing the last day of the month for a date object or date string.
+ * 
+ * The supported string formats are shared with the JavaScript `Date` object.
+ * 
+ * In this implementation the result is always UTC-based.
  */
 export class LastDayOfMonth extends Func {
   constructor() {
@@ -356,18 +360,25 @@ export class LastDayOfMonth extends Func {
     this.minArgs = 1;
     this.maxArgs = 1;
     this.signatures = [
-      new Signature("string", [new Parameter("date", "d")]),
-      new Signature("string", [new Parameter("string", "d")])
+      new Signature("date", [new Parameter("date", "d")]),
+      new Signature("date", [new Parameter("string", "d")])
     ];
   }
   
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    throw new Error("Method not implemented.");
+    // TODO: probably uses an implicit conversion to string instead, to be tested
+    if(args[0].type !== "string" && args[0].type !== "date")
+      throw new Error(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+
+    let date = JbDate.parse(args[0]);
+
+    // UTC-based last day of the month
+    return new JbDate(new Date(Date.UTC(date.getFullYear(), date.getMonth() + 1, 0)));
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
-    throw new Error("Method not implemented.");
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
 }
 
@@ -375,6 +386,10 @@ export class LastDayOfMonth extends Func {
  * The implementation of `LongDate` function.
  * 
  * Returns a string in the long date format for a date object or date string.
+ * 
+ * The supported string formats are shared with the JavaScript `Date` object.
+ * 
+ * In this implementation the result is always UTC-based.
  */
 export class LongDate extends Func {
   constructor() {
@@ -474,6 +489,10 @@ export class LongDate extends Func {
  * The implementation of `LongTime` function.
  * 
  * Returns a string in the long time format for a date object or date string.
+ * 
+ * The supported string formats are shared with the JavaScript `Date` object.
+ * 
+ * In this implementation the result is always UTC-based.
  */
 export class LongTime extends Func {
   constructor() {
@@ -510,6 +529,10 @@ export class LongTime extends Func {
  * The implementation of `MediumDate` function.
  * 
  * Returns a string in the medium date format for a date object or date string.
+ * 
+ * The supported string formats are shared with the JavaScript `Date` object.
+ * 
+ * In this implementation the result is always UTC-based.
  */
 export class MediumDate extends Func {
   constructor() {
@@ -576,6 +599,10 @@ export class MediumDate extends Func {
  * The implementation of `MediumTime` function.
  * 
  * Returns a string in the medium time format for a date object or date string.
+ * 
+ * The supported string formats are shared with the JavaScript `Date` object.
+ * 
+ * In this implementation the result is always UTC-based.
  */
 export class MediumTime extends Func {
   constructor() {

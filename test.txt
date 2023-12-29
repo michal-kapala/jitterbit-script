@@ -5,9 +5,8 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // tests for LongDate and LongTime functions
-  date = LongDate(Now());
-  time = LongTime(Now());
+  // tests for LastDayOfMonth function
+  date = LastDayOfMonth(Now());
   DebugBreak();
   
 </trans>
