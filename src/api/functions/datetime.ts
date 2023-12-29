@@ -35,12 +35,12 @@ export class ConvertTimeZone extends Func {
     ];
   }
 
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
     throw new Error(`${this.name} is currently unsupported`);
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
+  protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
 }
@@ -71,13 +71,13 @@ export class CVTDate extends Func {
     ];
   }
 
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error("Method not implemented.");
+    throw new Error(`${this.name} is currently unsupported`);
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
-    throw new Error("Method not implemented.");
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
 }
 
@@ -107,13 +107,13 @@ export class DateAdd extends Func {
     ];
   }
 
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error("Method not implemented.");
+    throw new Error(`${this.name} is currently unsupported`);
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
-    throw new Error("Method not implemented.");
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[args[2].type === "string" ? 1 : 0];
   }
 }
 
@@ -139,7 +139,7 @@ export class DayOfMonth extends Func {
     ];
   }
 
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     // TODO: probably uses an implicit conversion to string instead, to be tested
     if(args[0].type !== "string" && args[0].type !== "date")
@@ -219,13 +219,13 @@ export class FormatDate extends Func {
     ];
   }
 
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error("Method not implemented.");
+    throw new Error(`${this.name} is currently unsupported`);
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
-    throw new Error("Method not implemented.");
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
 }
 
@@ -296,13 +296,13 @@ export class GetUTCFormattedDate extends Func {
     ];
   }
 
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error("Method not implemented.");
+    throw new Error(`${this.name} is currently unsupported`);
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
-    throw new Error("Method not implemented.");
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
 }
 
@@ -333,13 +333,13 @@ export class GetUTCFormattedDateTime extends Func {
     ];
   }
 
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error("Method not implemented.");
+    throw new Error(`${this.name} is currently unsupported`);
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
-    throw new Error("Method not implemented.");
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
 }
 
@@ -697,7 +697,7 @@ export class Now extends Func {
     return new JbDate();
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
+  protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
 }
@@ -724,7 +724,7 @@ export class Now_ extends Func {
     return new JbDate(new Date(), false);
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
+  protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
 }

@@ -3069,7 +3069,7 @@ export class JbDate implements DateVal {
   }
 
   /**
-   * Converts the date to a unified format of `YYYY-MM-DD HH:MM:SS.mmm`.
+   * Converts the date to ISO 8601 format (`YYYY-MM-DD HH:MM:SS.mmm`).
    * @param date 
    * @returns
    */
