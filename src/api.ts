@@ -1,21 +1,22 @@
 import { Func, SystemVariable } from "./api/types";
 import * as Arrays from "./api/functions/array";
-import * as Dicts from "./api/functions/dict";
+import * as Cache from "./api/functions/cache";
 import * as Conversion from "./api/functions/conversion";
+import * as Database from "./api/functions/database";
 import * as Datetime from "./api/functions/datetime";
 import * as Debug from "./api/functions/debug";
-import * as EnvInfo from "./api/functions/envinfo";
-import * as Math from "./api/functions/math";
-import * as XML from "./api/functions/xml";
-import * as Cache from "./api/functions/cache";
-import * as Database from "./api/functions/database";
+import * as Dicts from "./api/functions/dict";
 import * as Diff from "./api/functions/diff";
+import * as Email from "./api/functions/email";
+import * as EnvInfo from "./api/functions/envinfo";
+import * as File from "./api/functions/file";
+import * as Instance from "./api/functions/instance";
 import * as LDAP from "./api/functions/ldap";
+import * as Math from "./api/functions/math";
 import * as NetSuite from "./api/functions/netsuite";
 import * as Salesforce from "./api/functions/salesforce";
-import * as Instance from "./api/functions/instance";
-import * as Email from "./api/functions/email";
-import * as File from "./api/functions/file";
+import * as Text from "./api/functions/text";
+import * as XML from "./api/functions/xml";
 
 type SystemVariables = {
   static: SystemVariable[];
@@ -1154,6 +1155,8 @@ export class Api {
       new Salesforce.SfLookup(),
       new Salesforce.SfLookupAll(),
       new Salesforce.SfLookupAllToFile(),
+      // text
+      new Text.Validate(),
       // xml
       new XML.Attribute(),
       new XML.CreateNode(),
