@@ -389,13 +389,84 @@ export class LongDate extends Func {
     ];
   }
   
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    throw new Error("Method not implemented.");
+    // TODO: probably uses an implicit conversion to string instead, to be tested
+    if(args[0].type !== "string" && args[0].type !== "date")
+      throw new Error(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+
+    let date = JbDate.parse(args[0]);
+
+    // "Saturday, September 16, 2000"
+    return new JbString(`${this.getWeekdayName(date)}, ${this.getMonthName(date)} ${date.getUTCDate()}, ${date.getUTCFullYear()}`);
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
-    throw new Error("Method not implemented.");
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
+  }
+
+  /**
+   * Returns the name of a weekday.
+   * @param date 
+   * @returns 
+   */
+  private getWeekdayName(date: Date) {
+    switch (date.getUTCDay()) {
+      case 0:
+        return "Sunday";
+      case 1:
+        return "Monday";
+      case 2:
+        return "Tuesday";
+      case 3:
+        return "Wednesday";
+      case 4:
+        return "Thursday";
+      case 5:
+        return "Friday";
+      case 6:
+        return "Saturday";
+      default:
+        // NaN
+        throw new Error(`[${this.name} Invalid date]`);
+    }
+  }
+
+  /**
+   * Returns the name of the month.
+   * @param date 
+   * @returns 
+   */
+  private getMonthName(date: Date) {
+    switch (date.getUTCMonth()) {
+      case 0:
+        return "January";
+      case 1:
+        return "February";
+      case 2:
+        return "March";
+      case 3:
+        return "April";
+      case 4:
+        return "May";
+      case 5:
+        return "June";
+      case 6:
+        return "July";
+      case 7:
+        return "August";
+      case 8:
+        return "September";
+      case 9:
+        return "October";
+      case 10:
+        return "November";
+      case 11:
+        return "December";
+      default:
+        // NaN
+        throw new Error(`[${this.name} Invalid date]`);
+    }
   }
 }
 
@@ -417,13 +488,21 @@ export class LongTime extends Func {
     ];
   }
   
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    throw new Error("Method not implemented.");
+    // TODO: probably uses an implicit conversion to string instead, to be tested
+    if(args[0].type !== "string" && args[0].type !== "date")
+      throw new Error(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+
+    let date = JbDate.parse(args[0]);
+
+    // "HH:MM:SS AM/PM"
+    // TODO: leading zero presence to be tested
+    return new JbString(`${date.getUTCHours() < 12 ? date.getUTCHours().toString().padStart(2, '0') : (date.getUTCHours() - 12).toString().padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')}:${date.getUTCSeconds()} ${date.getUTCHours() < 12 ? "AM" : "PM"}`);
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
-    throw new Error("Method not implemented.");
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
 }
 
@@ -445,7 +524,7 @@ export class MediumDate extends Func {
     ];
   }
 
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     // TODO: probably uses an implicit conversion to string instead, to be tested
     if(args[0].type !== "string" && args[0].type !== "date")
@@ -511,7 +590,7 @@ export class MediumTime extends Func {
     ];
   }
 
-  call(args: RuntimeVal[], scope: Scope): RuntimeVal {
+  call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     // TODO: probably uses an implicit conversion to string instead, to be tested
     if(args[0].type !== "string" && args[0].type !== "date")
@@ -524,7 +603,7 @@ export class MediumTime extends Func {
     return new JbString(`${date.getUTCHours() < 12 ? date.getUTCHours().toString().padStart(2, '0') : (date.getUTCHours() - 12).toString().padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')} ${date.getUTCHours() < 12 ? "AM" : "PM"}`);
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
+  protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
 }

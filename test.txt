@@ -5,9 +5,9 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // tests for MediumDate and MediumTime functions
-  date = MediumDate(Now());
-  time = MediumTime(Now());
+  // tests for LongDate and LongTime functions
+  date = LongDate(Now());
+  time = LongTime(Now());
   DebugBreak();
   
 </trans>
