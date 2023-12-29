@@ -5,8 +5,9 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // tests for DayOfMonth and DayOfWeek function (0 for Sundays)
-  DayOfMonth(Now());
-  DayOfWeek(Now());
+  // tests for MediumDate and MediumTime functions
+  date = MediumDate(Now());
+  time = MediumTime(Now());
+  DebugBreak();
   
 </trans>

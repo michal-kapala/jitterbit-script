@@ -447,11 +447,49 @@ export class MediumDate extends Func {
 
   call(args: RuntimeVal[], scope: Scope): RuntimeVal {
     this.chooseSignature(args);
-    throw new Error("Method not implemented.");
+    // TODO: probably uses an implicit conversion to string instead, to be tested
+    if(args[0].type !== "string" && args[0].type !== "date")
+      throw new Error(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+
+    let date = JbDate.parse(args[0]);
+
+    // "DD-Mth-YY"
+    return new JbString(`${date.getUTCDate().toString().padStart(2, '0')}-${this.getShortMonth(date.getUTCMonth())}-${date.getUTCFullYear().toString().substring(2)}`);
   }
 
-  protected chooseSignature(args: RuntimeVal[]): void {
-    throw new Error("Method not implemented.");
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
+  }
+
+  private getShortMonth(month: number) {
+    switch (month) {
+      case 0: 
+        return "Jan";
+      case 1: 
+        return "Feb";
+      case 2: 
+        return "Mar";
+      case 3: 
+        return "Apr";
+      case 4: 
+        return "May";
+      case 5: 
+        return "Jun";
+      case 6: 
+        return "Jul";
+      case 7: 
+        return "Aug";
+      case 8: 
+        return "Sep";
+      case 9: 
+        return "Oct";
+      case 10: 
+        return "Nov";
+      case 11: 
+        return "Dec";
+      default:
+        throw new Error(`[${this.name}] Invalid month: ${month}`);
+    }
   }
 }
 
@@ -475,11 +513,19 @@ export class MediumTime extends Func {
 
   call(args: RuntimeVal[], scope: Scope): RuntimeVal {
     this.chooseSignature(args);
-    throw new Error("Method not implemented.");
+    // TODO: probably uses an implicit conversion to string instead, to be tested
+    if(args[0].type !== "string" && args[0].type !== "date")
+      throw new Error(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+
+    let date = JbDate.parse(args[0]);
+
+    // "HH:MM AM/PM"
+    // TODO: leading zero presence to be tested
+    return new JbString(`${date.getUTCHours() < 12 ? date.getUTCHours().toString().padStart(2, '0') : (date.getUTCHours() - 12).toString().padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')} ${date.getUTCHours() < 12 ? "AM" : "PM"}`);
   }
 
   protected chooseSignature(args: RuntimeVal[]): void {
-    throw new Error("Method not implemented.");
+    this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
 }
 
