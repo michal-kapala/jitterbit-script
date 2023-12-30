@@ -9,6 +9,7 @@ import * as Dicts from "./api/functions/dict";
 import * as Diff from "./api/functions/diff";
 import * as Email from "./api/functions/email";
 import * as EnvInfo from "./api/functions/envinfo";
+import * as Error from "./api/functions/error";
 import * as File from "./api/functions/file";
 import * as Instance from "./api/functions/instance";
 import * as LDAP from "./api/functions/ldap";
@@ -1133,6 +1134,7 @@ export class Api {
       new LDAP.LDAPReplace(),
       new LDAP.LDAPSearch(),
       // log/error
+      new Error.GetLastError(),
       new Log.WriteToOperationLog(),
       // math
       new Math.Ceiling(),
