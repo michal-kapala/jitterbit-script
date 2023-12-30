@@ -2,6 +2,7 @@ import { Func, SystemVariable } from "./api/types";
 import * as Arrays from "./api/functions/array";
 import * as Cache from "./api/functions/cache";
 import * as Conversion from "./api/functions/conversion";
+import * as Crypto from "./api/functions/crypto";
 import * as Database from "./api/functions/database";
 import * as Datetime from "./api/functions/datetime";
 import * as Debug from "./api/functions/debug";
@@ -1017,6 +1018,15 @@ export class Api {
       new Conversion.String(),
       new Conversion.StringToHex(),
       new Conversion.UUIDToBinary(),
+      // crypto
+      new Crypto.AESDecryption(),
+      new Crypto.AESEncryption(),
+      new Crypto.Base64Decode(),
+      new Crypto.Base64Encode(),
+      new Crypto.Base64EncodeFile(),
+      new Crypto.MD5(),
+      new Crypto.MD5AsTwoNumbers(),
+      new Crypto.SHA256(),
       // database
       new Database.CacheLookup(),
       new Database.CallStoredProcedure(),
