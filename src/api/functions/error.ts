@@ -1,5 +1,5 @@
 import Scope from "../../runtime/scope";
-import { JbString } from "../../runtime/types";
+import { JbNull, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
 import { Func, Parameter, Signature } from "../types";
 import { NamedError } from "../../errors";
@@ -83,6 +83,38 @@ export class RaiseError extends Func {
     scope.assignVar("$jitterbit.operation.previous.error", scope.lookupVar("$jitterbit.operation.last_error"));
     scope.assignVar("$jitterbit.operation.last_error", err);
     throw new NamedError(err.value, this.name);
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `ResetLastError` function.
+ * 
+ * Sets the last error to an empty string. This is identical to calling `SetLastError("")`.
+ * 
+ * See also the function `SetLastError`.
+ */
+export class ResetLastError extends Func {
+  constructor() {
+    super();
+    this.name = "ResetLastError";
+    this.module = "log/error";
+    this.signatures = [
+      new Signature("void", [])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 0;
+    this.maxArgs = 0;
+  }
+
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // $jitterbit.operation.previous.error is not affected
+    scope.assignVar("$jitterbit.operation.last_error", new JbString());
+    return new JbNull();
   }
 
   protected chooseSignature(args: RuntimeVal[]) {

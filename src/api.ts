@@ -1136,6 +1136,7 @@ export class Api {
       // log/error
       new Error.GetLastError(),
       new Error.RaiseError(),
+      new Error.ResetLastError(),
       new Log.WriteToOperationLog(),
       // math
       new Math.Ceiling(),
