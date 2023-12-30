@@ -1135,6 +1135,7 @@ export class Api {
       new LDAP.LDAPSearch(),
       // log/error
       new Error.GetLastError(),
+      new Error.RaiseError(),
       new Log.WriteToOperationLog(),
       // math
       new Math.Ceiling(),

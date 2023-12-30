@@ -1,7 +1,8 @@
 import Scope from "../../runtime/scope";
 import { JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
-import { Func, Signature } from "../types";
+import { Func, Parameter, Signature } from "../types";
+import { NamedError } from "../../errors";
 
 /**
  * The implementation of `GetLastError` function.
@@ -19,6 +20,8 @@ import { Func, Signature } from "../types";
  * - `$jitterbit.operation.last_error`
  * 
  * See also the `RaiseError` function.
+ * 
+ * This implementation retrieves the value of `$jitterbit.operation.last_error`.
  */
 export class GetLastError extends Func {
   constructor() {
@@ -36,9 +39,52 @@ export class GetLastError extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     // POD: use of operation system variable
+    // TODO: all errors should be preceded with setting of this variable
     return new JbString(scope.lookupVar("$jitterbit.operation.last_error").toString());
   }
   
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `RaiseError` function.
+ * 
+ * Causes a script or transformation to fail, and the contents of the parameter message
+ * to be displayed in the error log.
+ * 
+ * The entire text written to the error log will be:
+ * 
+ * `RaiseError: <message>`
+ * 
+ * This implementation updates error system variables:
+ * - `$jitterbit.operation.previous.error`
+ * - `$jitterbit.operation.last_error`
+ */
+export class RaiseError extends Func {
+  constructor() {
+    super();
+    this.name = "RaiseError";
+    this.module = "log/error";
+    this.signatures = [
+      new Signature("void", [
+        new Parameter("string", "message")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+
+  call(args: RuntimeVal[], scope: Scope): never {
+    this.chooseSignature(args);
+    const err = new JbString(args[0].toString());
+    scope.assignVar("$jitterbit.operation.previous.error", scope.lookupVar("$jitterbit.operation.last_error"));
+    scope.assignVar("$jitterbit.operation.last_error", err);
+    throw new NamedError(err.value, this.name);
+  }
+
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
