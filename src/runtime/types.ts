@@ -2663,7 +2663,7 @@ export class JbString implements StringVal {
   binopBool(operator: string, rhs: JbBool) {
     switch (operator) {
       case "+":
-        new JbString(this.value + rhs.toString());
+        return new JbString(this.value + rhs.toString());
       case "-":
         throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
       case "*":

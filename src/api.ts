@@ -12,6 +12,7 @@ import * as EnvInfo from "./api/functions/envinfo";
 import * as File from "./api/functions/file";
 import * as Instance from "./api/functions/instance";
 import * as LDAP from "./api/functions/ldap";
+import * as Log from "./api/functions/log";
 import * as Math from "./api/functions/math";
 import * as NetSuite from "./api/functions/netsuite";
 import * as Salesforce from "./api/functions/salesforce";
@@ -1131,6 +1132,8 @@ export class Api {
       new LDAP.LDAPRename(),
       new LDAP.LDAPReplace(),
       new LDAP.LDAPSearch(),
+      // log/error
+      new Log.WriteToOperationLog(),
       // math
       new Math.Ceiling(),
       new Math.Exp(),

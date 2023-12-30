@@ -5,7 +5,7 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // tests for Validate function
-  Validate("Gt", "abcd1234", true);
+  // tests for WriteToOperationLog function
+  msg = WriteToOperationLog($niceTokenLol);
   
 </trans>
