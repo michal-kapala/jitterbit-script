@@ -5,11 +5,13 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // tests for GetLastError, RaiseError and ResetLastError functions
+  // tests for the error functions
   RaiseError("this is bad innit");
   err = GetLastError();
   ResetLastError();
   lastErr = GetLastError();
+  SetLastError("this is good innit");
+  lastLastErr = GetLastError();
   DebugBreak();
   
 </trans>

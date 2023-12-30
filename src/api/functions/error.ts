@@ -121,3 +121,41 @@ export class ResetLastError extends Func {
     this.signature = this.signatures[0];
   }
 }
+
+/**
+ * The implementation of `SetLastError` function.
+ * 
+ * Sets a user-defined last error. The message will be logged as a warning
+ * and the `GetLastError` function will return the message unless another error occurs.
+ * 
+ * See also the function `ResetLastError`, which performs the same action of setting
+ * the last error but without logging a message.
+ */
+export class SetLastError extends Func {
+  constructor() {
+    super();
+    this.name = "SetLastError";
+    this.module = "log/error";
+    this.signatures = [
+      new Signature("void", [
+        new Parameter("string", "message")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    const err = new JbString(args[0].toString());
+    // $jitterbit.operation.previous.error is not affected
+    scope.assignVar("$jitterbit.operation.last_error", err);
+    console.warn(`[${this.name}] Warning: ${err.value}`);
+    return new JbNull();
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
