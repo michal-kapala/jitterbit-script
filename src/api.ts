@@ -19,6 +19,7 @@ import * as Log from "./api/functions/log";
 import * as Math from "./api/functions/math";
 import * as NetSuite from "./api/functions/netsuite";
 import * as Salesforce from "./api/functions/salesforce";
+import * as String from "./api/functions/string";
 import * as Text from "./api/functions/text";
 import * as XML from "./api/functions/xml";
 
@@ -1212,6 +1213,8 @@ export class Api {
       new Salesforce.SfLookup(),
       new Salesforce.SfLookupAll(),
       new Salesforce.SfLookupAllToFile(),
+      // string
+      new String.CountSubString(),
       // text
       new Text.Validate(),
       // xml

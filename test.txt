@@ -6,9 +6,6 @@
   lol nice';
 
   // tests for Random function, order-proof
-  rnd = Random(10, 15);
-  // test for RandomString function
-  rndStr = RandomString(rnd);
-  DebugBreak();
+  nb = CountSubString("xdxdxd", "xd");
   
 </trans>
