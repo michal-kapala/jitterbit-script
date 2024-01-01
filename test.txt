@@ -5,7 +5,10 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // tests for the crypto module functions
-  MD5("text");
+  // tests for Random function, order-proof
+  rnd = Random(10, 15);
+  // test for RandomString function
+  rndStr = RandomString(rnd);
+  DebugBreak();
   
 </trans>

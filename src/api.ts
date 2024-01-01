@@ -12,6 +12,7 @@ import * as Email from "./api/functions/email";
 import * as EnvInfo from "./api/functions/envinfo";
 import * as Error from "./api/functions/error";
 import * as File from "./api/functions/file";
+import * as General from "./api/functions/general";
 import * as Instance from "./api/functions/instance";
 import * as LDAP from "./api/functions/ldap";
 import * as Log from "./api/functions/log";
@@ -1118,6 +1119,44 @@ export class Api {
       new File.FlushFile(),
       new File.ReadFile(),
       new File.WriteFile(),
+      // general
+      new General.ArgumentList(),
+      new General.AutoNumber(),
+      new General.CancelOperation(),
+      new General.CancelOperationChain(),
+      new General.Eval(),
+      new General.Get(),
+      new General.GetChunkDataElement(),
+      new General.GetHostByIP(),
+      new General.GetInputString(),
+      new General.GetLastOperationRunStartTime(),
+      new General.GetName(),
+      new General.GetOperationQueue(),
+      new General.GetServerName(),
+      new General.GUID(),
+      new General.IfEmpty(),
+      new General.IfNull(),
+      new General.InList(),
+      new General.InitCounter(),
+      new General.IsInteger(),
+      new General.IsNull(),
+      new General.IsValid(),
+      new General.Length(),
+      new General.Null(),
+      new General.Random(),
+      new General.RandomString(),
+      new General.ReRunOperation(),
+      new General.ReadArrayString(),
+      new General.RecordCount(),
+      new General.RunOperation(),
+      new General.RunPlugin(),
+      new General.RunScript(),
+      new General.Set(),
+      new General.SetChunkDataElement(),
+      new General.Sleep(),
+      new General.SourceInstanceCount(),
+      new General.TargetInstanceCount(),
+      new General.WaitForOperation(),
       // instance
       new Instance.Count(),
       new Instance.CountSourceRecords(),
