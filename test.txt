@@ -5,7 +5,7 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // tests for Random function, order-proof
-  nb = CountSubString("xdxdxd", "xd");
+  // tests for DQuote function, order-proof
+  dquoted = DQuote("xdxdxd");
   
 </trans>

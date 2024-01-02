@@ -1215,6 +1215,7 @@ export class Api {
       new Salesforce.SfLookupAllToFile(),
       // string
       new String.CountSubString(),
+      new String.DQuote(),
       // text
       new Text.Validate(),
       // xml

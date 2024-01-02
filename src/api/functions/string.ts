@@ -37,3 +37,35 @@ export class CountSubString extends Func {
     this.signature = this.signatures[0];
   }
 }
+
+/**
+ * The implementation of `DQuote` function.
+ * 
+ * Places a string in double quotes and returns the result.
+ * Embedded double quotes are not escaped.
+ */
+export class DQuote extends Func {
+  constructor() {
+    super();
+    this.name = "DQuote";
+    this.module = "string";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("string", "str")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // implicit conversion
+    return new JbString(`"${args[0].toString()}"`);
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
