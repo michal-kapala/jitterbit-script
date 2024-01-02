@@ -1222,6 +1222,7 @@ export class Api {
       new String.Left(),
       new String.LPad(),
       new String.LPadChar(),
+      new String.LTrim(),
       // text
       new Text.Validate(),
       // xml

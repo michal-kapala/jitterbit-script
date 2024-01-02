@@ -334,3 +334,35 @@ export class LPadChar extends Func {
     this.signature = this.signatures[0];
   }
 }
+
+/**
+ * The implementation of `LTrim` function.
+ * 
+ * Removes whitespace (spaces, tabs) from the left (the beginning) of a string
+ * and returns the remaining characters.
+ */
+export class LTrim extends Func {
+  constructor() {
+    super();
+    this.name = "LTrim";
+    this.module = "string";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("string", "str")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // implicit conversions
+    return new JbString(args[0].toString().trimStart());
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
