@@ -1226,6 +1226,7 @@ export class Api {
       new String.LTrimChars(),
       new String.Mid(),
       new String.ParseURL(),
+      new String.Quote(),
       // text
       new Text.Validate(),
       // xml

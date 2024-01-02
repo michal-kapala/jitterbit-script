@@ -5,8 +5,8 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // tests for ParseURL function, should return '{john1990@example.com,John Smith}'
-  params = ParseURL("http://hostname/user?email=john1990%40example.com&name=John%20Smith");
+  // tests for Quote function, should return "'xdxdxd'"
+  quoted = Quote("xdxdxd");
   DebugBreak();
   
 </trans>

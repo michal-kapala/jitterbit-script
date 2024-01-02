@@ -508,3 +508,35 @@ export class ParseURL extends Func {
     this.signature = this.signatures[0];
   }
 }
+
+/**
+ * The implementation of `Quote` function.
+ * 
+ * Places a string in single quotes and returns the result.
+ * Embedded single quotes are not escaped.
+ */
+export class Quote extends Func {
+  constructor() {
+    super();
+    this.name = "Quote";
+    this.module = "string";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("string", "str")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // implicit conversion
+    return new JbString(`'${args[0].toString()}'`);
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
