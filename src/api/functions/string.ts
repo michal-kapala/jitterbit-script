@@ -274,9 +274,59 @@ export class LPad extends Func {
       return new JbString(str.substring(0, n));
 
     let result = str;
-    for(let i = 0; i < n - str.length; i++) {
+    for(let i = 0; i < n - str.length; i++)
       result = " " + result;
-    }
+    return new JbString(result);
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `LPadChar` function.
+ * 
+ * Adds a padding character to the left (the beginning) of a string until the string
+ * contains `n` characters.
+ * Strings containing `n` or more characters are truncated to `n` characters.
+ * 
+ * `LPadChar(str, " ", n)` is the same as `LPad(str, n)`. See the `LPad` function.
+ */
+export class LPadChar extends Func {
+  constructor() {
+    super();
+    this.name = "LPadChar";
+    this.module = "string";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("string", "str"),
+        new Parameter("string", "padChar"),
+        new Parameter("number", "n"),
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 3;
+    this.maxArgs = 3;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // implicit conversions
+    const str = args[0].toString();
+    const char = args[1].toString();
+    const n = args[2].toNumber();
+
+    if(str.length >= n)
+      return new JbString(str.substring(0, n));
+
+    if(char === "")
+      return new JbString(str);
+
+    let result = str;
+    for(let i = 0; i < n - str.length; i++)
+      result = char[0] + result;
+
     return new JbString(result);
   }
 

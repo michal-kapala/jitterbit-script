@@ -1221,6 +1221,7 @@ export class Api {
       new String.IsValidString(),
       new String.Left(),
       new String.LPad(),
+      new String.LPadChar(),
       // text
       new Text.Validate(),
       // xml

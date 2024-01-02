@@ -5,10 +5,8 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // tests for IsValidString, Left and LPad functions
-  valid = IsValidString("is this valid?? €");
-  left = Left("get me out of this", 6);
-  padded = LPad("xdxdxd", 9);
+  // tests for LPadChar function, should return "@@@xdxdxd"
+  padded = LPadChar("xdxdxd", "@#", 9);
   DebugBreak();
   
 </trans>
