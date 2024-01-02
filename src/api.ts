@@ -1223,6 +1223,7 @@ export class Api {
       new String.LPad(),
       new String.LPadChar(),
       new String.LTrim(),
+      new String.LTrimChars(),
       // text
       new Text.Validate(),
       // xml

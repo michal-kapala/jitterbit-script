@@ -366,3 +366,57 @@ export class LTrim extends Func {
     this.signature = this.signatures[0];
   }
 }
+
+/**
+ * The implementation of `LTrimChars` function.
+ * 
+ * Removes any leading characters in a string from the left (the beginning) that match those in
+ * the trimming characters and returns the remaining characters.
+ * 
+ * This function tests each leading character of a string, beginning on the left edge, and
+ * sees if it is found in the trim characters.
+ * If it does, it is removed, and the process repeated until there is no longer a match.
+ * 
+ * This can be used to trim characters other than the default whitespace characters,
+ * such as trimming leading colons.
+ * 
+ * See also the `RTrimChars` and `TrimChars` functions.
+ */
+export class LTrimChars extends Func {
+  constructor() {
+    super();
+    this.name = "LTrimChars";
+    this.module = "string";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("string", "str"),
+        new Parameter("string", "trimChars")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 2;
+    this.maxArgs = 2;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // implicit conversions
+    const str = args[0].toString();
+    const trimChars = args[1].toString();
+    let strIdx = 0;
+    
+    outer:
+    for(; strIdx < str.length; strIdx++) {
+      for(let charIdx = 0; charIdx < trimChars.length; charIdx++) {
+        if(str[strIdx] === trimChars[charIdx])
+          continue outer;
+      }
+      break;
+    }
+    return new JbString(str.substring(strIdx));
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
