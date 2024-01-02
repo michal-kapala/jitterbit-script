@@ -5,8 +5,8 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // tests for LTrimChars function, should return "xdxdxd@"
-  trimmed = LTrimChars("@#$xdxdxd@", "$#@");
+  // tests for Mid function, should return 'xdxdxd'
+  mid = Mid("@#$xdxdxd@", 3, 9);
   DebugBreak();
   
 </trans>

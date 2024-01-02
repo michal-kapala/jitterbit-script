@@ -404,7 +404,7 @@ export class LTrimChars extends Func {
     const str = args[0].toString();
     const trimChars = args[1].toString();
     let strIdx = 0;
-    
+
     outer:
     for(; strIdx < str.length; strIdx++) {
       for(let charIdx = 0; charIdx < trimChars.length; charIdx++) {
@@ -414,6 +414,36 @@ export class LTrimChars extends Func {
       break;
     }
     return new JbString(str.substring(strIdx));
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
+
+export class Mid extends Func {
+  constructor() {
+    super();
+    this.name = "Mid";
+    this.module = "string";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("string", "str"),
+        new Parameter("number", "m"),
+        new Parameter("number", "n"),
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 3;
+    this.maxArgs = 3;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // implicit conversions
+    return new JbString(
+      args[0].toString().substring(args[1].toNumber(), args[2].toNumber())
+    );
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
