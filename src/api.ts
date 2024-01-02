@@ -1216,6 +1216,11 @@ export class Api {
       // string
       new String.CountSubString(),
       new String.DQuote(),
+      new String.Format(),
+      new String.Index(),
+      new String.IsValidString(),
+      new String.Left(),
+      new String.LPad(),
       // text
       new Text.Validate(),
       // xml

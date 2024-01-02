@@ -5,7 +5,10 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // tests for DQuote function, order-proof
-  dquoted = DQuote("xdxdxd");
+  // tests for IsValidString, Left and LPad functions
+  valid = IsValidString("is this valid?? €");
+  left = Left("get me out of this", 6);
+  padded = LPad("xdxdxd", 9);
+  DebugBreak();
   
 </trans>
