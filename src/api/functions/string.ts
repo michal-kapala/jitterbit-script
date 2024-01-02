@@ -1,5 +1,5 @@
 import Scope from "../../runtime/scope";
-import { JbBool, JbNumber, JbString } from "../../runtime/types";
+import { Array, JbBool, JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
 import { Func, Parameter, Signature } from "../types";
 
@@ -421,6 +421,14 @@ export class LTrimChars extends Func {
   }
 }
 
+/**
+ * The implementation of `Mid` function.
+ * 
+ * Returns a portion of a string, starting with the character at position `m` for a length
+ * of `n` characters.
+ * 
+ * See also the `Left` and `Right` functions.
+ */
 export class Mid extends Func {
   constructor() {
     super();
@@ -444,6 +452,56 @@ export class Mid extends Func {
     return new JbString(
       args[0].toString().substring(args[1].toNumber(), args[2].toNumber())
     );
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `ParseURL` function.
+ * 
+ * Parses a URL string and returns an array of decoded parameter values.
+ * ~~The values are tagged so that they can be retrieved either by index or by field name.~~
+ * ~~When retrieving values from the result, the case of a field name is ignored.~~
+ * 
+ * See also the `URLDecode` and `URLEncode` functions.
+ * 
+ * **Note**: This implementation returns an empty array if the URL is invalid.
+ * Only index-based member access is supported.
+ */
+export class ParseURL extends Func {
+  constructor() {
+    super();
+    this.name = "ParseURL";
+    this.module = "string";
+    this.signatures = [
+      new Signature("array", [
+        new Parameter("string", "url")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // implicit conversions
+    const urlStr = args[0].toString();
+    const result = new Array()
+    // URL.canParse was added in 2023
+    // see: https://github.com/nodejs/node/pull/47179
+    try {
+      const url = new URL(urlStr);
+      for(const param of url.searchParams)
+        result.members.push(new JbString(decodeURIComponent(param[1])))
+    }
+    catch(e) {
+      console.error(`[${this.name}] URL parsing error: '${urlStr}'`);
+    }
+    return result;  
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
