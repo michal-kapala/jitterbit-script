@@ -5,8 +5,12 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // tests for Quote function, should return "'xdxdxd'"
-  quoted = Quote("xdxdxd");
+  // tests for RegExMatch function
+  // should return 4
+  // should assign $dummy = "[abc]", $value = "[", $value2 = "abc", $value3 = "]"
+  // value4 should not get assigned
+  // this impl matches the whole string as 1st, compare with JB example in the docs
+  result = RegExMatch("[abc]", "(\\[)(.*)(\\])", "dummy", "value", "value2", "value3", "value4");
   DebugBreak();
   
 </trans>

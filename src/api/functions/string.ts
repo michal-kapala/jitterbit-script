@@ -540,3 +540,80 @@ export class Quote extends Func {
     this.signature = this.signatures[0];
   }
 }
+
+/**
+ * The implementation of `RegExMatch` function.
+ * 
+ * Matches a regular expression with an input string, stores the marked sub-expressions
+ * in variables, and returns the number of matches.
+ * 
+ * Returns the total number of marked sub-expressions (which could be more or less than
+ * the number of variables actually supplied).
+ * Any additional matches that exceed the number of variables supplied are discarded.
+ * If there are no matches, `-1` is returned.
+ * 
+ * ~~The regular expression follows the *Boost* regular expression library syntax.~~
+ * It is a variation of the Perl regular expression syntax.
+ * 
+ * Unicode characters, including symbols such as emoji, must be matched using their
+ * literal characters and not using Unicode escape sequences.
+ * For example, the range [😀-🤯] (`U+1F600` to `U+1F92F`) successfully captures the 🤔 (`U+1F914`) symbol in between.
+ * 
+ * See also the `RegExReplace` function.
+ * 
+ * This implementation uses JavaScript regex syntax, which should be in major part
+ * compatible with the original *Boost* dialect.
+ * 
+ * The first match is used for variable assignments, subsequent capture groups
+ * are assigned as values.
+ * 
+ * Supports up to 100-argument calls.
+ */
+export class RegExMatch extends Func {
+  constructor() {
+    super();
+    this.name = "RegExMatch";
+    this.module = "string";
+    this.signatures = [
+      new Signature("number", [
+        new Parameter("string", "str"),
+        new Parameter("string", "exp"),
+        new Parameter("type", "varN", false),
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 2;
+    this.maxArgs = 100;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    const matches = [...(args[0] as JbString).toString().matchAll(
+      new RegExp((args[1] as JbString).toString(), 'g')
+    )];
+
+    if(matches.length == 0)
+      return new JbNumber(-1);
+
+    if(args.length > 2) {
+      // POD: the original impl skips the first match
+      // for the example:
+      // result = RegExMatch("[abc]", "(\\[)(.*)(\\])", "dummy", "value");
+      // the agent performs: $dummy = "["; $value = "abc"; (returns 3)
+      // this impl performs: $dummy = "[abc]"; $value = "["; (returns 4)
+      let matchIdx = 0;
+      for(let idx = 2; idx < args.length; idx++) {
+        if(matchIdx < matches[0].length) {
+          scope.assignVar(`$${args[idx].toString()}`, new JbString(matches[0][matchIdx]))
+          matchIdx++;
+        }
+        else break;
+      }
+    }
+    return new JbNumber(matches[0].length);
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
