@@ -5,9 +5,12 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // tests for URLDecode function, should return "John Smith"
-  url = "http://hostname/user?email=john1990%40gmail.com&name=John%20Smith";
-  param = URLDecode(url, "name");
+  // tests for URLEncode function
+  // should return "http://hostname/get_doc?name1=FIRST%23&name2=%3CLAST%3E"
+  value1 = "FIRST#"; value2 = "<LAST>";
+  url = "http://hostname/get_doc?" +
+    "name1=" + URLEncode(value1) +
+    "&name2=" + URLEncode(value2);
   DebugBreak();
   
 </trans>

@@ -1245,6 +1245,7 @@ export class Api {
       new String.TrimChars(),
       new String.Truncate(),
       new String.URLDecode(),
+      new String.URLEncode(),
       // text
       new Text.Validate(),
       // xml

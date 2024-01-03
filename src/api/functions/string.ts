@@ -1329,3 +1329,51 @@ export class URLDecode extends Func {
     this.signature = this.signatures[0];
   }
 }
+
+/**
+ * The implementation of `URLEncode` function.
+ * 
+ * Encodes a string following RFC 1738.
+ * 
+ * Valid values for the optional encoding option are:
+ * 
+ * - `0`: Standard URL encoding. Encodes ASCII control characters, non-ASCII characters,
+ * "reserved" characters, and "unsafe" characters.
+ * This is the default encoding if the option is omitted.
+ * - `1`: Don't encode "unsafe" characters: " `< > ; # % { } | \ ^ ~ [ ]`, backtick and the space character
+ * - `2`: Don't encode "reserved" characters: `; / ? : @ & =`
+ * - `3`: Don't encode "unsafe" characters and "reserved" characters
+ * 
+ * These characters are considered "safe" and are never encoded: `$ - _ . + ! * ' ( ) ,`
+ * 
+ * See also the `ParseURL` and `URLDecode` functions.
+ * 
+ * This implementation does not honor the encoding option, all strings are encoded using JavaScript's `encodeURIComponent`.
+ */
+export class URLEncode extends Func {
+  constructor() {
+    super();
+    this.name = "URLEncode";
+    this.module = "string";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("string", "url"),
+        new Parameter("number", "encodingOption", false, new JbNumber(0))
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 2;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // implicit conversions
+    // POD: no encoding options
+    return new JbString(encodeURIComponent(args[0].toString()));
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
