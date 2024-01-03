@@ -5,8 +5,8 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // tests for Right function, should return "Tuesday"
-  right = Right("Monday Tuesday", 7);
+  // tests for RPad function, should return "xdxdxd   "
+  padded = RPad("xdxdxd", 9);
   DebugBreak();
   
 </trans>

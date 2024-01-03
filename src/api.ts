@@ -1231,6 +1231,7 @@ export class Api {
       new String.RegExReplace(),
       new String.Replace(),
       new String.Right(),
+      new String.RPad(),
       // text
       new Text.Validate(),
       // xml

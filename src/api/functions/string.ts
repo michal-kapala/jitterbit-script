@@ -247,7 +247,7 @@ export class Left extends Func {
  * Adds spaces to the left (the beginning) of a string until the string contains `n` characters.
  * Strings containing `n` or more characters are truncated to `n` characters.
  * 
- * `LPad(str, -n)` is the same as `RPad(str, n)`. See the `RPad` function.
+ * ~~`LPad(str, -n)` is the same as `RPad(str, n)`.~~ See the `RPad` function.
  */
 export class LPad extends Func {
   constructor() {
@@ -739,6 +739,49 @@ export class Right extends Func {
     return new JbString(
       str.substring(str.length - args[1].toNumber(), str.length)
     );
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `RPad` function.
+ * 
+ * Adds spaces to the right (the end) of a string until the string contains `n` characters.
+ * Strings containing `n` or more characters are truncated to `n` characters.
+ * 
+ * ~~`RPad(str, -n)` is the same as `LPad(str, n)`.~~ See the `LPad` function.
+ */
+export class RPad extends Func {
+  constructor() {
+    super();
+    this.name = "RPad";
+    this.module = "string";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("string", "str"),
+        new Parameter("number", "n"),
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 2;
+    this.maxArgs = 2;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // implicit conversions
+    const str = args[0].toString();
+    const n = args[1].toNumber();
+    if(str.length >= n)
+      return new JbString(str.substring(str.length - n, str.length));
+
+    let result = str;
+    for(let i = str.length; i > n - str.length; i--)
+      result = result + " ";
+    return new JbString(result);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
