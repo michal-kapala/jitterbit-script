@@ -1235,6 +1235,7 @@ export class Api {
       new String.RPadChar(),
       new String.RTrim(),
       new String.RTrimChars(),
+      new String.Split(),
       // text
       new Text.Validate(),
       // xml

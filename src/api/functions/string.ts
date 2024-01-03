@@ -924,3 +924,51 @@ export class RTrimChars extends Func {
     this.signature = this.signatures[0];
   }
 }
+
+/**
+ * The implementation of `Split` function.
+ * 
+ * Splits a string using a delimiter string, returning the result as an array.
+ * 
+ * Returns the result in an array of size equal to the number of delimiters plus one.
+ * If the expression ends with the delimiter, the array size is equal to
+ * the number of delimiters (the last empty value is ignored).
+ * If the string contains no delimiters, an array of size one is returned containing
+ * the original string.
+ */
+export class Split extends Func {
+  constructor() {
+    super();
+    this.name = "Split";
+    this.module = "string";
+    this.signatures = [
+      new Signature("array", [
+        new Parameter("string", "str"),
+        new Parameter("string", "delimiter")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 2;
+    this.maxArgs = 2;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // implicit conversions
+    let str = args[0].toString();
+    const delimiter = args[1].toString();
+    const result = new Array();
+
+    for(const s of str.split(delimiter))
+      result.members.push(new JbString(s));
+    
+    if((result.members[result.members.length - 1] as JbString).value === "")
+      result.members.pop();
+
+    return result;
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
