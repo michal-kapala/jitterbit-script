@@ -5,8 +5,8 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // tests for RPadChar function, should return "xdxdxd@@@"
-  padded = RPadChar("xdxdxd", "@", 9);
-  DebugBreak();
+  // tests for RTrim function, should return "  xdxdxd"
+  padded = RTrim("  xdxdxd  
+    ");
   
 </trans>

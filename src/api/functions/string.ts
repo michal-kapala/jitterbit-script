@@ -838,3 +838,35 @@ export class RPadChar extends Func {
     this.signature = this.signatures[0];
   }
 }
+
+/**
+ * The implementation of `RTrim` function.
+ * 
+ * Removes whitespace (spaces, tabs) from the right (the end) of a string
+ * and returns the remaining characters.
+ */
+export class RTrim extends Func {
+  constructor() {
+    super();
+    this.name = "RTrim";
+    this.module = "string";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("string", "str")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // implicit conversion
+    return new JbString(args[0].toString().trimEnd());
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}

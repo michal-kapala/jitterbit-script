@@ -1233,6 +1233,7 @@ export class Api {
       new String.Right(),
       new String.RPad(),
       new String.RPadChar(),
+      new String.RTrim(),
       // text
       new Text.Validate(),
       // xml
