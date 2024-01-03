@@ -617,3 +617,93 @@ export class RegExMatch extends Func {
     this.signature = this.signatures[0];
   }
 }
+
+/**
+ * The implementation of `RegExReplace` function.
+ * 
+ * Replaces all sub-strings in a string that match an expression, using a specifed format
+ * to replace each sub-string.
+ * Any sections of the string that do not match the expression are passed through
+ * to the returned string unchanged.
+ * 
+ * ~~The regular expression follows the Boost regular expression library syntax.~~
+ * It is a variation of the Perl regular expression syntax.
+ * 
+ * Unicode characters, including symbols such as emoji, must be matched using
+ * their literal characters and not using Unicode escape sequences.
+ * For example, the range [😀-🤯] (`U+1F600` to `U+1F92F`) successfully captures
+ * the 🤔 (`U+1F914`) symbol in between.
+ * 
+ * The format string follows the Boost-Extended Format String Syntax.
+ * If the format string is an empty string (`""`) then a match produces
+ * no result for that sub-string.
+ * 
+ * See also the `RegExMatch` function.
+ */
+export class RegExReplace extends Func {
+  constructor() {
+    super();
+    this.name = "RegExReplace";
+    this.module = "string";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("string", "str"),
+        new Parameter("string", "exp"),
+        new Parameter("string", "format"),
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 3;
+    this.maxArgs = 3;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope): never {
+    this.chooseSignature(args);
+    throw new Error(`${this.name} is currently unsupported`);
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `Replace` function.
+ * 
+ * Searches a string for sub-strings matching the `old` argument and replaces a matching
+ * sub-string with the `new` argument.
+ * 
+ * For more complex search and replace operations, see the `RegExReplace` function.
+ */
+export class Replace extends Func {
+  constructor() {
+    super();
+    this.name = "Replace";
+    this.module = "string";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("string", "str"),
+        new Parameter("string", "old"),
+        new Parameter("string", "new")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 3;
+    this.maxArgs = 3;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // implicit conversions
+    return new JbString(
+      args[0].toString().replaceAll(
+        args[1].toString(),
+        args[2].toString()
+      )
+    );
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}

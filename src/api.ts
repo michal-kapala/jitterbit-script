@@ -1228,6 +1228,8 @@ export class Api {
       new String.ParseURL(),
       new String.Quote(),
       new String.RegExMatch(),
+      new String.RegExReplace(),
+      new String.Replace(),
       // text
       new Text.Validate(),
       // xml
