@@ -5,10 +5,8 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // test for Trim function, should return "xdxdxd"
-  padded = Trim("  
-  xdxdxd  
-    ");
+  // tests for TrimChars function, should return "xdxdxd"
+  trimmed = TrimChars("@#$xdxdxd@", "$#@");
   DebugBreak();
   
 </trans>

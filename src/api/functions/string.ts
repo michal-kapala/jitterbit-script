@@ -1183,3 +1183,71 @@ export class Trim extends Func {
     this.signature = this.signatures[0];
   }
 }
+
+/**
+ * The implementation of `TrimChars` function.
+ * 
+ * Removes any leading or trailing characters in a string that match those
+ * in the trimming characters and returns the remaining characters.
+ * 
+ * This function tests each leading and trailing character of a string and sees if
+ * it is found in the trim characters.
+ * If it does, it is removed, and the process repeated until there are no longer any matches.
+ * 
+ * This can be used to trim characters other than the default whitespace characters,
+ * such as trimming colons.
+ * 
+ * See also the `LTrimChars` and `RTrimChars` functions.
+ */
+export class TrimChars extends Func {
+  constructor() {
+    super();
+    this.name = "TrimChars";
+    this.module = "string";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("string", "str"),
+        new Parameter("string", "trimChars")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 2;
+    this.maxArgs = 2;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // implicit conversions
+    const str = args[0].toString();
+    const trimChars = args[1].toString();
+    let strIdx = 0;
+
+    outer:
+    for(; strIdx < str.length; strIdx++) {
+      for(let charIdx = 0; charIdx < trimChars.length; charIdx++) {
+        if(str[strIdx] === trimChars[charIdx])
+          continue outer;
+      }
+      break;
+    }
+
+    const start = strIdx;
+
+    strIdx = str.length - 1;
+
+    outer:
+    for(; strIdx >= 0; strIdx--) {
+      for(let charIdx = 0; charIdx < trimChars.length; charIdx++) {
+        if(str[strIdx] === trimChars[charIdx])
+          continue outer;
+      }
+      break;
+    }
+
+    return new JbString(str.substring(start, strIdx + 1));
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
