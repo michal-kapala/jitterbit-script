@@ -1,16 +1,9 @@
 <trans>
-  // test for Case function
-  Case(
-    false,
-    WriteToOperationLog("false branch");
-    err = "not this one",
-
-    !false,
-    WriteToOperationLog("true branch");
-    success = "expr blocks are working",
-
-    err == "not this one",
-    err = "neither this one"
+  // test for While function
+  count = 0;
+  While(count < 10,
+    WriteToOperationLog("count is " + count);
+    count++
   );
 
   DebugBreak();

@@ -100,3 +100,52 @@ export class If extends DeferrableFunc {
     this.signature = this.signatures[0];
   }
 }
+
+/**
+ * The implementation of `While` function.
+ * 
+ * Repeatedly executes an expression as long as a condition is true.
+ * 
+ * The Jitterbit variable `jitterbit.scripting.while.max_iterations` limits
+ * the number of iterations.
+ * An error is reported if the maximum number of iterations is reached.
+ */
+export class While extends DeferrableFunc {
+  constructor() {
+    super();
+    this.name = "While";
+    this.module = "logical";
+    this.signatures = [
+      new Signature("null", [
+        new Parameter("bool", "condition"),
+        new Parameter("type", "expression")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 2;
+    this.maxArgs = 2;
+  }
+
+  callEval(args: Expr[], scope: Scope) {
+    const maxIters = scope.lookupVar("$jitterbit.scripting.while.max_iterations").toNumber();
+    let iterCount = 0;
+    while(evaluate(args[0], scope).toBool() && iterCount < maxIters) {
+      evaluate(args[1], scope);
+      iterCount++;
+    }
+
+    // POD: not the original error
+    if(iterCount === maxIters)
+      throw new NamedError(`Max number of ${maxIters} iterations reached. Set $jitterbit.scripting.while.max_iterations upstream of this function call to increase the iteration limit.`, this.name);
+
+    return new JbNull();
+  }
+
+  call(args: RuntimeVal[], scope: Scope): never {
+    throw new Error("Method not implemented.");
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}

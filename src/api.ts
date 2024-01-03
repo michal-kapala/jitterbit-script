@@ -1193,6 +1193,7 @@ export class Api {
       // logical
       new Logical.Case(),
       new Logical.If(),
+      new Logical.While(),
       // math
       new Math.Ceiling(),
       new Math.Exp(),
