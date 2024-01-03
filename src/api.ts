@@ -16,6 +16,7 @@ import * as General from "./api/functions/general";
 import * as Instance from "./api/functions/instance";
 import * as LDAP from "./api/functions/ldap";
 import * as Log from "./api/functions/log";
+import * as Logical from "./api/functions/logical";
 import * as Math from "./api/functions/math";
 import * as NetSuite from "./api/functions/netsuite";
 import * as Salesforce from "./api/functions/salesforce";
@@ -1189,6 +1190,8 @@ export class Api {
       new Error.ResetLastError(),
       new Error.SetLastError(),
       new Log.WriteToOperationLog(),
+      // logical
+      new Logical.If(),
       // math
       new Math.Ceiling(),
       new Math.Exp(),

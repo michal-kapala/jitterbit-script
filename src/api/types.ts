@@ -1,3 +1,4 @@
+import { Expr } from "../frontend/ast";
 import Scope from "../runtime/scope";
 import { RuntimeVal, ValueType } from "../runtime/values";
 
@@ -24,6 +25,18 @@ export abstract class Func {
    * Should always be called from `call`.
    */
   protected abstract chooseSignature(args: RuntimeVal[]): void;
+}
+
+/**
+ * Jitterbit function with deferred argument evaluation.
+ */
+export abstract class DeferrableFunc extends Func {
+  /**
+   * Evaluates the arguments in a controlled manner and executes the function implementation.
+   * @param args 
+   * @param scope 
+   */
+  abstract callEval(args: Expr[], scope: Scope): RuntimeVal;
 }
 
 /**

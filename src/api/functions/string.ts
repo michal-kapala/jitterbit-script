@@ -1251,6 +1251,14 @@ export class TrimChars extends Func {
   }
 }
 
+/**
+ * The implementation of `Truncate` function.
+ * 
+ * Deletes `firstChars` characters from the left (the beginning) and `lastChars` characters
+ * from the right (the end) of a string and returns the remaining string.
+ * 
+ * See also the `Left` and `Right` functions.
+ */
 export class Truncate extends Func {
   constructor() {
     super();

@@ -11,6 +11,7 @@ import {
   JbNumber,
   JbString
 } from "../runtime/types";
+import { DeferrableFunc } from "../api/types";
 
 /**
  * Statement and expression types.
@@ -296,12 +297,23 @@ export class CallExpr implements Expr {
 
   eval(scope: Scope): RuntimeVal {
     const func = Api.getFunc(this.caller.symbol);
-    const args = this.evalArgs(this.args, scope);
 
     // this is for type safety only, the error is thrown by parser
     if(func === undefined)
       throw `Function ${this.caller.symbol} does not exist, refer to Jitterbit function API docs`;
 
+    // deferred argument list evaluation functions (logical/general modules)
+    if((func as DeferrableFunc).callEval !== undefined) {
+      try {
+        return (func as DeferrableFunc).callEval(this.args, scope);
+      } catch(e) {
+        // TODO: add an error
+        console.error(`${e}`);
+        return new JbNull();
+      }
+    }
+
+    const args = this.evalArgs(this.args, scope);
     try {
       return func.call(args, scope);
     }
