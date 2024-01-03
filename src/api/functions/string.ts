@@ -972,3 +972,86 @@ export class Split extends Func {
     this.signature = this.signatures[0];
   }
 }
+
+/**
+ * The implementation of `SplitCSV` function.
+ * 
+ * Splits a CSV-formatted string and returns an array with the individual column values.
+ * 
+ * By default, the delimiter is a comma (`,`) and the string qualifier is a double quote (`"`).
+ * This can be changed by specifying the optional second and third arguments respectively.
+ */
+export class SplitCSV extends Func {
+  constructor() {
+    super();
+    this.name = "SplitCSV";
+    this.module = "string";
+    this.signatures = [
+      new Signature("array", [
+        new Parameter("string", "str"),
+        new Parameter("string", "delimiter", false, new JbString(",")),
+        new Parameter("string", "qualifier", false, new JbString('"'))
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 3;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope): never {
+    this.chooseSignature(args);
+    throw new Error(`${this.name} is currently unsupported`);
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `StringLength` function.
+ * 
+ * Returns the length of a string.
+ * 
+ * The function returns an array if the argument is an array, with each element
+ * of the returned array the length of the corresponding element of the argument array.
+ * The `Length` function returns the length of an array rather than the length
+ * of the individual elements.
+ */
+export class StringLength extends Func {
+  constructor() {
+    super();
+    this.name = "StringLength";
+    this.module = "string";
+    this.signatures = [
+      new Signature("number", [
+        new Parameter("string", "str")
+      ]),
+      new Signature("array", [
+        new Parameter("array", "arr")
+      ])
+    ];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    if(args[0].type === this.signatures[1].params[0].type) {
+      const arr = args[0] as Array;
+      const result = new Array();
+      // POD: converts nested arrays to strings, does not traverse
+      // implicit conversions
+      for(const mem of arr.members)
+        result.members.push(new JbNumber(mem.toString().length))
+      return result;
+    }
+    // implicit conversion
+    else
+      return new JbNumber(args[0].toString().length);
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[args[0].type === "string" ? 0 : 1];
+  }
+}

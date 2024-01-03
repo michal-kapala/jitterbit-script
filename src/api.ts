@@ -1236,6 +1236,8 @@ export class Api {
       new String.RTrim(),
       new String.RTrimChars(),
       new String.Split(),
+      new String.SplitCSV(),
+      new String.StringLength(),
       // text
       new Text.Validate(),
       // xml
