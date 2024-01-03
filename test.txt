@@ -5,8 +5,9 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // tests for Truncate function, should return "xdxdxd"
-  trunc = Truncate("@#$xdxdxd@", 3, 1);
+  // tests for URLDecode function, should return "John Smith"
+  url = "http://hostname/user?email=john1990%40gmail.com&name=John%20Smith";
+  param = URLDecode(url, "name");
   DebugBreak();
   
 </trans>

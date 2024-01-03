@@ -490,13 +490,13 @@ export class ParseURL extends Func {
     this.chooseSignature(args);
     // implicit conversions
     const urlStr = args[0].toString();
-    const result = new Array()
+    const result = new Array();
     // URL.canParse was added in 2023
     // see: https://github.com/nodejs/node/pull/47179
     try {
       const url = new URL(urlStr);
       for(const param of url.searchParams)
-        result.members.push(new JbString(decodeURIComponent(param[1])))
+        result.members.push(new JbString(decodeURIComponent(param[1])));
     }
     catch(e) {
       console.error(`[${this.name}] URL parsing error: '${urlStr}'`);
@@ -1275,6 +1275,54 @@ export class Truncate extends Func {
     return new JbString(
       str.substring(args[1].toNumber(), str.length - args[2].toNumber())
     );
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `URLDecode` function.
+ * 
+ * Parse a URL string and return the decoded value of the URL parameter with
+ * the specified name. The case of the name is ignored.
+ * If the name is not found in parameters of the URL, an empty string ("") is returned.
+ * 
+ * See also the `ParseURL` and `URLEncode` functions.
+ */
+export class URLDecode extends Func {
+  constructor() {
+    super();
+    this.name = "URLDecode";
+    this.module = "string";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("string", "url"),
+        new Parameter("string", "paramName")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 2;
+    this.maxArgs = 2;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // implicit conversions
+    const urlStr = args[0].toString();
+    const paramName = args[1].toString();
+    let result = "";
+    // URL.canParse was added in 2023
+    // see: https://github.com/nodejs/node/pull/47179
+    try {
+      const url = new URL(urlStr);
+      result = decodeURIComponent(url.searchParams.get(paramName.toLowerCase()) ?? "");
+    }
+    catch(e) {
+      console.error(`[${this.name}] URL parsing error: '${urlStr}'`);
+    }
+    return new JbString(result);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
