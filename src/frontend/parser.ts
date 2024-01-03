@@ -4,6 +4,7 @@ import {
   ArrayLiteral,
   AssignmentExpr,
   BinaryExpr,
+  BlockExpr,
   BooleanLiteral,
   CallExpr,
   Expr,
@@ -197,6 +198,23 @@ export default class Parser {
    */
   private parse_expr(): Expr {
     return this.parse_assignment_expr();
+  }
+
+  /**
+   * Parses a list of expressions with a shared scope.
+   * @returns
+   */
+  private parse_block_expr(): Expr {
+    const expr = this.parse_expr();
+    if(this.at().type === TokenType.Semicolon) {
+      const block = new BlockExpr([expr]);
+      while(this.at().type === TokenType.Semicolon) {
+        this.consume();
+        block.body.push(this.parse_expr());
+      }
+      return block;
+    }
+    else return expr;
   }
 
   /**
@@ -408,10 +426,10 @@ export default class Parser {
    * @returns 
    */
   private parse_arguments_list(): Expr[] {
-    const args = [this.parse_assignment_expr()];
+    const args = [this.parse_block_expr()];
 
     while (this.at().type == TokenType.Comma && this.consume()) {
-      args.push(this.parse_assignment_expr());
+      args.push(this.parse_block_expr());
     }
 
     return args;

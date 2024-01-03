@@ -25,6 +25,7 @@ export type NodeType =
   | "CallExpr"
   | "BinaryExpr"
   | "UnaryExpr"
+  | "BlockExpr"
   // Literals
   | "NumericLiteral"
   | "StringLiteral"
@@ -41,7 +42,7 @@ export interface Stmt {
 }
 
 /**
- * A program is a but a list of statements.
+ * A program is but a list of statements.
  */
 export class Program implements Stmt {
   kind: "Program";
@@ -68,6 +69,34 @@ export class Program implements Stmt {
       console.error(`InterpreterError: ${e}\nLast evaluated expression:\n`, lastEvaluated);
     }
     return lastEvaluated;
+  }
+}
+
+/**
+ * A list of subsequent expressions delimited by semicolons.
+ * 
+ * The evaluation of the last expression yields the runtime value.
+ */
+export class BlockExpr implements Expr {
+  kind: "BlockExpr";
+  body: Expr[];
+
+  constructor(body: Expr[] = []) {
+    this.kind = "BlockExpr";
+    this.body = body;
+  }
+
+  eval(scope: Scope) {
+    let lastValue: RuntimeVal = new JbNull();
+    try {
+      for (const expr of this.body)
+        lastValue = evaluate(expr, scope);
+    }
+    catch(e) {
+      // TODO: this should be added as an error
+      console.error(`InterpreterError: ${e}\nLast evaluated expression:\n`, lastValue);
+    }
+    return lastValue;
   }
 }
 

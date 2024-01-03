@@ -25,6 +25,7 @@ export function evaluate(astNode: Stmt, scope: Scope): RuntimeVal {
     case "BinaryExpr":
     case "UnaryExpr":
     case "CallExpr":
+    case "BlockExpr":
       return (astNode as Expr).eval(scope);
     default:
       console.error(

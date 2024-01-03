@@ -7,8 +7,12 @@
 
   // tests for If function
   If(DebugBreak(false),
-    WriteToOperationLog("true branch"),
-    WriteToOperationLog("false branch")
+    WriteToOperationLog("true branch");
+    "expr blocks are working",
+    WriteToOperationLog("false branch");
+    a = "expr blocks are working"
   );
+
+  DebugBreak();
   
 </trans>

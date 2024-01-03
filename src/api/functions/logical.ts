@@ -30,7 +30,7 @@ export class If extends DeferrableFunc {
     this.maxArgs = 3;
   }
 
-  callEval(args: Expr[], scope: Scope): RuntimeVal {
+  callEval(args: Expr[], scope: Scope) {
     const condition = evaluate(args[0], scope).toBool();
 
     if(!condition && args.length === 2)
