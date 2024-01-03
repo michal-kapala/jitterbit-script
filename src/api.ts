@@ -1243,6 +1243,7 @@ export class Api {
       new String.ToUpper(),
       new String.Trim(),
       new String.TrimChars(),
+      new String.Truncate(),
       // text
       new Text.Validate(),
       // xml

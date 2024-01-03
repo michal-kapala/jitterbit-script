@@ -1232,7 +1232,6 @@ export class TrimChars extends Func {
     }
 
     const start = strIdx;
-
     strIdx = str.length - 1;
 
     outer:
@@ -1245,6 +1244,37 @@ export class TrimChars extends Func {
     }
 
     return new JbString(str.substring(start, strIdx + 1));
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
+
+export class Truncate extends Func {
+  constructor() {
+    super();
+    this.name = "Truncate";
+    this.module = "string";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("string", "str"),
+        new Parameter("number", "firstChars"),
+        new Parameter("number", "lastChars")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 3;
+    this.maxArgs = 3;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // implicit conversions
+    const str = args[0].toString();
+    return new JbString(
+      str.substring(args[1].toNumber(), str.length - args[2].toNumber())
+    );
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
