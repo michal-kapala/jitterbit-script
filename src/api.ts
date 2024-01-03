@@ -1230,6 +1230,7 @@ export class Api {
       new String.RegExMatch(),
       new String.RegExReplace(),
       new String.Replace(),
+      new String.Right(),
       // text
       new Text.Validate(),
       // xml

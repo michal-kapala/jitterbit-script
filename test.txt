@@ -5,8 +5,8 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // tests for Replace function, should return "Monnight Tuesnight"
-  replaced = Replace("Monday Tuesday", "day", "night");
+  // tests for Right function, should return "Tuesday"
+  right = Right("Monday Tuesday", 7);
   DebugBreak();
   
 </trans>

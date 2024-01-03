@@ -707,3 +707,41 @@ export class Replace extends Func {
     this.signature = this.signatures[0];
   }
 }
+
+/**
+ * The implementation of `Right` function.
+ * 
+ * Returns `n` characters of a string, counting from the right (the end) of a string.
+ * 
+ * See also the `Left` and `Mid` functions.
+ */
+export class Right extends Func {
+  constructor() {
+    super();
+    this.name = "Right";
+    this.module = "string";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("string", "str"),
+        new Parameter("number", "n")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 2;
+    this.maxArgs = 2;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // implicit conversions
+    let str = args[0].toString();
+
+    return new JbString(
+      str.substring(str.length - args[1].toNumber(), str.length)
+    );
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
