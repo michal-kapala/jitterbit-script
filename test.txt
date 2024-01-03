@@ -5,8 +5,10 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // tests for ToUpper function, should return "HELLO WORLD!"
-  upper = ToUpper("Hello World!");
+  // test for Trim function, should return "xdxdxd"
+  padded = Trim("  
+  xdxdxd  
+    ");
   DebugBreak();
   
 </trans>

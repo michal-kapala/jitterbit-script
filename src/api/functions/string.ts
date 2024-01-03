@@ -1151,3 +1151,35 @@ export class ToUpper extends Func {
     this.signature = this.signatures[0];
   }
 }
+
+/**
+ * The implementation of `Trim` function.
+ * 
+ * Removes whitespace from the beginning and end of a string and returns the
+ * remaining characters.
+ */
+export class Trim extends Func {
+  constructor() {
+    super();
+    this.name = "Trim";
+    this.module = "string";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("string", "str")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // implicit conversion
+    return new JbString(args[0].toString().trim());
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
