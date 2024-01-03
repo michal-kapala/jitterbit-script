@@ -1055,3 +1055,35 @@ export class StringLength extends Func {
     this.signature = this.signatures[args[0].type === "string" ? 0 : 1];
   }
 }
+
+/**
+ * The implementation of `ToLower` function.
+ * 
+ * Converts all ASCII uppercase characters (A through Z, ASCII 65 through 90)
+ * in a string to lowercase.
+ */
+export class ToLower extends Func {
+  constructor() {
+    super();
+    this.name = "ToLower";
+    this.module = "string";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("string", "str")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // implicit conversions
+    return new JbString(args[0].toString().toLowerCase());
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}

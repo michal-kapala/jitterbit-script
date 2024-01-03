@@ -5,9 +5,8 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // tests for StringLength function, should return {4,1}
-  arr = {a="abcd", b="e"};
-  lenArr = StringLength(arr);
+  // tests for ToLower function, should return "hello world!"
+  lower = ToLower("Hello World!");
   DebugBreak();
   
 </trans>

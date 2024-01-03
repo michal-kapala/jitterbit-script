@@ -1238,6 +1238,7 @@ export class Api {
       new String.Split(),
       new String.SplitCSV(),
       new String.StringLength(),
+      new String.ToLower(),
       // text
       new Text.Validate(),
       // xml
