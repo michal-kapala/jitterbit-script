@@ -1,16 +1,16 @@
 <trans>
-  // user-defined system variable null-initialization test
-  niceTokenLol = $jitterbit.api.request.headers.Authentication;
-  // default value-initialized system variable assigned to a global var
-  $niceTokenLol = '$jitterbit.web_service_call.sync_response;
-  lol nice';
-
-  // tests for If function
-  If(DebugBreak(false),
-    WriteToOperationLog("true branch");
-    "expr blocks are working",
+  // test for Case function
+  Case(
+    false,
     WriteToOperationLog("false branch");
-    a = "expr blocks are working"
+    err = "not this one",
+
+    !false,
+    WriteToOperationLog("true branch");
+    success = "expr blocks are working",
+
+    err == "not this one",
+    err = "neither this one"
   );
 
   DebugBreak();

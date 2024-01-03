@@ -148,8 +148,6 @@ export default class Parser {
     this.tokens.pop();
     this.tokens.push(new Token("EndOfFile", TokenType.EOF, curPos, curPos));
 
-    this.printTokens();
-
     try {
       // Parse until end of file
       while (this.not_eof()) {
