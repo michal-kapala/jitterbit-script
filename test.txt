@@ -5,8 +5,8 @@
   $niceTokenLol = '$jitterbit.web_service_call.sync_response;
   lol nice';
 
-  // tests for ToLower function, should return "hello world!"
-  lower = ToLower("Hello World!");
+  // tests for ToUpper function, should return "HELLO WORLD!"
+  upper = ToUpper("Hello World!");
   DebugBreak();
   
 </trans>

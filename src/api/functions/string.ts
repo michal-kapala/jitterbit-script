@@ -1087,3 +1087,67 @@ export class ToLower extends Func {
     this.signature = this.signatures[0];
   }
 }
+
+/**
+ * The implementation of `ToProper` function.
+ * 
+ * Converts a string to proper case (the first letter of every word being capitalized).
+ * This is distinct from title case, which only capitalizes selected and longer words
+ * in a string.
+ */
+export class ToProper extends Func {
+  constructor() {
+    super();
+    this.name = "ToProper";
+    this.module = "string";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("string", "str")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope): never {
+    this.chooseSignature(args);
+    throw new Error(`${this.name} is currently unsupported`);
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
+
+/**
+ * The implementation of `ToUpper` function.
+ * 
+ * Converts all ASCII lowercase characters (a through z, ASCII 97 through 122) in a string
+ * to uppercase.
+ */
+export class ToUpper extends Func {
+  constructor() {
+    super();
+    this.name = "ToUpper";
+    this.module = "string";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("string", "str")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 1;
+    this.maxArgs = 1;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // implicit conversion
+    return new JbString(args[0].toString().toUpperCase());
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
