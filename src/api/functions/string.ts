@@ -788,3 +788,53 @@ export class RPad extends Func {
     this.signature = this.signatures[0];
   }
 }
+
+/**
+ * The implementation of `RPadChar` function.
+ * 
+ * Adds a padding character to the right (the end) of a string until the string contains
+ * `n` characters. Strings containing `n` or more characters are truncated to `n` characters.
+ * 
+ * `RPadChar(str, " ", n)` is the same as `RPad(str, n)`. See the `RPad` function.
+ */
+export class RPadChar extends Func {
+  constructor() {
+    super();
+    this.name = "RPadChar";
+    this.module = "string";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("string", "str"),
+        new Parameter("string", "padChar"),
+        new Parameter("number", "n"),
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 3;
+    this.maxArgs = 3;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // implicit conversions
+    const str = args[0].toString();
+    const char = args[1].toString();
+    const n = args[2].toNumber();
+
+    if(str.length >= n)
+      return new JbString(str.substring(str.length - n, str.length));
+
+    if(char === "")
+      return new JbString(str);
+
+    let result = str;
+    for(let i = str.length; i > n - str.length; i--)
+      result = result + char[0];
+
+    return new JbString(result);
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
