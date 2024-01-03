@@ -870,3 +870,57 @@ export class RTrim extends Func {
     this.signature = this.signatures[0];
   }
 }
+
+/**
+ * The implementation of `RTrimChars` function.
+ * 
+ * Removes any trailing characters in a string from the end that match those in
+ * the trimming characters and returns the remaining characters.
+ * 
+ * This function tests each trailing character of a string, beginning on the right edge,
+ * and sees if it is found in the trim characters.
+ * If it does, it is removed, and the process repeated until there is no longer a match.
+ * 
+ * This can be used to trim characters other than the default whitespace characters,
+ * such as trimming trailing colons.
+ * 
+ * See also the `LTrimChars` and `TrimChars` functions.
+ */
+export class RTrimChars extends Func {
+  constructor() {
+    super();
+    this.name = "RTrimChars";
+    this.module = "string";
+    this.signatures = [
+      new Signature("string", [
+        new Parameter("string", "str"),
+        new Parameter("string", "trimChars")
+      ])
+    ];
+    this.signature = this.signatures[0];
+    this.minArgs = 2;
+    this.maxArgs = 2;
+  }
+  
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // implicit conversions
+    let str = args[0].toString();
+    const trimChars = args[1].toString();
+    let strIdx = str.length - 1;
+
+    outer:
+    for(; strIdx >= 0; strIdx--) {
+      for(let charIdx = 0; charIdx < trimChars.length; charIdx++) {
+        if(str[strIdx] === trimChars[charIdx])
+          continue outer;
+      }
+      break;
+    }
+    return new JbString(str.substring(0, strIdx + 1));
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    this.signature = this.signatures[0];
+  }
+}
