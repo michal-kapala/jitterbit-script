@@ -1,10 +1,12 @@
 <trans>
-  // test for While function
-  count = 0;
-  While(count < 10,
-    WriteToOperationLog("count is " + count);
-    count++
-  );
+  // tests for Equal function
+  bin1 = HexToBinary("AAAAAAAA");
+  bin2 = HexToBinary("AAAABBBB");
+  binResult = Equal(bin1, bin2);
+
+  arr1 = {bin1, bin2};
+  arr2 = arr1;
+  arrResult = Equal(arr1, arr2);
 
   DebugBreak();
   

@@ -1192,6 +1192,7 @@ export class Api {
       new Log.WriteToOperationLog(),
       // logical
       new Logical.Case(),
+      new Logical.Equal(),
       new Logical.If(),
       new Logical.While(),
       // math

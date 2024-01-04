@@ -2,9 +2,9 @@ import { NamedError } from "../../errors";
 import { Expr } from "../../frontend/ast";
 import { evaluate } from "../../runtime/interpreter";
 import Scope from "../../runtime/scope";
-import { JbNull } from "../../runtime/types";
+import { Array, JbBool, JbNull } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
-import { DeferrableFunc, Parameter, Signature } from "../types";
+import { DeferrableFunc, Func, Parameter, Signature } from "../types";
 
 /**
  * The implementation of `Case` function.
@@ -55,6 +55,56 @@ export class Case extends DeferrableFunc {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+}
+
+export class Equal extends Func {
+  constructor() {
+    super();
+    this.name = "Equal";
+    this.module = "logical";
+    this.signatures = [
+      new Signature("bool", [
+        new Parameter("array", "array1"),
+        new Parameter("array", "array2")
+      ]),
+      new Signature("bool", [
+        new Parameter("type", "arg1"),
+        new Parameter("type", "arg2")
+      ])
+    ];
+    this.minArgs = 2;
+    this.maxArgs = 2;
+  }
+
+  call(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    if(args[0].type !== args[1].type)
+      return new JbBool(false);
+
+    // arrays
+    if(this.signature === this.signatures[0]) {
+      const arr1 = args[0] as Array;
+      const arr2 = args[1] as Array;
+      if(arr1.members.length !== arr2.members.length)
+        return new JbBool(false);
+
+      // compares types and string representations of each element pair
+      for(let idx = 0; idx < arr1.members.length; idx++) {
+        if(arr1.members[idx].type !== arr2.members[idx].type)
+          return new JbBool(false);
+        if(arr1.members[idx].toString() !== arr2.members[idx].toString())
+          return new JbBool(false);
+      }
+      return new JbBool(true);
+    }
+    // other types
+    return new JbBool(args[0].toString() === args[1].toString());
+  }
+
+  protected chooseSignature(args: RuntimeVal[]) {
+    const condition = args[0].type === args[1].type && args[0].type == "array";
+    this.signature = this.signatures[condition ? 0 : 1];
   }
 }
 
