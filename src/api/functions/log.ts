@@ -31,5 +31,4 @@ export class WriteToOperationLog extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
-
 }
