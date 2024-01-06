@@ -130,3 +130,5 @@ The list of statements and expressions supported by the interpreter.
 [System variables](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/variables/jitterbit-variables/) and [functions](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/) were implemented as specified by the documentation:
 - [system variables](https://github.com/michal-kapala/jitterbit-interpreter/blob/main/src/api.ts)
 - [functions](https://github.com/michal-kapala/jitterbit-interpreter/tree/main/src/api/functions)
+
+The runtime support matrix can be found [here](https://github.com/michal-kapala/jitterbit-interpreter/tree/main/src/api).

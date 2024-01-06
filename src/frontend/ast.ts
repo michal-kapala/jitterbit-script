@@ -6,6 +6,7 @@ import { Api } from "../api";
 import {
   Array,
   Dictionary,
+  JbBinary,
   JbBool,
   JbNull,
   JbNumber,
@@ -270,6 +271,13 @@ export class BinaryExpr implements Expr {
     if (lhs.type === "dictionary" && rhs.type === "array")
       return (lhs as Dictionary).binopArray(this.operator, rhs as Array);
 
+    // array-binary
+    if(lhs.type === "array" && rhs.type === "binary")
+      return (lhs as Array).binopBin(this.operator, rhs as JbBinary);
+
+    if (lhs.type === "binary" && rhs.type === "array")
+      return (lhs as JbBinary).binopArray(this.operator, rhs as Array);
+
     // dicts
 
     // dict-dict
@@ -303,6 +311,49 @@ export class BinaryExpr implements Expr {
 
     if (lhs.type === "null" && rhs.type === "dictionary")
       return (lhs as JbNull).binopDict(this.operator, rhs as Dictionary);
+
+    // dict-binary
+    if (lhs.type === "dictionary" && rhs.type === "binary")
+      return (lhs as Dictionary).binopBin(this.operator, rhs as JbBinary);
+
+    if (lhs.type === "binary" && rhs.type === "dictionary")
+      return (lhs as JbBinary).binopDict(this.operator, rhs as Dictionary);
+
+    // binary
+
+    // binary-binary
+    if (lhs.type === "binary" && rhs.type === "binary")
+      return (lhs as JbBinary).binopBin(this.operator, rhs as JbBinary);
+
+    // binary-number
+    if (lhs.type === "binary" && rhs.type === "number")
+      return (lhs as JbBinary).binopNumber(this.operator, rhs as JbNumber);
+
+    if (lhs.type === "number" && rhs.type === "binary")
+      return (lhs as JbNumber).binopBin(this.operator, rhs as JbBinary);
+
+    // binary-bool
+    if (lhs.type === "binary" && rhs.type === "bool")
+      return (lhs as JbBinary).binopBool(this.operator, rhs as JbBool);
+
+    if (lhs.type === "bool" && rhs.type === "binary")
+      return (lhs as JbBool).binopBin(this.operator, rhs as JbBinary);
+
+    // binary-string
+    if (lhs.type === "binary" && rhs.type === "string")
+      return (lhs as JbBinary).binopString(this.operator, rhs as JbString);
+
+    if (lhs.type === "string" && rhs.type === "binary")
+      return (lhs as JbString).binopBin(this.operator, rhs as JbBinary);
+
+    // binary-null
+    if (lhs.type === "binary" && rhs.type === "null")
+      return (lhs as JbBinary).binopNull(this.operator, rhs as JbNull);
+
+    if (lhs.type === "null" && rhs.type === "binary")
+      return (lhs as JbNull).binopBin(this.operator, rhs as JbBinary);
+
+    // TODO: date
 
     // Add JB error:
     // Illegal operation, <operation name, ex. SUBTRACT> with incompatible data types: <lhs.type> <operator> <rhs.type>
