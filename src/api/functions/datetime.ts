@@ -82,7 +82,7 @@ export class CVTDate extends Func {
 }
 
 /**
- * The implementation of `` function.
+ * The implementation of `DateAdd` function.
  * 
  * Returns a date string after adding a number to a specified part of a date object.
  */

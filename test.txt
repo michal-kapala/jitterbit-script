@@ -1,8 +1,8 @@
 <trans>
-  // test for binary additive assignments, should return bin
-  bin = HexToBinary("AAAAAAAA");
-  bin -= Null();
-
+  // test for date binary operators, should return true
+  date1 = Now();
+  date2 = date1 + 1;
+  result = date1 + 1 == date2;
   DebugBreak();
   
 </trans>

@@ -927,7 +927,9 @@ export class Array implements ArrayVal {
         case "binary":
           members[idx] = (members[idx] as JbBinary).binopNumber(operator, rhs);
           break;
-        // TODO: date
+        case "date":
+          members[idx] = (members[idx] as JbDate).binopNumber(operator, rhs);
+          break;
         default:
           throw `Unsupported array member type: ${members[idx].type}`;
       }
@@ -967,7 +969,9 @@ export class Array implements ArrayVal {
         case "binary":
           members[idx] = (members[idx] as JbBinary).binopBool(operator, rhs);
           break;
-        // TODO: date
+        case "date":
+          members[idx] = (members[idx] as JbDate).binopBool(operator, rhs);
+          break;
         default:
           throw `Unsupported array member type: ${members[idx].type}`;
       }
@@ -1007,7 +1011,9 @@ export class Array implements ArrayVal {
         case "binary":
           members[idx] = (members[idx] as JbBinary).binopString(operator, rhs);
           break;
-        // TODO: date
+        case "date":
+          members[idx] = (members[idx] as JbDate).binopString(operator, rhs);
+          break;
         default:
           throw `Unsupported array member type: ${members[idx].type}`;
       }
@@ -1047,7 +1053,9 @@ export class Array implements ArrayVal {
         case "binary":
           members[idx] = (members[idx] as JbBinary).binopNull(operator, rhs);
           break;
-        // TODO: date
+        case "date":
+          members[idx] = (members[idx] as JbDate).binopNull(operator, rhs);
+          break;
         default:
           throw `Unsupported array member type: ${members[idx].type}`;
       }
@@ -1114,7 +1122,12 @@ export class Array implements ArrayVal {
                   rMembers[idx] as JbBinary
               );
               break;
-            // TODO: date
+            case "date":
+              lMembers[idx] = (lMembers[idx] as JbNumber).binopDate(
+                  operator,
+                  rMembers[idx] as JbDate
+              );
+              break;
             default:
               throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
           }
@@ -1162,7 +1175,12 @@ export class Array implements ArrayVal {
                   rMembers[idx] as JbBinary
               );
               break;
-            // TODO: date
+            case "date":
+              lMembers[idx] = (lMembers[idx] as JbBool).binopDate(
+                  operator,
+                  rMembers[idx] as JbDate
+              );
+              break;
             default:
               throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
           }
@@ -1210,7 +1228,12 @@ export class Array implements ArrayVal {
                   rMembers[idx] as JbBinary
               );
               break;
-            // TODO: date
+            case "date":
+              lMembers[idx] = (lMembers[idx] as JbString).binopDate(
+                  operator,
+                  rMembers[idx] as JbDate
+              );
+              break;
             default:
               throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
           }
@@ -1258,7 +1281,12 @@ export class Array implements ArrayVal {
                   rMembers[idx] as JbBinary
               );
               break;
-            // TODO: date
+            case "date":
+              lMembers[idx] = (lMembers[idx] as JbNull).binopDate(
+                  operator,
+                  rMembers[idx] as JbDate
+              );
+              break;
             default:
               throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
           }
@@ -1306,7 +1334,12 @@ export class Array implements ArrayVal {
                   rMembers[idx] as JbBinary
               );
               break;
-            // TODO: date
+            case "binary":
+              lMembers[idx] = (lMembers[idx] as Array).binopDate(
+                  operator,
+                  rMembers[idx] as JbDate
+              );
+              break;
             default:
               throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
           }
@@ -1354,7 +1387,12 @@ export class Array implements ArrayVal {
                   rMembers[idx] as JbBinary
               );
               break;
-            // TODO: date
+            case "date":
+              lMembers[idx] = (lMembers[idx] as Dictionary).binopDate(
+                  operator,
+                  rMembers[idx] as JbDate
+              );
+              break;
             default:
               throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
           }
@@ -1402,12 +1440,69 @@ export class Array implements ArrayVal {
                   rMembers[idx] as JbBinary
               );
               break;
-            // TODO: date
+            case "date":
+              lMembers[idx] = (lMembers[idx] as JbBinary).binopDate(
+                  operator,
+                  rMembers[idx] as JbDate
+              );
+              break;
             default:
               throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
           }
           break;
-        // TODO: date
+        case "date":
+          switch (rMembers[idx].type) {
+            case "number":
+              lMembers[idx] = (lMembers[idx] as JbDate).binopNumber(
+                operator,
+                rMembers[idx] as JbNumber
+              );
+              break;
+            case "bool":
+              lMembers[idx] = (lMembers[idx] as JbDate).binopBool(
+                operator,
+                rMembers[idx] as JbBool
+              );
+              break;
+            case "string":
+              lMembers[idx] = (lMembers[idx] as JbDate).binopString(
+                operator,
+                rMembers[idx] as JbString
+              );
+              break;
+            case "null":
+              lMembers[idx] = (lMembers[idx] as JbDate).binopNull(
+                operator,
+                rMembers[idx] as JbNull
+              );
+              break;
+            case "array":
+              lMembers[idx] = (lMembers[idx] as JbDate).binopArray(
+                operator,
+                rMembers[idx] as Array
+              );
+              break;
+            case "dictionary":
+              lMembers[idx] = (lMembers[idx] as JbDate).binopDict(
+                operator,
+                rMembers[idx] as Dictionary
+              );
+            case "binary":
+              lMembers[idx] = (lMembers[idx] as JbDate).binopBin(
+                  operator,
+                  rMembers[idx] as JbBinary
+              );
+              break;
+            case "date":
+              lMembers[idx] = (lMembers[idx] as JbDate).binopDate(
+                  operator,
+                  rMembers[idx] as JbDate
+              );
+              break;
+            default:
+              throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
+          }
+          break;
         default:
           throw `Unsupported LHS array member type: ${lMembers[idx].type}`;
       }
@@ -1447,7 +1542,9 @@ export class Array implements ArrayVal {
         case "binary":
           members[idx] = (members[idx] as JbBinary).binopDict(operator, rhs);
           break;
-        // TODO: date
+        case "date":
+          members[idx] = (members[idx] as JbDate).binopDict(operator, rhs);
+          break;
         default:
           throw `Unsupported array member type: ${members[idx].type}`;
       }
@@ -1487,7 +1584,51 @@ export class Array implements ArrayVal {
         case "binary":
           members[idx] = (members[idx] as JbBinary).binopBin(operator, rhs);
           break;
-        // TODO: date
+        case "date":
+          members[idx] = (members[idx] as JbDate).binopBin(operator, rhs);
+          break;
+        default:
+          throw `Unsupported array member type: ${members[idx].type}`;
+      }
+    }
+    return this;
+  }
+
+  /**
+   * Applies a binary operator to array (always LHS).
+   * The RHS value is a date.
+   * @param rhs 
+   * @param operator 
+   * @returns 
+   */
+  binopDate(operator: string, rhs: JbDate) {
+    const members = this.members;
+    for(const idx in members) {
+      switch (members[idx].type) {
+        case "number":
+          members[idx] = (members[idx] as JbNumber).binopDate(operator, rhs);
+          break;
+        case "bool":
+          members[idx] = (members[idx] as JbBool).binopDate(operator, rhs);
+          break;
+        case "string":
+          members[idx] = (members[idx] as JbString).binopDate(operator, rhs);
+          break;
+        case "null":
+          members[idx] = (members[idx] as JbNull).binopDate(operator, rhs);
+          break;
+        case "array":
+          members[idx] = (members[idx] as Array).binopDate(operator, rhs);
+          break;
+        case "dictionary":
+          members[idx] = (members[idx] as Dictionary).binopDate(operator, rhs);
+          break;
+        case "binary":
+          members[idx] = (members[idx] as JbBinary).binopDate(operator, rhs);
+          break;
+        case "date":
+          members[idx] = (members[idx] as JbDate).binopDate(operator, rhs);
+          break;
         default:
           throw `Unsupported array member type: ${members[idx].type}`;
       }
@@ -1798,7 +1939,9 @@ export class Dictionary implements DictVal {
         case "binary":
           rMembers[idx] = this.binopBin(operator, rMembers[idx] as JbBinary);
           break;
-        // TODO: date
+        case "date":
+          rMembers[idx] = this.binopDate(operator, rMembers[idx] as JbDate);
+          break;
         default:
           throw `Unsupported LHS array member type: ${rMembers[idx].type}`;
       }
@@ -1883,6 +2026,44 @@ export class Dictionary implements DictVal {
         return new JbBool(false);
       default:
         throw new Error(`Unsupported operator ${operator}`);
+    }
+  }
+
+  /**
+   * Applies a binary operator to a dictionary (always LHS).
+   * The RHS value is a date.
+   * @param operator 
+   * @param rhs 
+   * @returns 
+   */
+  binopDate(operator: string, rhs: JbDate) {
+    switch (operator) {
+      case "+":
+        throw `Illegal operation: ${this.type} Add ${rhs.type}`;
+      case "-":
+        throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      // 'Comparing arguments of different data types is not supported.'
+      case "<":
+      case "<=":
+      case "!=":
+        return new JbBool(true);
+      case ">":
+      case ">=":
+      case "==":
+        return new JbBool(false);
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return new JbBool(false);
+      default:
+        throw `Unsupported operator ${operator}`;
     }
   }
 }
@@ -2160,7 +2341,9 @@ export class JbBool implements BooleanVal {
         case "binary":
           members[idx] = this.binopBin(operator, members[idx] as JbBinary);
           break;
-        // TODO: date
+        case "date":
+          members[idx] = this.binopDate(operator, members[idx] as JbDate);
+          break;
         default:
           throw `Unsupported array member type: ${members[idx].type}`;
       }
@@ -2247,6 +2430,49 @@ export class JbBool implements BooleanVal {
         return new JbBool(this.value);
       default:
         throw new Error(`Unsupported operator ${operator}`);
+    }
+  }
+
+  /**
+   * Applies a binary operator to a boolean (always LHS).
+   * The RHS value is a date.
+   * @param operator 
+   * @param rhs 
+   * @returns 
+   */
+  binopDate(operator: string, rhs: JbDate) {
+    switch (operator) {
+      case "+":
+        throw `Illegal operation: ${this.type} Add ${rhs.type}`;
+      case "-":
+        throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      // 'Comparing arguments of different data types is not supported.'
+      case "<":
+        return new JbBool(this.toNumber() < rhs.toNumber());
+      case ">":
+        return new JbBool(this.toNumber() > rhs.toNumber());
+      case "<=":
+        return new JbBool(this.toNumber() <= rhs.toNumber());
+      case ">=":
+        return new JbBool(this.toNumber() >= rhs.toNumber());
+      case "==":
+        return new JbBool(false);
+      case "!=":
+        return new JbBool(true);
+      case "&&":
+      case "&":
+        return new JbBool(false);
+      case "||":
+      case "|":
+        return new JbBool(this.value);
+      default:
+        throw `Unsupported operator ${operator}`;
     }
   }
 }
@@ -2477,7 +2703,9 @@ export class JbNull implements NullVal {
         case "binary":
           members[idx] = this.binopBin(operator, members[idx] as JbBinary);
           break;
-        // TODO: date
+        case "date":
+          members[idx] = this.binopDate(operator, members[idx] as JbDate);
+          break;
         default:
           throw `Unsupported array member type: ${members[idx].type}`;
       }
@@ -2555,6 +2783,45 @@ export class JbNull implements NullVal {
         return new JbBool(false);
       default:
         throw new Error(`Unsupported operator ${operator}`);
+    }
+  }
+
+  /**
+   * Applies a binary operator to a null (always LHS).
+   * The RHS value is a date.
+   * @param operator 
+   * @param rhs 
+   * @returns 
+   */
+  binopDate(operator: string, rhs: JbDate) {
+    switch (operator) {
+      case "+":
+        return rhs;
+      case "-":
+        throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      // 'Comparing arguments of different data types is not supported.'
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+        return new JbBool(false);
+      case "==":
+        return new JbBool(false);
+      case "!=":
+        return new JbBool(true);
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return new JbBool(false);
+      default:
+        throw `Unsupported operator ${operator}`;
     }
   }
 }
@@ -2844,7 +3111,9 @@ export class JbNumber implements NumberVal {
         case "binary":
           members[idx] = this.binopBin(operator, members[idx] as JbBinary);
           break;
-        // TODO: date
+        case "date":
+          members[idx] = this.binopDate(operator, members[idx] as JbDate);
+          break;
         default:
           throw `Unsupported array member type: ${members[idx].type}`;
       }
@@ -2931,6 +3200,50 @@ export class JbNumber implements NumberVal {
         return new JbBool(this.toBool());
       default:
         throw new Error(`Unsupported operator ${operator}`);
+    }
+  }
+
+  /**
+   * Applies a binary operator to a number (always LHS).
+   * The RHS value is a date.
+   * @param operator 
+   * @param rhs 
+   * @returns 
+   */
+  binopDate(operator: string, rhs: JbDate) {
+    switch (operator) {
+      case "+":
+        rhs.value.setTime(rhs.value.getTime() + this.value * 1000);
+        return rhs;
+      case "-":
+        throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      // 'Comparing arguments of different data types is not supported.'
+      case "<":
+        return new JbBool(this.value < rhs.toNumber());
+      case ">":
+        return new JbBool(this.value > rhs.toNumber());
+      case "<=":
+        return new JbBool(this.value <= rhs.toNumber());
+      case ">=":
+        return new JbBool(this.value >= rhs.toNumber());
+      case "==":
+        return new JbBool(this.value === rhs.toNumber());
+      case "!=":
+        return new JbBool(this.value !== rhs.toNumber());
+      case "&&":
+      case "&":
+        return new JbBool(false);
+      case "||":
+      case "|":
+        return new JbBool(this.toBool());
+      default:
+        throw `Unsupported operator ${operator}`;
     }
   }
 }
@@ -3273,7 +3586,9 @@ export class JbString implements StringVal {
         case "binary":
           members[idx] = this.binopBin(operator, members[idx] as JbBinary);
           break;
-        // TODO: date
+        case "date":
+          members[idx] = this.binopDate(operator, members[idx] as JbDate);
+          break;
         default:
           throw `Unsupported array member type: ${members[idx].type}`;
       }
@@ -3362,6 +3677,49 @@ export class JbString implements StringVal {
         return new JbBool(this.toBool());
       default:
         throw new Error(`Unsupported operator ${operator}`);
+    }
+  }
+
+  /**
+   * Applies a binary operator to a string (always LHS).
+   * The RHS value is a date.
+   * @param operator 
+   * @param rhs 
+   * @returns 
+   */
+  binopDate(operator: string, rhs: JbDate) {
+    switch (operator) {
+      case "+":
+        return new JbString(this.toString() + rhs.toStringTruncMillis());
+      case "-":
+        throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      // 'Comparing arguments of different data types is not supported.'
+      case "<":
+        return new JbBool(this.toNumber() < rhs.toNumber());
+      case ">":
+        return new JbBool(this.toNumber() > rhs.toNumber());
+      case "<=":
+        return new JbBool(this.toNumber() <= rhs.toNumber());
+      case ">=":
+        return new JbBool(this.toNumber() >= rhs.toNumber());
+      case "==":
+        return new JbBool(false);
+      case "!=":
+        return new JbBool(true);
+      case "&&":
+      case "&":
+        return new JbBool(false);
+      case "||":
+      case "|":
+        return new JbBool(this.toBool());
+      default:
+        throw `Unsupported operator ${operator}`;
     }
   }
 }
@@ -3752,7 +4110,9 @@ export class JbBinary implements BinaryVal {
         case "binary":
           members[idx] = this.binopBin(operator, members[idx] as JbBinary);
           break;
-        // TODO: date
+        case "date":
+          members[idx] = this.binopDate(operator, members[idx] as JbDate);
+          break;
         default:
           throw `Unsupported array member type: ${members[idx].type}`;
       }
@@ -3972,5 +4332,339 @@ export class JbDate implements DateVal {
       result = (date as JbDate).value;
 
     return result;
+  }
+
+  /**
+   * Applies a binary operator to a date (always LHS).
+   * The RHS value is a number.
+   * @param operator 
+   * @param rhs 
+   * @returns 
+   */
+  binopNumber(operator: string, rhs: JbNumber) {
+    switch (operator) {
+      case "+":
+        this.value.setTime(this.value.getTime() + rhs.value * 1000);
+        return this;
+      case "-":
+        this.value.setTime(this.value.getTime() - rhs.value * 1000);
+        return this;
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      // 'Comparing arguments of different data types is not supported.'
+      case "<":
+        return new JbBool(this.toNumber() < rhs.value);
+      case ">":
+        return new JbBool(this.toNumber() > rhs.value);
+      case "<=":
+        return new JbBool(this.toNumber() <= rhs.value);
+      case ">=":
+        return new JbBool(this.toNumber() >= rhs.value);
+      case "==":
+        return new JbBool(this.toNumber() === rhs.value);
+      case "!=":
+        return new JbBool(this.toNumber() !== rhs.value);
+      case "&&":
+      case "&":
+        return new JbBool(false);
+      case "||":
+      case "|":
+        return new JbBool(rhs.toBool());
+      default:
+        throw `Unsupported operator ${operator}`;
+    }
+  }
+
+  /**
+   * Applies a binary operator to a date (always LHS).
+   * The RHS value is a boolean.
+   * @param operator 
+   * @param rhs 
+   * @returns 
+   */
+  binopBool(operator: string, rhs: JbBool) {
+    switch (operator) {
+      case "+":
+        throw `Illegal operation: ${this.type} Add ${rhs.type}`;
+      case "-":
+        throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      // 'Comparing arguments of different data types is not supported.'
+      case "<":
+        return new JbBool(this.toNumber() < rhs.toNumber());
+      case ">":
+        return new JbBool(this.toNumber() > rhs.toNumber());
+      case "<=":
+        return new JbBool(this.toNumber() <= rhs.toNumber());
+      case ">=":
+        return new JbBool(this.toNumber() >= rhs.toNumber());
+      case "==":
+        return new JbBool(this.toNumber() === rhs.toNumber());
+      case "!=":
+        return new JbBool(this.toNumber() !== rhs.toNumber());
+      case "&&":
+      case "&":
+        return new JbBool(false);
+      case "||":
+      case "|":
+        return new JbBool(rhs.toBool());
+      default:
+        throw `Unsupported operator ${operator}`;
+    }
+  }
+
+  /**
+   * Applies a binary operator to a date (always LHS).
+   * The RHS value is a string.
+   * @param operator 
+   * @param rhs 
+   * @returns 
+   */
+  binopString(operator: string, rhs: JbString) {
+    switch (operator) {
+      case "+":
+        return new JbString(this.toString() + rhs.toString());
+      case "-":
+        throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      // 'Comparing arguments of different data types is not supported.'
+      case "<":
+        return new JbBool(this.toNumber() < rhs.toNumber());
+      case ">":
+        return new JbBool(this.toNumber() > rhs.toNumber());
+      case "<=":
+        return new JbBool(this.toNumber() <= rhs.toNumber());
+      case ">=":
+        return new JbBool(this.toNumber() >= rhs.toNumber());
+      case "==":
+        return new JbBool(this.toNumber() === rhs.toNumber());
+      case "!=":
+        return new JbBool(this.toNumber() !== rhs.toNumber());
+      case "&&":
+      case "&":
+        return new JbBool(false);
+      case "||":
+      case "|":
+        return new JbBool(rhs.toBool());
+      default:
+        throw `Unsupported operator ${operator}`;
+    }
+  }
+
+  /**
+   * Applies a binary operator to a date (always LHS).
+   * The RHS value is a null.
+   * @param operator 
+   * @param rhs 
+   * @returns 
+   */
+  binopNull(operator: string, rhs: JbNull) {
+    switch (operator) {
+      case "+":
+      case "-":
+        return this;
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      // 'Comparing arguments of different data types is not supported.'
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+        return new JbBool(false);
+      case "!=":
+        return new JbBool(true);
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return new JbBool(false);
+      default:
+        throw `Unsupported operator ${operator}`;
+    }
+  }
+
+  /**
+   * Applies a binary operator to a date (always LHS).
+   * The RHS value is an array.
+   * @param operator 
+   * @param rhs 
+   * @returns 
+   */
+  binopArray(operator: string, rhs: Array) {
+    const members = rhs.members;
+    for(const idx in members) {
+      switch (members[idx].type) {
+        case "number":
+          members[idx] = this.binopNumber(operator, members[idx] as JbNumber);
+          break;
+        case "bool":
+          members[idx] = this.binopBool(operator, members[idx] as JbBool);
+          break;
+        case "string":
+          members[idx] = this.binopString(operator, members[idx] as JbString);
+          break;
+        case "null":
+          members[idx] = this.binopNull(operator, members[idx] as JbNull);
+          break;
+        case "array":
+          members[idx] = this.binopArray(operator, members[idx] as Array);
+          break;
+        case "dictionary":
+          members[idx] = this.binopDict(operator, members[idx] as Dictionary);
+          break;
+        case "binary":
+          members[idx] = this.binopBin(operator, members[idx] as JbBinary);
+          break;
+        case "date":
+          members[idx] = this.binopDate(operator, members[idx] as JbDate);
+          break;
+        default:
+          throw `Unsupported array member type: ${members[idx].type}`;
+      }
+    }
+    return rhs;
+  }
+
+  /**
+   * Applies a binary operator to a date (always LHS).
+   * The RHS value is a dictionary.
+   * @param operator 
+   * @param rhs 
+   * @returns 
+   */
+  binopDict(operator: string, rhs: Dictionary) {
+    switch (operator) {
+      case "+":
+        throw new Error(`Illegal operation: ${this.type} Add ${rhs.type}`);
+      case "-":
+        throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      // 'Comparing arguments of different data types is not supported.'
+      case "<":
+        return new JbBool(false);
+      case "<=":
+        return new JbBool(this.toNumber() === 0);
+      case ">":
+        return new JbBool(this.toNumber() > 0);
+      case ">=":
+        return new JbBool(this.toNumber() >= 0);
+      case "==":
+        return new JbBool(false);
+      case "!=":
+        return new JbBool(true);
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return new JbBool(false);
+      default:
+        throw `Unsupported operator ${operator}`;
+    }
+  }
+
+  /**
+   * Applies a binary operator to a date (always LHS).
+   * The RHS value is binary data.
+   * @param operator 
+   * @param rhs 
+   * @returns 
+   */
+  binopBin(operator: string, rhs: JbBinary) {
+    switch (operator) {
+      case "+":
+        throw new Error(`Illegal operation: ${this.type} Add ${rhs.type}`);
+      case "-":
+        throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      // 'Comparing arguments of different data types is not supported.'
+      case "<":
+      case "<=":
+      case ">":
+      case ">=":
+        throw new Error(`compare (${operator}) with binary data`);
+      case "==":
+      case "!=":
+        throw new Error(`compare (${operator}) binary data with data of other type`);
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return new JbBool(false);
+      default:
+        throw `Unsupported operator ${operator}`;
+    }
+  }
+
+  /**
+   * Applies a binary operator to a date (always LHS).
+   * The RHS value is a date too.
+   * @param operator 
+   * @param rhs 
+   * @returns 
+   */
+  binopDate(operator: string, rhs: JbDate) {
+    switch (operator) {
+      case "+":
+        throw `Illegal operation, ADDITION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      // for some reason date subtraction is supported instead of addition
+      // originally returns a long
+      case "-":
+        return new JbNumber(this.toNumber() - rhs.toNumber());
+      case "*":
+        throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "/":
+        throw `Illegal operation, DIVISION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      case "^":
+        throw `Illegal operation, POW with incompatible types: ${this.type} ${operator} ${rhs.type}`;
+      // 'Comparing arguments of different data types is not supported.'
+      case "<":
+        return new JbBool(this.value < rhs.value);
+      case "<=":
+        return new JbBool(this.value <= rhs.value);
+      case ">":
+        return new JbBool(this.value > rhs.value);
+      case ">=":
+        return new JbBool(this.value >= rhs.value);
+      case "==":
+        return new JbBool(this.toNumber() === rhs.toNumber());
+      case "!=":
+        return new JbBool(this.toNumber() !== rhs.toNumber());
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return new JbBool(false);
+      default:
+        throw `Unsupported operator ${operator}`;
+    }
   }
 }

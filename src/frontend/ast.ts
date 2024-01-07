@@ -8,6 +8,7 @@ import {
   Dictionary,
   JbBinary,
   JbBool,
+  JbDate,
   JbNull,
   JbNumber,
   JbString
@@ -278,6 +279,13 @@ export class BinaryExpr implements Expr {
     if (lhs.type === "binary" && rhs.type === "array")
       return (lhs as JbBinary).binopArray(this.operator, rhs as Array);
 
+    // array-date
+    if(lhs.type === "array" && rhs.type === "date")
+      return (lhs as Array).binopDate(this.operator, rhs as JbDate);
+
+    if (lhs.type === "date" && rhs.type === "array")
+      return (lhs as JbDate).binopArray(this.operator, rhs as Array);
+
     // dicts
 
     // dict-dict
@@ -319,6 +327,13 @@ export class BinaryExpr implements Expr {
     if (lhs.type === "binary" && rhs.type === "dictionary")
       return (lhs as JbBinary).binopDict(this.operator, rhs as Dictionary);
 
+    // dict-date
+    if (lhs.type === "dictionary" && rhs.type === "date")
+      return (lhs as Dictionary).binopDate(this.operator, rhs as JbDate);
+
+    if (lhs.type === "date" && rhs.type === "dictionary")
+      return (lhs as JbDate).binopDict(this.operator, rhs as Dictionary);
+
     // binary
 
     // binary-binary
@@ -353,7 +368,46 @@ export class BinaryExpr implements Expr {
     if (lhs.type === "null" && rhs.type === "binary")
       return (lhs as JbNull).binopBin(this.operator, rhs as JbBinary);
 
-    // TODO: date
+    // binary-date
+    if (lhs.type === "binary" && rhs.type === "date")
+      return (lhs as JbBinary).binopDate(this.operator, rhs as JbDate);
+
+    if (lhs.type === "date" && rhs.type === "binary")
+      return (lhs as JbDate).binopBin(this.operator, rhs as JbBinary);
+
+    // date
+
+    // date-date
+    if (lhs.type === "date" && rhs.type === "date")
+      return (lhs as JbDate).binopDate(this.operator, rhs as JbDate);
+
+    // date-number
+    if (lhs.type === "date" && rhs.type === "number")
+      return (lhs as JbDate).binopNumber(this.operator, rhs as JbNumber);
+
+    if (lhs.type === "number" && rhs.type === "date")
+      return (lhs as JbNumber).binopDate(this.operator, rhs as JbDate);
+
+    // date-bool
+    if (lhs.type === "date" && rhs.type === "bool")
+      return (lhs as JbDate).binopBool(this.operator, rhs as JbBool);
+
+    if (lhs.type === "bool" && rhs.type === "date")
+      return (lhs as JbBool).binopDate(this.operator, rhs as JbDate);
+
+    // date-string
+    if (lhs.type === "date" && rhs.type === "string")
+      return (lhs as JbDate).binopString(this.operator, rhs as JbString);
+
+    if (lhs.type === "string" && rhs.type === "date")
+      return (lhs as JbString).binopDate(this.operator, rhs as JbDate);
+
+    // date-null
+    if (lhs.type === "date" && rhs.type === "null")
+      return (lhs as JbDate).binopNull(this.operator, rhs as JbNull);
+
+    if (lhs.type === "null" && rhs.type === "date")
+      return (lhs as JbNull).binopDate(this.operator, rhs as JbDate);
 
     // Add JB error:
     // Illegal operation, <operation name, ex. SUBTRACT> with incompatible data types: <lhs.type> <operator> <rhs.type>
