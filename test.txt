@@ -1,8 +1,7 @@
 <trans>
-  // tests for Equal function
-  bin1 = HexToBinary("AAAAAAAA");
-  bin2 = HexToBinary("AAAABBBB");
-  result = bin1 != bin2;
+  // test for binary additive assignments, should return bin
+  bin = HexToBinary("AAAAAAAA");
+  bin -= Null();
 
   DebugBreak();
   

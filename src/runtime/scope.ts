@@ -2,6 +2,7 @@ import { Api } from "../api";
 import { GlobalIdentifier } from "../frontend/ast";
 import { 
   Array,
+  JbBinary,
   JbBool,
   JbNull,
   JbNumber,
@@ -74,15 +75,15 @@ export default class Scope {
       switch(operator) {
         case "-=":
           switch(value.type) {
-            case "bool":
-              throw `Illegal operation, SUBTRACT with incompatible data types: unknown - bool`
             // zero-initialized
             case "number":
               let newValue = value as JbNumber;
               newValue.value = 0 - newValue.value;
               this.getGlobal().variables.set(varName, newValue);
               return newValue;
+            case "bool":
             case "string":
+            case "binary":
               throw `Illegal operation, SUBTRACT with incompatible data types: unknown - ${value.type}`;
             case "array":
               // eval as null-initialized
@@ -93,7 +94,7 @@ export default class Scope {
               return value;
             case "dictionary":
               throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
-            // TODO: binary
+            // TODO: date
             default:
               throw `Unsupported type: ${value.type}`;
           }
@@ -109,13 +110,13 @@ export default class Scope {
             case "bool":
             case "string":
             case "array":
+            case "binary":
             case "null":
-              // new value assigned
               this.getGlobal().variables.set(varName, value);
               return value;
             case "dictionary":
               throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
-            // TODO: binary
+            // TODO: date
             default:
               throw `Unsupported type: ${value.type}`;
           }
@@ -337,6 +338,19 @@ export default class Scope {
           throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
         }
 
+        // binary -= array
+        // array -= binary
+        else if (
+          lhs.type === "binary" && rhs.type === "array" ||
+          lhs.type === "array" && rhs.type === "binary"
+        ) {
+          const isLhs = lhs.type === "binary";
+          const binVal = (isLhs ? lhs : rhs) as JbBinary;
+          let arr = (isLhs ? rhs : lhs) as Array;
+          arr = arr.assignBin(binVal, operator, isLhs);
+          return arr;
+        }
+
         // dicts
 
         // dict -= dict
@@ -354,6 +368,15 @@ export default class Scope {
           throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
         }
 
+        // binary
+
+        // binary -= null
+        else if (lhs.type === "binary" && rhs.type === "null") {
+          return lhs;
+        }
+
+        // TODO: date
+
         else
           // currently returns interpreter types rather than strict JB types (e.g. 'number' instead of int/double)
           // string -= string
@@ -370,6 +393,16 @@ export default class Scope {
           // dict -= string
           // bool -= dict
           // dict -= bool
+          // binary -= binary
+          // binary -= number
+          // number -= binary
+          // binary -= string
+          // string -= binary
+          // binary -= bool
+          // bool -= binary
+          // null -= binary
+          // binary -= dict
+          // dict -= binary
           throw `Illegal operation, SUBTRACT with incompatible data types: ${lhs.type} - ${rhs.type}`;
       case "+=":
         // number += number
@@ -485,6 +518,18 @@ export default class Scope {
           // POD: originally nested empty arrays work too, e.g. {{{}}}
           throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
         }
+        // binary += array
+        // array += binary
+        else if (
+          lhs.type === "binary" && rhs.type === "array" ||
+          lhs.type === "array" && rhs.type === "binary"
+        ) {
+          const isLhs = lhs.type === "binary";
+          const binVal = (isLhs ? lhs : rhs) as JbBinary;
+          let arr = (isLhs ? rhs : lhs) as Array;
+          arr = arr.assignBin(binVal, operator, isLhs);
+          return arr;
+        }
 
         // dicts
 
@@ -524,10 +569,50 @@ export default class Scope {
         ) {
           throw new Error(`Illegal operation: ${lhs.type} += ${rhs.type}`);
         }
+
+        // binary
+
+        // binary += binary
+        // number += binary
+        // binary += number
+        // string += binary
+        // binary += string
+        // dict += binary
+        // binary += dict
+        else if (
+          lhs.type === "binary" && rhs.type === "binary" ||
+          lhs.type === "number" && rhs.type === "binary" ||
+          lhs.type === "binary" && rhs.type === "number" ||
+          lhs.type === "string" && rhs.type === "binary" ||
+          lhs.type === "binary" && rhs.type === "string" ||
+          lhs.type === "dictionary" && rhs.type === "binary" ||
+          lhs.type === "binary" && rhs.type === "dictionary"
+        ) {
+          throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+        }
+
+        // bool += binary
+        // binary += bool
+        else if (
+          lhs.type === "bool" && rhs.type === "binary" ||
+          lhs.type === "binary" && rhs.type === "bool"
+        ) {
+          throw new Error(`Illegal operation: ${lhs.type} += ${rhs.type}`);
+        }
+        
+        // null += binary
+        // binary += null
+        else if (
+          lhs.type === "null" && rhs.type === "binary" ||
+          lhs.type === "binary" && rhs.type === "null"
+        ) {
+          return lhs.type === "binary" ? lhs : rhs;
+        }
+
         else
           // POD: currently returns interpreter types rather than strict JB types (e.g. 'number' instead of int/double)
           // call types should not be here, it should be their return value
-          // TODO: binary type handling
+          // TODO: date type handling
           throw `Illegal operation, ADDITION with incompatible data types: ${lhs.type} + ${rhs.type}`
       default:
         throw `Unknown assignment operator ${operator}`;
