@@ -11,7 +11,7 @@ import {
 } from "./values";
 
 /**
- * Runtime value of an array object.
+ * Runtime array type.
  */
 export class Array implements ArrayVal {
   type: "array";
@@ -228,7 +228,7 @@ export class Array implements ArrayVal {
           if (lhs)
             members[idx] = numVal.binopBin(operator[0], members[idx] as JbBinary);
           else
-            members[idx] = (members[idx] as JbBinary).binopNumber(operator[0], numVal);
+            members[idx] = members[idx].binopNumber(operator[0], numVal);
           break;
         // TODO: date
         default:
@@ -277,7 +277,7 @@ export class Array implements ArrayVal {
           if (lhs)
             members[idx] = nullVal.binopBin(operator[0], members[idx] as JbBinary);
           else
-            members[idx] = (members[idx] as JbBinary).binopNull(operator[0], nullVal);
+            members[idx] = members[idx].binopNull(operator[0], nullVal);
           break;
         // TODO: date
         default:
@@ -325,7 +325,7 @@ export class Array implements ArrayVal {
           if (lhs)
             members[idx] = boolVal.binopBin(operator[0], members[idx] as JbBinary);
           else
-            members[idx] = (members[idx] as JbBinary).binopBool(operator[0], boolVal);
+            members[idx] = members[idx].binopBool(operator[0], boolVal);
           break;
         // TODO: date
         default:
@@ -399,7 +399,7 @@ export class Array implements ArrayVal {
           if (lhs)
             members[idx] = strVal.binopBin(operator[0], members[idx] as JbBinary);
           else
-            members[idx] = (members[idx] as JbBinary).binopString(operator[0], strVal);
+            members[idx] = members[idx].binopString(operator[0], strVal);
           break;
         // TODO: date
         default:
@@ -424,25 +424,25 @@ export class Array implements ArrayVal {
           if(lhs)
             members[idx] = binVal.binopNumber(operator[0], members[idx] as JbNumber);
           else
-            members[idx] = (members[idx] as JbNumber).binopBin(operator[0], binVal);
+            members[idx] = members[idx].binopBin(operator[0], binVal);
           break;
         case "bool":
           if(lhs)
             members[idx] = binVal.binopBool(operator[0], members[idx] as JbBool);
           else
-            members[idx] = (members[idx] as JbBool).binopBin(operator[0], binVal);
+            members[idx] = members[idx].binopBin(operator[0], binVal);
           break;
         case "string":
           if(lhs)
             members[idx] = binVal.binopString(operator[0], members[idx] as JbString);
           else
-            members[idx] = (members[idx] as JbString).binopBin(operator[0], binVal);
+            members[idx] = members[idx].binopBin(operator[0], binVal);
           break;
         case "null":
           if(lhs)
             members[idx] = binVal.binopNull(operator[0], members[idx] as JbNull);
           else
-            members[idx] = (members[idx] as JbNull).binopBin(operator[0], binVal);
+            members[idx] = members[idx].binopBin(operator[0], binVal);
           break;
         case "array":
           members[idx] = (members[idx] as Array).assignBin(binVal, operator, lhs);
@@ -451,13 +451,13 @@ export class Array implements ArrayVal {
           if(lhs)
             members[idx] = binVal.binopDict(operator[0], members[idx] as Dictionary);
           else
-            members[idx] = (members[idx] as Dictionary).binopBin(operator[0], binVal);
+            members[idx] = members[idx].binopBin(operator[0], binVal);
           break;
         case "binary":
           if(lhs)
             members[idx] = binVal.binopBin(operator[0], members[idx] as JbBinary);
           else
-            members[idx] = (members[idx] as JbBinary).binopBin(operator[0], binVal);
+            members[idx] = members[idx].binopBin(operator[0], binVal);
           break;
         // TODO: date
         default:
@@ -515,7 +515,7 @@ export class Array implements ArrayVal {
             case "dictionary":
               throw `Transform Error: DE_TYPE_CONVERT_FAILED`;
             case "binary":
-              lMembers[idx] = (lMembers[idx] as JbNumber).binopBin("-", rMembers[idx] as JbBinary);
+              lMembers[idx] = lMembers[idx].binopBin("-", rMembers[idx] as JbBinary);
               break;
             // TODO: date
             default:
@@ -536,7 +536,7 @@ export class Array implements ArrayVal {
                 "-=");
               break;
             case "binary":
-              lMembers[idx] = (lMembers[idx] as JbBool).binopBin("-", rMembers[idx] as JbBinary);
+              lMembers[idx] = lMembers[idx].binopBin("-", rMembers[idx] as JbBinary);
               break;
             // TODO: date
             default:
@@ -558,7 +558,7 @@ export class Array implements ArrayVal {
                 "-=");
               break;
             case "binary":
-              lMembers[idx] = (lMembers[idx] as JbString).binopBin("-", rMembers[idx] as JbBinary);
+              lMembers[idx] = lMembers[idx].binopBin("-", rMembers[idx] as JbBinary);
               break;
             // TODO: date
             default:
@@ -583,7 +583,7 @@ export class Array implements ArrayVal {
             case "dictionary":
               throw `Transform Error: DE_TYPE_CONVERT_FAILED`;
             case "binary":
-              lMembers[idx] = (lMembers[idx] as JbNull).binopBin("-", rMembers[idx] as JbBinary);
+              lMembers[idx] = lMembers[idx].binopBin("-", rMembers[idx] as JbBinary);
               break;
             // TODO: date
             default:
@@ -640,7 +640,7 @@ export class Array implements ArrayVal {
               // TODO: recursive function for dict +- array
               throw `Handling for dictionary -= array not yet implemented`;
             case "binary":
-              lMembers[idx] = (lMembers[idx] as Dictionary).binopBin("-", rMembers[idx] as JbBinary);
+              lMembers[idx] = lMembers[idx].binopBin("-", rMembers[idx] as JbBinary);
               break;
             // TODO: date
             default:
@@ -649,16 +649,16 @@ export class Array implements ArrayVal {
         case "binary":
           switch (rMembers[idx].type) {
             case "number":
-              lMembers[idx] = (lMembers[idx] as JbBinary).binopNumber("-", rMembers[idx] as JbNumber);
+              lMembers[idx] = lMembers[idx].binopNumber("-", rMembers[idx] as JbNumber);
               break;
             case "bool":
-              lMembers[idx] = (lMembers[idx] as JbBinary).binopBool("-", rMembers[idx] as JbBool);
+              lMembers[idx] = lMembers[idx].binopBool("-", rMembers[idx] as JbBool);
               break;
             case "string":
-              lMembers[idx] = (lMembers[idx] as JbBinary).binopString("-", rMembers[idx] as JbString);
+              lMembers[idx] = lMembers[idx].binopString("-", rMembers[idx] as JbString);
               break;
             case "null":
-              lMembers[idx] = (lMembers[idx] as JbBinary).binopNull("-", rMembers[idx] as JbNull);
+              lMembers[idx] = lMembers[idx].binopNull("-", rMembers[idx] as JbNull);
               break;
             case "array":
               lMembers[idx] = (rMembers[idx] as Array).assignArray(
@@ -666,10 +666,10 @@ export class Array implements ArrayVal {
                 "-=");
               break;
             case "dictionary":
-              lMembers[idx] = (lMembers[idx] as JbBinary).binopDict("-", rMembers[idx] as Dictionary);
+              lMembers[idx] = lMembers[idx].binopDict("-", rMembers[idx] as Dictionary);
               break;
             case "binary":
-              lMembers[idx] = (lMembers[idx] as JbBinary).binopBin("-", rMembers[idx] as JbBinary);
+              lMembers[idx] = lMembers[idx].binopBin("-", rMembers[idx] as JbBinary);
               break;
             // TODO: date
             default:
@@ -714,10 +714,10 @@ export class Array implements ArrayVal {
                 "+=");
               break;
             case "dictionary":
-              lMembers[idx] = (lMembers[idx] as JbNumber).binopDict("+", rMembers[idx] as Dictionary);
+              lMembers[idx] = lMembers[idx].binopDict("+", rMembers[idx] as Dictionary);
               break;
             case "binary":
-              lMembers[idx] = (lMembers[idx] as JbNumber).binopBin("+", rMembers[idx] as JbBinary);
+              lMembers[idx] = lMembers[idx].binopBin("+", rMembers[idx] as JbBinary);
               break;
             // TODO: date
             default:
@@ -744,7 +744,7 @@ export class Array implements ArrayVal {
                 "+=");
               break;
             case "binary":
-              lMembers[idx] = (lMembers[idx] as JbBool).binopBin("+", rMembers[idx] as JbBinary);
+              lMembers[idx] = lMembers[idx].binopBin("+", rMembers[idx] as JbBinary);
               break;
             // TODO: date
             default:
@@ -772,7 +772,7 @@ export class Array implements ArrayVal {
             case "dictionary":
               throw `Transform Error: DE_TYPE_CONVERT_FAILED`;
             case "binary":
-              lMembers[idx] = (lMembers[idx] as JbString).binopBin("+", rMembers[idx] as JbBinary);
+              lMembers[idx] = lMembers[idx].binopBin("+", rMembers[idx] as JbBinary);
               break;
             // TODO: date
             default:
@@ -796,7 +796,7 @@ export class Array implements ArrayVal {
             case "dictionary":
               throw `Transform Error: DE_TYPE_CONVERT_FAILED`;
             case "binary":
-              lMembers[idx] = (lMembers[idx] as JbNull).binopBin("+", rMembers[idx] as JbBinary);
+              lMembers[idx] = lMembers[idx].binopBin("+", rMembers[idx] as JbBinary);
               break;
             // TODO: date
             default:
@@ -853,7 +853,7 @@ export class Array implements ArrayVal {
               // TODO: recursive function for dict +- array
               throw `Handling for dictionary += array not yet implemented`;
             case "binary":
-              lMembers[idx] = (lMembers[idx] as Dictionary).binopBin("+", rMembers[idx] as JbBinary);
+              lMembers[idx] = lMembers[idx].binopBin("+", rMembers[idx] as JbBinary);
               break;
             // TODO: date
             default:
@@ -862,25 +862,25 @@ export class Array implements ArrayVal {
         case "binary":
           switch (rMembers[idx].type) {
             case "bool":
-              lMembers[idx] = (lMembers[idx] as JbBinary).binopBool("+", rMembers[idx] as JbBool);
+              lMembers[idx] = lMembers[idx].binopBool("+", rMembers[idx] as JbBool);
               break;
             case "string":
-              lMembers[idx] = (lMembers[idx] as JbBinary).binopString("+", rMembers[idx] as JbString);
+              lMembers[idx] = lMembers[idx].binopString("+", rMembers[idx] as JbString);
               break;
             case "number":
-              lMembers[idx] = (lMembers[idx] as JbBinary).binopNumber("+", rMembers[idx] as JbNumber);
+              lMembers[idx] = lMembers[idx].binopNumber("+", rMembers[idx] as JbNumber);
               break;
             case "null":
-              lMembers[idx] = (lMembers[idx] as JbBinary).binopNull("+", rMembers[idx] as JbNull);
+              lMembers[idx] = lMembers[idx].binopNull("+", rMembers[idx] as JbNull);
               break;
             case "dictionary":
-              lMembers[idx] = (lMembers[idx] as JbBinary).binopDict("+", rMembers[idx] as Dictionary);
+              lMembers[idx] = lMembers[idx].binopDict("+", rMembers[idx] as Dictionary);
               break;
             case "array":
-              lMembers[idx] = (lMembers[idx] as JbBinary).binopArray("+", rMembers[idx] as Array);
+              lMembers[idx] = lMembers[idx].binopArray("+", rMembers[idx] as Array);
               break;
             case "binary":
-              lMembers[idx] = (lMembers[idx] as JbBinary).binopBin("+", rMembers[idx] as JbBinary);
+              lMembers[idx] = lMembers[idx].binopBin("+", rMembers[idx] as JbBinary);
               break;
             // TODO: date
             default:
@@ -903,37 +903,8 @@ export class Array implements ArrayVal {
    * @returns 
    */
   binopNumber(operator: string, rhs: JbNumber) {
-    const members = this.members;
-    for(const idx in members) {
-      switch (members[idx].type) {
-        case "number":
-          members[idx] = (members[idx] as JbNumber).binopNumber(operator, rhs);
-          break;
-        case "bool":
-          members[idx] = (members[idx] as JbBool).binopNumber(operator, rhs);
-          break;
-        case "string":
-          members[idx] = (members[idx] as JbString).binopNumber(operator, rhs);
-          break;
-        case "null":
-          members[idx] = (members[idx] as JbNull).binopNumber(operator, rhs);
-          break;
-        case "array":
-          members[idx] = (members[idx] as Array).binopNumber(operator, rhs);
-          break;
-        case "dictionary":
-          members[idx] = (members[idx] as Dictionary).binopNumber(operator, rhs);
-          break;
-        case "binary":
-          members[idx] = (members[idx] as JbBinary).binopNumber(operator, rhs);
-          break;
-        case "date":
-          members[idx] = (members[idx] as JbDate).binopNumber(operator, rhs);
-          break;
-        default:
-          throw `Unsupported array member type: ${members[idx].type}`;
-      }
-    }
+    for(const idx in this.members)
+      this.members[idx] = this.members[idx].binopNumber(operator, rhs);
     return this;
   }
 
@@ -945,37 +916,8 @@ export class Array implements ArrayVal {
    * @returns 
    */
   binopBool(operator: string, rhs: JbBool) {
-    const members = this.members;
-    for(const idx in members) {
-      switch (members[idx].type) {
-        case "number":
-          members[idx] = (members[idx] as JbNumber).binopBool(operator, rhs);
-          break;
-        case "bool":
-          members[idx] = (members[idx] as JbBool).binopBool(operator, rhs);
-          break;
-        case "string":
-          members[idx] = (members[idx] as JbString).binopBool(operator, rhs);
-          break;
-        case "null":
-          members[idx] = (members[idx] as JbNull).binopBool(operator, rhs);
-          break;
-        case "array":
-          members[idx] = (members[idx] as Array).binopBool(operator, rhs);
-          break;
-        case "dictionary":
-          members[idx] = (members[idx] as Dictionary).binopBool(operator, rhs);
-          break;
-        case "binary":
-          members[idx] = (members[idx] as JbBinary).binopBool(operator, rhs);
-          break;
-        case "date":
-          members[idx] = (members[idx] as JbDate).binopBool(operator, rhs);
-          break;
-        default:
-          throw `Unsupported array member type: ${members[idx].type}`;
-      }
-    }
+    for(const idx in this.members)
+      this.members[idx] = this.members[idx].binopBool(operator, rhs);
     return this;
   }
 
@@ -987,37 +929,8 @@ export class Array implements ArrayVal {
    * @returns 
    */
   binopString(operator: string, rhs: JbString) {
-    const members = this.members;
-    for(const idx in members) {
-      switch (members[idx].type) {
-        case "number":
-          members[idx] = (members[idx] as JbNumber).binopString(operator, rhs);
-          break;
-        case "bool":
-          members[idx] = (members[idx] as JbBool).binopString(operator, rhs);
-          break;
-        case "string":
-          members[idx] = (members[idx] as JbString).binopString(operator, rhs);
-          break;
-        case "null":
-          members[idx] = (members[idx] as JbString).binopString(operator, rhs);
-          break;
-        case "array":
-          members[idx] = (members[idx] as Array).binopString(operator, rhs);
-          break;
-        case "dictionary":
-          members[idx] = (members[idx] as Dictionary).binopString(operator, rhs);
-          break;
-        case "binary":
-          members[idx] = (members[idx] as JbBinary).binopString(operator, rhs);
-          break;
-        case "date":
-          members[idx] = (members[idx] as JbDate).binopString(operator, rhs);
-          break;
-        default:
-          throw `Unsupported array member type: ${members[idx].type}`;
-      }
-    }
+    for(const idx in this.members)
+      this.members[idx] = this.members[idx].binopString(operator, rhs);
     return this;
   }
 
@@ -1029,37 +942,8 @@ export class Array implements ArrayVal {
    * @returns 
    */
   binopNull(operator: string, rhs: JbNull) {
-    const members = this.members;
-    for(const idx in members) {
-      switch (members[idx].type) {
-        case "number":
-          members[idx] = (members[idx] as JbNumber).binopNull(operator, rhs);
-          break;
-        case "bool":
-          members[idx] = (members[idx] as JbBool).binopNull(operator, rhs);
-          break;
-        case "string":
-          members[idx] = (members[idx] as JbString).binopNull(operator, rhs);
-          break;
-        case "null":
-          members[idx] = (members[idx] as JbNull).binopNull(operator, rhs);
-          break;
-        case "array":
-          members[idx] = (members[idx] as Array).binopNull(operator, rhs);
-          break;
-        case "dictionary":
-          members[idx] = (members[idx] as Dictionary).binopNull(operator, rhs);
-          break;
-        case "binary":
-          members[idx] = (members[idx] as JbBinary).binopNull(operator, rhs);
-          break;
-        case "date":
-          members[idx] = (members[idx] as JbDate).binopNull(operator, rhs);
-          break;
-        default:
-          throw `Unsupported array member type: ${members[idx].type}`;
-      }
-    }
+    for(const idx in this.members)
+      this.members[idx] = this.members[idx].binopNull(operator, rhs);
     return this;
   }
 
@@ -1078,433 +962,56 @@ export class Array implements ArrayVal {
     const rMembers = rhs.members;
   
     for(const idx in lMembers) {
-      switch (lMembers[idx].type) {
+      switch (rMembers[idx].type) {
         case "number":
-          switch (rMembers[idx].type) {
-            case "number":
-              lMembers[idx] = (lMembers[idx] as JbNumber).binopNumber(
-                operator,
-                rMembers[idx] as JbNumber
-              );
-              break;
-            case "bool":
-              lMembers[idx] = (lMembers[idx] as JbNumber).binopBool(
-                operator,
-                rMembers[idx] as JbBool
-              );
-              break;
-            case "string":
-              lMembers[idx] = (lMembers[idx] as JbNumber).binopString(
-                operator,
-                rMembers[idx] as JbString
-              );
-              break;
-            case "null":
-              lMembers[idx] = (lMembers[idx] as JbNumber).binopNull(
-                operator,
-                rMembers[idx] as JbNull
-              );
-              break;
-            case "array":
-              lMembers[idx] = (lMembers[idx] as JbNumber).binopArray(
-                operator,
-                rMembers[idx] as Array
-              );
-              break;
-            case "dictionary":
-              lMembers[idx] = (lMembers[idx] as JbNumber).binopDict(
-                operator,
-                rMembers[idx] as Dictionary
-              );
-            case "binary":
-              lMembers[idx] = (lMembers[idx] as JbNumber).binopBin(
-                  operator,
-                  rMembers[idx] as JbBinary
-              );
-              break;
-            case "date":
-              lMembers[idx] = (lMembers[idx] as JbNumber).binopDate(
-                  operator,
-                  rMembers[idx] as JbDate
-              );
-              break;
-            default:
-              throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
-          }
+          lMembers[idx] = lMembers[idx].binopNumber(
+            operator,
+            rMembers[idx] as JbNumber
+          );
           break;
         case "bool":
-          switch (rMembers[idx].type) {
-            case "number":
-              lMembers[idx] = (lMembers[idx] as JbBool).binopNumber(
-                operator,
-                rMembers[idx] as JbNumber
-              );
-              break;
-            case "bool":
-              lMembers[idx] = (lMembers[idx] as JbBool).binopBool(
-                operator,
-                rMembers[idx] as JbBool
-              );
-              break;
-            case "string":
-              lMembers[idx] = (lMembers[idx] as JbBool).binopString(
-                operator,
-                rMembers[idx] as JbString
-              );
-              break;
-            case "null":
-              lMembers[idx] = (lMembers[idx] as JbBool).binopNull(
-                operator,
-                rMembers[idx] as JbNull
-              );
-              break;
-            case "array":
-              lMembers[idx] = (lMembers[idx] as JbBool).binopArray(
-                operator,
-                rMembers[idx] as Array
-              );
-              break;
-            case "dictionary":
-              lMembers[idx] = (lMembers[idx] as JbBool).binopDict(
-                operator,
-                rMembers[idx] as Dictionary
-              );
-            case "binary":
-              lMembers[idx] = (lMembers[idx] as JbBool).binopBin(
-                  operator,
-                  rMembers[idx] as JbBinary
-              );
-              break;
-            case "date":
-              lMembers[idx] = (lMembers[idx] as JbBool).binopDate(
-                  operator,
-                  rMembers[idx] as JbDate
-              );
-              break;
-            default:
-              throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
-          }
+          lMembers[idx] = lMembers[idx].binopBool(
+            operator,
+            rMembers[idx] as JbBool
+          );
           break;
         case "string":
-          switch (rMembers[idx].type) {
-            case "number":
-              lMembers[idx] = (lMembers[idx] as JbString).binopNumber(
-                operator,
-                rMembers[idx] as JbNumber
-              );
-              break;
-            case "bool":
-              lMembers[idx] = (lMembers[idx] as JbString).binopBool(
-                operator,
-                rMembers[idx] as JbBool
-              );
-              break;
-            case "string":
-              lMembers[idx] = (lMembers[idx] as JbString).binopString(
-                operator,
-                rMembers[idx] as JbString
-              );
-              break;
-            case "null":
-              lMembers[idx] = (lMembers[idx] as JbString).binopNull(
-                operator,
-                rMembers[idx] as JbNull
-              );
-              break;
-            case "array":
-              lMembers[idx] = (lMembers[idx] as JbString).binopArray(
-                operator,
-                rMembers[idx] as Array
-              );
-              break;
-            case "dictionary":
-              lMembers[idx] = (lMembers[idx] as JbString).binopDict(
-                operator,
-                rMembers[idx] as Dictionary
-              );
-            case "binary":
-              lMembers[idx] = (lMembers[idx] as JbString).binopBin(
-                  operator,
-                  rMembers[idx] as JbBinary
-              );
-              break;
-            case "date":
-              lMembers[idx] = (lMembers[idx] as JbString).binopDate(
-                  operator,
-                  rMembers[idx] as JbDate
-              );
-              break;
-            default:
-              throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
-          }
+          lMembers[idx] = lMembers[idx].binopString(
+            operator,
+            rMembers[idx] as JbString
+          );
           break;
         case "null":
-          switch (rMembers[idx].type) {
-            case "number":
-              lMembers[idx] = (lMembers[idx] as JbNull).binopNumber(
-                operator,
-                rMembers[idx] as JbNumber
-              );
-              break;
-            case "bool":
-              lMembers[idx] = (lMembers[idx] as JbNull).binopBool(
-                operator,
-                rMembers[idx] as JbBool
-              );
-              break;
-            case "string":
-              lMembers[idx] = (lMembers[idx] as JbNull).binopString(
-                operator,
-                rMembers[idx] as JbString
-              );
-              break;
-            case "null":
-              lMembers[idx] = (lMembers[idx] as JbNull).binopNull(
-                operator,
-                rMembers[idx] as JbNull
-              );
-              break;
-            case "array":
-              lMembers[idx] = (lMembers[idx] as JbNull).binopArray(
-                operator,
-                rMembers[idx] as Array
-              );
-              break;
-            case "dictionary":
-              lMembers[idx] = (lMembers[idx] as JbNull).binopDict(
-                operator,
-                rMembers[idx] as Dictionary
-              );
-            case "binary":
-              lMembers[idx] = (lMembers[idx] as JbNull).binopBin(
-                  operator,
-                  rMembers[idx] as JbBinary
-              );
-              break;
-            case "date":
-              lMembers[idx] = (lMembers[idx] as JbNull).binopDate(
-                  operator,
-                  rMembers[idx] as JbDate
-              );
-              break;
-            default:
-              throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
-          }
+          lMembers[idx] = lMembers[idx].binopNull(
+            operator,
+            rMembers[idx] as JbNull
+          );
           break;
         case "array":
-          switch (rMembers[idx].type) {
-            case "number":
-              lMembers[idx] = (lMembers[idx] as Array).binopNumber(
-                operator,
-                rMembers[idx] as JbNumber
-              );
-              break;
-            case "bool":
-              lMembers[idx] = (lMembers[idx] as Array).binopBool(
-                operator,
-                rMembers[idx] as JbBool
-              );
-              break;
-            case "string":
-              lMembers[idx] = (lMembers[idx] as Array).binopString(
-                operator,
-                rMembers[idx] as JbString
-              );
-              break;
-            case "null":
-              lMembers[idx] = (lMembers[idx] as Array).binopNull(
-                operator,
-                rMembers[idx] as JbNull
-              );
-              break;
-            case "array":
-              lMembers[idx] = (lMembers[idx] as Array).binopArray(
-                operator,
-                rMembers[idx] as Array
-              );
-              break;
-            case "dictionary":
-              lMembers[idx] = (lMembers[idx] as Array).binopDict(
-                operator,
-                rMembers[idx] as Dictionary
-              );
-            case "binary":
-              lMembers[idx] = (lMembers[idx] as Array).binopBin(
-                  operator,
-                  rMembers[idx] as JbBinary
-              );
-              break;
-            case "binary":
-              lMembers[idx] = (lMembers[idx] as Array).binopDate(
-                  operator,
-                  rMembers[idx] as JbDate
-              );
-              break;
-            default:
-              throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
-          }
+          lMembers[idx] = lMembers[idx].binopArray(
+            operator,
+            rMembers[idx] as Array
+          );
           break;
         case "dictionary":
-          switch (rMembers[idx].type) {
-            case "number":
-              lMembers[idx] = (lMembers[idx] as Dictionary).binopNumber(
-                operator,
-                rMembers[idx] as JbNumber
-              );
-              break;
-            case "bool":
-              lMembers[idx] = (lMembers[idx] as Dictionary).binopBool(
-                operator,
-                rMembers[idx] as JbBool
-              );
-              break;
-            case "string":
-              lMembers[idx] = (lMembers[idx] as Dictionary).binopString(
-                operator,
-                rMembers[idx] as JbString
-              );
-              break;
-            case "null":
-              lMembers[idx] = (lMembers[idx] as Dictionary).binopNull(
-                operator,
-                rMembers[idx] as JbNull
-              );
-              break;
-            case "array":
-              lMembers[idx] = (lMembers[idx] as Dictionary).binopArray(
-                operator,
-                rMembers[idx] as Array
-              );
-              break;
-            case "dictionary":
-              lMembers[idx] = (lMembers[idx] as Dictionary).binopDict(
-                operator,
-                rMembers[idx] as Dictionary
-              );
-            case "binary":
-              lMembers[idx] = (lMembers[idx] as Dictionary).binopBin(
-                  operator,
-                  rMembers[idx] as JbBinary
-              );
-              break;
-            case "date":
-              lMembers[idx] = (lMembers[idx] as Dictionary).binopDate(
-                  operator,
-                  rMembers[idx] as JbDate
-              );
-              break;
-            default:
-              throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
-          }
-          break;
+          lMembers[idx] = lMembers[idx].binopDict(
+            operator,
+            rMembers[idx] as Dictionary
+          );
         case "binary":
-          switch (rMembers[idx].type) {
-            case "number":
-              lMembers[idx] = (lMembers[idx] as JbBinary).binopNumber(
-                operator,
-                rMembers[idx] as JbNumber
-              );
-              break;
-            case "bool":
-              lMembers[idx] = (lMembers[idx] as JbBinary).binopBool(
-                operator,
-                rMembers[idx] as JbBool
-              );
-              break;
-            case "string":
-              lMembers[idx] = (lMembers[idx] as JbBinary).binopString(
-                operator,
-                rMembers[idx] as JbString
-              );
-              break;
-            case "null":
-              lMembers[idx] = (lMembers[idx] as JbBinary).binopNull(
-                operator,
-                rMembers[idx] as JbNull
-              );
-              break;
-            case "array":
-              lMembers[idx] = (lMembers[idx] as JbBinary).binopArray(
-                operator,
-                rMembers[idx] as Array
-              );
-              break;
-            case "dictionary":
-              lMembers[idx] = (lMembers[idx] as JbBinary).binopDict(
-                operator,
-                rMembers[idx] as Dictionary
-              );
-            case "binary":
-              lMembers[idx] = (lMembers[idx] as JbBinary).binopBin(
-                  operator,
-                  rMembers[idx] as JbBinary
-              );
-              break;
-            case "date":
-              lMembers[idx] = (lMembers[idx] as JbBinary).binopDate(
-                  operator,
-                  rMembers[idx] as JbDate
-              );
-              break;
-            default:
-              throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
-          }
+          lMembers[idx] = lMembers[idx].binopBin(
+              operator,
+              rMembers[idx] as JbBinary
+          );
           break;
         case "date":
-          switch (rMembers[idx].type) {
-            case "number":
-              lMembers[idx] = (lMembers[idx] as JbDate).binopNumber(
-                operator,
-                rMembers[idx] as JbNumber
-              );
-              break;
-            case "bool":
-              lMembers[idx] = (lMembers[idx] as JbDate).binopBool(
-                operator,
-                rMembers[idx] as JbBool
-              );
-              break;
-            case "string":
-              lMembers[idx] = (lMembers[idx] as JbDate).binopString(
-                operator,
-                rMembers[idx] as JbString
-              );
-              break;
-            case "null":
-              lMembers[idx] = (lMembers[idx] as JbDate).binopNull(
-                operator,
-                rMembers[idx] as JbNull
-              );
-              break;
-            case "array":
-              lMembers[idx] = (lMembers[idx] as JbDate).binopArray(
-                operator,
-                rMembers[idx] as Array
-              );
-              break;
-            case "dictionary":
-              lMembers[idx] = (lMembers[idx] as JbDate).binopDict(
-                operator,
-                rMembers[idx] as Dictionary
-              );
-            case "binary":
-              lMembers[idx] = (lMembers[idx] as JbDate).binopBin(
-                  operator,
-                  rMembers[idx] as JbBinary
-              );
-              break;
-            case "date":
-              lMembers[idx] = (lMembers[idx] as JbDate).binopDate(
-                  operator,
-                  rMembers[idx] as JbDate
-              );
-              break;
-            default:
-              throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
-          }
+          lMembers[idx] = lMembers[idx].binopDate(
+              operator,
+              rMembers[idx] as JbDate
+          );
           break;
         default:
-          throw `Unsupported LHS array member type: ${lMembers[idx].type}`;
+          throw `Unsupported RHS array member type: ${rMembers[idx].type}`;
       }
     }
     return this;
@@ -1519,36 +1026,8 @@ export class Array implements ArrayVal {
    */
   binopDict(operator: string, rhs: Dictionary) {
     const members = this.members;
-    for(const idx in members) {
-      switch (members[idx].type) {
-        case "number":
-          members[idx] = (members[idx] as JbNumber).binopDict(operator, rhs);
-          break;
-        case "bool":
-          members[idx] = (members[idx] as JbBool).binopDict(operator, rhs);
-          break;
-        case "string":
-          members[idx] = (members[idx] as JbString).binopDict(operator, rhs);
-          break;
-        case "null":
-          members[idx] = (members[idx] as JbNull).binopDict(operator, rhs);
-          break;
-        case "array":
-          members[idx] = (members[idx] as Array).binopDict(operator, rhs);
-          break;
-        case "dictionary":
-          members[idx] = (members[idx] as Dictionary).binopDict(operator, rhs);
-          break;
-        case "binary":
-          members[idx] = (members[idx] as JbBinary).binopDict(operator, rhs);
-          break;
-        case "date":
-          members[idx] = (members[idx] as JbDate).binopDict(operator, rhs);
-          break;
-        default:
-          throw `Unsupported array member type: ${members[idx].type}`;
-      }
-    }
+    for(const idx in members)
+      members[idx] = members[idx].binopDict(operator, rhs);
     return this;
   }
 
@@ -1561,36 +1040,8 @@ export class Array implements ArrayVal {
    */
   binopBin(operator: string, rhs: JbBinary) {
     const members = this.members;
-    for(const idx in members) {
-      switch (members[idx].type) {
-        case "number":
-          members[idx] = (members[idx] as JbNumber).binopBin(operator, rhs);
-          break;
-        case "bool":
-          members[idx] = (members[idx] as JbBool).binopBin(operator, rhs);
-          break;
-        case "string":
-          members[idx] = (members[idx] as JbString).binopBin(operator, rhs);
-          break;
-        case "null":
-          members[idx] = (members[idx] as JbNull).binopBin(operator, rhs);
-          break;
-        case "array":
-          members[idx] = (members[idx] as Array).binopBin(operator, rhs);
-          break;
-        case "dictionary":
-          members[idx] = (members[idx] as Dictionary).binopBin(operator, rhs);
-          break;
-        case "binary":
-          members[idx] = (members[idx] as JbBinary).binopBin(operator, rhs);
-          break;
-        case "date":
-          members[idx] = (members[idx] as JbDate).binopBin(operator, rhs);
-          break;
-        default:
-          throw `Unsupported array member type: ${members[idx].type}`;
-      }
-    }
+    for(const idx in members) 
+      members[idx] = members[idx].binopBin(operator, rhs);
     return this;
   }
 
@@ -1603,43 +1054,15 @@ export class Array implements ArrayVal {
    */
   binopDate(operator: string, rhs: JbDate) {
     const members = this.members;
-    for(const idx in members) {
-      switch (members[idx].type) {
-        case "number":
-          members[idx] = (members[idx] as JbNumber).binopDate(operator, rhs);
-          break;
-        case "bool":
-          members[idx] = (members[idx] as JbBool).binopDate(operator, rhs);
-          break;
-        case "string":
-          members[idx] = (members[idx] as JbString).binopDate(operator, rhs);
-          break;
-        case "null":
-          members[idx] = (members[idx] as JbNull).binopDate(operator, rhs);
-          break;
-        case "array":
-          members[idx] = (members[idx] as Array).binopDate(operator, rhs);
-          break;
-        case "dictionary":
-          members[idx] = (members[idx] as Dictionary).binopDate(operator, rhs);
-          break;
-        case "binary":
-          members[idx] = (members[idx] as JbBinary).binopDate(operator, rhs);
-          break;
-        case "date":
-          members[idx] = (members[idx] as JbDate).binopDate(operator, rhs);
-          break;
-        default:
-          throw `Unsupported array member type: ${members[idx].type}`;
-      }
-    }
+    for(const idx in members)
+      members[idx] = members[idx].binopDate(operator, rhs);
     return this;
   }
 }
 
 /**
-   * Jitterbit dictionary object.
-   */
+ * Runtime dictionary type.
+ */
 export class Dictionary implements DictVal {
   type: "dictionary";
   members: Map<string, RuntimeVal>;
@@ -2069,7 +1492,7 @@ export class Dictionary implements DictVal {
 }
 
 /**
- * Runtime bool values.
+ * Runtime boolean type.
  */
 export class JbBool implements BooleanVal {
   type: "bool";

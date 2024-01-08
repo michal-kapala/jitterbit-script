@@ -68,6 +68,70 @@ export interface RuntimeVal {
    * Returns the string representation of the runtime value.
    */
   toString(): string;
+
+  /**
+   * Applies a binary operator to this value with the RHS value being a number.
+   * @param operator 
+   * @param rhs 
+   * @returns 
+   */
+  binopNumber(operator: string, rhs: NumberVal): RuntimeVal;
+
+  /**
+   * Applies a binary operator to this value with the RHS value being a boolean.
+   * @param operator 
+   * @param rhs 
+   * @returns 
+   */
+  binopBool(operator: string, rhs: BooleanVal): RuntimeVal;
+
+  /**
+   * Applies a binary operator to this value with the RHS value being a string.
+   * @param operator 
+   * @param rhs 
+   * @returns 
+   */
+  binopString(operator: string, rhs: StringVal): RuntimeVal;
+
+  /**
+   * Applies a binary operator to this value with the RHS value being a null.
+   * @param operator 
+   * @param rhs 
+   * @returns 
+   */
+  binopNull(operator: string, rhs: NullVal): RuntimeVal;
+
+  /**
+   * Applies a binary operator to this value with the RHS value being an array.
+   * @param operator 
+   * @param rhs 
+   * @returns 
+   */
+  binopArray(operator: string, rhs: ArrayVal): RuntimeVal;
+
+  /**
+   * Applies a binary operator to this value with the RHS value being a dictionary.
+   * @param operator 
+   * @param rhs 
+   * @returns 
+   */
+  binopDict(operator: string, rhs: DictVal): RuntimeVal;
+
+  /**
+   * Applies a binary operator to this value with the RHS value being binary data.
+   * @param operator 
+   * @param rhs 
+   * @returns 
+   */
+  binopBin(operator: string, rhs: BinaryVal): RuntimeVal;
+
+  /**
+   * Applies a binary operator to this value with the RHS value being a date.
+   * @param operator 
+   * @param rhs 
+   * @returns 
+   */
+  binopDate(operator: string, rhs: DateVal): RuntimeVal;
 }
 
 /**
