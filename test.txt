@@ -1,8 +1,8 @@
 <trans>
-  // test for date binary operators, should return true
+  // test for -= date assignment operator, should return 1
   date1 = Now();
   date2 = date1 + 1;
-  result = date1 + 1 == date2;
+  date2 -= date1;
   DebugBreak();
   
 </trans>

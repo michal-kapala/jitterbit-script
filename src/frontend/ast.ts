@@ -552,7 +552,7 @@ export class MemberExpr implements Expr {
           rhs,
           assignment.operator.value
         );
-        // setMember appends null values if index is out of bounds
+        // set appends null values if index is out of bounds
         return  (lhs as Array).set(index, newValue);
       case "dictionary":
         const key = evaluate(this.key, scope);

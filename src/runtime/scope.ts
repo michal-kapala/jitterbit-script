@@ -2,8 +2,10 @@ import { Api } from "../api";
 import { GlobalIdentifier } from "../frontend/ast";
 import { 
   Array,
+  Dictionary,
   JbBinary,
   JbBool,
+  JbDate,
   JbNull,
   JbNumber,
   JbString
@@ -84,6 +86,7 @@ export default class Scope {
             case "bool":
             case "string":
             case "binary":
+            case "date":
               throw `Illegal operation, SUBTRACT with incompatible data types: unknown - ${value.type}`;
             case "array":
               // eval as null-initialized
@@ -94,7 +97,6 @@ export default class Scope {
               return value;
             case "dictionary":
               throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
-            // TODO: date
             default:
               throw `Unsupported type: ${value.type}`;
           }
@@ -112,11 +114,11 @@ export default class Scope {
             case "array":
             case "binary":
             case "null":
+            case "date":
               this.getGlobal().variables.set(varName, value);
               return value;
             case "dictionary":
               throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
-            // TODO: date
             default:
               throw `Unsupported type: ${value.type}`;
           }
@@ -351,6 +353,19 @@ export default class Scope {
           return arr;
         }
 
+        // date -= array
+        // array -= date
+        else if (
+          lhs.type === "date" && rhs.type === "array" ||
+          lhs.type === "array" && rhs.type === "date"
+        ) {
+          const isLhs = lhs.type === "date";
+          const dateVal = (isLhs ? lhs : rhs) as JbDate;
+          let arr = (isLhs ? rhs : lhs) as Array;
+          arr = arr.assignDate(dateVal, operator, isLhs);
+          return arr;
+        }
+
         // dicts
 
         // dict -= dict
@@ -371,11 +386,46 @@ export default class Scope {
         // binary
 
         // binary -= null
-        else if (lhs.type === "binary" && rhs.type === "null") {
+        else if (lhs.type === "binary" && rhs.type === "null")
           return lhs;
-        }
 
-        // TODO: date
+        // date
+
+        // date -= date
+        else if (lhs.type === "date" && rhs.type === "date")
+          return lhs.binopDate(operator[0], rhs as JbDate);
+
+        // date -= number
+        // number -= date
+        else if (lhs.type === "date" && rhs.type === "number")
+          return lhs.binopNumber(operator[0], rhs as JbNumber);
+
+        else if (lhs.type === "number" && rhs.type === "date")
+          return lhs.binopDate(operator[0], rhs as JbDate);
+
+        // date -= bool
+        // bool -= date
+        else if (lhs.type === "date" && rhs.type === "bool")
+          return lhs.binopBool(operator[0], rhs as JbBool);
+
+        else if (lhs.type === "bool" && rhs.type === "date")
+          return lhs.binopDate(operator[0], rhs as JbDate);
+
+        // date -= string
+        // string -= date
+        else if (lhs.type === "date" && rhs.type === "string")
+          return lhs.binopString(operator[0], rhs as JbString);
+
+        else if (lhs.type === "string" && rhs.type === "date")
+          return lhs.binopDate(operator[0], rhs as JbDate);
+
+        // date -= null
+        // null -= date
+        else if (lhs.type === "date" && rhs.type === "null")
+          return lhs.binopNull(operator[0], rhs as JbNull);
+
+        else if (lhs.type === "null" && rhs.type === "date")
+          return lhs.binopDate(operator[0], rhs as JbDate);
 
         else
           // currently returns interpreter types rather than strict JB types (e.g. 'number' instead of int/double)
@@ -403,6 +453,10 @@ export default class Scope {
           // null -= binary
           // binary -= dict
           // dict -= binary
+          // date -= dict
+          // dict -= date
+          // date -= binary
+          // binary -= date
           throw `Illegal operation, SUBTRACT with incompatible data types: ${lhs.type} - ${rhs.type}`;
       case "+=":
         // number += number
@@ -531,6 +585,19 @@ export default class Scope {
           return arr;
         }
 
+        // date += array
+        // array += date
+        else if (
+          lhs.type === "date" && rhs.type === "array" ||
+          lhs.type === "array" && rhs.type === "date"
+        ) {
+          const isLhs = lhs.type === "date";
+          const dateVal = (isLhs ? lhs : rhs) as JbDate;
+          let arr = (isLhs ? rhs : lhs) as Array;
+          arr = arr.assignDate(dateVal, operator, isLhs);
+          return arr;
+        }
+
         // dicts
 
         // dict += dict
@@ -569,6 +636,14 @@ export default class Scope {
         ) {
           throw new Error(`Illegal operation: ${lhs.type} += ${rhs.type}`);
         }
+
+        // dict += date
+        // date += dict
+        else if (lhs.type === "dictionary" && rhs.type === "date")
+          return lhs.binopDate(operator[0], rhs as JbDate);
+
+        else if (lhs.type === "date" && rhs.type === "dictionary")
+          return lhs.binopDict(operator[0], rhs as Dictionary);
 
         // binary
 
@@ -609,10 +684,55 @@ export default class Scope {
           return lhs.type === "binary" ? lhs : rhs;
         }
 
+        // binary += date
+        // date += binary
+        else if (lhs.type === "binary" && rhs.type === "date")
+          return lhs.binopDate(operator[0], rhs as JbDate);
+
+        else if (lhs.type === "date" && rhs.type === "binary")
+          return lhs.binopBin(operator[0], rhs as JbBinary);
+
+        // date
+
+        // date += date
+        else if (lhs.type === "date" && rhs.type === "date")
+          return lhs.binopDate(operator[0], rhs as JbDate);
+
+        // date += number
+        // number += date
+        else if (lhs.type === "date" && rhs.type === "number")
+          return lhs.binopNumber(operator[0], rhs as JbNumber);
+
+        else if (lhs.type === "number" && rhs.type === "date")
+          return lhs.binopDate(operator[0], rhs as JbDate);
+
+        // date += bool
+        // bool += date
+        else if (lhs.type === "date" && rhs.type === "bool")
+          return lhs.binopBool(operator[0], rhs as JbBool);
+
+        else if (lhs.type === "bool" && rhs.type === "date")
+          return lhs.binopDate(operator[0], rhs as JbDate);
+
+        // date += string
+        // string += date
+        else if (lhs.type === "date" && rhs.type === "string")
+          return lhs.binopString(operator[0], rhs as JbString);
+
+        else if (lhs.type === "string" && rhs.type === "date")
+          return lhs.binopDate(operator[0], rhs as JbDate);
+
+        // date += null
+        // null += date
+        else if (lhs.type === "date" && rhs.type === "null")
+          return lhs.binopNull(operator[0], rhs as JbNull);
+
+        else if (lhs.type === "null" && rhs.type === "date")
+          return lhs.binopDate(operator[0], rhs as JbDate);
+
         else
           // POD: currently returns interpreter types rather than strict JB types (e.g. 'number' instead of int/double)
           // call types should not be here, it should be their return value
-          // TODO: date type handling
           throw `Illegal operation, ADDITION with incompatible data types: ${lhs.type} + ${rhs.type}`
       default:
         throw `Unknown assignment operator ${operator}`;
