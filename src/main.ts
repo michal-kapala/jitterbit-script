@@ -12,33 +12,10 @@ async function run(filename: string) {
 
   fs.readFile(filename, 'utf8', function (err,data) {
     if (err) {
-      return console.log(err);
+      return console.error(err);
     }
     const program = parser.parse(data);
     const result = evaluate(program, globalScope);
     console.log("\nScript result:\n", result);
   });
-}
-
-function repl() {
-  const parser = new Parser();
-  const globalScope = new Scope();
-  // INITIALIZE REPL
-  const prompt = require('prompt-sync')({sigint: true});
-  console.log("\nRepl v0.1");
-
-  // Continue Repl Until User Stops Or Types `exit`
-  while (true) {
-    const input = prompt("> ");
-    // Check for no user input or exit keyword.
-    if (!input || input.includes("exit")) {
-      return;
-    }
-
-    // Produce AST From source-code
-    const program = parser.parse(input ?? "");
-
-    const result = evaluate(program, globalScope);
-    console.log(result);
-  }
 }
