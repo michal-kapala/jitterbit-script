@@ -549,8 +549,8 @@ export class MemberExpr implements Expr {
           : new JbNull();
         const newValue = Scope.assign(
           evaluate(this, scope),
-          rhs,
-          assignment.operator.value
+          assignment.operator.value,
+          rhs
         );
         // set appends null values if index is out of bounds
         return  (lhs as Array).set(index, newValue);
@@ -558,8 +558,8 @@ export class MemberExpr implements Expr {
         const key = evaluate(this.key, scope);
         const newVal = Scope.assign(
           evaluate(this, scope),
-          evaluate(assignment.value, scope),
-          assignment.operator.value
+          assignment.operator.value,
+          evaluate(assignment.value, scope)
         );
         return (lhs as Dictionary).set(key, newVal);
       default:

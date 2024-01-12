@@ -2811,8 +2811,7 @@ export class JbNumber implements NumberVal {
   binopDate(operator: string, rhs: JbDate) {
     switch (operator) {
       case "+":
-        rhs.value.setTime(rhs.value.getTime() + this.value * 1000);
-        return rhs;
+        return new JbDate(new Date(rhs.value.getTime() + this.value * 1000));
       case "-":
         throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
       case "*":

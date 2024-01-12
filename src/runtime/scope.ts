@@ -127,7 +127,7 @@ export default class Scope {
       }
     }
 
-    let newValue = Scope.assign(oldValue ?? new JbNull(), value, operator);
+    let newValue = Scope.assign(oldValue ?? new JbNull(), operator, value);
     return this.setVar(varName, newValue);
   }
 
@@ -213,7 +213,7 @@ export default class Scope {
    * @param operator 
    * @returns 
    */
-  static assign(lhs: RuntimeVal, rhs: RuntimeVal, operator: string) {
+  static assign(lhs: RuntimeVal, operator: string, rhs: RuntimeVal) {
     switch (operator) {
       case "=":
         return rhs;
