@@ -546,6 +546,12 @@ export default class Parser {
       case TokenType.Float:
         return new NumericLiteral(parseFloat(this.consume().value));
 
+      // leading-dot float literals
+      case TokenType.Dot:
+        if(this.not_eof() && this.tokens[1].type === TokenType.Integer) {
+          return new NumericLiteral(parseFloat(this.consume().value + this.consume().value));
+        }
+
       case TokenType.True:
         this.consume();
         return new BooleanLiteral(true);

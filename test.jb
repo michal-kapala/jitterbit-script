@@ -1,8 +1,6 @@
 <trans>
   // test for -= date assignment operator, should return 1
-  date1 = Now();
-  date2 = date1 + 1;
-  date2 -= date1;
+  result = 1.234 + .5;
   DebugBreak();
   
 </trans>
