@@ -1,13 +1,6 @@
 import { describe, expect, test } from '@jest/globals';
-import Parser from "../../src/frontend/parser";
-import Scope from "../../src/runtime/scope";
-import { evaluate } from "../../src/runtime/interpreter";
+import run from '../utils';
 import { JbNumber } from '../../src/runtime/types';
-
-function run(testScript: string) {
-  const program = new Parser().parse(testScript);
-  return evaluate(program, new Scope());
-}
 
 describe('Tests for runtime implementations of JbNumber operators', function() {
   test('number + number', function() {
@@ -15,7 +8,7 @@ describe('Tests for runtime implementations of JbNumber operators', function() {
       <trans>
         1 + 2
       </trans>`;
-    const result = run(test);
-    expect((result as JbNumber).value).toBe(3);
+    const result = run(test) as JbNumber;
+    expect(result.value).toBe(3);
   });
 });
