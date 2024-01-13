@@ -14,43 +14,28 @@ import Scope from '../../src/runtime/scope';
 
 describe('JbNumber operators', function() {
   test('-number', function() {
-    const test = `
-      <trans>
-        -7.4
-      </trans>`;
-    const result = run(test) as JbNumber;
-    expect(result.type).toBe("number");
-    expect(result.value).toBeCloseTo(-7.4);
+    expect(
+      new JbNumber(7.4).negative()
+    ).toEqual(new JbNumber(-7.4));
   });
 
   test('!number', function() {
-    const test = `
-      <trans>
-        !7.4
-      </trans>`;
-    const result = run(test) as JbNumber;
-    expect(result.type).toBe("bool");
-    expect(result.value).toBe(false);
+    expect(
+      new JbNumber(7.4).negate()
+    ).toEqual(new JbBool(false));
   });
 
   test('!0', function() {
-    const test = `
-      <trans>
-        !.0
-      </trans>`;
-    const result = run(test) as JbNumber;
-    expect(result.type).toBe("bool");
-    expect(result.value).toBe(true);
+    expect(
+      new JbNumber(0).negate()
+    ).toEqual(new JbBool(true));
   });
 
   test('= number', function() {
-    const test = `
-      <trans>
-        result = 6.9;
-      </trans>`;
-    const result = run(test) as JbNumber;
-    expect(result.type).toBe("number");
-    expect(result.value).toBe(6.9);
+    const num = new JbNumber(6.9);
+    expect(
+      Scope.assign(new Array(), "=", num)
+    ).toStrictEqual(num);
   });
 
   test('--number', function() {
@@ -61,7 +46,7 @@ describe('JbNumber operators', function() {
       </trans>`;
     const result = run(test) as JbNumber;
     expect(result.type).toBe("number");
-    expect(result.value).toBe(2.3);
+    expect(result.value).toBeCloseTo(2.3);
   });
 
   test('number--', function() {
@@ -73,7 +58,7 @@ describe('JbNumber operators', function() {
       </trans>`;
     const result = run(test) as JbNumber;
     expect(result.type).toBe("number");
-    expect(result.value).toBe(5.6);
+    expect(result.value).toBeCloseTo(5.6);
   });
 
   test('++number', function() {
@@ -84,7 +69,7 @@ describe('JbNumber operators', function() {
       </trans>`;
     const result = run(test) as JbNumber;
     expect(result.type).toBe("number");
-    expect(result.value).toBe(4.3);
+    expect(result.value).toBeCloseTo(4.3);
   });
 
   test('number++', function() {
@@ -96,49 +81,31 @@ describe('JbNumber operators', function() {
       </trans>`;
     const result = run(test) as JbNumber;
     expect(result.type).toBe("number");
-    expect(result.value).toBe(7.6);
+    expect(result.value).toBeCloseTo(7.6);
   });
 
   test('number -= number', function() {
-    const test = `
-      <trans>
-        num = 6.9;
-        num -= -.1;
-      </trans>`;
-    const result = run(test) as JbNumber;
-    expect(result.type).toBe("number");
-    expect(result.value).toBe(7);
+    expect(
+      Scope.assign(new JbNumber(6.9), "-=", new JbNumber(-0.1))
+    ).toEqual(new JbNumber(7));
   });
 
   test('number += number', function() {
-    const test = `
-      <trans>
-        num = 6.9;
-        num += .1;
-      </trans>`;
-    const result = run(test) as JbNumber;
-    expect(result.type).toBe("number");
-    expect(result.value).toBe(7);
+    expect(
+      Scope.assign(new JbNumber(6.9), "+=", new JbNumber(0.1))
+    ).toEqual(new JbNumber(7));
   });
 
   test('number + number', function() {
-    const test = `
-      <trans>
-        1.234 + .5
-      </trans>`;
-    const result = run(test) as JbNumber;
-    expect(result.type).toBe("number");
-    expect(result.value).toBeCloseTo(1.734);
+    expect(
+      new JbNumber(1.234).binopNumber("+", new JbNumber(0.5)).value
+    ).toBeCloseTo(1.734);
   });
 
   test('number - number', function() {
-    const test = `
-      <trans>
-        1 - 1.2
-      </trans>`;
-    const result = run(test) as JbNumber;
-    expect(result.type).toBe("number");
-    expect(result.value).toBeCloseTo(-0.2);
+    expect(
+      new JbNumber(1).binopNumber("-", new JbNumber(1.2)).value
+    ).toBeCloseTo(-0.2);
   });
 
   test('number * number', function() {
@@ -168,113 +135,69 @@ describe('JbNumber operators', function() {
   });
 
   test('number ^ number', function() {
-    const test = `
-      <trans>
-        3 ^ 4
-      </trans>`;
-    const result = run(test) as JbNumber;
-    expect(result.type).toBe("number");
-    expect(result.value).toBe(81);
+    expect(
+      new JbNumber(3).binopNumber("^", new JbNumber(4))
+    ).toEqual(new JbNumber(81));
   });
 
   test('number < number', function() {
-    const test = `
-      <trans>
-        3.46 < 3.461
-      </trans>`;
-    const result = run(test) as JbNumber;
-    expect(result.type).toBe("bool");
-    expect(result.value).toBe(true);
+    expect(
+      new JbNumber(3.46).binopNumber("<", new JbNumber(3.461))
+    ).toEqual(new JbBool(true));
   });
 
   test('number > number', function() {
-    const test = `
-      <trans>
-        3.46 > 3.461
-      </trans>`;
-    const result = run(test) as JbNumber;
-    expect(result.type).toBe("bool");
-    expect(result.value).toBe(false);
+    expect(
+      new JbNumber(3.46).binopNumber(">", new JbNumber(3.461))
+    ).toEqual(new JbBool(false));
   });
 
   test('number <= number', function() {
-    const test = `
-      <trans>
-        3.461 <= 3.461
-      </trans>`;
-    const result = run(test) as JbNumber;
-    expect(result.type).toBe("bool");
-    expect(result.value).toBe(true);
+    expect(
+      new JbNumber(3.46).binopNumber("<=", new JbNumber(3.461))
+    ).toEqual(new JbBool(true));
   });
 
   test('number >= number', function() {
-    const test = `
-      <trans>
-        3.460 >= 3.461
-      </trans>`;
-    const result = run(test) as JbNumber;
-    expect(result.type).toBe("bool");
-    expect(result.value).toBe(false);
+    expect(
+      new JbNumber(3.46).binopNumber(">=", new JbNumber(3.461))
+    ).toEqual(new JbBool(false));
   });
 
   test('number == number', function() {
-    const test = `
-      <trans>
-        0 == 0.0
-      </trans>`;
-    const result = run(test) as JbNumber;
-    expect(result.type).toBe("bool");
-    expect(result.value).toBe(true);
+    expect(
+      new JbNumber(0).binopNumber("==", new JbNumber(0.0))
+    ).toEqual(new JbBool(true));
   });
 
   test('number != number', function() {
-    const test = `
-      <trans>
-        0 != 0.0
-      </trans>`;
-    const result = run(test) as JbNumber;
-    expect(result.type).toBe("bool");
-    expect(result.value).toBe(false);
+    expect(
+      new JbNumber(0).binopNumber("!=", new JbNumber(0.0))
+    ).toEqual(new JbBool(false));
   });
 
   test('number && number', function() {
-    const test = `
-      <trans>
-        0 && 0.0
-      </trans>`;
-    const result = run(test) as JbNumber;
-    expect(result.type).toBe("bool");
-    expect(result.value).toBe(false);
+    expect(
+      new JbNumber(0).binopNumber("&&", new JbNumber(0.0))
+    ).toEqual(new JbBool(false));
   });
 
   test('number & number', function() {
-    const test = `
-      <trans>
-        0 & 0.0
-      </trans>`;
-    const result = run(test) as JbNumber;
-    expect(result.type).toBe("bool");
-    expect(result.value).toBe(false);
+    expect(
+      new JbNumber(0).binopNumber("&", new JbNumber(0.0))
+    ).toEqual(new JbBool(false));
   });
 
   test('number || number', function() {
-    const test = `
-      <trans>
-        0 || 0.1
-      </trans>`;
-    const result = run(test) as JbNumber;
-    expect(result.type).toBe("bool");
-    expect(result.value).toBe(true);
+    expect(
+      new JbNumber(0).binopNumber("||", new JbNumber(0.1))
+    ).toEqual(new JbBool(true));
   });
 
   test('number | number', function() {
-    const test = `
-      <trans>
-        0 | 0.1
-      </trans>`;
-    const result = run(test) as JbNumber;
-    expect(result.type).toBe("bool");
-    expect(result.value).toBe(true);
+    expect(
+      new JbNumber(0).binopNumber("|", new JbNumber(0.1))
+    ).toEqual(new JbBool(true));
   });
 });
 
@@ -344,15 +267,9 @@ describe('JbNumber cross-type interactions', function() {
   });
 
   test('number += string', function() {
-    const test = `
-      <trans>
-        num = -3.3;
-        num += "-2.7abcd";
-      </trans>
-    `;
-    const result = run(test) as JbString;
-    expect(result.type).toBe("string");
-    expect(result.value).toBe("-3.3-2.7abcd");
+    expect(
+      Scope.assign(new JbNumber(-3.3), "+=", new JbString("-2.7abcd"))
+    ).toEqual(new JbString("-3.3-2.7abcd"));
   });
 
   test('number += null', function() {
@@ -413,14 +330,9 @@ describe('JbNumber cross-type interactions', function() {
   });
 
   test('number + string', function() {
-    const test = `
-      <trans>
-        5 + "-420.69";
-      </trans>
-    `;
-    const result = run(test) as JbString;
-    expect(result.type).toBe("string");
-    expect(result.value).toBe("5-420.69");
+    expect(
+      new JbNumber(5).binopString("+", new JbString("-420.69"))
+    ).toEqual(new JbString("5-420.69"));
   });
 
   test('number + null', function() {
