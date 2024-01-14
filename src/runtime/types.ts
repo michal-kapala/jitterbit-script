@@ -1770,7 +1770,7 @@ export class JbBool implements BooleanVal {
   binopString(operator: string, rhs: JbString) {
     switch (operator) {
       case "+":
-        new JbString(this.toString() + rhs.value);
+        return new JbString(this.toString() + rhs.value);
       case "-":
         throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
       case "*":
@@ -1850,15 +1850,9 @@ export class JbBool implements BooleanVal {
           : 0 >= rhs.value
         );
       case "==":
-        return new JbBool(this.value
-          ? 1 === rhs.value
-          : 0 === rhs.value
-        );
+        return new JbBool(this.value === rhs.toBool());
       case "!=":
-        return new JbBool(this.value
-          ? 1 !== rhs.value
-          : 0 !== rhs.value
-        );
+        return new JbBool(this.value !== rhs.toBool());
       case "&&":
       case "&":
         return new JbBool(this.value && rhs.toBool());
@@ -1880,7 +1874,7 @@ export class JbBool implements BooleanVal {
   binopNull(operator: string, rhs: JbNull) {
     switch (operator) {
       case "+":
-        return new JbNumber(this.toNumber());
+        return new JbBool(this.value);
       case "-":
         throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
       case "*":
@@ -2619,15 +2613,9 @@ export class JbNumber implements NumberVal {
           : this.value >= 0
         );
       case "==":
-        return new JbBool(rhs.value
-          ? this.value === 1
-          : this.value === 0
-        );
+        return new JbBool(this.toBool() === rhs.value);
       case "!=":
-        return new JbBool(rhs.value
-          ? this.value !== 1
-          : this.value !== 0
-        );
+        return new JbBool(this.toBool() !== rhs.value);
       case "&&":
       case "&":
         return new JbBool(this.toBool() && rhs.value);
@@ -2951,9 +2939,7 @@ export class JbString implements StringVal {
    * @returns 
    */
   compareWithBool(operator: string, boolVal: JbBool): boolean {
-    let parseResult = parseFloat(this.value);
-    let strBoolVal = !Number.isNaN(parseResult) && parseResult >= 1;
-    let strIntVal = strBoolVal ? 1 : 0;
+    let strIntVal = this.toNumber();
     let boolIntVal = boolVal.toNumber();
 
     switch(operator) {

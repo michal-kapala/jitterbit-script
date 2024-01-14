@@ -32,10 +32,10 @@ describe('JbNumber operators', function() {
   });
 
   test('= number', function() {
-    const num = new JbNumber(6.9);
+    const rhs = new JbNumber(6.9);
     expect(
-      Scope.assign(new Array(), "=", num)
-    ).toStrictEqual(num);
+      Scope.assign(new Array(), "=", rhs)
+    ).toStrictEqual(rhs);
   });
 
   test('--number', function() {
@@ -215,10 +215,10 @@ describe('JbNumber cross-type interactions', function() {
   });
 
   test('number -= null', function() {
-    const num = new JbNumber(5.5);
+    const lhs = new JbNumber(5.5);
     expect(
-      Scope.assign(num, "-=", new JbNull())
-    ).toEqual(num);
+      Scope.assign(lhs, "-=", new JbNull())
+    ).toEqual(lhs);
   });
 
   test('number -= array', function() {
@@ -273,9 +273,10 @@ describe('JbNumber cross-type interactions', function() {
   });
 
   test('number += null', function() {
-    expect(function() {
-      Scope.assign(new JbNumber(5.5), "+=", new JbNull())
-    }).toThrow();
+    const lhs = new JbNumber(5.5);
+    expect(
+      Scope.assign(lhs, "+=", new JbNull())
+    ).toStrictEqual(lhs);
   });
 
   test('number += array', function() {
@@ -336,10 +337,10 @@ describe('JbNumber cross-type interactions', function() {
   });
 
   test('number + null', function() {
-    const num = new JbNumber(5.5);
+    const lhs = new JbNumber(5.5);
     expect(
-      num.binopNull("+", new JbNull())
-    ).toEqual(num);
+      lhs.binopNull("+", new JbNull())
+    ).toEqual(lhs);
   });
 
   test('number + array', function() {
@@ -391,10 +392,10 @@ describe('JbNumber cross-type interactions', function() {
   });
 
   test('number - null', function() {
-    const num = new JbNumber(5.5);
+    const lhs = new JbNumber(5.5);
     expect(
-      num.binopNull("-", new JbNull())
-    ).toEqual(num);
+      lhs.binopNull("-", new JbNull())
+    ).toEqual(lhs);
   });
 
   test('number - array', function() {
@@ -441,9 +442,8 @@ describe('JbNumber cross-type interactions', function() {
   });
 
   test('number * null', function() {
-    const num = new JbNumber(5.5);
     expect(
-      num.binopNull("*", new JbNull())
+      new JbNumber(5.5).binopNull("*", new JbNull())
     ).toEqual(new JbNumber(0));
   });
 
