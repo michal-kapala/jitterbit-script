@@ -41,8 +41,8 @@ describe('JbNumber operators', function() {
   test('--number', function() {
     const test = `
       <trans>
-        num = 3.3;
-        result = --num;
+        value = 3.3;
+        result = --value;
       </trans>`;
     const result = run(test) as JbNumber;
     expect(result.type).toBe("number");
@@ -52,9 +52,9 @@ describe('JbNumber operators', function() {
   test('number--', function() {
     const test = `
       <trans>
-        num = 3.3;
-        result = num--;
-        result + num;
+        value = 3.3;
+        result = value--;
+        result + value;
       </trans>`;
     const result = run(test) as JbNumber;
     expect(result.type).toBe("number");
@@ -64,8 +64,8 @@ describe('JbNumber operators', function() {
   test('++number', function() {
     const test = `
       <trans>
-        num = 3.3;
-        result = ++num;
+        value = 3.3;
+        result = ++value;
       </trans>`;
     const result = run(test) as JbNumber;
     expect(result.type).toBe("number");
@@ -75,9 +75,9 @@ describe('JbNumber operators', function() {
   test('number++', function() {
     const test = `
       <trans>
-        num = 3.3;
-        result = num++;
-        result + num;
+        value = 3.3;
+        result = value++;
+        result + value;
       </trans>`;
     const result = run(test) as JbNumber;
     expect(result.type).toBe("number");
@@ -598,8 +598,9 @@ describe('JbNumber cross-type interactions', function() {
     const result = new JbNumber(5.5).binopArray(
       "<", new Array([new JbNumber(3.5), new JbString("6")])
     );
-    expect(result.members[0]).toEqual(new JbBool(false));
-    expect(result.members[1]).toEqual(new JbBool(true));
+    expect(result).toStrictEqual(
+      new Array([new JbBool(false), new JbBool(true)])
+    );
   });
 
   test('number < {}', function() {
@@ -649,8 +650,9 @@ describe('JbNumber cross-type interactions', function() {
     const result = new JbNumber(5.5).binopArray(
       ">", new Array([new JbNumber(3.5), new JbString("6")])
     );
-    expect(result.members[0]).toEqual(new JbBool(true));
-    expect(result.members[1]).toEqual(new JbBool(false));
+    expect(result).toStrictEqual(
+      new Array([new JbBool(true), new JbBool(false)])
+    );
   });
 
   test('number > {}', function() {
@@ -673,12 +675,9 @@ describe('JbNumber cross-type interactions', function() {
   });
 
   test('number > date', function() {
-    // timezone-proof
-    const localTimestamp = Math.floor(Date.UTC(2024, 0, 13) / 1000);
+    const timestamp = Math.floor(Date.UTC(2024, 0, 13) / 1000);
     expect(
-      new JbNumber(
-        localTimestamp + new Date().getTimezoneOffset() * 60
-      ).binopDate(">", new JbDate(new Date("1/13/24")))
+      new JbNumber(timestamp).binopDate(">", new JbDate(new Date("1/13/24")))
     ).toEqual(new JbBool(false));
   });
 
@@ -704,8 +703,9 @@ describe('JbNumber cross-type interactions', function() {
     const result = new JbNumber(6).binopArray(
       "<=", new Array([new JbNumber(3.5), new JbString("6")])
     );
-    expect(result.members[0]).toEqual(new JbBool(false));
-    expect(result.members[1]).toEqual(new JbBool(true));
+    expect(result).toStrictEqual(
+      new Array([new JbBool(false), new JbBool(true)])
+    );
   });
 
   test('number <= {}', function() {
@@ -755,8 +755,9 @@ describe('JbNumber cross-type interactions', function() {
     const result = new JbNumber(3.5).binopArray(
       ">=", new Array([new JbNumber(3.5), new JbString("6")])
     );
-    expect(result.members[0]).toEqual(new JbBool(true));
-    expect(result.members[1]).toEqual(new JbBool(false));
+    expect(result).toStrictEqual(
+      new Array([new JbBool(true), new JbBool(false)])
+    );
   });
 
   test('number >= {}', function() {
@@ -779,12 +780,9 @@ describe('JbNumber cross-type interactions', function() {
   });
 
   test('number >= date', function() {
-    // timezone-proof
-    const localTimestamp = Math.floor(Date.UTC(2024, 0, 13) / 1000);
+    const timestamp = Math.floor(Date.UTC(2024, 0, 13) / 1000);
     expect(
-      new JbNumber(
-        localTimestamp + new Date().getTimezoneOffset() * 60
-      ).binopDate(">=", new JbDate(new Date("1/13/24")))
+      new JbNumber(timestamp).binopDate(">=", new JbDate(new Date("1/13/24")))
     ).toEqual(new JbBool(true));
   });
 
@@ -810,8 +808,9 @@ describe('JbNumber cross-type interactions', function() {
     const result = new JbNumber(6).binopArray(
       "==", new Array([new JbNumber(3.5), new JbString("6")])
     );
-    expect(result.members[0]).toEqual(new JbBool(false));
-    expect(result.members[1]).toEqual(new JbBool(true));
+    expect(result).toStrictEqual(
+      new Array([new JbBool(false), new JbBool(true)])
+    );
   });
 
   test('number == {}', function() {
@@ -834,12 +833,9 @@ describe('JbNumber cross-type interactions', function() {
   });
 
   test('number == date', function() {
-    // timezone-proof
-    const localTimestamp = Math.floor(Date.UTC(2024, 0, 13) / 1000);
+    const timestamp = Math.floor(Date.UTC(2024, 0, 13) / 1000);
     expect(
-      new JbNumber(
-         localTimestamp + new Date().getTimezoneOffset() * 60
-      ).binopDate("==", new JbDate(new Date("1/13/24")))
+      new JbNumber(timestamp).binopDate("==", new JbDate(new Date("1/13/24")))
     ).toEqual(new JbBool(true));
   });
 
@@ -865,8 +861,9 @@ describe('JbNumber cross-type interactions', function() {
     const result = new JbNumber(6).binopArray(
       "!=", new Array([new JbNumber(3.5), new JbString("6")])
     );
-    expect(result.members[0]).toEqual(new JbBool(true));
-    expect(result.members[1]).toEqual(new JbBool(false));
+    expect(result).toStrictEqual(
+      new Array([new JbBool(true), new JbBool(false)])
+    );
   });
 
   test('number != {}', function() {
@@ -889,12 +886,9 @@ describe('JbNumber cross-type interactions', function() {
   });
 
   test('number != date', function() {
-    // timezone-proof
-    const localTimestamp = Math.floor(Date.UTC(2024, 0, 13) / 1000);
+    const timestamp = Math.floor(Date.UTC(2024, 0, 13) / 1000);
     expect(
-      new JbNumber(
-         localTimestamp + new Date().getTimezoneOffset() * 60
-      ).binopDate("!=", new JbDate(new Date("1/13/24")))
+      new JbNumber(timestamp).binopDate("!=", new JbDate(new Date("1/13/24")))
     ).toEqual(new JbBool(false));
   });
 
@@ -920,15 +914,13 @@ describe('JbNumber cross-type interactions', function() {
     const result = new JbNumber(5.5).binopArray(
       "&&", new Array([new JbNumber(3.5), new JbString("NaN")])
     );
-    expect(result.members[0]).toEqual(new JbBool(true));
-    expect(result.members[1]).toEqual(new JbBool(false));
+    expect(result).toStrictEqual(new JbBool(false));
   });
 
   test('number && {}', function() {
-    const emptyArray = new Array();
     expect(
-      new JbNumber(5.5).binopArray("&&", emptyArray)
-    ).toEqual(emptyArray);
+      new JbNumber(5.5).binopArray("&&", new Array())
+    ).toEqual(new JbBool(false));
   });
 
   test('number && dictionary', function() {
@@ -971,15 +963,13 @@ describe('JbNumber cross-type interactions', function() {
     const result = new JbNumber(5.5).binopArray(
       "&", new Array([new JbNumber(3.5), new JbString("NaN")])
     );
-    expect(result.members[0]).toEqual(new JbBool(true));
-    expect(result.members[1]).toEqual(new JbBool(false));
+    expect(result).toStrictEqual(new JbBool(false));
   });
 
   test('number & {}', function() {
-    const emptyArray = new Array();
     expect(
-      new JbNumber(5.5).binopArray("&", emptyArray)
-    ).toEqual(emptyArray);
+      new JbNumber(5.5).binopArray("&", new Array())
+    ).toEqual(new JbBool(false));
   });
 
   test('number & dictionary', function() {
@@ -1022,15 +1012,13 @@ describe('JbNumber cross-type interactions', function() {
     const result = new JbNumber(0).binopArray(
       "||", new Array([new JbNumber(3.5), new JbString("NaN")])
     );
-    expect(result.members[0]).toEqual(new JbBool(true));
-    expect(result.members[1]).toEqual(new JbBool(false));
+    expect(result).toStrictEqual(new JbBool(false));
   });
 
   test('number || {}', function() {
-    const emptyArray = new Array();
     expect(
-      new JbNumber(5.5).binopArray("||", emptyArray)
-    ).toEqual(emptyArray);
+      new JbNumber(5.5).binopArray("||", new Array())
+    ).toEqual(new JbBool(true));
   });
 
   test('number || dictionary', function() {
@@ -1073,15 +1061,13 @@ describe('JbNumber cross-type interactions', function() {
     const result = new JbNumber(0).binopArray(
       "|", new Array([new JbNumber(3.5), new JbString("NaN")])
     );
-    expect(result.members[0]).toEqual(new JbBool(true));
-    expect(result.members[1]).toEqual(new JbBool(false));
+    expect(result).toStrictEqual(new JbBool(false));
   });
 
   test('number | {}', function() {
-    const emptyArray = new Array();
     expect(
-      new JbNumber(5.5).binopArray("|", emptyArray)
-    ).toEqual(emptyArray);
+      new JbNumber(5.5).binopArray("|", new Array())
+    ).toEqual(new JbBool(true));
   });
 
   test('number | dictionary', function() {

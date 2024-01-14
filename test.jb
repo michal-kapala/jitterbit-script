@@ -1,8 +1,6 @@
 <trans>
-  // test for number += date assignment
-  result = 5;
-  date = Now();
-  result += date;
+  // test for string || {} comparison
+  result = "true" || {};
   DebugBreak();
   
 </trans>

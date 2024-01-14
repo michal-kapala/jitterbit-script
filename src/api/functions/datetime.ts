@@ -261,7 +261,9 @@ export class GeneralDate extends Func {
     let date = JbDate.parse(args[0]);
 
     // "MM/DD/YYYY HH:MM:SS AM/PM"
-    return new JbString(`${(date.getUTCMonth()+1).toString().padStart(2, '0')}/${date.getUTCDate().toString().padStart(2, '0')}/${date.getUTCFullYear()} ${date.getUTCHours() < 12 ? date.getUTCHours().toString().padStart(2, '0') : (date.getUTCHours()-12).toString().padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')}:${date.getUTCSeconds().toString().padStart(2, '0')} ${date.getUTCHours() < 12 ? "AM" : "PM"}`);
+    return new JbString(
+      `${(date.getUTCMonth()+1).toString().padStart(2, '0')}/${date.getUTCDate().toString().padStart(2, '0')}/${date.getUTCFullYear()} ${date.getUTCHours() < 12 ? date.getUTCHours().toString().padStart(2, '0') : (date.getUTCHours()-12).toString().padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')}:${date.getUTCSeconds().toString().padStart(2, '0')} ${date.getUTCHours() < 12 ? "AM" : "PM"}`
+    );
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -374,7 +376,13 @@ export class LastDayOfMonth extends Func {
     let date = JbDate.parse(args[0]);
 
     // UTC-based last day of the month
-    return new JbDate(new Date(Date.UTC(date.getFullYear(), date.getMonth() + 1, 0)));
+    return new JbDate(
+      new Date(
+        date.getUTCFullYear(),
+        date.getUTCMonth() + 1,
+        0,
+      )
+    );
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -680,6 +688,8 @@ export class MonthOfYear extends Func {
  * 
  * Returns a date object representing the date and time values at the moment the function was run.
  * The fraction of the second is truncated.
+ * 
+ * This implementation always returns local time.
  */
 export class Now extends Func {
   constructor() {
@@ -707,6 +717,8 @@ export class Now extends Func {
  * 
  * Returns a date object representing the date and time values at the moment the function was run.
  * The time value includes the fraction of second (milliseconds).
+ * 
+ * This implementation always returns local time.
  */
 export class Now_ extends Func {
   constructor() {
