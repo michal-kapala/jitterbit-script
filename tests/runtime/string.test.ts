@@ -56,7 +56,7 @@ describe('JbString operators', function() {
         value = "13";
         result = ++value;
       </trans>`;
-    expect(run(test)).toEqual(new JbString("14"));
+    expect(run(test)).toStrictEqual(new JbString("14"));
   });
 
   test('string++', function() {
@@ -65,7 +65,7 @@ describe('JbString operators', function() {
         value = "13";
         result = value++;
       </trans>`;
-    expect(run(test)).toEqual(new JbString("13"));
+    expect(run(test)).toStrictEqual(new JbString("13"));
   });
 
   test('string -= string', function() {
@@ -138,38 +138,38 @@ describe('JbString operators', function() {
     expect(
       // tests the default value ("")
       new JbString().binopString("==", new JbString())
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string != string', function() {
     expect(
       new JbString("true").binopString("!=", new JbString("t"))
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string && string', function() {
     // POD: "t" strings dont evaluate to true
     expect(
       new JbString("true").binopString("&&", new JbString("t"))
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string & string', function() {
     expect(
       new JbString("true").binopString("&", new JbString("-1.1"))
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string || string', function() {
     expect(
       new JbString("0").binopString("||", new JbString("hi"))
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string | string', function() {
     expect(
       new JbString("1").binopString("|", new JbString("hi"))
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 });
 
@@ -210,7 +210,7 @@ describe('JbString cross-type interactions', function() {
         "-=",
         emptyArray
       )
-    ).toEqual(emptyArray);
+    ).toStrictEqual(emptyArray);
   });
 
   test('string -= dictionary', function() {
@@ -240,7 +240,7 @@ describe('JbString cross-type interactions', function() {
   test('string += bool', function() {
     expect(
       Scope.assign(new JbString("-2.7abcd"), "+=", new JbBool(true))
-    ).toEqual(new JbString("-2.7abcd1"));
+    ).toStrictEqual(new JbString("-2.7abcd1"));
   });
 
   test('string += null', function() {
@@ -257,7 +257,7 @@ describe('JbString cross-type interactions', function() {
         "+=",
         new Array([new JbString("3.5"), new JbString("6")])
       )
-    ).toEqual(new Array([new JbString("1true3.5"), new JbString("1true6")]));
+    ).toStrictEqual(new Array([new JbString("1true3.5"), new JbString("1true6")]));
   });
 
   test('string += {}', function() {
@@ -268,7 +268,7 @@ describe('JbString cross-type interactions', function() {
         "+=",
         emptyArray
       )
-    ).toEqual(emptyArray);
+    ).toStrictEqual(emptyArray);
   });
 
   test('string += dictionary', function() {
@@ -298,14 +298,14 @@ describe('JbString cross-type interactions', function() {
   test('string + bool', function() {
     expect(
       new JbString("boolean: ").binopBool("+", new JbBool(true))
-    ).toEqual(new JbString("boolean: 1"));
+    ).toStrictEqual(new JbString("boolean: 1"));
   });
 
   test('string + null', function() {
     const lhs = new JbString();
     expect(
       lhs.binopNull("+", new JbNull())
-    ).toEqual(lhs);
+    ).toStrictEqual(lhs);
   });
 
   test('string + array', function() {
@@ -320,7 +320,7 @@ describe('JbString cross-type interactions', function() {
     const emptyArray = new Array();
     expect(
       new JbString().binopArray("+", emptyArray)
-    ).toEqual(emptyArray);
+    ).toStrictEqual(emptyArray);
   });
 
   test('string + dictionary', function() {
@@ -369,7 +369,7 @@ describe('JbString cross-type interactions', function() {
     const emptyArray = new Array();
     expect(
       new JbString().binopArray("-", emptyArray)
-    ).toEqual(emptyArray);
+    ).toStrictEqual(emptyArray);
   });
 
   test('string - dictionary', function() {
@@ -418,7 +418,7 @@ describe('JbString cross-type interactions', function() {
     const emptyArray = new Array();
     expect(
       new JbString().binopArray("*", emptyArray)
-    ).toEqual(emptyArray);
+    ).toStrictEqual(emptyArray);
   });
 
   test('string * dictionary', function() {
@@ -467,7 +467,7 @@ describe('JbString cross-type interactions', function() {
     const emptyArray = new Array();
     expect(
       new JbString().binopArray("/", emptyArray)
-    ).toEqual(emptyArray);
+    ).toStrictEqual(emptyArray);
   });
 
   test('string / dictionary', function() {
@@ -516,7 +516,7 @@ describe('JbString cross-type interactions', function() {
     const emptyArray = new Array();
     expect(
       new JbString().binopArray("^", emptyArray)
-    ).toEqual(emptyArray);
+    ).toStrictEqual(emptyArray);
   });
 
   test('string ^ dictionary', function() {
@@ -540,19 +540,19 @@ describe('JbString cross-type interactions', function() {
   test('string < number', function() {
     expect(
       new JbString("-56.1 this gets truncated").binopNumber("<", new JbNumber(0))
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string < bool', function() {
     expect(
       new JbString("whatever").binopBool("<", new JbBool(true))
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string < null', function() {
     expect(
       new JbString("1").binopNull("<", new JbNull())
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string < array', function() {
@@ -568,13 +568,13 @@ describe('JbString cross-type interactions', function() {
     const emptyArray = new Array();
     expect(
       new JbString().binopArray("<", emptyArray)
-    ).toEqual(emptyArray);
+    ).toStrictEqual(emptyArray);
   });
 
   test('string < dictionary', function() {
     expect(
       new JbString("-1").binopDict("<", new Dictionary())
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string < binary', function() {
@@ -586,25 +586,25 @@ describe('JbString cross-type interactions', function() {
   test('string < date', function() {
     expect(
       new JbString("1705190400").binopDate("<", new JbDate(new Date("1/13/24")))
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string > number', function() {
     expect(
       new JbString("1").binopNumber(">", new JbNumber(0.5))
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string > bool', function() {
     expect(
       new JbString("1.01").binopBool(">", new JbBool(true))
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string > null', function() {
     expect(
       new JbString().binopNull(">", new JbNull())
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string > array', function() {
@@ -620,13 +620,13 @@ describe('JbString cross-type interactions', function() {
     const emptyArray = new Array();
     expect(
       new JbString("whatever").binopArray(">", emptyArray)
-    ).toEqual(emptyArray);
+    ).toStrictEqual(emptyArray);
   });
 
   test('string > dictionary', function() {
     expect(
       new JbString("0.01").binopDict(">", new Dictionary())
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string > binary', function() {
@@ -639,25 +639,25 @@ describe('JbString cross-type interactions', function() {
     expect(
       // equal timestamp
       new JbString("1705104000").binopDate(">", new JbDate(new Date("1/13/24")))
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string <= number', function() {
     expect(
       new JbString("false").binopNumber("<=", new JbNumber(-0))
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string <= bool', function() {
     expect(
       new JbString("1.1").binopBool("<=", new JbBool(true))
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string <= null', function() {
     expect(
       new JbString().binopNull("<=", new JbNull())
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string <= array', function() {
@@ -673,13 +673,13 @@ describe('JbString cross-type interactions', function() {
     const emptyArray = new Array();
     expect(
       new JbString().binopArray("<=", emptyArray)
-    ).toEqual(emptyArray);
+    ).toStrictEqual(emptyArray);
   });
 
   test('string <= dictionary', function() {
     expect(
       new JbString("whatever").binopDict("<=", new Dictionary())
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string <= binary', function() {
@@ -692,25 +692,25 @@ describe('JbString cross-type interactions', function() {
     expect(
       // timestamp + 1
       new JbString("1705104001").binopDate("<=", new JbDate(new Date("1/13/24")))
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string >= number', function() {
     expect(
       new JbString("whatever123").binopNumber(">=", new JbNumber(1))
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string >= bool', function() {
     expect(
       new JbString("true").binopBool(">=", new JbBool(true))
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string >= null', function() {
     expect(
       new JbString().binopNull(">=", new JbNull())
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string >= array', function() {
@@ -726,13 +726,13 @@ describe('JbString cross-type interactions', function() {
     const emptyArray = new Array();
     expect(
       new JbString().binopArray(">=", emptyArray)
-    ).toEqual(emptyArray);
+    ).toStrictEqual(emptyArray);
   });
 
   test('string >= dictionary', function() {
     expect(
       new JbString(".1").binopDict(">=", new Dictionary())
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string >= binary', function() {
@@ -745,25 +745,25 @@ describe('JbString cross-type interactions', function() {
     expect(
       // timestamp + 1
       new JbString("1705104001").binopDate(">=", new JbDate(new Date("1/13/24")))
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string == number', function() {
     expect(
       new JbString("1").binopNumber("==", new JbNumber(1))
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string == bool', function() {
     expect(
       new JbString("whatever").binopBool("==", new JbBool(true))
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string == null', function() {
     expect(
       new JbString("null").binopNull("==", new JbNull())
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string == array', function() {
@@ -779,13 +779,13 @@ describe('JbString cross-type interactions', function() {
     const emptyArray = new Array();
     expect(
       new JbString().binopArray("==", emptyArray)
-    ).toEqual(emptyArray);
+    ).toStrictEqual(emptyArray);
   });
 
   test('string == dictionary', function() {
     expect(
       new JbString().binopDict("==", new Dictionary())
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string == binary', function() {
@@ -797,25 +797,25 @@ describe('JbString cross-type interactions', function() {
   test('string == date', function() {
     expect(
       new JbString("1/13/24").binopDate("==", new JbDate(new Date("1/13/24")))
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string != number', function() {
     expect(
       new JbString("0").binopNumber("!=", new JbNumber(0))
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string != bool', function() {
     expect(
       new JbString("true").binopBool("!=", new JbBool(true))
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string != null', function() {
     expect(
       new JbString().binopNull("!=", new JbNull())
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string != array', function() {
@@ -831,13 +831,13 @@ describe('JbString cross-type interactions', function() {
     const emptyArray = new Array();
     expect(
       new JbString().binopArray("!=", emptyArray)
-    ).toEqual(emptyArray);
+    ).toStrictEqual(emptyArray);
   });
 
   test('string != dictionary', function() {
     expect(
       new JbString("[]").binopDict("!=", new Dictionary())
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string != binary', function() {
@@ -849,25 +849,25 @@ describe('JbString cross-type interactions', function() {
   test('string != date', function() {
     expect(
       new JbString("2024-01-13 00:00:00.000").binopDate("!=", new JbDate(new Date("1/13/24")))
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string && number', function() {
     expect(
       new JbString("$whatever").binopNumber("&&", new JbNumber(0))
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string && bool', function() {
     expect(
       new JbString("true").binopBool("&&", new JbBool(true))
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string && null', function() {
     expect(
       new JbString("true").binopNull("&&", new JbNull())
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string && array', function() {
@@ -881,43 +881,43 @@ describe('JbString cross-type interactions', function() {
   test('string && {}', function() {
     expect(
       new JbString().binopArray("&&", new Array())
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string && dictionary', function() {
     expect(
       new JbString("true").binopDict("&&", new Dictionary())
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string && binary', function() {
     expect(
       new JbString("true").binopBin("&&", new JbBinary())
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string && date', function() {
     expect(
       new JbString("true").binopDate("&&", new JbDate())
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string & number', function() {
     expect(
       new JbString("true").binopNumber("&", new JbNumber(0))
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string & bool', function() {
     expect(
       new JbString("E420.69niceinnit").binopBool("&", new JbBool(true))
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string & null', function() {
     expect(
       new JbString("false").binopNull("&", new JbNull())
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string & array', function() {
@@ -930,44 +930,44 @@ describe('JbString cross-type interactions', function() {
   test('string & {}', function() {
     expect(
       new JbString().binopArray("&", new Array())
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string & dictionary', function() {
     expect(
       new JbString("true").binopDict("&", new Dictionary())
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string & binary', function() {
     expect(
       new JbString("true").binopBin("&", new JbBinary())
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string & date', function() {
     expect(
       new JbString("1705104000").binopDate("&", new JbDate())
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string || number', function() {
     expect(
       new JbString("0").binopNumber("||", new JbNumber(0))
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string || bool', function() {
     expect(
       // POD: "t"/"T" is not a truthy value
       new JbString("T").binopBool("||", new JbBool(false))
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string || null', function() {
     expect(
       new JbString("true").binopNull("||", new JbNull())
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string || array', function() {
@@ -980,43 +980,43 @@ describe('JbString cross-type interactions', function() {
   test('string || {}', function() {
     expect(
       new JbString().binopArray("||", new Array())
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string || dictionary', function() {
     expect(
       new JbString("true").binopDict("||", new Dictionary())
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string || binary', function() {
     expect(
       new JbString("true").binopBin("||", new JbBinary())
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string || date', function() {
     expect(
       new JbString("true").binopDate("||", new JbDate())
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string | number', function() {
     expect(
       new JbString("true").binopNumber("||", new JbNumber(0))
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string | bool', function() {
     expect(
       new JbString("0xABCD1234").binopBool("|", new JbBool(false))
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string | null', function() {
     expect(
       new JbString().binopNull("|", new JbNull())
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string | array', function() {
@@ -1029,24 +1029,24 @@ describe('JbString cross-type interactions', function() {
   test('string | {}', function() {
     expect(
       new JbString("true").binopArray("|", new Array())
-    ).toEqual(new JbBool(true));
+    ).toStrictEqual(new JbBool(true));
   });
 
   test('string | dictionary', function() {
     expect(
       new JbString().binopDict("|", new Dictionary())
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string | binary', function() {
     expect(
       new JbString().binopBin("|", new JbBinary())
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('string | date', function() {
     expect(
       new JbString().binopDate("|", new JbDate())
-    ).toEqual(new JbBool(false));
+    ).toStrictEqual(new JbBool(false));
   });
 });

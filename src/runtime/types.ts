@@ -1430,7 +1430,7 @@ export class JbNull implements NullVal {
   binopBool(operator: string, rhs: JbBool) {
     switch (operator) {
       case "+":
-        return new JbNumber(rhs.toNumber())
+        return new JbBool(rhs.value);
       case "-":
         throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
       case "*":
