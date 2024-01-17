@@ -2,7 +2,7 @@ import { NamedError } from "../../errors";
 import { Expr } from "../../frontend/ast";
 import { evaluate } from "../../runtime/interpreter";
 import Scope from "../../runtime/scope";
-import { Array, JbBool, JbNull } from "../../runtime/types";
+import { JbArray, JbBool, JbNull } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
 import { DeferrableFunc, Func, Parameter, Signature } from "../types";
 
@@ -84,8 +84,8 @@ export class Equal extends Func {
 
     // arrays
     if(this.signature === this.signatures[0]) {
-      const arr1 = args[0] as Array;
-      const arr2 = args[1] as Array;
+      const arr1 = args[0] as JbArray;
+      const arr2 = args[1] as JbArray;
       if(arr1.members.length !== arr2.members.length)
         return new JbBool(false);
 

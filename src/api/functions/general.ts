@@ -1,5 +1,5 @@
 import Scope from "../../runtime/scope";
-import { Array, Dictionary, JbBinary, JbBool, JbNull, JbNumber, JbString } from "../../runtime/types";
+import { JbArray, JbDictionary, JbBinary, JbBool, JbNull, JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
 import { Func, Parameter, Signature } from "../types";
 import { hostname } from "os";
@@ -779,9 +779,9 @@ export class Length extends Func {
     this.chooseSignature(args);
     switch (args[0].type) {
       case "array":
-        return new JbNumber((args[0] as Array).members.length);
+        return new JbNumber((args[0] as JbArray).members.length);
       case "dictionary":
-        return new JbNumber((args[0] as Dictionary).members.size);
+        return new JbNumber((args[0] as JbDictionary).members.size);
       case "binary":
         return new JbNumber((args[0] as JbBinary).value.length);
       case "null":

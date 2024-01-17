@@ -4,8 +4,8 @@ import { RuntimeVal } from "../runtime/values";
 import { Token } from "./types";
 import { Api } from "../api";
 import {
-  Array,
-  Dictionary,
+  JbArray,
+  JbDictionary,
   JbBinary,
   JbBool,
   JbDate,
@@ -235,104 +235,104 @@ export class BinaryExpr implements Expr {
 
     // array-array
     if (lhs.type === "array" && rhs.type === "array")
-      return (lhs as Array).binopArray(this.operator, rhs as Array);
+      return (lhs as JbArray).binopArray(this.operator, rhs as JbArray);
 
     // array-number
     if (lhs.type === "array" && rhs.type === "number")
-      return (lhs as Array).binopNumber(this.operator, rhs as JbNumber);
+      return (lhs as JbArray).binopNumber(this.operator, rhs as JbNumber);
 
     if (lhs.type === "number" && rhs.type === "array")
-      return (lhs as JbNumber).binopArray(this.operator, rhs as Array);
+      return (lhs as JbNumber).binopArray(this.operator, rhs as JbArray);
 
     // array-bool
     if(lhs.type === "array" && rhs.type === "bool")
-      return (lhs as Array).binopBool(this.operator, rhs as JbBool);
+      return (lhs as JbArray).binopBool(this.operator, rhs as JbBool);
 
     if (lhs.type === "bool" && rhs.type === "array")
-      return (lhs as JbBool).binopArray(this.operator, rhs as Array);
+      return (lhs as JbBool).binopArray(this.operator, rhs as JbArray);
 
     // array-string
     if(lhs.type === "array" && rhs.type === "string")
-      return (lhs as Array).binopString(this.operator, rhs as JbString);
+      return (lhs as JbArray).binopString(this.operator, rhs as JbString);
 
     if (lhs.type === "string" && rhs.type === "array")
-      return (lhs as JbString).binopArray(this.operator, rhs as Array);
+      return (lhs as JbString).binopArray(this.operator, rhs as JbArray);
 
     // array-null
     if(lhs.type === "array" && rhs.type === "null")
-      return (lhs as Array).binopNull(this.operator, rhs as JbNull);
+      return (lhs as JbArray).binopNull(this.operator, rhs as JbNull);
 
     if (lhs.type === "null" && rhs.type === "array")
-      return (lhs as JbNull).binopArray(this.operator, rhs as Array);
+      return (lhs as JbNull).binopArray(this.operator, rhs as JbArray);
 
     // array-dict
     if(lhs.type === "array" && rhs.type === "dictionary")
-      return (lhs as Array).binopDict(this.operator, rhs as Dictionary);
+      return (lhs as JbArray).binopDict(this.operator, rhs as JbDictionary);
 
     if (lhs.type === "dictionary" && rhs.type === "array")
-      return (lhs as Dictionary).binopArray(this.operator, rhs as Array);
+      return (lhs as JbDictionary).binopArray(this.operator, rhs as JbArray);
 
     // array-binary
     if(lhs.type === "array" && rhs.type === "binary")
-      return (lhs as Array).binopBin(this.operator, rhs as JbBinary);
+      return (lhs as JbArray).binopBin(this.operator, rhs as JbBinary);
 
     if (lhs.type === "binary" && rhs.type === "array")
-      return (lhs as JbBinary).binopArray(this.operator, rhs as Array);
+      return (lhs as JbBinary).binopArray(this.operator, rhs as JbArray);
 
     // array-date
     if(lhs.type === "array" && rhs.type === "date")
-      return (lhs as Array).binopDate(this.operator, rhs as JbDate);
+      return (lhs as JbArray).binopDate(this.operator, rhs as JbDate);
 
     if (lhs.type === "date" && rhs.type === "array")
-      return (lhs as JbDate).binopArray(this.operator, rhs as Array);
+      return (lhs as JbDate).binopArray(this.operator, rhs as JbArray);
 
     // dicts
 
     // dict-dict
     if (lhs.type === "dictionary" && rhs.type === "dictionary")
-      return (lhs as Dictionary).binopDict(this.operator, rhs as Dictionary);
+      return (lhs as JbDictionary).binopDict(this.operator, rhs as JbDictionary);
 
     // dict-number
     if (lhs.type === "dictionary" && rhs.type === "number")
-      return (lhs as Dictionary).binopNumber(this.operator, rhs as JbNumber);
+      return (lhs as JbDictionary).binopNumber(this.operator, rhs as JbNumber);
 
     if (lhs.type === "number" && rhs.type === "dictionary")
-      return (lhs as JbNumber).binopDict(this.operator, rhs as Dictionary);
+      return (lhs as JbNumber).binopDict(this.operator, rhs as JbDictionary);
 
     // dict-bool
     if (lhs.type === "dictionary" && rhs.type === "bool")
-      return (lhs as Dictionary).binopBool(this.operator, rhs as JbBool);
+      return (lhs as JbDictionary).binopBool(this.operator, rhs as JbBool);
 
     if (lhs.type === "bool" && rhs.type === "dictionary")
-      return (lhs as JbBool).binopDict(this.operator, rhs as Dictionary);
+      return (lhs as JbBool).binopDict(this.operator, rhs as JbDictionary);
 
     // dict-string
     if (lhs.type === "dictionary" && rhs.type === "string")
-      return (lhs as Dictionary).binopString(this.operator, rhs as JbString);
+      return (lhs as JbDictionary).binopString(this.operator, rhs as JbString);
 
     if (lhs.type === "string" && rhs.type === "dictionary")
-      return (lhs as JbString).binopDict(this.operator, rhs as Dictionary);
+      return (lhs as JbString).binopDict(this.operator, rhs as JbDictionary);
 
     // dict-null
     if (lhs.type === "dictionary" && rhs.type === "null")
-      return (lhs as Dictionary).binopNull(this.operator, rhs as JbNull);
+      return (lhs as JbDictionary).binopNull(this.operator, rhs as JbNull);
 
     if (lhs.type === "null" && rhs.type === "dictionary")
-      return (lhs as JbNull).binopDict(this.operator, rhs as Dictionary);
+      return (lhs as JbNull).binopDict(this.operator, rhs as JbDictionary);
 
     // dict-binary
     if (lhs.type === "dictionary" && rhs.type === "binary")
-      return (lhs as Dictionary).binopBin(this.operator, rhs as JbBinary);
+      return (lhs as JbDictionary).binopBin(this.operator, rhs as JbBinary);
 
     if (lhs.type === "binary" && rhs.type === "dictionary")
-      return (lhs as JbBinary).binopDict(this.operator, rhs as Dictionary);
+      return (lhs as JbBinary).binopDict(this.operator, rhs as JbDictionary);
 
     // dict-date
     if (lhs.type === "dictionary" && rhs.type === "date")
-      return (lhs as Dictionary).binopDate(this.operator, rhs as JbDate);
+      return (lhs as JbDictionary).binopDate(this.operator, rhs as JbDate);
 
     if (lhs.type === "date" && rhs.type === "dictionary")
-      return (lhs as JbDate).binopDict(this.operator, rhs as Dictionary);
+      return (lhs as JbDate).binopDict(this.operator, rhs as JbDictionary);
 
     // binary
 
@@ -494,7 +494,7 @@ export class MemberExpr implements Expr {
     switch(this.object.kind) {
       // {1,2,3}[1]
       case "ArrayLiteral":
-        const arr = evaluate(this.object as ArrayLiteral, scope) as Array;
+        const arr = evaluate(this.object as ArrayLiteral, scope) as JbArray;
         return arr.get(key);
       // a[1], $a[1]
       case "Identifier":
@@ -504,9 +504,9 @@ export class MemberExpr implements Expr {
         // check the value type
         switch (val.type) {
           case "array":
-            return (val as Array).get(key);
+            return (val as JbArray).get(key);
           case "dictionary":
-            return (val as Dictionary).get(key);
+            return (val as JbDictionary).get(key);
           default:
             throw `[] operator applied to a ${this.object.kind} data element of unsupported type: ${val.type}`;
         }
@@ -515,9 +515,9 @@ export class MemberExpr implements Expr {
         const left = evaluate(this.object, scope);
         switch(left.type) {
           case "array":
-            return (left as Array).get(key);
+            return (left as JbArray).get(key);
           case "dictionary":
-            return (left as Dictionary).get(key);
+            return (left as JbDictionary).get(key);
           default:
             throw `[] operator applied to a ${this.object.kind} data element of unsupported type: ${left.type}`;
         }
@@ -543,8 +543,8 @@ export class MemberExpr implements Expr {
 
     switch (lhs.type) {
       case "array":
-        const index = Array.keyValueToNumber(evaluate(this.key, scope));
-        let rhs = Array.checkIndex(index)
+        const index = JbArray.keyValueToNumber(evaluate(this.key, scope));
+        let rhs = JbArray.checkIndex(index)
           ? evaluate(assignment.value, scope)
           : new JbNull();
         const newValue = Scope.assign(
@@ -553,7 +553,7 @@ export class MemberExpr implements Expr {
           rhs
         );
         // set appends null values if index is out of bounds
-        return  (lhs as Array).set(index, newValue);
+        return  (lhs as JbArray).set(index, newValue);
       case "dictionary":
         const key = evaluate(this.key, scope);
         const newVal = Scope.assign(
@@ -561,7 +561,7 @@ export class MemberExpr implements Expr {
           assignment.operator.value,
           evaluate(assignment.value, scope)
         );
-        return (lhs as Dictionary).set(key, newVal);
+        return (lhs as JbDictionary).set(key, newVal);
       default:
         throw `[] operator applied to a ${lhs.type} data element.\nIf in the script testing screen, try clicking 'Reset' and run again`;
     }
@@ -645,7 +645,7 @@ export class ArrayLiteral implements Expr {
     for (let elem of this.members)
       members.push(evaluate(elem, scope));
 
-    return new Array(members);
+    return new JbArray(members);
   }
 }
 

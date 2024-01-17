@@ -5,8 +5,8 @@ import {
   JbNull,
   JbNumber,
   JbString,
-  Array,
-  Dictionary,
+  JbArray,
+  JbDictionary,
   JbBinary,
   JbDate
 } from '../../src/runtime/types';
@@ -34,7 +34,7 @@ describe('JbNumber operators', function() {
   test('= number', function() {
     const rhs = new JbNumber(6.9);
     expect(
-      Scope.assign(new Array(), "=", rhs)
+      Scope.assign(new JbArray(), "=", rhs)
     ).toStrictEqual(rhs);
   });
 
@@ -226,13 +226,13 @@ describe('JbNumber cross-type interactions', function() {
       Scope.assign(
         new JbNumber(5.5),
         "-=",
-        new Array([new JbNumber(3.5), new JbNumber(6)])
+        new JbArray([new JbNumber(3.5), new JbNumber(6)])
       )
-    ).toStrictEqual(new Array([new JbNumber(2), new JbNumber(-0.5)]));
+    ).toStrictEqual(new JbArray([new JbNumber(2), new JbNumber(-0.5)]));
   });
 
   test('number -= {}', function() {
-    const emptyArray = new Array();
+    const emptyArray = new JbArray();
     expect(
       Scope.assign(
         new JbNumber(5.5),
@@ -244,7 +244,7 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number -= dictionary', function() {
     expect(function() {
-      return Scope.assign(new JbNumber(5.5), "-=", new Dictionary())
+      return Scope.assign(new JbNumber(5.5), "-=", new JbDictionary())
     }).toThrow();
   });
 
@@ -284,13 +284,13 @@ describe('JbNumber cross-type interactions', function() {
       Scope.assign(
         new JbNumber(5.5),
         "+=",
-        new Array([new JbNumber(3.5), new JbNumber(6)])
+        new JbArray([new JbNumber(3.5), new JbNumber(6)])
       )
-    ).toStrictEqual(new Array([new JbNumber(9), new JbNumber(11.5)]));
+    ).toStrictEqual(new JbArray([new JbNumber(9), new JbNumber(11.5)]));
   });
 
   test('number += {}', function() {
-    const emptyArray = new Array();
+    const emptyArray = new JbArray();
     expect(
       Scope.assign(
         new JbNumber(5.5),
@@ -302,7 +302,7 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number += dictionary', function() {
     expect(function() {
-      return Scope.assign(new JbNumber(5.5), "+=", new Dictionary())
+      return Scope.assign(new JbNumber(5.5), "+=", new JbDictionary())
     }).toThrow();
   });
 
@@ -345,12 +345,12 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number + array', function() {
     expect(
-      new JbNumber(5.5).binopArray("+", new Array([new JbNumber(3.5), new JbString("6")]))
-    ).toStrictEqual(new Array([new JbNumber(9), new JbString("5.56")]));
+      new JbNumber(5.5).binopArray("+", new JbArray([new JbNumber(3.5), new JbString("6")]))
+    ).toStrictEqual(new JbArray([new JbNumber(9), new JbString("5.56")]));
   });
 
   test('number + {}', function() {
-    const emptyArray = new Array();
+    const emptyArray = new JbArray();
     expect(
       new JbNumber(5.5).binopArray("+", emptyArray)
     ).toStrictEqual(emptyArray);
@@ -358,7 +358,7 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number + dictionary', function() {
     expect(function() {
-      return new JbNumber(5.5).binopDict("+", new Dictionary())
+      return new JbNumber(5.5).binopDict("+", new JbDictionary())
     }).toThrow();
   });
 
@@ -400,12 +400,12 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number - array', function() {
     expect(function() {
-      return new JbNumber(5.5).binopArray("-", new Array([new JbNumber(3.5), new JbString("6")]))
+      return new JbNumber(5.5).binopArray("-", new JbArray([new JbNumber(3.5), new JbString("6")]))
     }).toThrow();
   });
 
   test('number - {}', function() {
-    const emptyArray = new Array();
+    const emptyArray = new JbArray();
     expect(
       new JbNumber(5.5).binopArray("-", emptyArray)
     ).toStrictEqual(emptyArray);
@@ -413,7 +413,7 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number - dictionary', function() {
     expect(function() {
-      return new JbNumber(5.5).binopDict("-", new Dictionary())
+      return new JbNumber(5.5).binopDict("-", new JbDictionary())
     }).toThrow();
   });
 
@@ -449,12 +449,12 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number * array', function() {
     expect(function() {
-      return new JbNumber(5.5).binopArray("*", new Array([new JbNumber(3.5), new JbString("6")]))
+      return new JbNumber(5.5).binopArray("*", new JbArray([new JbNumber(3.5), new JbString("6")]))
     }).toThrow();
   });
 
   test('number * {}', function() {
-    const emptyArray = new Array();
+    const emptyArray = new JbArray();
     expect(
       new JbNumber(5.5).binopArray("*", emptyArray)
     ).toStrictEqual(emptyArray);
@@ -462,7 +462,7 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number * dictionary', function() {
     expect(function() {
-      return new JbNumber(5.5).binopDict("*", new Dictionary())
+      return new JbNumber(5.5).binopDict("*", new JbDictionary())
     }).toThrow();
   });
 
@@ -498,12 +498,12 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number / array', function() {
     expect(function() {
-      return new JbNumber(5.5).binopArray("/", new Array([new JbNumber(3.5), new JbString("6")]))
+      return new JbNumber(5.5).binopArray("/", new JbArray([new JbNumber(3.5), new JbString("6")]))
     }).toThrow();
   });
 
   test('number / {}', function() {
-    const emptyArray = new Array();
+    const emptyArray = new JbArray();
     expect(
       new JbNumber(5.5).binopArray("/", emptyArray)
     ).toStrictEqual(emptyArray);
@@ -511,7 +511,7 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number / dictionary', function() {
     expect(function() {
-      return new JbNumber(5.5).binopDict("/", new Dictionary())
+      return new JbNumber(5.5).binopDict("/", new JbDictionary())
     }).toThrow();
   });
 
@@ -547,12 +547,12 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number ^ array', function() {
     expect(function() {
-      return new JbNumber(5.5).binopArray("^", new Array([new JbNumber(3.5), new JbString("6")]))
+      return new JbNumber(5.5).binopArray("^", new JbArray([new JbNumber(3.5), new JbString("6")]))
     }).toThrow();
   });
 
   test('number ^ {}', function() {
-    const emptyArray = new Array();
+    const emptyArray = new JbArray();
     expect(
       new JbNumber(5.5).binopArray("^", emptyArray)
     ).toStrictEqual(emptyArray);
@@ -560,7 +560,7 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number ^ dictionary', function() {
     expect(function() {
-      return new JbNumber(5.5).binopDict("^", new Dictionary())
+      return new JbNumber(5.5).binopDict("^", new JbDictionary())
     }).toThrow();
   });
 
@@ -596,15 +596,15 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number < array', function() {
     const result = new JbNumber(5.5).binopArray(
-      "<", new Array([new JbNumber(3.5), new JbString("6")])
+      "<", new JbArray([new JbNumber(3.5), new JbString("6")])
     );
     expect(result).toStrictEqual(
-      new Array([new JbBool(false), new JbBool(true)])
+      new JbArray([new JbBool(false), new JbBool(true)])
     );
   });
 
   test('number < {}', function() {
-    const emptyArray = new Array();
+    const emptyArray = new JbArray();
     expect(
       new JbNumber(5.5).binopArray("<", emptyArray)
     ).toStrictEqual(emptyArray);
@@ -612,7 +612,7 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number < dictionary', function() {
     expect(
-      new JbNumber(-1).binopDict("<", new Dictionary())
+      new JbNumber(-1).binopDict("<", new JbDictionary())
     ).toStrictEqual(new JbBool(true));
   });
 
@@ -648,15 +648,15 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number > array', function() {
     const result = new JbNumber(5.5).binopArray(
-      ">", new Array([new JbNumber(3.5), new JbString("6")])
+      ">", new JbArray([new JbNumber(3.5), new JbString("6")])
     );
     expect(result).toStrictEqual(
-      new Array([new JbBool(true), new JbBool(false)])
+      new JbArray([new JbBool(true), new JbBool(false)])
     );
   });
 
   test('number > {}', function() {
-    const emptyArray = new Array();
+    const emptyArray = new JbArray();
     expect(
       new JbNumber(5.5).binopArray(">", emptyArray)
     ).toStrictEqual(emptyArray);
@@ -664,7 +664,7 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number > dictionary', function() {
     expect(
-      new JbNumber(1).binopDict(">", new Dictionary())
+      new JbNumber(1).binopDict(">", new JbDictionary())
     ).toStrictEqual(new JbBool(true));
   });
 
@@ -701,15 +701,15 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number <= array', function() {
     const result = new JbNumber(6).binopArray(
-      "<=", new Array([new JbNumber(3.5), new JbString("6")])
+      "<=", new JbArray([new JbNumber(3.5), new JbString("6")])
     );
     expect(result).toStrictEqual(
-      new Array([new JbBool(false), new JbBool(true)])
+      new JbArray([new JbBool(false), new JbBool(true)])
     );
   });
 
   test('number <= {}', function() {
-    const emptyArray = new Array();
+    const emptyArray = new JbArray();
     expect(
       new JbNumber(5.5).binopArray("<=", emptyArray)
     ).toStrictEqual(emptyArray);
@@ -717,7 +717,7 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number <= dictionary', function() {
     expect(
-      new JbNumber(0).binopDict("<=", new Dictionary())
+      new JbNumber(0).binopDict("<=", new JbDictionary())
     ).toStrictEqual(new JbBool(true));
   });
 
@@ -753,15 +753,15 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number >= array', function() {
     const result = new JbNumber(3.5).binopArray(
-      ">=", new Array([new JbNumber(3.5), new JbString("6")])
+      ">=", new JbArray([new JbNumber(3.5), new JbString("6")])
     );
     expect(result).toStrictEqual(
-      new Array([new JbBool(true), new JbBool(false)])
+      new JbArray([new JbBool(true), new JbBool(false)])
     );
   });
 
   test('number >= {}', function() {
-    const emptyArray = new Array();
+    const emptyArray = new JbArray();
     expect(
       new JbNumber(5.5).binopArray(">=", emptyArray)
     ).toStrictEqual(emptyArray);
@@ -769,7 +769,7 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number >= dictionary', function() {
     expect(
-      new JbNumber(0).binopDict(">=", new Dictionary())
+      new JbNumber(0).binopDict(">=", new JbDictionary())
     ).toStrictEqual(new JbBool(true));
   });
 
@@ -806,15 +806,15 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number == array', function() {
     const result = new JbNumber(6).binopArray(
-      "==", new Array([new JbNumber(3.5), new JbString("6")])
+      "==", new JbArray([new JbNumber(3.5), new JbString("6")])
     );
     expect(result).toStrictEqual(
-      new Array([new JbBool(false), new JbBool(true)])
+      new JbArray([new JbBool(false), new JbBool(true)])
     );
   });
 
   test('number == {}', function() {
-    const emptyArray = new Array();
+    const emptyArray = new JbArray();
     expect(
       new JbNumber(5.5).binopArray("==", emptyArray)
     ).toStrictEqual(emptyArray);
@@ -822,7 +822,7 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number == dictionary', function() {
     expect(
-      new JbNumber(0).binopDict("==", new Dictionary())
+      new JbNumber(0).binopDict("==", new JbDictionary())
     ).toStrictEqual(new JbBool(false));
   });
 
@@ -859,15 +859,15 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number != array', function() {
     const result = new JbNumber(6).binopArray(
-      "!=", new Array([new JbNumber(3.5), new JbString("6")])
+      "!=", new JbArray([new JbNumber(3.5), new JbString("6")])
     );
     expect(result).toStrictEqual(
-      new Array([new JbBool(true), new JbBool(false)])
+      new JbArray([new JbBool(true), new JbBool(false)])
     );
   });
 
   test('number != {}', function() {
-    const emptyArray = new Array();
+    const emptyArray = new JbArray();
     expect(
       new JbNumber(5.5).binopArray("!=", emptyArray)
     ).toStrictEqual(emptyArray);
@@ -875,7 +875,7 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number != dictionary', function() {
     expect(
-      new JbNumber(0).binopDict("!=", new Dictionary())
+      new JbNumber(0).binopDict("!=", new JbDictionary())
     ).toStrictEqual(new JbBool(true));
   });
 
@@ -912,20 +912,20 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number && array', function() {
     const result = new JbNumber(5.5).binopArray(
-      "&&", new Array([new JbNumber(3.5), new JbString("NaN")])
+      "&&", new JbArray([new JbNumber(3.5), new JbString("NaN")])
     );
     expect(result).toStrictEqual(new JbBool(false));
   });
 
   test('number && {}', function() {
     expect(
-      new JbNumber(5.5).binopArray("&&", new Array())
+      new JbNumber(5.5).binopArray("&&", new JbArray())
     ).toStrictEqual(new JbBool(false));
   });
 
   test('number && dictionary', function() {
     expect(
-      new JbNumber(1).binopDict("&&", new Dictionary())
+      new JbNumber(1).binopDict("&&", new JbDictionary())
     ).toStrictEqual(new JbBool(false));
   });
 
@@ -961,20 +961,20 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number & array', function() {
     const result = new JbNumber(5.5).binopArray(
-      "&", new Array([new JbNumber(3.5), new JbString("NaN")])
+      "&", new JbArray([new JbNumber(3.5), new JbString("NaN")])
     );
     expect(result).toStrictEqual(new JbBool(false));
   });
 
   test('number & {}', function() {
     expect(
-      new JbNumber(5.5).binopArray("&", new Array())
+      new JbNumber(5.5).binopArray("&", new JbArray())
     ).toStrictEqual(new JbBool(false));
   });
 
   test('number & dictionary', function() {
     expect(
-      new JbNumber(1).binopDict("&", new Dictionary())
+      new JbNumber(1).binopDict("&", new JbDictionary())
     ).toStrictEqual(new JbBool(false));
   });
 
@@ -1010,20 +1010,20 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number || array', function() {
     const result = new JbNumber(0).binopArray(
-      "||", new Array([new JbNumber(3.5), new JbString("NaN")])
+      "||", new JbArray([new JbNumber(3.5), new JbString("NaN")])
     );
     expect(result).toStrictEqual(new JbBool(false));
   });
 
   test('number || {}', function() {
     expect(
-      new JbNumber(5.5).binopArray("||", new Array())
+      new JbNumber(5.5).binopArray("||", new JbArray())
     ).toStrictEqual(new JbBool(true));
   });
 
   test('number || dictionary', function() {
     expect(
-      new JbNumber(1).binopDict("||", new Dictionary())
+      new JbNumber(1).binopDict("||", new JbDictionary())
     ).toStrictEqual(new JbBool(true));
   });
 
@@ -1059,20 +1059,20 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number | array', function() {
     const result = new JbNumber(0).binopArray(
-      "|", new Array([new JbNumber(3.5), new JbString("NaN")])
+      "|", new JbArray([new JbNumber(3.5), new JbString("NaN")])
     );
     expect(result).toStrictEqual(new JbBool(false));
   });
 
   test('number | {}', function() {
     expect(
-      new JbNumber(5.5).binopArray("|", new Array())
+      new JbNumber(5.5).binopArray("|", new JbArray())
     ).toStrictEqual(new JbBool(true));
   });
 
   test('number | dictionary', function() {
     expect(
-      new JbNumber(1).binopDict("|", new Dictionary())
+      new JbNumber(1).binopDict("|", new JbDictionary())
     ).toStrictEqual(new JbBool(true));
   });
 

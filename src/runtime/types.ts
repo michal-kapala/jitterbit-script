@@ -13,7 +13,7 @@ import {
 /**
  * Runtime array type.
  */
-export class Array implements ArrayVal {
+export class JbArray implements ArrayVal {
   type: "array";
   members: RuntimeVal[];
 
@@ -29,7 +29,11 @@ export class Array implements ArrayVal {
   }
 
   clone() {
-    return new Array(this.members);
+    const newMembers: RuntimeVal[] = [];
+    for(const rv of this.members)
+      newMembers.push(rv.clone());
+
+    return new JbArray(newMembers);
   }
 
   decrement() {
@@ -48,9 +52,9 @@ export class Array implements ArrayVal {
 
   negate() {
     for(const idx in this.members)
-      this.members[idx].negate();
+      this.members[idx] = this.members[idx].negate();
     
-    return this as Array;
+    return this;
   }
 
   negative() {
@@ -86,9 +90,9 @@ export class Array implements ArrayVal {
    * @returns 
    */
   get(key: RuntimeVal): RuntimeVal {
-    const index = Array.keyValueToNumber(key);
+    const index = JbArray.keyValueToNumber(key);
   
-    if (!Array.checkIndex(index)) {
+    if (!JbArray.checkIndex(index)) {
       return new JbNull();
     }
     
@@ -165,7 +169,7 @@ export class Array implements ArrayVal {
       throw `Invalid array index: ${index}`;
   
     // limit testing warning
-    if(index > Array.MAX_ARRAY_SIZE)
+    if(index > JbArray.MAX_ARRAY_SIZE)
       console.warn(`Index of ${index} exceeds maximum array size for Jitterbit Studio's default Java heap (1GB)`);
   
     // non-empty strings evaluate to NaN and dont affect the array size
@@ -272,7 +276,7 @@ export class Array implements ArrayVal {
    * @param operator 
    * @returns 
    */
-  binopArray(operator: string, rhs: Array) {
+  binopArray(operator: string, rhs: JbArray) {
     if(this.members.length !== rhs.members.length)
       throw `The operator ${operator} operating on two array data elements with inconsistent sizes n1/n2: ${this.members.length}/${rhs.members.length}`;
 
@@ -316,13 +320,13 @@ export class Array implements ArrayVal {
         case "array":
           lMembers[idx] = lMembers[idx].binopArray(
             operator,
-            rMembers[idx] as Array
+            rMembers[idx] as JbArray
           );
           break;
         case "dictionary":
           lMembers[idx] = lMembers[idx].binopDict(
             operator,
-            rMembers[idx] as Dictionary
+            rMembers[idx] as JbDictionary
           );
         case "binary":
           lMembers[idx] = lMembers[idx].binopBin(
@@ -350,7 +354,7 @@ export class Array implements ArrayVal {
    * @param operator 
    * @returns 
    */
-  binopDict(operator: string, rhs: Dictionary) {
+  binopDict(operator: string, rhs: JbDictionary) {
     switch(operator) {
       case "&&":
       case "&":
@@ -414,7 +418,7 @@ export class Array implements ArrayVal {
 /**
  * Runtime dictionary type.
  */
-export class Dictionary implements DictVal {
+export class JbDictionary implements DictVal {
   type: "dictionary";
   members: Map<string, RuntimeVal>;
 
@@ -424,7 +428,7 @@ export class Dictionary implements DictVal {
   }
 
   clone(): RuntimeVal {
-    return new Dictionary(this.members);
+    return new JbDictionary(this.members);
   }
 
   decrement(): RuntimeVal {
@@ -469,7 +473,7 @@ export class Dictionary implements DictVal {
    * @returns 
    */
   get(keyVal: RuntimeVal): RuntimeVal {
-    const key = Dictionary.keyValueToString(keyVal);
+    const key = JbDictionary.keyValueToString(keyVal);
     const result = this.members.get(key);
     return result ?? new JbNull();
   }
@@ -481,7 +485,7 @@ export class Dictionary implements DictVal {
    * @returns 
    */
   set(keyVal: RuntimeVal, newValue: RuntimeVal): RuntimeVal {
-    const key = Dictionary.keyValueToString(keyVal);
+    const key = JbDictionary.keyValueToString(keyVal);
     this.members.set(key, newValue);
     return newValue;
   }
@@ -503,9 +507,9 @@ export class Dictionary implements DictVal {
         throw new Error(`A dictionary key can't be NULL`);
       // object types are stringified
       case "dictionary":
-        return (key as Dictionary).toString();
+        return (key as JbDictionary).toString();
       case "array":
-        return (key as Array).toString();
+        return (key as JbArray).toString();
       default:
         throw `Unsupported member expression key type: ${key.type}`;
     }
@@ -688,7 +692,7 @@ export class Dictionary implements DictVal {
    * @param operator 
    * @returns 
    */
-  binopArray(operator: string, rhs: Array) {
+  binopArray(operator: string, rhs: JbArray) {
     switch(operator) {
       case "&&":
       case "&":
@@ -713,10 +717,10 @@ export class Dictionary implements DictVal {
           rMembers[idx] = this.binopNull(operator, rMembers[idx] as JbNull);
           break;
         case "array":
-          rMembers[idx] = this.binopArray(operator, rMembers[idx] as Array);
+          rMembers[idx] = this.binopArray(operator, rMembers[idx] as JbArray);
           break;
         case "dictionary":
-          rMembers[idx] = this.binopDict(operator, rMembers[idx] as Dictionary);
+          rMembers[idx] = this.binopDict(operator, rMembers[idx] as JbDictionary);
           break;
         case "binary":
           rMembers[idx] = this.binopBin(operator, rMembers[idx] as JbBinary);
@@ -738,7 +742,7 @@ export class Dictionary implements DictVal {
    * @param operator 
    * @returns 
    */
-  binopDict(operator: string, rhs: Dictionary) {
+  binopDict(operator: string, rhs: JbDictionary) {
     switch(operator) {
       case "+":
       case "-":
@@ -1092,7 +1096,7 @@ export class JbBool implements BooleanVal {
    * @param operator 
    * @returns 
    */
-  binopArray(operator: string, rhs: Array) {
+  binopArray(operator: string, rhs: JbArray) {
     switch(operator) {
       case "&&":
       case "&":
@@ -1118,10 +1122,10 @@ export class JbBool implements BooleanVal {
           members[idx] = this.binopNull(operator, members[idx] as JbNull);
           break;
         case "array":
-          members[idx] = this.binopArray(operator, members[idx] as Array);
+          members[idx] = this.binopArray(operator, members[idx] as JbArray);
           break;
         case "dictionary":
-          members[idx] = this.binopDict(operator, members[idx] as Dictionary);
+          members[idx] = this.binopDict(operator, members[idx] as JbDictionary);
           break;
         case "binary":
           members[idx] = this.binopBin(operator, members[idx] as JbBinary);
@@ -1143,7 +1147,7 @@ export class JbBool implements BooleanVal {
    * @param operator 
    * @returns 
    */
-  binopDict(operator: string, rhs: Dictionary) {
+  binopDict(operator: string, rhs: JbDictionary) {
     switch(operator) {
       case "+":
         throw new Error(`Illegal operation: ${this.type} Add ${rhs.type}`);
@@ -1464,7 +1468,7 @@ export class JbNull implements NullVal {
    * @param operator 
    * @returns 
    */
-  binopArray(operator: string, rhs: Array) {
+  binopArray(operator: string, rhs: JbArray) {
     switch(operator) {
       case "&&":
       case "&":
@@ -1490,10 +1494,10 @@ export class JbNull implements NullVal {
           members[idx] = this.binopNull(operator, members[idx] as JbNull);
           break;
         case "array":
-          members[idx] = this.binopArray(operator, members[idx] as Array);
+          members[idx] = this.binopArray(operator, members[idx] as JbArray);
           break;
         case "dictionary":
-          members[idx] = this.binopDict(operator, members[idx] as Dictionary);
+          members[idx] = this.binopDict(operator, members[idx] as JbDictionary);
           break;
         case "binary":
           members[idx] = this.binopBin(operator, members[idx] as JbBinary);
@@ -1515,7 +1519,7 @@ export class JbNull implements NullVal {
    * @param operator 
    * @returns 
    */
-  binopDict(operator: string, rhs: Dictionary) {
+  binopDict(operator: string, rhs: JbDictionary) {
     switch(operator) {
       case "+":
       case "-":
@@ -1874,7 +1878,7 @@ export class JbNumber implements NumberVal {
    * @param operator 
    * @returns 
    */
-  binopArray(operator: string, rhs: Array) {
+  binopArray(operator: string, rhs: JbArray) {
     switch(operator) {
       case "&&":
       case "&":
@@ -1900,10 +1904,10 @@ export class JbNumber implements NumberVal {
           members[idx] = this.binopNull(operator, members[idx] as JbNull);
           break;
         case "array":
-          members[idx] = this.binopArray(operator, members[idx] as Array);
+          members[idx] = this.binopArray(operator, members[idx] as JbArray);
           break;
         case "dictionary":
-          members[idx] = this.binopDict(operator, members[idx] as Dictionary);
+          members[idx] = this.binopDict(operator, members[idx] as JbDictionary);
           break;
         case "binary":
           members[idx] = this.binopBin(operator, members[idx] as JbBinary);
@@ -1925,7 +1929,7 @@ export class JbNumber implements NumberVal {
    * @param operator 
    * @returns 
    */
-  binopDict(operator: string, rhs: Dictionary) {
+  binopDict(operator: string, rhs: JbDictionary) {
     switch (operator) {
       case "+":
       case "-":
@@ -2119,7 +2123,7 @@ export class JbString implements StringVal {
     // 1234 == "1234abcd5"
     // -0.8 == "-.8abc.-.5"
 
-    const pattern = /^(-{0,1}[0-9]|\.)+/g;
+    const pattern = /^(-{0,1}\.{0,1}[0-9]|\.)+/g;
     const matches = this.value.match(pattern);
     
     // regular strings evaluate to 0, e.g. 0 == "abcd1234" is true
@@ -2361,7 +2365,7 @@ export class JbString implements StringVal {
    * @param operator 
    * @returns 
    */
-  binopArray(operator: string, rhs: Array) {
+  binopArray(operator: string, rhs: JbArray) {
     switch(operator) {
       case "&&":
       case "&":
@@ -2387,10 +2391,10 @@ export class JbString implements StringVal {
           members[idx] = this.binopNull(operator, members[idx] as JbNull);
           break;
         case "array":
-          members[idx] = this.binopArray(operator, members[idx] as Array);
+          members[idx] = this.binopArray(operator, members[idx] as JbArray);
           break;
         case "dictionary":
-          members[idx] = this.binopDict(operator, members[idx] as Dictionary);
+          members[idx] = this.binopDict(operator, members[idx] as JbDictionary);
           break;
         case "binary":
           members[idx] = this.binopBin(operator, members[idx] as JbBinary);
@@ -2412,7 +2416,7 @@ export class JbString implements StringVal {
    * @param operator 
    * @returns 
    */
-  binopDict(operator: string, rhs: Dictionary) {
+  binopDict(operator: string, rhs: JbDictionary) {
     switch(operator) {
       case "+":
         throw new Error(`Transform Error: DE_TYPE_CONVERT_FAILED`);
@@ -2894,7 +2898,7 @@ export class JbBinary implements BinaryVal {
    * @param rhs 
    * @returns 
    */
-  binopArray(operator: string, rhs: Array) {
+  binopArray(operator: string, rhs: JbArray) {
     switch(operator) {
       case "&&":
       case "&":
@@ -2919,10 +2923,10 @@ export class JbBinary implements BinaryVal {
           members[idx] = this.binopNull(operator, members[idx] as JbNull);
           break;
         case "array":
-          members[idx] = this.binopArray(operator, members[idx] as Array);
+          members[idx] = this.binopArray(operator, members[idx] as JbArray);
           break;
         case "dictionary":
-          members[idx] = this.binopDict(operator, members[idx] as Dictionary);
+          members[idx] = this.binopDict(operator, members[idx] as JbDictionary);
           break;
         case "binary":
           members[idx] = this.binopBin(operator, members[idx] as JbBinary);
@@ -2944,7 +2948,7 @@ export class JbBinary implements BinaryVal {
    * @param rhs 
    * @returns 
    */
-  binopDict(operator: string, rhs: Dictionary) {
+  binopDict(operator: string, rhs: JbDictionary) {
     switch (operator) {
       case "+":
         throw `Transformation Error: DE_TYPE_CONVERT_FAILED`;
@@ -3334,7 +3338,7 @@ export class JbDate implements DateVal {
    * @param rhs 
    * @returns 
    */
-  binopArray(operator: string, rhs: Array) {
+  binopArray(operator: string, rhs: JbArray) {
     switch(operator) {
       case "&&":
       case "&":
@@ -3360,10 +3364,10 @@ export class JbDate implements DateVal {
           members[idx] = this.binopNull(operator, members[idx] as JbNull);
           break;
         case "array":
-          members[idx] = this.binopArray(operator, members[idx] as Array);
+          members[idx] = this.binopArray(operator, members[idx] as JbArray);
           break;
         case "dictionary":
-          members[idx] = this.binopDict(operator, members[idx] as Dictionary);
+          members[idx] = this.binopDict(operator, members[idx] as JbDictionary);
           break;
         case "binary":
           members[idx] = this.binopBin(operator, members[idx] as JbBinary);
@@ -3385,7 +3389,7 @@ export class JbDate implements DateVal {
    * @param rhs 
    * @returns 
    */
-  binopDict(operator: string, rhs: Dictionary) {
+  binopDict(operator: string, rhs: JbDictionary) {
     switch (operator) {
       case "+":
         throw new Error(`Illegal operation: ${this.type} Add ${rhs.type}`);

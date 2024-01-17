@@ -1,5 +1,5 @@
 import { RuntimeVal } from "../../runtime/values";
-import { Dictionary, JbBool, Array, JbString } from "../../runtime/types";
+import { JbDictionary, JbBool, JbArray, JbString } from "../../runtime/types";
 import { Func, Parameter, Signature } from "../types";
 import Scope from "../../runtime/scope";
 
@@ -39,10 +39,10 @@ export class AddToDict extends Func {
     if(args[0].type !== this.signature.params[0].type)
       throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
-    const dict = args[0] as Dictionary;
+    const dict = args[0] as JbDictionary;
 
     // native get needed for the result
-    const result = dict.members.get(Dictionary.keyValueToString(args[1])) === undefined;
+    const result = dict.members.get(JbDictionary.keyValueToString(args[1])) === undefined;
     dict.set(args[1], args[2]);
     return new JbBool(result);
   }
@@ -83,7 +83,7 @@ export class CollectValues extends Func {
     if(args[0].type !== this.signature.params[0].type)
       throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
-    const dict = args[0] as Dictionary;
+    const dict = args[0] as JbDictionary;
 
     if(args[1].type !== this.signature.params[1].type)
       throw new Error(`${this.name} can only be called on ${this.signature.params[1].type} data elements. The '${this.signature.params[1].name}' argument is of type ${args[1].type}`);
@@ -91,8 +91,8 @@ export class CollectValues extends Func {
     // POD: the function will throw on null values in 'names' array
     // originally a null value is returned
     let idx = 0;
-    const result = new Array();
-    for(const key of (args[1] as Array).members)
+    const result = new JbArray();
+    for(const key of (args[1] as JbArray).members)
       result.set(idx++, dict.get(key));
 
     return result;
@@ -131,8 +131,8 @@ export class GetKeys extends Func {
     if(args[0].type !== this.signature.params[0].type)
       throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
-    const dict = args[0] as Dictionary;
-    const result = new Array();
+    const dict = args[0] as JbDictionary;
+    const result = new JbArray();
     let idx = 0;
     for(const key of dict.members.keys())
       result.set(idx++, new JbString(key));
@@ -239,7 +239,7 @@ export class Dict extends Func {
 
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    return new Dictionary();
+    return new JbDictionary();
   }
 
   protected chooseSignature(args: RuntimeVal[]): void {
@@ -277,8 +277,8 @@ export class HasKey extends Func {
     if(args[0].type !== this.signature.params[0].type)
       throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
-    const dict = args[0] as Dictionary;
-    const result = dict.members.get(Dictionary.keyValueToString(args[1]));
+    const dict = args[0] as JbDictionary;
+    const result = dict.members.get(JbDictionary.keyValueToString(args[1]));
     return new JbBool(result !== undefined)
   }
 
@@ -331,8 +331,8 @@ export class MapCache extends Func {
     if(args[0].type !== this.signature.params[0].type)
       throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
-    const dict = args[0] as Dictionary;
-    const lookup = dict.members.get(Dictionary.keyValueToString(args[1]));
+    const dict = args[0] as JbDictionary;
+    const lookup = dict.members.get(JbDictionary.keyValueToString(args[1]));
     const result = lookup !== undefined
       ? lookup.toString()
       : dict.set(args[1], args[2]).toString();
@@ -375,8 +375,8 @@ export class RemoveKey extends Func {
     if(args[0].type !== this.signature.params[0].type)
       throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
-    const dict = args[0] as Dictionary;
-    const key = Dictionary.keyValueToString(args[1]);
+    const dict = args[0] as JbDictionary;
+    const key = JbDictionary.keyValueToString(args[1]);
     return new JbBool(dict.members.delete(key));
   }
 

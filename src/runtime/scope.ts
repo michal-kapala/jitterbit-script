@@ -1,8 +1,8 @@
 import { Api } from "../api";
 import { GlobalIdentifier } from "../frontend/ast";
 import { 
-  Array,
-  Dictionary,
+  JbArray,
+  JbDictionary,
   JbBinary,
   JbBool,
   JbDate,
@@ -37,7 +37,7 @@ export default class Scope {
               def = new JbString(value.default);
               break;
             case "Array":
-              def = new Array();
+              def = new JbArray();
               break;
             default:
               // This can happen only if you modify system vars types
@@ -221,7 +221,7 @@ export default class Scope {
       case "+=":
         switch(rhs.type) {
           case "array":
-            return lhs.binopArray(operator[0], rhs as Array);
+            return lhs.binopArray(operator[0], rhs as JbArray);
           case "binary":
             return lhs.binopBin(operator[0], rhs as JbBinary);
           case "bool":
@@ -229,7 +229,7 @@ export default class Scope {
           case "date":
             return lhs.binopDate(operator[0], rhs as JbDate);
           case "dictionary":
-            return lhs.binopDict(operator[0], rhs as Dictionary);
+            return lhs.binopDict(operator[0], rhs as JbDictionary);
           case "null":
             return lhs.binopNull(operator[0], rhs as JbNull);
           case "number":

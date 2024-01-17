@@ -1,5 +1,5 @@
 import Scope from "../../runtime/scope";
-import { Array, JbBool, JbNumber, JbString } from "../../runtime/types";
+import { JbArray, JbBool, JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
 import { Func, Parameter, Signature } from "../types";
 
@@ -490,7 +490,7 @@ export class ParseURL extends Func {
     this.chooseSignature(args);
     // implicit conversions
     const urlStr = args[0].toString();
-    const result = new Array();
+    const result = new JbArray();
     // URL.canParse was added in 2023
     // see: https://github.com/nodejs/node/pull/47179
     try {
@@ -957,7 +957,7 @@ export class Split extends Func {
     // implicit conversions
     let str = args[0].toString();
     const delimiter = args[1].toString();
-    const result = new Array();
+    const result = new JbArray();
 
     for(const s of str.split(delimiter))
       result.members.push(new JbString(s));
@@ -1038,8 +1038,8 @@ export class StringLength extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     if(args[0].type === this.signatures[1].params[0].type) {
-      const arr = args[0] as Array;
-      const result = new Array();
+      const arr = args[0] as JbArray;
+      const result = new JbArray();
       // POD: converts nested arrays to strings, does not traverse
       // implicit conversions
       for(const mem of arr.members)

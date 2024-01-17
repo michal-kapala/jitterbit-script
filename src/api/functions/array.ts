@@ -1,5 +1,5 @@
 import Scope from "../../runtime/scope";
-import { Array as JbArray, JbBool, JbNumber, JbString } from "../../runtime/types";
+import { JbArray, JbBool, JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
 import { Func, Parameter, Signature } from "../types";
 
