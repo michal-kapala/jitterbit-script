@@ -1,5 +1,5 @@
 import { describe, expect, test } from '@jest/globals';
-import run from '../utils';
+import { run } from '../utils';
 import {
   JbBool,
   JbNull,

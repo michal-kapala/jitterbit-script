@@ -143,16 +143,15 @@ export class JbArray implements ArrayVal {
   static keyValueToNumber(key: RuntimeVal): number {
     switch (key.type) {
       case "number":
-        return (key as JbNumber).value;
       case "bool":
-        return (key as JbBool).toNumber();
+      case "null":
+      case "date":
+        return key.toNumber();
       case "string":
         return (key as JbString).value === "" ? 0 : NaN;
-      case "null":
-        return (key as JbNull).toNumber();
       case "array":
       case "dictionary":
-        // same for dict
+      case "binary":
         throw `Evaluation of array index error`;
       default:
         throw `Unsupported member expression key type: ${key.type}`;
@@ -498,21 +497,45 @@ export class JbDictionary implements DictVal {
   static keyValueToString(key: RuntimeVal) {
     switch (key.type) {
       case "number":
-        return (key as JbNumber).toString();
       case "bool":
-        return (key as JbBool).toString();
       case "string":
-        return (key as JbString).value;
+      case "array":
+      case "dictionary":
+      case "binary":
+      case "date":
+        return key.toString();
       case "null":
         throw new Error(`A dictionary key can't be NULL`);
-      // object types are stringified
-      case "dictionary":
-        return (key as JbDictionary).toString();
-      case "array":
-        return (key as JbArray).toString();
       default:
         throw `Unsupported member expression key type: ${key.type}`;
     }
+  }
+
+  /**
+   * Compares two dictionaries by number conversions of the members.
+   * @param dict `RHS` dictionary
+   * @returns 
+   */
+  private compareDict(dict: JbDictionary) {
+    if(this.members.size !== dict.members.size)
+      return false;
+
+    for (let [key, val] of this.members) {
+      // missing key
+      if(!dict.members.has(key))
+        return false;
+
+      // missing value
+      const testVal = dict.members.get(key);
+      if(testVal === undefined)
+        return false;
+
+      // value comparison - conversion to numbers
+      // this is very wrong but reflects the original behaviour
+      if (testVal.toNumber() !== val.toNumber())
+        return false;
+    }
+    return true;
   }
 
   /**
@@ -532,21 +555,19 @@ export class JbDictionary implements DictVal {
         throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
       case "<":
         // dictionary is implicitly converted to 0
-        return new JbBool(rhs.value < 0);
+        return new JbBool(0 < rhs.value);
       case ">":
         // dictionary is implicitly converted to 0
-        return new JbBool(rhs.value > 0);
+        return new JbBool(0 > rhs.value);
       case "<=":
         // dictionary is implicitly converted to 0
-        return new JbBool(rhs.value <= 0);
+        return new JbBool(0 <= rhs.value);
       case ">=":
         // dictionary is implicitly converted to 0
-        return new JbBool(rhs.value >= 0);
+        return new JbBool(0 >= rhs.value);
       case "==":
-        // ref comparison, only true if compared with self
         return new JbBool(false);
       case "!=":
-        // ref comparison, only false if compared with self
         return new JbBool(true);
       case "&&":
       case "&":
@@ -760,11 +781,9 @@ export class JbDictionary implements DictVal {
       case "<=":
       case ">=":
       case "==":
-        // ref comparison, only true if compared with self
-        return new JbBool(this === rhs);
+        return new JbBool(this.compareDict(rhs));
       case "!=":
-        // ref comparison, only false if compared with self
-        return new JbBool(this !== rhs);
+        return new JbBool(!this.compareDict(rhs));
       case "&&":
       case "&":
       case "||":

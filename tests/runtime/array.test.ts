@@ -10,8 +10,7 @@ import {
   JbDate
 } from '../../src/runtime/types';
 import Scope from '../../src/runtime/scope';
-import { RuntimeVal } from '../../src/runtime/values';
-import run from '../utils'
+import { run } from '../utils'
 
 describe('JbArray operators', function() {
   test('-array', function() {
@@ -33,7 +32,7 @@ describe('JbArray operators', function() {
   test('= array', function() {
     const rhs = new JbArray([
       new JbDictionary(
-        new Map<string, RuntimeVal>([["testKey", new JbBool()]])
+        new Map([["testKey", new JbBool()]])
       )
     ]);
     expect(
@@ -779,7 +778,7 @@ describe('JbArray cross-type interactions', function() {
   test('array <= dictionary', function() {
     expect(
       new JbArray([new JbDictionary()]).binopDict("<=", new JbDictionary())
-    ).toStrictEqual(new JbArray([new JbBool(false)]));
+    ).toStrictEqual(new JbArray([new JbBool(true)]));
   });
 
   test('array <= binary', function() {
@@ -940,7 +939,7 @@ describe('JbArray cross-type interactions', function() {
   test('array != dictionary', function() {
     expect(
       new JbArray([new JbDictionary()]).binopDict("!=", new JbDictionary())
-    ).toStrictEqual(new JbArray([new JbBool(true)]));
+    ).toStrictEqual(new JbArray([new JbBool(false)]));
   });
 
   test('array != binary', function() {
