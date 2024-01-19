@@ -89,12 +89,16 @@ export class JbArray implements ArrayVal {
    * @param key 
    * @returns 
    */
-  get(key: RuntimeVal): RuntimeVal {
+  get(key: RuntimeVal) {
     const index = JbArray.keyValueToNumber(key);
   
     if (!JbArray.checkIndex(index)) {
       return new JbNull();
     }
+
+    // POD: Jitterbit Studio errors for large enough indices
+    if(index > JbArray.MAX_ARRAY_SIZE)
+      return new JbNull();
     
     // computed index out of bounds
     if (index >= this.members.length) {
@@ -118,10 +122,13 @@ export class JbArray implements ArrayVal {
    * @param index 
    * @returns 
    */
-  set(index: number, newValue: RuntimeVal): RuntimeVal {
+  set(index: number, newValue: RuntimeVal) {
+    // POD: Jitterbit Studio errors for large enough indices
+    if(index > JbArray.MAX_ARRAY_SIZE)
+      return new JbNull();
+
     // handle out-of-bounds index
     if (index >= this.members.length) {
-      
       for(let i = index; i > this.members.length; i--) {
         console.warn(`InterpreterWarning: Specified index value out of bounds, the original array is resized to ${index+1} with null values`);
         this.members.push(new JbNull());
@@ -131,6 +138,9 @@ export class JbArray implements ArrayVal {
       return newValue;
     }
     
+    // negative indices are converted to string keys
+    // which makes them inaccessible from get()
+    // from the user's perspective those assignments seem to be ignored
     this.members[index] = newValue;
     return newValue;
   }
@@ -140,7 +150,7 @@ export class JbArray implements ArrayVal {
    * @param key 
    * @returns 
    */
-  static keyValueToNumber(key: RuntimeVal): number {
+  static keyValueToNumber(key: RuntimeVal) {
     switch (key.type) {
       case "number":
       case "bool":
@@ -163,7 +173,7 @@ export class JbArray implements ArrayVal {
    * @param index 
    * @returns 
    */
-  static checkIndex(index: number): boolean {
+  static checkIndex(index: number) {
     if(index < 0)
       throw `Invalid array index: ${index}`;
   

@@ -265,6 +265,24 @@ describe('JbArray operators', function() {
       new JbArray([new JbBool(true)]).binopArray("|", new JbArray([new JbString("true")]))
     ).toStrictEqual(new JbBool(false));
   });
+
+  test('array[number]', function() {
+    const value = new JbString("hello there");
+    // underflow
+    expect(function() {
+      new JbArray([value]).get(new JbNumber(-1))
+    }).toThrow();
+  });
+
+  test('array[number] =', function() {
+    const newValue = new JbString("general kenobi");
+    const arr = new JbArray([new JbNumber(3), new JbNumber(4)]);
+    const key = new JbNumber(1);
+    arr.set(key.toNumber(), newValue);
+    expect(
+      arr.get(key)
+    ).toStrictEqual(newValue);
+  });
 });
 
 describe('JbArray cross-type interactions', function() {
@@ -1144,5 +1162,126 @@ describe('JbArray cross-type interactions', function() {
     expect(
       new JbArray().binopDate("|", new JbDate())
     ).toStrictEqual(new JbBool(false));
+  });
+
+  test('array[string]', function() {
+    const value = new JbNumber(3);
+    // non-existent index
+    expect(
+      new JbArray([value]).get(new JbString("1"))
+    ).toStrictEqual(new JbNull());
+  });
+
+  test('array[bool]', function() {
+    expect(
+      new JbArray([new JbNumber(3)]).get(new JbBool(true))
+    ).toStrictEqual(new JbNull());
+  });
+
+  test('array[null]', function() {
+    expect(
+      new JbArray([new JbNumber(3), new JbNumber(4)]).get(new JbNull())
+    ).toStrictEqual(new JbNumber(3));
+  });
+
+  test('array[array]', function() {
+    expect(function() {
+      new JbArray([new JbNumber(3)]).get(new JbArray())
+    }).toThrow();
+  });
+
+  test('array[dictionary]', function() {
+    expect(function() {
+      new JbArray([new JbNumber(3)]).get(new JbDictionary())
+    }).toThrow();
+  });
+
+  test('array[binary]', function() {
+    expect(function() {
+      new JbArray([new JbNumber(3)]).get(new JbBinary(new Uint8Array([0])))
+    }).toThrow();
+  });
+
+  test('array[date]', function() {
+    expect(
+      new JbArray([new JbNumber(3)]).get(new JbDate(new Date("1/13/24")))
+    ).toStrictEqual(new JbNull());
+  });
+
+  test('array[string] =', function() {
+    const newValue = new JbNumber(4);
+    const arr = new JbArray([new JbNumber(3)]);
+    // underflow, assignment should be ignored
+    const key = new JbString("-1");
+    arr.set(key.toNumber(), newValue);
+    expect(
+      arr.get(key)
+    ).toStrictEqual(new JbNull());
+  });
+
+  test('array[bool] =', function() {
+    const value = new JbNumber(3);
+    const newValue = new JbString("new value");
+    const arr = new JbArray([value]);
+    const key = new JbBool(true);
+    arr.set(key.toNumber(), newValue);
+    expect(
+      arr.get(key)
+    ).toStrictEqual(newValue);
+  });
+
+  test('array[null] =', function() {
+    const value = new JbNumber(3);
+    const newValue = new JbString("new value");
+    const arr = new JbArray([value]);
+    const key = new JbNull();
+    arr.set(key.toNumber(), newValue);
+    expect(
+      arr.get(key)
+    ).toStrictEqual(newValue);
+  });
+
+  test('array[array] =', function() {
+    const newValue = new JbString("the value");
+    const arr = new JbArray([new JbNumber(3), new JbString()]);
+    const key = new JbArray();
+    expect(function() {
+      arr.set(key.toNumber(), newValue);
+      return arr.get(key);
+    }).toThrow();
+  });
+
+  test('array[dictionary] =', function() {
+    const value = new JbNumber(3);
+    const newValue = new JbString("the value");
+    const arr = new JbArray([value]);
+    const key = new JbDictionary();
+    expect(function() {
+      arr.set(key.toNumber(), newValue);;
+      return arr.get(key);
+    }).toThrow();
+  });
+
+  test('array[binary] =', function() {
+    const value = new JbNumber(3);
+    const newValue = new JbString("the value");
+    const arr = new JbArray([value]);
+    const key = new JbBinary(new Uint8Array([0]));
+    
+    expect(function() {
+      arr.set(key.toNumber(), newValue);
+      return arr.get(key);
+    }).toThrow();
+  });
+
+  test('array[date] =', function() {
+    const value = new JbNumber(3);
+    const newValue = new JbString("the value");
+    const arr = new JbArray([value]);
+    const key = new JbDate(new Date("1970-01-01T00:00:00"));
+    arr.set(key.toNumber(), newValue);
+    expect(
+      arr.get(key)
+    ).toStrictEqual(newValue);
   });
 });

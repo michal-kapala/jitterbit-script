@@ -166,6 +166,17 @@ describe('JbDictionary operators', function() {
       makeDict("", value).get(new JbString())
     ).toStrictEqual(value);
   });
+
+  test('dictionary[string] =', function() {
+    const value = new JbNumber(3);
+    const newValue = new JbNumber(4);
+    const dict = makeDict("1", value);
+    const key = new JbString("1");
+    dict.set(key, newValue);
+    expect(
+      dict.get(key)
+    ).toStrictEqual(newValue);
+  });
 });
 
 describe('JbDictionary cross-type interactions', function() {
@@ -1034,9 +1045,10 @@ describe('JbDictionary cross-type interactions', function() {
 
   test('dictionary[number]', function() {
     const value = new JbNumber(3);
+    // non-existent key
     expect(
-      makeDict("1", value).get(new JbNumber(1))
-    ).toStrictEqual(value);
+      makeDict("1", value).get(new JbNumber(2))
+    ).toStrictEqual(new JbNull());
   });
 
   test('dictionary[bool]', function() {

@@ -7,7 +7,7 @@
     "build": "tsc",
     "start": "tsc && node ./build/main.js",
     "prepublish": "tsc",
-    "test": "jest --config=./jest.config.js ./tests" 
+    "test": "jest --config=./jest.config.js ./tests --silent" 
   },
   "repository": {
     "type": "git",
