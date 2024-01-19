@@ -14,6 +14,7 @@ import {
   JbString
 } from "../runtime/types";
 import { DeferrableFunc } from "../api/types";
+import { RuntimeError } from "../errors";
 
 /**
  * Statement and expression types.
@@ -61,16 +62,16 @@ export class Program implements Stmt {
    * @returns 
    */
   execute(scope: Scope): RuntimeVal {
-    let lastEvaluated: RuntimeVal = new JbNull();
+    let lastEval: RuntimeVal = new JbNull();
     try {
       for (const statement of this.body)
-        lastEvaluated = evaluate(statement, scope);
+        lastEval = evaluate(statement, scope);
     }
     catch(e) {
       // TODO: this should be added as an error
-      console.error(`InterpreterError: ${e}\nLast evaluated expression:\n`, lastEvaluated);
+      throw new RuntimeError(`${e}`)
     }
-    return lastEvaluated;
+    return lastEval;
   }
 }
 
@@ -496,6 +497,16 @@ export class MemberExpr implements Expr {
       case "ArrayLiteral":
         const arr = evaluate(this.object as ArrayLiteral, scope) as JbArray;
         return arr.get(key);
+      case "CallExpr":
+        const callResult = evaluate(this.object as CallExpr, scope);
+        switch (callResult.type) {
+          case "array":
+            return (callResult as JbArray).get(key);
+          case "dictionary":
+            return (callResult as JbDictionary).get(key);
+          default:
+            throw `[] operator applied to a data element of unsupported type: ${callResult.type}`;
+        }
       // a[1], $a[1]
       case "Identifier":
       case "GlobalIdentifier":
@@ -508,7 +519,7 @@ export class MemberExpr implements Expr {
           case "dictionary":
             return (val as JbDictionary).get(key);
           default:
-            throw `[] operator applied to a ${this.object.kind} data element of unsupported type: ${val.type}`;
+            throw `[] operator applied to a data element of unsupported type: ${val.type}`;
         }
       // a[1][1]
       case "MemberExpr":
@@ -519,7 +530,7 @@ export class MemberExpr implements Expr {
           case "dictionary":
             return (left as JbDictionary).get(key);
           default:
-            throw `[] operator applied to a ${this.object.kind} data element of unsupported type: ${left.type}`;
+            throw `[] operator applied to a data element of unsupported type: ${left.type}`;
         }
       default:
         throw `[] operator applied to a ${this.object.kind} data element.\nIf in the script testing screen, try clicking 'Reset' and run again`;

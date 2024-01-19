@@ -480,7 +480,15 @@ export function tokenize(sourceCode: string, curPos: Position): Token[] {
     } else if (src[0] === ",") {
       addToken(tokens, src.shift() ?? src[0], TokenType.Comma, curPos);
     } else if (src[0] === ".") {
-      addToken(tokens, src.shift() ?? src[0], TokenType.Dot, curPos);
+      // leading-dot float literal
+      if(src.length >= 2 && isNumber(src[1])) {
+        let dotLiteral = src.shift() ?? src[0];
+        while(isNumber(src[0]))
+          dotLiteral += src.shift();
+        addToken(tokens, dotLiteral, TokenType.Float, curPos);
+      }
+      else
+        addToken(tokens, src.shift() ?? src[0], TokenType.Dot, curPos);
     } else if (src[0] === "^") {
       addToken(tokens, src.shift() ?? src[0], TokenType.MathOperator, curPos);
     } else if (src[0] === "%") {

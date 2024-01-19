@@ -171,6 +171,25 @@ describe('JbString operators', function() {
       new JbString("1").binopString("|", new JbString("hi"))
     ).toStrictEqual(new JbBool(true));
   });
+
+  test('string[string]', function() {
+    const test = `
+      <trans>
+        result = "</trans>"["0"];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('string[string] =', function() {
+    const test = `
+      <trans>
+        value = "";
+        value["1"] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
 });
 
 describe('JbString cross-type interactions', function() {
@@ -1048,5 +1067,138 @@ describe('JbString cross-type interactions', function() {
     expect(
       new JbString().binopDate("|", new JbDate())
     ).toStrictEqual(new JbBool(false));
+  });
+
+  test('string[number]', function() {
+    const test = `
+      <trans>
+        result = "result"[0];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('string[bool]', function() {
+    const test = `
+      <trans>
+        result = "$jitterbit.netsuite.async"[false];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('string[null]', function() {
+    const test = `
+      <trans>
+        result = "GeneralDate(Now_())"[Null()];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('string[array]', function() {
+    const test = `
+      <trans>
+        result = "-.56"[{0}];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('string[dictionary]', function() {
+    const test = `
+      <trans>
+        result = "<trans>"[Dict()];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('string[binary]', function() {
+    const test = `
+      <trans>
+        result = "<trans>"[HexToBinary("00")];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('string[date]', function() {
+    const test = `
+      <trans>
+        result = ""[Now()];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('string[number] =', function() {
+    const test = `
+      <trans>
+        value = "[0]";
+        value[0] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('string[bool] =', function() {
+    const test = `
+      <trans>
+        value = "[";
+        value[true] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('string[null] =', function() {
+    const test = `
+      <trans>
+        value = "987654321";
+        value[Null()] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('string[array] =', function() {
+    const test = `
+      <trans>
+        value = "null";
+        value[{1}] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('string[dictionary] =', function() {
+    const test = `
+      <trans>
+        value = "{1,2,3}";
+        value[Dict()] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('string[binary] =', function() {
+    const test = `
+      <trans>
+        value = "!";
+        value[HexToBinary("01")] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('string[date] =', function() {
+    const test = `
+      <trans>
+        value = "[]";
+        value[Now()] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
   });
 });

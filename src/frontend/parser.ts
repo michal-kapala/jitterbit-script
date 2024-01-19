@@ -71,6 +71,34 @@ export default class Parser {
   }
 
   /**
+   * Validates if there are no adjacent primary expressions.
+   */
+  private checkAdjacentLiterals() {
+    // TODO: handling to be extended for other applicable expression pairs
+    for(let curIdx = 0; curIdx < this.tokens.length - 1; curIdx++) {
+      const primaryTokens = [
+        TokenType.Identifier,
+        TokenType.GlobalIdentifier,
+        TokenType.Integer,
+        TokenType.Float,
+        TokenType.True,
+        TokenType.False,
+        TokenType.SingleQuoteString,
+        TokenType.DoubleQuoteString,
+      ];
+
+      // two adjacent primary expressions or ')('
+      if (
+        (primaryTokens.includes(this.tokens[curIdx].type) &&
+          primaryTokens.includes(this.tokens[curIdx+1].type)) ||
+        (this.tokens[curIdx].type === TokenType.CloseParen &&
+          this.tokens[curIdx+1].type === TokenType.OpenParen)
+      )
+        throw `Missing operator between two operands: ${this.tokens[curIdx].value} and ${this.tokens[curIdx+1].value}`;
+    }
+  }
+
+  /**
    * Parses a Jitterbit script, returns an expression list.
    * @param sourceCode 
    * @returns 
@@ -149,6 +177,7 @@ export default class Parser {
     this.tokens.push(new Token("EndOfFile", TokenType.EOF, curPos, curPos));
 
     try {
+      this.checkAdjacentLiterals();
       // Parse until end of file
       while (this.not_eof()) {
         program.body.push(this.parse_stmt());
@@ -268,7 +297,10 @@ export default class Parser {
   private parse_additive_expr(): Expr {
     let left = this.parse_multiplicative_expr();
 
-    while (this.at().value === "+" || this.at().value === "-") {
+    while (
+      (this.at().type === TokenType.MathOperator || this.at().type === TokenType.Minus) &&
+      (this.at().value === "+" || this.at().value === "-")
+    ) {
       const operator = this.consume().value;
       const right = this.parse_multiplicative_expr();
       left = new BinaryExpr(left, right, operator);
@@ -285,7 +317,8 @@ export default class Parser {
     let left = this.parse_negation_expr();
 
     while (
-      this.at().value === "/" || this.at().value === "*" || this.at().value === "%"
+      this.at().type === TokenType.MathOperator &&
+      (this.at().value === "/" || this.at().value === "*")
     ) {
       const operator = this.consume().value;
       const right = this.parse_negation_expr();
@@ -302,7 +335,7 @@ export default class Parser {
   private parse_negation_expr(): Expr {
     // LHS unary operator expr
     // for some reason Jitterbit dont parse this with other unary expressions
-    if(this.at().value === "!") {
+    if(this.at().type === TokenType.UnaryOperator && this.at().value === "!") {
       let operator = this.consume().value;
       return new UnaryExpr(this.parse_assignment_expr(), operator, true);
     } else {
@@ -317,7 +350,7 @@ export default class Parser {
   private parse_power_expr(): Expr {
     let left = this.parse_unary_expr();
 
-    while (this.at().value === "^") {
+    while (this.at().type === TokenType.MathOperator && this.at().value === "^") {
       const operator = this.consume().value;
       const right = this.parse_unary_expr();
       left = new BinaryExpr(left, right, operator);
@@ -338,12 +371,15 @@ export default class Parser {
       this.at().type === TokenType.Minus
     ) {
       const operator = this.consume().value;
-      return new UnaryExpr(this.parse_call_member_expr(), operator, true);
+      return new UnaryExpr(this.parse_member_expr(), operator, true);
     } else {
       // RHS operators (post-)
-      let left = this.parse_call_member_expr();
+      let left = this.parse_member_expr();
 
-      if(this.at().value === "++" || this.at().value === "--") {
+      if(
+        this.at().type === TokenType.UnaryOperator &&
+        (this.at().value === "++" || this.at().value === "--")
+      ) {
         const operator = this.consume().value;
         left = new UnaryExpr(left, operator, false);
       }
@@ -353,17 +389,46 @@ export default class Parser {
   }
 
   /**
-   * Parses the caller identifier of a call expressions.
+   * Parses a member access expression to array or dictionary.
    * @returns 
    */
-  private parse_call_member_expr(): Expr {
-    const member = this.parse_member_expr();
-
-    if (this.at().type == TokenType.OpenParen) {
-      return this.parse_call_expr(member);
+  private parse_member_expr(): Expr {
+    let expr = this.parse_array_expr();
+    while (this.at().type === TokenType.OpenBracket) {
+      // [
+      this.consume();
+      // this allows obj[computedValue]
+      let key = this.parse_expr();
+      this.expect(
+        TokenType.CloseBracket,
+        "Missing closing bracket in computed value.",
+      );
+      expr = new MemberExpr(expr, key, true);
     }
+    return expr;
+  }
 
-    return member;
+  /**
+   * Parses an array literal expression.
+   * @returns 
+   */
+  private parse_array_expr(): Expr {
+    if(this.at().type !== TokenType.OpenBrace) {
+      return this.parse_call_expr();
+    }
+    // {
+    this.consume();
+    // empty array
+    if(this.at().type === TokenType.CloseBrace) {
+      this.consume();
+      return new ArrayLiteral();
+    }
+    const members = this.parse_arguments_list();
+    this.expect(
+      TokenType.CloseBrace,
+      "Array literal missing closing brace."
+    );
+    return new ArrayLiteral(members);
   }
 
   /**
@@ -371,9 +436,13 @@ export default class Parser {
    * @param caller 
    * @returns 
    */
-  private parse_call_expr(caller: Expr): Expr {
+  private parse_call_expr(): Expr {
     // the caller should always be an identifier
-    // prevents a[x](), 3(), ()() etc.
+    const caller = this.parse_primary_expr();
+    if(this.at().type !== TokenType.OpenParen)
+      return caller;
+
+    // prevents 3(), ()() etc.
     if(caller.kind !== "Identifier")
       throw `Invalid call expression, the caller is not a function identifier`;
 
@@ -393,11 +462,6 @@ export default class Parser {
     )
       throw `Wrong number of arguments for the function ${func.name}, should be `
       + `${func.minArgs === func.maxArgs ? func.minArgs : `${func.minArgs}-${func.maxArgs}`}`;
-
-    // TODO: possibly to be removed
-    if (this.at().type == TokenType.OpenParen) {
-      call_expr = this.parse_call_expr(call_expr);
-    }
 
     return call_expr;
   }
@@ -433,57 +497,6 @@ export default class Parser {
     return args;
   }
 
-  /**
-   * Parses a member access expression to array or dictionary.
-   * @returns 
-   */
-  private parse_member_expr(): Expr {
-    let object = this.parse_array_expr();
-
-    while (this.at().type === TokenType.OpenBracket) {
-      // [
-      this.consume();
-
-      // this allows obj[computedValue]
-      let key = this.parse_expr();
-      this.expect(
-        TokenType.CloseBracket,
-        "Missing closing bracket in computed value.",
-      );
-
-      object = new MemberExpr(object, key, true);
-    }
-
-    return object;
-  }
-
-    /**
-   * Parses an array literal expression.
-   * @returns 
-   */
-  private parse_array_expr(): Expr {
-    if(this.at().type !== TokenType.OpenBrace) {
-      return this.parse_primary_expr();
-    }
-
-    // {
-    this.consume();
-
-    // empty array
-    if(this.at().type === TokenType.CloseBrace) {
-      this.consume();
-      return new ArrayLiteral();
-    }
-
-    const members = this.parse_arguments_list();
-
-    this.expect(
-      TokenType.CloseBrace,
-      "Array literal missing closing brace."
-    );
-    return new ArrayLiteral(members);
-  }
-
   // Expression precedence (lowest to highest):
   // Assignment
   // Object
@@ -494,9 +507,9 @@ export default class Parser {
   // Negation
   // Power
   // Unary
-  // Call
   // Member
   // Array
+  // Call
   // Primary
 
   /**
@@ -504,10 +517,10 @@ export default class Parser {
    * @returns 
    */
   private parse_primary_expr(): Expr {
-    const tk = this.at().type;
+    const tk = this.at();
 
     // Determine which token we are currently at and return literal value
-    switch (tk) {
+    switch (tk.type) {
       // User-defined local variables
       case TokenType.Identifier:
         return new Identifier(this.consume().value)
@@ -546,12 +559,6 @@ export default class Parser {
       case TokenType.Float:
         return new NumericLiteral(parseFloat(this.consume().value));
 
-      // leading-dot float literals
-      case TokenType.Dot:
-        if(this.not_eof() && this.tokens[1].type === TokenType.Integer) {
-          return new NumericLiteral(parseFloat(this.consume().value + this.consume().value));
-        }
-
       case TokenType.True:
         this.consume();
         return new BooleanLiteral(true);
@@ -562,27 +569,39 @@ export default class Parser {
 
       // Grouping Expressions
       case TokenType.OpenParen: {
+        // ()
+        if(
+          this.tokens[0].type === TokenType.OpenParen &&
+          this.tokens[1].type === TokenType.CloseParen
+        )
+          throw "ParserError: Nothing between parentheses";
+        
         this.consume();
         const value = this.parse_expr();
         this.expect(
           TokenType.CloseParen,
           "Unexpected token found inside parenthesised expression. Expected closing parenthesis.",
-        ); // closing paren
+        );
         return value;
       }
 
-      // '' string literal
+      case TokenType.CloseParen:
+        // TODO: error handling to be unified
+        // consume the token to prevent infinite loops
+        this.consume();
+        throw "Syntax error, misplaced operator \")\".";
+
+      // string literals
       case TokenType.SingleQuoteString:
       case TokenType.DoubleQuoteString:
         return new StringLiteral(this.consume().value);
 
-      // TODO: error message to be unified
       default:
-        const error = "Unexpected token found during parsing: " + this.at().value;
+        // TODO: error message to be unified
         // TODO: add an error/error detail for every other token type here
         // consume the token to prevent infinite loops
-        this.consume()
-        throw error;
+        this.consume();
+        throw `Unexpected token found during parsing: ${tk.value}`;
     }
   }
 }

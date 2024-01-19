@@ -1,7 +1,7 @@
 /**
- * Named exceptions, e.g. thrown by `RaiseError` function.
+ * Runtime exceptions, e.g. thrown by `RaiseError` function.
  */
-export class NamedError extends Error {
+export class RuntimeError extends Error {
   constructor(message: string, src?: string) {
     super();
     if(src !== undefined)

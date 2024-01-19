@@ -199,6 +199,25 @@ describe('JbNumber operators', function() {
       new JbNumber(0).binopNumber("|", new JbNumber(0.1))
     ).toStrictEqual(new JbBool(true));
   });
+
+  test('number[number]', function() {
+    const test = `
+      <trans>
+        result = -.56[0];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('number[number] =', function() {
+    const test = `
+      <trans>
+        value = -.56;
+        value[0] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
 });
 
 describe('JbNumber cross-type interactions', function() {
@@ -1086,5 +1105,138 @@ describe('JbNumber cross-type interactions', function() {
     expect(
       new JbNumber(-5.5).binopDate("|", new JbDate())
     ).toStrictEqual(new JbBool(true));
+  });
+
+  test('number[bool]', function() {
+    const test = `
+      <trans>
+        result = -.56[false];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('number[string]', function() {
+    const test = `
+      <trans>
+        result = -.56["0"];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('number[null]', function() {
+    const test = `
+      <trans>
+        result = -.56[Null()];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('number[array]', function() {
+    const test = `
+      <trans>
+        result = -.56[{0}];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('number[dictionary]', function() {
+    const test = `
+      <trans>
+        result = -.56[Dict()];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('number[binary]', function() {
+    const test = `
+      <trans>
+        result = -.56[HexToBinary("00")];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('number[date]', function() {
+    const test = `
+      <trans>
+        result = -.56[Now()];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('number[bool] =', function() {
+    const test = `
+      <trans>
+        value = -.56;
+        value[true] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('number[string] =', function() {
+    const test = `
+      <trans>
+        value = 0;
+        value["1"] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('number[null] =', function() {
+    const test = `
+      <trans>
+        value = 987654321;
+        value[Null()] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('number[array] =', function() {
+    const test = `
+      <trans>
+        value = -.56;
+        value[{1}] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('number[dictionary] =', function() {
+    const test = `
+      <trans>
+        value = -.56;
+        value[Dict()] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('number[binary] =', function() {
+    const test = `
+      <trans>
+        value = -.56;
+        value[HexToBinary("01")] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('number[date] =', function() {
+    const test = `
+      <trans>
+        value = -.56;
+        value[Now()] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
   });
 });

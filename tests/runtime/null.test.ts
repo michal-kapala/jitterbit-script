@@ -10,6 +10,7 @@ import {
   JbDate
 } from '../../src/runtime/types';
 import Scope from '../../src/runtime/scope';
+import { run } from '../utils';
 
 describe('JbNull operators', function() {
   test('-null', function() {
@@ -174,6 +175,25 @@ describe('JbNull operators', function() {
     expect(
       nil.binopNull("|", nil)
     ).toStrictEqual(new JbBool(false));
+  });
+
+  test('null[null]', function() {
+    const test = `
+      <trans>
+        result = Null()[Null()];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('null[null] =', function() {
+    const test = `
+      <trans>
+        value = Null();
+        value[Null()] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
   });
 });
 
@@ -1045,5 +1065,138 @@ describe('JbNull cross-type interactions', function() {
     expect(
       new JbNull().binopDate("|", new JbDate())
     ).toStrictEqual(new JbBool(false));
+  });
+
+  test('null[number]', function() {
+    const test = `
+      <trans>
+        result = Null()[0];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('null[bool]', function() {
+    const test = `
+      <trans>
+        result = Null()[false];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('null[string]', function() {
+    const test = `
+      <trans>
+        result = Null()["0"];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('null[array]', function() {
+    const test = `
+      <trans>
+        result = Null()[{0}];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('null[dictionary]', function() {
+    const test = `
+      <trans>
+        result = Null()[Dict()];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('null[binary]', function() {
+    const test = `
+      <trans>
+        result = Null()[HexToBinary("00")];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('null[date]', function() {
+    const test = `
+      <trans>
+        result = Null()[Now()];
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('null[number] =', function() {
+    const test = `
+      <trans>
+        value = Null();
+        value[0] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('null[bool] =', function() {
+    const test = `
+      <trans>
+        value = Null();
+        value[true] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('null[string] =', function() {
+    const test = `
+      <trans>
+        value = Null();
+        value["1"] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('null[array] =', function() {
+    const test = `
+      <trans>
+        value = Null();
+        value[{1}] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('null[dictionary] =', function() {
+    const test = `
+      <trans>
+        value = Null();
+        value[Dict()] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('null[binary] =', function() {
+    const test = `
+      <trans>
+        value = Null();
+        value[HexToBinary("01")] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
+  });
+
+  test('null[date] =', function() {
+    const test = `
+      <trans>
+        value = Null();
+        value[Now()] = "new value";
+      </trans>
+    `;
+    expect(function() {return run(test)}).toThrow();
   });
 });

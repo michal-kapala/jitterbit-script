@@ -1,4 +1,4 @@
-import { NamedError } from "../../errors";
+import { RuntimeError } from "../../errors";
 import { Expr } from "../../frontend/ast";
 import { evaluate } from "../../runtime/interpreter";
 import Scope from "../../runtime/scope";
@@ -40,7 +40,7 @@ export class Case extends DeferrableFunc {
   callEval(args: Expr[], scope: Scope) {
     // TODO: to be copied into typechecker
     if(args.length % 2 === 1)
-      throw new NamedError("Odd number of arguments", this.name);
+      throw new RuntimeError("Odd number of arguments", this.name);
 
     for(let idx = 0; idx < args.length; idx += 2) {
       if(evaluate(args[idx], scope).toBool())
@@ -186,7 +186,7 @@ export class While extends DeferrableFunc {
 
     // POD: not the original error
     if(iterCount === maxIters)
-      throw new NamedError(`Max number of ${maxIters} iterations reached. Set $jitterbit.scripting.while.max_iterations upstream of this function call to increase the iteration limit.`, this.name);
+      throw new RuntimeError(`Max number of ${maxIters} iterations reached. Set $jitterbit.scripting.while.max_iterations upstream of this function call to increase the iteration limit.`, this.name);
 
     return new JbNull();
   }

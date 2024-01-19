@@ -2,7 +2,7 @@ import Scope from "../../runtime/scope";
 import { JbNull, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
 import { Func, Parameter, Signature } from "../types";
-import { NamedError } from "../../errors";
+import { RuntimeError } from "../../errors";
 
 /**
  * The implementation of `GetLastError` function.
@@ -82,7 +82,7 @@ export class RaiseError extends Func {
     const err = new JbString(args[0].toString());
     scope.assignVar("$jitterbit.operation.previous.error", scope.lookupVar("$jitterbit.operation.last_error"));
     scope.assignVar("$jitterbit.operation.last_error", err);
-    throw new NamedError(err.value, this.name);
+    throw new RuntimeError(err.value, this.name);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {

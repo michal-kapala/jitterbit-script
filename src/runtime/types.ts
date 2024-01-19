@@ -179,7 +179,7 @@ export class JbArray implements ArrayVal {
   
     // limit testing warning
     if(index > JbArray.MAX_ARRAY_SIZE)
-      console.warn(`Index of ${index} exceeds maximum array size for Jitterbit Studio's default Java heap (1GB)`);
+      console.warn(`RuntimeWarning: Array index of ${index} exceeds maximum array size for Jitterbit Studio's default Java heap (1GB)`);
   
     // non-empty strings evaluate to NaN and dont affect the array size
     // float indices return null values

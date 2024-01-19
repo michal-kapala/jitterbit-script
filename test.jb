@@ -1,6 +1,6 @@
 <trans>
-  // test for string || {} comparison
-  result = "true" || {};
+  // test for call vs member expr precedence
+  result = SortArray({2,1})[1];
   DebugBreak();
   
 </trans>
