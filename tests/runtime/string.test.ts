@@ -1,5 +1,5 @@
 import { describe, expect, test } from '@jest/globals';
-import { run } from '../utils';
+import { makeDate, run } from '../utils';
 import {
   JbBool,
   JbNull,
@@ -304,7 +304,7 @@ describe('JbString cross-type interactions', function() {
 
   test('string += date', function() {
     expect(
-      Scope.assign(new JbString("2date: "), "+=", new JbDate(new Date("1/13/24")))
+      Scope.assign(new JbString("2date: "), "+=", makeDate("1/13/24"))
     ).toStrictEqual(new JbString("2date: 2024-01-13 00:00:00.000"));
   });
 
@@ -356,7 +356,7 @@ describe('JbString cross-type interactions', function() {
 
   test('string + date', function() {
     expect(
-      new JbString("someDate: ").binopDate("+", new JbDate(new Date("1/13/24")))
+      new JbString("someDate: ").binopDate("+", makeDate("1/13/24"))
     ).toStrictEqual(new JbString("someDate: 2024-01-13 00:00:00.000"));
   });
 
@@ -405,7 +405,7 @@ describe('JbString cross-type interactions', function() {
 
   test('string - date', function() {
     expect(function() {
-      return new JbString().binopDate("-", new JbDate(new Date("1/13/24")))
+      return new JbString().binopDate("-", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -454,7 +454,7 @@ describe('JbString cross-type interactions', function() {
 
   test('string * date', function() {
     expect(function() {
-      return new JbString().binopDate("*", new JbDate(new Date("1/13/24")))
+      return new JbString().binopDate("*", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -503,7 +503,7 @@ describe('JbString cross-type interactions', function() {
 
   test('string / date', function() {
     expect(function() {
-      return new JbString().binopDate("/", new JbDate(new Date("1/13/24")))
+      return new JbString().binopDate("/", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -552,7 +552,7 @@ describe('JbString cross-type interactions', function() {
 
   test('string ^ date', function() {
     expect(function() {
-      return new JbString().binopDate("^", new JbDate(new Date("1/13/24")))
+      return new JbString().binopDate("^", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -604,7 +604,7 @@ describe('JbString cross-type interactions', function() {
 
   test('string < date', function() {
     expect(
-      new JbString("1705190400").binopDate("<", new JbDate(new Date("1/13/24")))
+      new JbString("1705190400").binopDate("<", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(false));
   });
 
@@ -657,7 +657,7 @@ describe('JbString cross-type interactions', function() {
   test('string > date', function() {
     expect(
       // equal timestamp
-      new JbString("1705104000").binopDate(">", new JbDate(new Date("1/13/24")))
+      new JbString("1705104000").binopDate(">", makeDate("2024-01-13T00:00:00.000Z"))
     ).toStrictEqual(new JbBool(false));
   });
 
@@ -710,7 +710,7 @@ describe('JbString cross-type interactions', function() {
   test('string <= date', function() {
     expect(
       // timestamp + 1
-      new JbString("1705104001").binopDate("<=", new JbDate(new Date("1/13/24")))
+      new JbString("1705104001").binopDate("<=", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(false));
   });
 
@@ -763,7 +763,7 @@ describe('JbString cross-type interactions', function() {
   test('string >= date', function() {
     expect(
       // timestamp + 1
-      new JbString("1705104001").binopDate(">=", new JbDate(new Date("1/13/24")))
+      new JbString("1705104001").binopDate(">=", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(true));
   });
 
@@ -815,7 +815,7 @@ describe('JbString cross-type interactions', function() {
 
   test('string == date', function() {
     expect(
-      new JbString("1/13/24").binopDate("==", new JbDate(new Date("1/13/24")))
+      new JbString("1/13/24").binopDate("==", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(false));
   });
 
@@ -867,7 +867,7 @@ describe('JbString cross-type interactions', function() {
 
   test('string != date', function() {
     expect(
-      new JbString("2024-01-13 00:00:00.000").binopDate("!=", new JbDate(new Date("1/13/24")))
+      new JbString("2024-01-13 00:00:00.000").binopDate("!=", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(true));
   });
 

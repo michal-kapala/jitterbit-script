@@ -10,7 +10,7 @@ import {
   JbDate
 } from '../../src/runtime/types';
 import Scope from '../../src/runtime/scope';
-import { run } from '../utils'
+import { makeDate, run } from '../utils'
 
 describe('JbArray operators', function() {
   test('-array', function() {
@@ -504,7 +504,7 @@ describe('JbArray cross-type interactions', function() {
 
   test('array - date', function() {
     expect(function() {
-      return new JbArray([new JbNull()]).binopDate("-", new JbDate(new Date("1/13/24")))
+      return new JbArray([new JbNull()]).binopDate("-", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -553,7 +553,7 @@ describe('JbArray cross-type interactions', function() {
 
   test('array * date', function() {
     expect(function() {
-      return new JbArray([new JbNull()]).binopDate("*", new JbDate(new Date("1/13/24")))
+      return new JbArray([new JbNull()]).binopDate("*", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -603,7 +603,7 @@ describe('JbArray cross-type interactions', function() {
 
   test('array / date', function() {
     expect(function() {
-      return new JbArray([new JbNull()]).binopDate("/", new JbDate(new Date("1/13/24")))
+      return new JbArray([new JbNull()]).binopDate("/", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -652,7 +652,7 @@ describe('JbArray cross-type interactions', function() {
 
   test('array ^ date', function() {
     expect(function() {
-      return new JbArray([new JbNull()]).binopDate("^", new JbDate(new Date("1/13/24")))
+      return new JbArray([new JbNull()]).binopDate("^", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -704,7 +704,7 @@ describe('JbArray cross-type interactions', function() {
   test('array < date', function() {
     expect(
       new JbArray([new JbString("true"), new JbNumber(123456)]).binopDate(
-        "<", new JbDate(new Date("1/13/24"))
+        "<", makeDate("1/13/24")
       )
     ).toStrictEqual(new JbArray([new JbBool(true), new JbBool(true)]));
   });
@@ -756,7 +756,7 @@ describe('JbArray cross-type interactions', function() {
 
   test('array > date', function() {
     expect(
-      new JbArray([new JbString("true")]).binopDate(">", new JbDate(new Date("1/13/24")))
+      new JbArray([new JbString("true")]).binopDate(">", makeDate("1/13/24"))
     ).toStrictEqual(new JbArray([new JbBool(false)]));
   });
 
@@ -807,7 +807,7 @@ describe('JbArray cross-type interactions', function() {
 
   test('array <= date', function() {
     expect(
-      new JbArray([new JbDate(new Date("1/14/24"))]).binopDate("<=", new JbDate(new Date("1/13/24")))
+      new JbArray([makeDate("1/14/24")]).binopDate("<=", makeDate("1/13/24"))
     ).toStrictEqual(new JbArray([new JbBool(false)]));
   });
 
@@ -858,7 +858,7 @@ describe('JbArray cross-type interactions', function() {
 
   test('array >= date', function() {
     expect(
-      new JbArray([new JbDate(new Date("1/13/24"))]).binopDate(">=", new JbDate(new Date("1/13/24")))
+      new JbArray([makeDate("1/13/24")]).binopDate(">=", makeDate("1/13/24"))
     ).toStrictEqual(new JbArray([new JbBool(true)]));
   });
 
@@ -917,7 +917,7 @@ describe('JbArray cross-type interactions', function() {
 
   test('array == date', function() {
     expect(
-      new JbArray([new JbDate(new Date("1/13/24"))]).binopDate("==", new JbDate(new Date("1/13/24")))
+      new JbArray([makeDate("1/13/24")]).binopDate("==", makeDate("1/13/24"))
     ).toStrictEqual(new JbArray([new JbBool(true)]));
   });
 
@@ -968,7 +968,7 @@ describe('JbArray cross-type interactions', function() {
 
   test('array != date', function() {
     expect(
-      new JbArray([new JbDate(new Date("1/13/24"))]).binopDate("!=", new JbDate(new Date("1/13/24")))
+      new JbArray([makeDate("1/13/24")]).binopDate("!=", makeDate("1/13/24"))
     ).toStrictEqual(new JbArray([new JbBool(false)]));
   });
 
@@ -1204,7 +1204,7 @@ describe('JbArray cross-type interactions', function() {
 
   test('array[date]', function() {
     expect(
-      new JbArray([new JbNumber(3)]).get(new JbDate(new Date("1/13/24")))
+      new JbArray([new JbNumber(3)]).get(makeDate("1/13/24"))
     ).toStrictEqual(new JbNull());
   });
 
@@ -1278,7 +1278,7 @@ describe('JbArray cross-type interactions', function() {
     const value = new JbNumber(3);
     const newValue = new JbString("the value");
     const arr = new JbArray([value]);
-    const key = new JbDate(new Date("1970-01-01T00:00:00"));
+    const key = makeDate("1970-01-01T00:00:00Z");
     arr.set(key.toNumber(), newValue);
     expect(
       arr.get(key)

@@ -2046,8 +2046,10 @@ export class JbNumber implements NumberVal {
         return new JbDate(
           new Date(
             // getTime returns local time
-            rhs.value.getTime() + rhs.value.getTimezoneOffset() * 60000 + this.value * 1000
-          )
+            rhs.value.getTime() + (this.value < 0 ? Math.ceil(this.value) : Math.floor(this.value)) * 1000
+          ),
+          false,
+          rhs.isUTC
         );
       case "-":
         throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
@@ -3095,13 +3097,23 @@ export class JbBinary implements BinaryVal {
 export class JbDate implements DateVal {
   type: "date";
   value: Date;
+  /**
+   * Whether the date was created as UTC-based (currently only dates parsed from ISO strings).
+   */
+  isUTC: boolean;
 
-  constructor(date: Date = new Date(), truncMillis = true) {
+  /**
+   * Returns the date with local time.
+   * @param date 
+   * @param truncMillis 
+   */
+  constructor(date: Date = new Date(), truncMillis = true, utc = false) {
     this.type = "date";
     // truncate milliseconds
     if(truncMillis)
-      date.setMilliseconds(0)
-    this.value = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+      date.setMilliseconds(0);
+    this.value = new Date(date.getTime());
+    this.isUTC = utc;
   }
 
   clone() {
@@ -3132,21 +3144,30 @@ export class JbDate implements DateVal {
   }
 
   /**
-   * Returns the epoch timestamp in seconds.
+   * Returns the epoch timestamp in seconds (UTC-based).
    * @returns 
    */
   toNumber() {
-    return Math.floor(this.value.getTime() / 1000);
+    return this.isUTC
+      ? Math.floor(this.value.getTime() / 1000 - this.value.getTimezoneOffset() * 60)
+      : Math.floor(this.value.getTime() / 1000);
   }
 
   /**
-   * Converts the date to ISO 8601 format (`YYYY-MM-DD HH:MM:SS.mmm`).
+   * Converts the date to ISO 8601-ish format (`YYYY-MM-DD HH:MM:SS.mmm`).
+   * Does not recalculate time to UTC (WYSIWYG).
    * @param date 
    * @returns
    */
   toString() {
-    let isoStr = this.value.toISOString();
-    return isoStr.replace("T", " ").replace("Z", "");
+    const year = this.value.getFullYear();
+    const month = (this.value.getMonth() + 1).toString().padStart(2, "0");
+    const day = this.value.getDate().toString().padStart(2, "0");
+    const hour = this.value.getHours().toString().padStart(2, "0");
+    const min = this.value.getMinutes().toString().padStart(2, "0");
+    const sec = this.value.getSeconds().toString().padStart(2, "0");
+    const mil = this.value.getMilliseconds().toString().padStart(3, "0");
+    return `${year}-${month}-${day} ${hour}:${min}:${sec}.${mil}`;
   }
 
   /**
@@ -3170,16 +3191,25 @@ export class JbDate implements DateVal {
    * @returns 
    */
   static parse(date: RuntimeVal) {
-    let result: Date;
+    let result: JbDate;
     // POD: supports JS implementation rather than JB's
     if(date.type === "string") {
       const timestamp = Date.parse((date as JbString).value);
       if(isNaN(timestamp))
         throw new Error(`[${this.name}] Invalid date string: '${(date as JbString).value}'`);
-      result = new Date(timestamp - new Date().getTimezoneOffset() * 60000);
+
+      // for ISO 8601 dates returns the date as-is (original behaviour)
+      const isoDate = /(^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]{3})?Z)$/g;
+      const isIso = (date as JbString).value.match(isoDate) !== null;
+
+      result = isIso
+        ? new JbDate(new Date(timestamp + new Date().getTimezoneOffset() * 60000), false, true)
+        : new JbDate(new Date(timestamp), false);
     }
+    else if(date.type === "date")
+      result = new JbDate((date as JbDate).value);
     else
-      result = (date as JbDate).value;
+      throw `Cannot parse a ${date.type} value as date.`;
 
     return result;
   }
@@ -3197,15 +3227,19 @@ export class JbDate implements DateVal {
         return new JbDate(
           new Date(
             // getTime returns local time
-            this.value.getTime() + this.value.getTimezoneOffset() * 60000 + rhs.value * 1000
-          )
+            this.value.getTime() + (rhs.value < 0 ? Math.ceil(rhs.value) : Math.floor(rhs.value)) * 1000
+          ),
+          false,
+          this.isUTC
         );
       case "-":
         return new JbDate(
           new Date(
             // getTime returns local time
-            this.value.getTime() + this.value.getTimezoneOffset() * 60000 - rhs.value * 1000
-          )
+            this.value.getTime() - (rhs.value < 0 ? Math.ceil(rhs.value) : Math.floor(rhs.value)) * 1000
+          ),
+          false,
+          this.isUTC
         );
       case "*":
         throw `Illegal operation, MULTIPLICATION with incompatible types: ${this.type} ${operator} ${rhs.type}`;
@@ -3434,7 +3468,7 @@ export class JbDate implements DateVal {
       case "<":
         return new JbBool(false);
       case "<=":
-        return new JbBool(this.toNumber() === 0);
+        return new JbBool(this.toNumber() <= 0);
       case ">":
         return new JbBool(this.toNumber() > 0);
       case ">=":

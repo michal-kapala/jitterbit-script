@@ -146,7 +146,7 @@ export class DayOfMonth extends Func {
       throw new Error(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     let date = JbDate.parse(args[0]);
-    return new JbNumber(date.getUTCDate());
+    return new JbNumber(date.value.getDate());
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -186,7 +186,7 @@ export class DayOfWeek extends Func {
       throw new Error(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     let date = JbDate.parse(args[0]);
-    return new JbNumber(date.getUTCDay());
+    return new JbNumber(date.value.getDay());
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -262,7 +262,7 @@ export class GeneralDate extends Func {
 
     // "MM/DD/YYYY HH:MM:SS AM/PM"
     return new JbString(
-      `${(date.getUTCMonth()+1).toString().padStart(2, '0')}/${date.getUTCDate().toString().padStart(2, '0')}/${date.getUTCFullYear()} ${date.getUTCHours() < 12 ? date.getUTCHours().toString().padStart(2, '0') : (date.getUTCHours()-12).toString().padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')}:${date.getUTCSeconds().toString().padStart(2, '0')} ${date.getUTCHours() < 12 ? "AM" : "PM"}`
+      `${(date.value.getMonth()+1).toString().padStart(2, '0')}/${date.value.getDate().toString().padStart(2, '0')}/${date.value.getFullYear()} ${date.value.getHours() < 12 ? date.value.getHours().toString().padStart(2, '0') : (date.value.getHours()-12).toString().padStart(2, '0')}:${date.value.getMinutes().toString().padStart(2, '0')}:${date.value.getSeconds().toString().padStart(2, '0')} ${date.value.getHours() < 12 ? "AM" : "PM"}`
     );
   }
 
@@ -375,11 +375,11 @@ export class LastDayOfMonth extends Func {
 
     let date = JbDate.parse(args[0]);
 
-    // UTC-based last day of the month
+    // local timezone-based last day of the month
     return new JbDate(
       new Date(
-        date.getUTCFullYear(),
-        date.getUTCMonth() + 1,
+        date.value.getFullYear(),
+        date.value.getMonth() + 1,
         0,
       )
     );
@@ -421,7 +421,7 @@ export class LongDate extends Func {
     let date = JbDate.parse(args[0]);
 
     // "Saturday, September 16, 2000"
-    return new JbString(`${this.getWeekdayName(date)}, ${this.getMonthName(date)} ${date.getUTCDate()}, ${date.getUTCFullYear()}`);
+    return new JbString(`${this.getWeekdayName(date.value)}, ${this.getMonthName(date.value)} ${date.value.getDate()}, ${date.value.getFullYear()}`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -434,7 +434,7 @@ export class LongDate extends Func {
    * @returns 
    */
   private getWeekdayName(date: Date) {
-    switch (date.getUTCDay()) {
+    switch (date.getDay()) {
       case 0:
         return "Sunday";
       case 1:
@@ -461,7 +461,7 @@ export class LongDate extends Func {
    * @returns 
    */
   private getMonthName(date: Date) {
-    switch (date.getUTCMonth()) {
+    switch (date.getMonth()) {
       case 0:
         return "January";
       case 1:
@@ -525,7 +525,7 @@ export class LongTime extends Func {
 
     // "HH:MM:SS AM/PM"
     // TODO: leading zero presence to be tested
-    return new JbString(`${date.getUTCHours() < 12 ? date.getUTCHours().toString().padStart(2, '0') : (date.getUTCHours() - 12).toString().padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')}:${date.getUTCSeconds()} ${date.getUTCHours() < 12 ? "AM" : "PM"}`);
+    return new JbString(`${date.value.getHours() < 12 ? date.value.getHours().toString().padStart(2, '0') : (date.value.getHours() - 12).toString().padStart(2, '0')}:${date.value.getMinutes().toString().padStart(2, '0')}:${date.value.getSeconds().toString().padStart(2, '0')} ${date.value.getHours() < 12 ? "AM" : "PM"}`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -564,7 +564,7 @@ export class MediumDate extends Func {
     let date = JbDate.parse(args[0]);
 
     // "DD-Mth-YY"
-    return new JbString(`${date.getUTCDate().toString().padStart(2, '0')}-${this.getShortMonth(date.getUTCMonth())}-${date.getUTCFullYear().toString().substring(2)}`);
+    return new JbString(`${date.value.getDate().toString().padStart(2, '0')}-${this.getShortMonth(date.value.getMonth())}-${date.value.getFullYear().toString().substring(2)}`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -635,7 +635,7 @@ export class MediumTime extends Func {
 
     // "HH:MM AM/PM"
     // TODO: leading zero presence to be tested
-    return new JbString(`${date.getUTCHours() < 12 ? date.getUTCHours().toString().padStart(2, '0') : (date.getUTCHours() - 12).toString().padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')} ${date.getUTCHours() < 12 ? "AM" : "PM"}`);
+    return new JbString(`${date.value.getHours() < 12 ? date.value.getHours().toString().padStart(2, '0') : (date.value.getHours() - 12).toString().padStart(2, '0')}:${date.value.getMinutes().toString().padStart(2, '0')} ${date.value.getHours() < 12 ? "AM" : "PM"}`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -675,7 +675,7 @@ export class MonthOfYear extends Func {
     let date = JbDate.parse(args[0]);
 
     // 1-12
-    return new JbNumber(date.getUTCMonth() + 1);
+    return new JbNumber(date.value.getMonth() + 1);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -772,7 +772,7 @@ export class ShortDate extends Func {
     let date = JbDate.parse(args[0]);
 
     // "(M)M/(D)D/YY"
-    return new JbString(`${date.getUTCMonth()+1}/${date.getUTCDate()}/${date.getUTCFullYear().toString().substring(2)}`);
+    return new JbString(`${date.value.getMonth()+1}/${date.value.getDate()}/${date.value.getFullYear().toString().substring(2)}`);
   }
   
   protected chooseSignature(args: RuntimeVal[]) {
@@ -811,7 +811,7 @@ export class ShortTime extends Func {
     let date = JbDate.parse(args[0]);
 
     // "HH:MM"
-    return new JbString(`${date.getUTCHours().toString().padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')}`);
+    return new JbString(`${date.value.getHours().toString().padStart(2, '0')}:${date.value.getMinutes().toString().padStart(2, '0')}`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {

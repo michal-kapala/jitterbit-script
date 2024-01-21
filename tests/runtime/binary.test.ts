@@ -10,7 +10,7 @@ import {
   JbDate
 } from '../../src/runtime/types';
 import Scope from '../../src/runtime/scope';
-import { run } from '../utils';
+import { makeDate, run } from '../utils';
 
 describe('JbBinary operators', function() {
   test('-binary', function() {
@@ -397,7 +397,7 @@ describe('JbBinary cross-type interactions', function() {
 
   test('binary - date', function() {
     expect(function() {
-      return new JbBinary().binopDate("-", new JbDate(new Date("1/13/24")))
+      return new JbBinary().binopDate("-", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -446,7 +446,7 @@ describe('JbBinary cross-type interactions', function() {
 
   test('binary * date', function() {
     expect(function() {
-      return new JbBinary().binopDate("*", new JbDate(new Date("1/13/24")))
+      return new JbBinary().binopDate("*", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -495,7 +495,7 @@ describe('JbBinary cross-type interactions', function() {
 
   test('binary / date', function() {
     expect(function() {
-      return new JbBinary().binopDate("/", new JbDate(new Date("1/13/24")))
+      return new JbBinary().binopDate("/", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -544,7 +544,7 @@ describe('JbBinary cross-type interactions', function() {
 
   test('binary ^ date', function() {
     expect(function() {
-      return new JbBinary().binopDate("^", new JbDate(new Date("1/13/24")))
+      return new JbBinary().binopDate("^", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -595,7 +595,7 @@ describe('JbBinary cross-type interactions', function() {
 
   test('binary < date', function() {
     expect(function() {
-      new JbBinary().binopDate("<", new JbDate(new Date("1/13/24")))
+      new JbBinary().binopDate("<", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -646,7 +646,7 @@ describe('JbBinary cross-type interactions', function() {
 
   test('binary > date', function() {
     expect(function() {
-      new JbBinary().binopDate(">", new JbDate(new Date("1/13/24")))
+      new JbBinary().binopDate(">", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -697,7 +697,7 @@ describe('JbBinary cross-type interactions', function() {
 
   test('binary <= date', function() {
     expect(function() {
-      new JbBinary().binopDate("<=", new JbDate(new Date("1/13/24")))
+      new JbBinary().binopDate("<=", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -748,7 +748,7 @@ describe('JbBinary cross-type interactions', function() {
 
   test('binary >= date', function() {
     expect(function() {
-      new JbBinary().binopDate(">=", new JbDate(new Date("1/13/24")))
+      new JbBinary().binopDate(">=", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -799,7 +799,7 @@ describe('JbBinary cross-type interactions', function() {
 
   test('binary == date', function() {
     expect(function() {
-      new JbBinary().binopDate("==", new JbDate(new Date("1/13/24")))
+      new JbBinary().binopDate("==", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -850,7 +850,7 @@ describe('JbBinary cross-type interactions', function() {
 
   test('binary != date', function() {
     expect(function() {
-      new JbBinary().binopDate("!=", new JbDate(new Date("1/13/24")))
+      new JbBinary().binopDate("!=", makeDate("1/13/24"))
     }).toThrow();
   });
 

@@ -1,5 +1,5 @@
 import { describe, expect, test } from '@jest/globals';
-import { run } from '../utils';
+import { run, makeDate } from '../utils';
 import {
   JbBool,
   JbNull,
@@ -339,8 +339,10 @@ describe('JbNumber cross-type interactions', function() {
       </trans>
     `;
     const result = run(test) as JbDate;
-    expect(result.type).toBe("date");
-    expect(result.toString()).toBe("2024-01-31 00:00:05.000");
+    // input in local format, expected in ISO format (UTC)
+    const expected = makeDate("2024-01-31T00:00:05.000Z");
+    expected.isUTC = false;
+    expect(result).toStrictEqual(expected);
   });
 
   test('number + bool', function() {
@@ -444,7 +446,7 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number - date', function() {
     expect(function() {
-      return new JbNumber(5.5).binopDate("-", new JbDate(new Date("1/13/24")))
+      return new JbNumber(5.5).binopDate("-", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -493,7 +495,7 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number * date', function() {
     expect(function() {
-      return new JbNumber(5.5).binopDate("*", new JbDate(new Date("1/13/24")))
+      return new JbNumber(5.5).binopDate("*", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -542,7 +544,7 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number / date', function() {
     expect(function() {
-      return new JbNumber(5.5).binopDate("/", new JbDate(new Date("1/13/24")))
+      return new JbNumber(5.5).binopDate("/", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -591,7 +593,7 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number ^ date', function() {
     expect(function() {
-      return new JbNumber(5.5).binopDate("^", new JbDate(new Date("1/13/24")))
+      return new JbNumber(5.5).binopDate("^", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -643,7 +645,7 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number < date', function() {
     expect(
-      new JbNumber(5.5).binopDate("<", new JbDate(new Date("1/13/24")))
+      new JbNumber(5.5).binopDate("<", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(true));
   });
 
@@ -696,7 +698,7 @@ describe('JbNumber cross-type interactions', function() {
   test('number > date', function() {
     const timestamp = Math.floor(Date.UTC(2024, 0, 13) / 1000);
     expect(
-      new JbNumber(timestamp).binopDate(">", new JbDate(new Date("1/13/24")))
+      new JbNumber(timestamp).binopDate(">", makeDate("2024-01-13T00:00:00Z"))
     ).toStrictEqual(new JbBool(false));
   });
 
@@ -748,7 +750,7 @@ describe('JbNumber cross-type interactions', function() {
 
   test('number <= date', function() {
     expect(
-      new JbNumber(5.5).binopDate("<=", new JbDate(new Date("1/13/24")))
+      new JbNumber(5.5).binopDate("<=", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(true));
   });
 
@@ -801,7 +803,7 @@ describe('JbNumber cross-type interactions', function() {
   test('number >= date', function() {
     const timestamp = Math.floor(Date.UTC(2024, 0, 13) / 1000);
     expect(
-      new JbNumber(timestamp).binopDate(">=", new JbDate(new Date("1/13/24")))
+      new JbNumber(timestamp).binopDate(">=", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(true));
   });
 
@@ -854,7 +856,7 @@ describe('JbNumber cross-type interactions', function() {
   test('number == date', function() {
     const timestamp = Math.floor(Date.UTC(2024, 0, 13) / 1000);
     expect(
-      new JbNumber(timestamp).binopDate("==", new JbDate(new Date("1/13/24")))
+      new JbNumber(timestamp).binopDate("==", makeDate("2024-01-13T00:00:00Z"))
     ).toStrictEqual(new JbBool(true));
   });
 
@@ -907,7 +909,7 @@ describe('JbNumber cross-type interactions', function() {
   test('number != date', function() {
     const timestamp = Math.floor(Date.UTC(2024, 0, 13) / 1000);
     expect(
-      new JbNumber(timestamp).binopDate("!=", new JbDate(new Date("1/13/24")))
+      new JbNumber(timestamp).binopDate("!=", makeDate("2024-01-13T00:00:00Z"))
     ).toStrictEqual(new JbBool(false));
   });
 

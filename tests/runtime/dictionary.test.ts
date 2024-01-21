@@ -10,7 +10,7 @@ import {
   JbDate
 } from '../../src/runtime/types';
 import Scope from '../../src/runtime/scope';
-import { makeDict } from '../utils';
+import { makeDate, makeDict } from '../utils';
 
 describe('JbDictionary operators', function() {
   test('-dictionary', function() {
@@ -380,7 +380,7 @@ describe('JbDictionary cross-type interactions', function() {
 
   test('dictionary - date', function() {
     expect(function() {
-      return new JbDictionary().binopDate("-", new JbDate(new Date("1/13/24")))
+      return new JbDictionary().binopDate("-", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -429,7 +429,7 @@ describe('JbDictionary cross-type interactions', function() {
 
   test('dictionary * date', function() {
     expect(function() {
-      return new JbDictionary().binopDate("*", new JbDate(new Date("1/13/24")))
+      return new JbDictionary().binopDate("*", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -478,7 +478,7 @@ describe('JbDictionary cross-type interactions', function() {
 
   test('dictionary / date', function() {
     expect(function() {
-      return new JbDictionary().binopDate("/", new JbDate(new Date("1/13/24")))
+      return new JbDictionary().binopDate("/", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -527,7 +527,7 @@ describe('JbDictionary cross-type interactions', function() {
 
   test('dictionary ^ date', function() {
     expect(function() {
-      return new JbDictionary().binopDate("^", new JbDate(new Date("1/13/24")))
+      return new JbDictionary().binopDate("^", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -580,7 +580,7 @@ describe('JbDictionary cross-type interactions', function() {
 
   test('dictionary < date', function() {
     expect(
-      new JbDictionary().binopDate("<", new JbDate(new Date("1/13/24")))
+      new JbDictionary().binopDate("<", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(true));
   });
 
@@ -632,7 +632,7 @@ describe('JbDictionary cross-type interactions', function() {
 
   test('dictionary > date', function() {
     expect(
-      new JbDictionary().binopDate(">", new JbDate(new Date("1/13/24")))
+      new JbDictionary().binopDate(">", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(false));
   });
 
@@ -685,7 +685,7 @@ describe('JbDictionary cross-type interactions', function() {
 
   test('dictionary <= date', function() {
     expect(
-      new JbDictionary().binopDate("<=", new JbDate(new Date("1/13/24")))
+      new JbDictionary().binopDate("<=", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(true));
   });
 
@@ -738,7 +738,7 @@ describe('JbDictionary cross-type interactions', function() {
 
   test('dictionary >= date', function() {
     expect(
-      new JbDictionary().binopDate(">=", new JbDate(new Date("1/13/24")))
+      new JbDictionary().binopDate(">=", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(false));
   });
 
@@ -790,7 +790,7 @@ describe('JbDictionary cross-type interactions', function() {
 
   test('dictionary == date', function() {
     expect(
-      new JbDictionary().binopDate("==", new JbDate(new Date("1/13/24")))
+      new JbDictionary().binopDate("==", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(false));
   });
 
@@ -843,7 +843,7 @@ describe('JbDictionary cross-type interactions', function() {
 
   test('dictionary != date', function() {
     expect(
-      new JbDictionary().binopDate("!=", new JbDate(new Date("1/13/24")))
+      new JbDictionary().binopDate("!=", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(true));
   });
 
@@ -990,7 +990,7 @@ describe('JbDictionary cross-type interactions', function() {
 
   test('dictionary || date', function() {
     expect(
-      new JbDictionary().binopDate("||", new JbDate(new Date("1/13/24")))
+      new JbDictionary().binopDate("||", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(false));
   });
 
@@ -1088,7 +1088,7 @@ describe('JbDictionary cross-type interactions', function() {
   test('dictionary[date]', function() {
     const value = new JbNumber(3);
     expect(
-      makeDict("2024-01-13 00:00:00.000", value).get(new JbDate(new Date("1/13/24")))
+      makeDict("2024-01-13 00:00:00.000", value).get(makeDate("1/13/24"))
     ).toStrictEqual(value);
   });
 
@@ -1161,7 +1161,7 @@ describe('JbDictionary cross-type interactions', function() {
     const value = new JbNumber(3);
     const newValue = new JbString("the value");
     const dict = makeDict("2024-01-13 00:00:00.000", value);
-    const key = new JbDate(new Date("1/13/24"));
+    const key = makeDate("1/13/24");
     dict.set(key, newValue);
     expect(
       dict.get(key)

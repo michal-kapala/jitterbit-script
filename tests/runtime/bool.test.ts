@@ -1,5 +1,5 @@
 import { describe, expect, test } from '@jest/globals';
-import { run } from '../utils';
+import { makeDate, run } from '../utils';
 import {
   JbBool,
   JbNull,
@@ -416,7 +416,7 @@ describe('JbBool cross-type interactions', function() {
 
   test('bool - date', function() {
     expect(function() {
-      return new JbBool().binopDate("-", new JbDate(new Date("1/13/24")))
+      return new JbBool().binopDate("-", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -465,7 +465,7 @@ describe('JbBool cross-type interactions', function() {
 
   test('bool * date', function() {
     expect(function() {
-      return new JbBool().binopDate("*", new JbDate(new Date("1/13/24")))
+      return new JbBool().binopDate("*", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -514,7 +514,7 @@ describe('JbBool cross-type interactions', function() {
 
   test('bool / date', function() {
     expect(function() {
-      return new JbBool().binopDate("/", new JbDate(new Date("1/13/24")))
+      return new JbBool().binopDate("/", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -563,7 +563,7 @@ describe('JbBool cross-type interactions', function() {
 
   test('bool ^ date', function() {
     expect(function() {
-      return new JbBool().binopDate("^", new JbDate(new Date("1/13/24")))
+      return new JbBool().binopDate("^", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -615,7 +615,7 @@ describe('JbBool cross-type interactions', function() {
 
   test('bool < date', function() {
     expect(
-      new JbBool().binopDate("<", new JbDate(new Date("1/13/24")))
+      new JbBool().binopDate("<", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(true));
   });
 
@@ -667,7 +667,7 @@ describe('JbBool cross-type interactions', function() {
 
   test('bool > date', function() {
     expect(
-      new JbBool().binopDate(">", new JbDate(new Date("1/13/24")))
+      new JbBool().binopDate(">", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(false));
   });
 
@@ -719,7 +719,7 @@ describe('JbBool cross-type interactions', function() {
 
   test('bool <= date', function() {
     expect(
-      new JbBool().binopDate("<=", new JbDate(new Date("1/13/24")))
+      new JbBool().binopDate("<=", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(true));
   });
 
@@ -771,7 +771,7 @@ describe('JbBool cross-type interactions', function() {
 
   test('bool >= date', function() {
     expect(
-      new JbBool().binopDate(">=", new JbDate(new Date("1/13/24")))
+      new JbBool().binopDate(">=", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(false));
   });
 
@@ -823,7 +823,7 @@ describe('JbBool cross-type interactions', function() {
 
   test('bool == date', function() {
     expect(
-      new JbBool(true).binopDate("==", new JbDate(new Date("1/13/24")))
+      new JbBool(true).binopDate("==", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(false));
   });
 
@@ -875,7 +875,7 @@ describe('JbBool cross-type interactions', function() {
 
   test('bool != date', function() {
     expect(
-      new JbBool(true).binopDate("!=", new JbDate(new Date("1/13/24")))
+      new JbBool(true).binopDate("!=", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(true));
   });
 

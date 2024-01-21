@@ -160,11 +160,11 @@ export class DateFunc extends Func {
       case "bool":
         throw new Error(`Cannot convert a ${args[0].type} to a date object`);
       case "number":
-        // 'the input is interpreted as the number of seconds'
+        // 'the input is interpreted as the number of seconds' - epoch timestamp (UTC-based)
         return new JbDate(new Date(Math.round((args[0] as JbNumber).value) * 1000));
       case "string":
         // POD: JbDate.parse supports the JS formats rather than JB's
-        return new JbDate(JbDate.parse(args[0] as JbString));
+        return JbDate.parse(args[0] as JbString);
       case "date":
         return args[0] as JbDate;
       case "array":

@@ -10,7 +10,7 @@ import {
   JbDate
 } from '../../src/runtime/types';
 import Scope from '../../src/runtime/scope';
-import { run } from '../utils';
+import { makeDate, run } from '../utils';
 
 describe('JbNull operators', function() {
   test('-null', function() {
@@ -408,7 +408,7 @@ describe('JbNull cross-type interactions', function() {
 
   test('null - date', function() {
     expect(function() {
-      return new JbNull().binopDate("-", new JbDate(new Date("1/13/24")))
+      return new JbNull().binopDate("-", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -457,7 +457,7 @@ describe('JbNull cross-type interactions', function() {
 
   test('null * date', function() {
     expect(function() {
-      return new JbNull().binopDate("*", new JbDate(new Date("1/13/24")))
+      return new JbNull().binopDate("*", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -506,7 +506,7 @@ describe('JbNull cross-type interactions', function() {
 
   test('null / date', function() {
     expect(function() {
-      return new JbNull().binopDate("/", new JbDate(new Date("1/13/24")))
+      return new JbNull().binopDate("/", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -555,7 +555,7 @@ describe('JbNull cross-type interactions', function() {
 
   test('null ^ date', function() {
     expect(function() {
-      return new JbNull().binopDate("^", new JbDate(new Date("1/13/24")))
+      return new JbNull().binopDate("^", makeDate("1/13/24"))
     }).toThrow();
   });
 
@@ -607,7 +607,7 @@ describe('JbNull cross-type interactions', function() {
 
   test('null < date', function() {
     expect(
-      new JbNull().binopDate("<", new JbDate(new Date("1/13/24")))
+      new JbNull().binopDate("<", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(false));
   });
 
@@ -659,7 +659,7 @@ describe('JbNull cross-type interactions', function() {
 
   test('null > date', function() {
     expect(
-      new JbNull().binopDate(">", new JbDate(new Date("1/13/24")))
+      new JbNull().binopDate(">", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(false));
   });
 
@@ -711,7 +711,7 @@ describe('JbNull cross-type interactions', function() {
 
   test('null <= date', function() {
     expect(
-      new JbNull().binopDate("<=", new JbDate(new Date("1/13/24")))
+      new JbNull().binopDate("<=", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(false));
   });
 
@@ -763,7 +763,7 @@ describe('JbNull cross-type interactions', function() {
 
   test('null >= date', function() {
     expect(
-      new JbNull().binopDate(">=", new JbDate(new Date("1/13/24")))
+      new JbNull().binopDate(">=", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(false));
   });
 
@@ -815,7 +815,7 @@ describe('JbNull cross-type interactions', function() {
 
   test('null == date', function() {
     expect(
-      new JbNull().binopDate("==", new JbDate(new Date("1/13/24")))
+      new JbNull().binopDate("==", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(false));
   });
 
@@ -867,7 +867,7 @@ describe('JbNull cross-type interactions', function() {
 
   test('null != date', function() {
     expect(
-      new JbNull().binopDate("!=", new JbDate(new Date("1/13/24")))
+      new JbNull().binopDate("!=", makeDate("1/13/24"))
     ).toStrictEqual(new JbBool(true));
   });
 
