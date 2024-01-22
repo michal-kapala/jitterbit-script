@@ -10,7 +10,7 @@ import {
   JbDate
 } from '../../src/runtime/types';
 import Scope from '../../src/runtime/scope';
-import { makeDate, run } from '../utils'
+import { makeDate, run } from '../utils';
 
 describe('JbArray operators', function() {
   test('-array', function() {

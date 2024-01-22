@@ -9,3 +9,8 @@ export class RuntimeError extends Error {
     this.message =  message;
   }
 }
+
+/**
+ * Indicates that the functionality has not been implemented yet.
+ */
+export class UnimplementedError extends RuntimeError {}

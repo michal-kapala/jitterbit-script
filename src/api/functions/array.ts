@@ -1,5 +1,6 @@
+import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
-import { JbArray, JbBool, JbNumber, JbString } from "../../runtime/types";
+import { JbArray, JbBool, JbNull, JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
 import { Func, Parameter, Signature } from "../types";
 
@@ -67,7 +68,7 @@ export class GetSourceAttrNames extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]): void {
@@ -104,7 +105,7 @@ export class GetSourceElementNames extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]): void {
@@ -139,7 +140,7 @@ export class GetSourceInstanceArray extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]): void {
@@ -173,7 +174,7 @@ export class GetSourceInstanceElementArray extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]): void {
@@ -201,7 +202,7 @@ type Evaluation = { eval: number; elem: RuntimeVal; };
  * 
  * Multiple sorting of the same array is possible by applying the `SortArray` function repeatedly.
  */
-export class SortArray extends Func  {
+export class SortArray extends Func {
   constructor() {
     super();
     this.name = "SortArray";
@@ -266,7 +267,7 @@ export class SortArray extends Func  {
         if(!isAscending)
           array.members.reverse();
       }
-      return array;
+      return new JbNull();
     }
 
     // SortArray(array, index, [isAscending])
@@ -289,7 +290,7 @@ export class SortArray extends Func  {
         if(!isAscending)
           array.members.reverse();
     }
-    return array;
+    return new JbNull();
   }
 
   protected chooseSignature(args: RuntimeVal[]): void {
@@ -500,6 +501,7 @@ export class ReduceDimension extends Func {
         new Parameter("array", "arrayMultiD")
       ])
     ];
+    this.signature = this.signatures[0];
   }
   
   call(args: RuntimeVal[], scope: Scope) {
