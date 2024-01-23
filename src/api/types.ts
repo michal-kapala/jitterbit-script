@@ -36,7 +36,19 @@ export abstract class DeferrableFunc extends Func {
    * @param args 
    * @param scope 
    */
-  abstract callEval(args: Expr[], scope: Scope): RuntimeVal;
+  abstract callEval(args: Expr[], scope: Scope): Promise<RuntimeVal>;
+}
+
+/**
+ * Jitterbit function executing an async operation.
+ */
+export abstract class AsyncFunc extends Func {
+  /**
+   * Executes the implementation of an async function.
+   * @param args 
+   * @param scope 
+   */
+  abstract callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal>;
 }
 
 /**

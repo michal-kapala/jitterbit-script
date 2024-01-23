@@ -9,14 +9,14 @@ async function run(filename: string) {
   const parser = new Parser();
   const globalScope = new Scope();
 
-  fs.readFile(filename, 'utf8', function (err, data) {
+  fs.readFile(filename, 'utf8', async function (err, data) {
     if (err)
       return console.error(err);
     
     const program = parser.parse(data);
     let result;
     try {
-      result = evaluate(program, globalScope);
+      result = await evaluate(program, globalScope);
       console.log("\nScript result:\n", result);
     } catch(e) {
       console.error(e);

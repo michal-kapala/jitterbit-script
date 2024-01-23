@@ -4,9 +4,9 @@ import { evaluate } from "../src/runtime/interpreter";
 import { RuntimeVal } from "../src/runtime/values";
 import { JbDate, JbDictionary, JbNull, JbString } from "../src/runtime/types";
 
-export function run(testScript: string) {
+export async function run(testScript: string) {
   const program = new Parser().parse(testScript);
-  return evaluate(program, new Scope());
+  return await evaluate(program, new Scope());
 }
 
 export function makeDict(key: string, value: RuntimeVal = new JbNull()) {

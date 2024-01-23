@@ -46,40 +46,40 @@ describe('JbBool operators', function() {
     ).toStrictEqual(rhs);
   });
 
-  test('--bool', function() {
+  test('--bool', async function() {
     const test = `
       <trans>
         value = true;
         result = --value;
       </trans>`;
-    expect(run(test)).toStrictEqual(new JbBool(false));
+    expect(await run(test)).toStrictEqual(new JbBool(false));
   });
 
-  test('bool--', function() {
+  test('bool--', async function() {
     const test = `
       <trans>
         value = true;
         result = value--;
       </trans>`;
-    expect(run(test)).toStrictEqual(new JbBool(true));
+    expect(await run(test)).toStrictEqual(new JbBool(true));
   });
 
-  test('++bool', function() {
+  test('++bool', async function() {
     const test = `
       <trans>
         value = false;
         result = ++value;
       </trans>`;
-    expect(run(test)).toStrictEqual(new JbBool(true));
+    expect(await run(test)).toStrictEqual(new JbBool(true));
   });
 
-  test('bool++', function() {
+  test('bool++', async function() {
     const test = `
       <trans>
         value = false;
         result = value++;
       </trans>`;
-    expect(run(test)).toStrictEqual(new JbBool(false));
+    expect(await run(test)).toStrictEqual(new JbBool(false));
   });
 
   test('bool -= bool', function() {
@@ -191,7 +191,7 @@ describe('JbBool operators', function() {
         result = true[false];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {return await run(test)}).rejects.toThrow();
   });
 
   test('bool[bool] =', function() {
@@ -201,7 +201,7 @@ describe('JbBool operators', function() {
         value[true] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {return await run(test)}).rejects.toThrow();
   });
 });
 
@@ -1081,7 +1081,7 @@ describe('JbBool cross-type interactions', function() {
         result = true[0];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {return await run(test)}).rejects.toThrow();
   });
 
   test('bool[string]', function() {
@@ -1090,7 +1090,7 @@ describe('JbBool cross-type interactions', function() {
         result = true["0"];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {return await run(test)}).rejects.toThrow();
   });
 
   test('bool[null]', function() {
@@ -1099,7 +1099,7 @@ describe('JbBool cross-type interactions', function() {
         result = true[Null()];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {return await run(test)}).rejects.toThrow();
   });
 
   test('bool[array]', function() {
@@ -1108,7 +1108,7 @@ describe('JbBool cross-type interactions', function() {
         result = true[{0}];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {return await run(test)}).rejects.toThrow();
   });
 
   test('bool[dictionary]', function() {
@@ -1117,7 +1117,7 @@ describe('JbBool cross-type interactions', function() {
         result = true[Dict()];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {return await run(test)}).rejects.toThrow();
   });
 
   test('bool[binary]', function() {
@@ -1126,7 +1126,7 @@ describe('JbBool cross-type interactions', function() {
         result = true[HexToBinary("00")];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {return await run(test)}).rejects.toThrow();
   });
 
   test('bool[date]', function() {
@@ -1135,7 +1135,7 @@ describe('JbBool cross-type interactions', function() {
         result = true[Now()];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {return await run(test)}).rejects.toThrow();
   });
 
   test('bool[number] =', function() {
@@ -1145,7 +1145,7 @@ describe('JbBool cross-type interactions', function() {
         value[0] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {return await run(test)}).rejects.toThrow();
   });
 
   test('bool[string] =', function() {
@@ -1155,7 +1155,7 @@ describe('JbBool cross-type interactions', function() {
         value["1"] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {return await run(test)}).rejects.toThrow();
   });
 
   test('bool[null] =', function() {
@@ -1165,7 +1165,7 @@ describe('JbBool cross-type interactions', function() {
         value[Null()] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {return await run(test)}).rejects.toThrow();
   });
 
   test('bool[array] =', function() {
@@ -1175,7 +1175,7 @@ describe('JbBool cross-type interactions', function() {
         value[{1}] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {return await run(test)}).rejects.toThrow();
   });
 
   test('bool[dictionary] =', function() {
@@ -1185,7 +1185,7 @@ describe('JbBool cross-type interactions', function() {
         value[Dict()] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {return await run(test)}).rejects.toThrow();
   });
 
   test('bool[binary] =', function() {
@@ -1195,7 +1195,7 @@ describe('JbBool cross-type interactions', function() {
         value[HexToBinary("01")] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {return await run(test)}).rejects.toThrow();
   });
 
   test('bool[date] =', function() {
@@ -1205,6 +1205,6 @@ describe('JbBool cross-type interactions', function() {
         value[Now()] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {return await run(test)}).rejects.toThrow();
   });
 });

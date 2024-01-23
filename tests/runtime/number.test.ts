@@ -38,48 +38,48 @@ describe('JbNumber operators', function() {
     ).toStrictEqual(rhs);
   });
 
-  test('--number', function() {
+  test('--number', async function() {
     const test = `
       <trans>
         value = 3.3;
         result = --value;
       </trans>`;
-    const result = run(test) as JbNumber;
+    const result = await run(test) as JbNumber;
     expect(result.type).toBe("number");
     expect(result.value).toBeCloseTo(2.3);
   });
 
-  test('number--', function() {
+  test('number--', async function() {
     const test = `
       <trans>
         value = 3.3;
         result = value--;
         result + value;
       </trans>`;
-    const result = run(test) as JbNumber;
+    const result = await run(test) as JbNumber;
     expect(result.type).toBe("number");
     expect(result.value).toBeCloseTo(5.6);
   });
 
-  test('++number', function() {
+  test('++number', async function() {
     const test = `
       <trans>
         value = 3.3;
         result = ++value;
       </trans>`;
-    const result = run(test) as JbNumber;
+    const result = await run(test) as JbNumber;
     expect(result.type).toBe("number");
     expect(result.value).toBeCloseTo(4.3);
   });
 
-  test('number++', function() {
+  test('number++', async function() {
     const test = `
       <trans>
         value = 3.3;
         result = value++;
         result + value;
       </trans>`;
-    const result = run(test) as JbNumber;
+    const result = await run(test) as JbNumber;
     expect(result.type).toBe("number");
     expect(result.value).toBeCloseTo(7.6);
   });
@@ -108,22 +108,22 @@ describe('JbNumber operators', function() {
     ).toBeCloseTo(-0.2);
   });
 
-  test('number * number', function() {
+  test('number * number', async function() {
     const test = `
       <trans>
         13 * -5 * -2
       </trans>`;
-    const result = run(test) as JbNumber;
+    const result = await run(test) as JbNumber;
     expect(result.type).toBe("number");
     expect(result.value).toBe(130);
   });
 
-  test('number / number', function() {
+  test('number / number', async function() {
     const test = `
       <trans>
         13 / 4 / 3.25
       </trans>`;
-    const result = run(test) as JbNumber;
+    const result = await run(test) as JbNumber;
     expect(result.type).toBe("number");
     expect(result.value).toBeCloseTo(1);
   });
@@ -200,23 +200,27 @@ describe('JbNumber operators', function() {
     ).toStrictEqual(new JbBool(true));
   });
 
-  test('number[number]', function() {
+  test('number[number]', async function() {
     const test = `
       <trans>
         result = -.56[0];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('number[number] =', function() {
+  test('number[number] =', async function() {
     const test = `
       <trans>
         value = -.56;
         value[0] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 });
 
@@ -331,14 +335,14 @@ describe('JbNumber cross-type interactions', function() {
     }).toThrow();
   });
 
-  test('number += date', function() {
+  test('number += date', async function() {
     const test = `
       <trans>
         num = 5;
         num += LastDayOfMonth("1/13/24");
       </trans>
     `;
-    const result = run(test) as JbDate;
+    const result = await run(test) as JbDate;
     // input in local format, expected in ISO format (UTC)
     const expected = makeDate("2024-01-31T00:00:05.000Z");
     expected.isUTC = false;
@@ -389,13 +393,13 @@ describe('JbNumber cross-type interactions', function() {
     }).toThrow();
   });
 
-  test('number + date', function() {
+  test('number + date', async function() {
     const test = `
       <trans>
         5 + LastDayOfMonth("1/13/24");
       </trans>
     `;
-    const result = run(test) as JbDate;
+    const result = await run(test) as JbDate;
     expect(result.type).toBe("date");
     expect(result.toString()).toBe("2024-01-31 00:00:05.000");
   });
@@ -1109,136 +1113,164 @@ describe('JbNumber cross-type interactions', function() {
     ).toStrictEqual(new JbBool(true));
   });
 
-  test('number[bool]', function() {
+  test('number[bool]', async function() {
     const test = `
       <trans>
         result = -.56[false];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('number[string]', function() {
+  test('number[string]', async function() {
     const test = `
       <trans>
         result = -.56["0"];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('number[null]', function() {
+  test('number[null]', async function() {
     const test = `
       <trans>
         result = -.56[Null()];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('number[array]', function() {
+  test('number[array]', async function() {
     const test = `
       <trans>
         result = -.56[{0}];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('number[dictionary]', function() {
+  test('number[dictionary]', async function() {
     const test = `
       <trans>
         result = -.56[Dict()];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('number[binary]', function() {
+  test('number[binary]', async function() {
     const test = `
       <trans>
         result = -.56[HexToBinary("00")];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('number[date]', function() {
+  test('number[date]', async function() {
     const test = `
       <trans>
         result = -.56[Now()];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('number[bool] =', function() {
+  test('number[bool] =', async function() {
     const test = `
       <trans>
         value = -.56;
         value[true] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('number[string] =', function() {
+  test('number[string] =', async function() {
     const test = `
       <trans>
         value = 0;
         value["1"] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('number[null] =', function() {
+  test('number[null] =', async function() {
     const test = `
       <trans>
         value = 987654321;
         value[Null()] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('number[array] =', function() {
+  test('number[array] =', async function() {
     const test = `
       <trans>
         value = -.56;
         value[{1}] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('number[dictionary] =', function() {
+  test('number[dictionary] =', async function() {
     const test = `
       <trans>
         value = -.56;
         value[Dict()] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('number[binary] =', function() {
+  test('number[binary] =', async function() {
     const test = `
       <trans>
         value = -.56;
         value[HexToBinary("01")] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('number[date] =', function() {
+  test('number[date] =', async function() {
     const test = `
       <trans>
         value = -.56;
         value[Now()] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 });

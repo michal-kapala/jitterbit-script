@@ -37,14 +37,14 @@ export class Case extends DeferrableFunc {
     this.maxArgs = 100;
   }
 
-  callEval(args: Expr[], scope: Scope) {
+  async callEval(args: Expr[], scope: Scope) {
     // TODO: to be copied into typechecker
     if(args.length % 2 === 1)
       throw new RuntimeError("Odd number of arguments", this.name);
 
     for(let idx = 0; idx < args.length; idx += 2) {
-      if(evaluate(args[idx], scope).toBool())
-        return evaluate(args[idx + 1], scope);
+      if((await evaluate(args[idx], scope)).toBool())
+        return await evaluate(args[idx + 1], scope);
     }
     return new JbNull();
   }
@@ -133,8 +133,8 @@ export class If extends DeferrableFunc {
     this.maxArgs = 3;
   }
 
-  callEval(args: Expr[], scope: Scope) {
-    const condition = evaluate(args[0], scope).toBool();
+  async callEval(args: Expr[], scope: Scope) {
+    const condition = (await evaluate(args[0], scope)).toBool();
 
     if(!condition && args.length === 2)
       return new JbNull();
@@ -176,10 +176,10 @@ export class While extends DeferrableFunc {
     this.maxArgs = 2;
   }
 
-  callEval(args: Expr[], scope: Scope) {
+  async callEval(args: Expr[], scope: Scope) {
     const maxIters = scope.lookupVar("$jitterbit.scripting.while.max_iterations").toNumber();
     let iterCount = 0;
-    while(evaluate(args[0], scope).toBool() && iterCount < maxIters) {
+    while((await evaluate(args[0], scope)).toBool() && iterCount < maxIters) {
       evaluate(args[1], scope);
       iterCount++;
     }

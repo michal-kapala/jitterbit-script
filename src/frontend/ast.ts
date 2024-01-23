@@ -13,7 +13,7 @@ import {
   JbNumber,
   JbString
 } from "../runtime/types";
-import { DeferrableFunc } from "../api/types";
+import { AsyncFunc, DeferrableFunc } from "../api/types";
 import { RuntimeError } from "../errors";
 
 /**
@@ -61,11 +61,11 @@ export class Program implements Stmt {
    * @param scope 
    * @returns 
    */
-  execute(scope: Scope): RuntimeVal {
+  async execute(scope: Scope) {
     let lastEval: RuntimeVal = new JbNull();
     try {
       for (const statement of this.body)
-        lastEval = evaluate(statement, scope);
+        lastEval = await evaluate(statement, scope);
     }
     catch(e) {
       // TODO: this should be added as an error
@@ -89,11 +89,11 @@ export class BlockExpr implements Expr {
     this.body = body;
   }
 
-  eval(scope: Scope) {
+  async eval(scope: Scope) {
     let lastValue: RuntimeVal = new JbNull();
     try {
       for (const expr of this.body)
-        lastValue = evaluate(expr, scope);
+        lastValue = await evaluate(expr, scope);
     }
     catch(e) {
       // TODO: this should be added as an error
@@ -111,7 +111,7 @@ export interface Expr extends Stmt {
    * Evaluates the expression at runtime.
    * @param scope 
    */
-  eval(scope: Scope): RuntimeVal;
+  eval(scope: Scope): Promise<RuntimeVal>;
 }
 
 /**
@@ -130,14 +130,14 @@ export class AssignmentExpr implements Expr {
     this.operator = operator;
   }
 
-  eval(scope: Scope) {
+  async eval(scope: Scope) {
     switch (this.assignee.kind) {
       case "Identifier":
       case "GlobalIdentifier":
         const varName = (this.assignee as Identifier).symbol;
-        return scope.assignVar(varName, evaluate(this.value, scope), this.operator.value);
+        return scope.assignVar(varName, await evaluate(this.value, scope), this.operator.value);
       case "MemberExpr":
-        return (this.assignee as MemberExpr).evalAssignment(this, scope);
+        return await (this.assignee as MemberExpr).evalAssignment(this, scope);
       default:
         // POD: the original error:
         // The left hand side of the assignment operator '=' must be a local or global data element, such as x=... or $x=... error occured
@@ -165,9 +165,9 @@ export class BinaryExpr implements Expr {
     this.operator = operator;
   }
 
-  eval(scope: Scope): RuntimeVal {
-    const lhs = evaluate(this.left, scope);
-    const rhs = evaluate(this.right, scope);
+  async eval(scope: Scope) {
+    const lhs = await evaluate(this.left, scope);
+    const rhs = await evaluate(this.right, scope);
 
     // math
     if (lhs.type === "number" && rhs.type === "number")
@@ -430,7 +430,7 @@ export class CallExpr implements Expr {
     this.caller = caller;
   }
 
-  eval(scope: Scope): RuntimeVal {
+  async eval(scope: Scope) {
     const func = Api.getFunc(this.caller.symbol);
 
     // this is for type safety only, the error is thrown by parser
@@ -440,7 +440,7 @@ export class CallExpr implements Expr {
     // deferred argument list evaluation functions (logical/general modules)
     if((func as DeferrableFunc).callEval !== undefined) {
       try {
-        return (func as DeferrableFunc).callEval(this.args, scope);
+        return await (func as DeferrableFunc).callEval(this.args, scope);
       } catch(e) {
         // TODO: add an error
         console.error(`${e}`);
@@ -448,7 +448,18 @@ export class CallExpr implements Expr {
       }
     }
 
-    const args = this.evalArgs(this.args, scope);
+    const args = await this.evalArgs(this.args, scope);
+
+    // async calls
+    if((func as AsyncFunc).callAsync !== undefined) {
+      try {
+        return await (func as AsyncFunc).callAsync(args, scope);
+      } catch(e) {
+        // TODO: add an error
+        console.error(`${e}`);
+        return new JbNull();
+      }
+    }
     try {
       return func.call(args, scope);
     }
@@ -465,10 +476,10 @@ export class CallExpr implements Expr {
    * @param scope 
    * @returns 
    */
-  private evalArgs(args: Expr[], scope: Scope) {
+  private async evalArgs(args: Expr[], scope: Scope) {
     const result: RuntimeVal[] = [];
     for(const expr of args)
-      result.push(evaluate(expr, scope));
+      result.push(await evaluate(expr, scope));
     return result;
   }
 }
@@ -489,16 +500,16 @@ export class MemberExpr implements Expr {
     this.computed = computed;
   }
 
-  eval(scope: Scope) {
-    const key = evaluate(this.key, scope);
+  async eval(scope: Scope) {
+    const key = await evaluate(this.key, scope);
 
     switch(this.object.kind) {
       // {1,2,3}[1]
       case "ArrayLiteral":
-        const arr = evaluate(this.object as ArrayLiteral, scope) as JbArray;
+        const arr = await evaluate(this.object as ArrayLiteral, scope) as JbArray;
         return arr.get(key);
       case "CallExpr":
-        const callResult = evaluate(this.object as CallExpr, scope);
+        const callResult = await evaluate(this.object as CallExpr, scope);
         switch (callResult.type) {
           case "array":
             return (callResult as JbArray).get(key);
@@ -523,7 +534,7 @@ export class MemberExpr implements Expr {
         }
       // a[1][1]
       case "MemberExpr":
-        const left = evaluate(this.object, scope);
+        const left = await evaluate(this.object, scope);
         switch(left.type) {
           case "array":
             return (left as JbArray).get(key);
@@ -543,34 +554,34 @@ export class MemberExpr implements Expr {
    * @param scope 
    * @returns 
    */
-  evalAssignment(assignment: AssignmentExpr, scope: Scope) {
+  async evalAssignment(assignment: AssignmentExpr, scope: Scope) {
     const kind = this.object.kind;
     // only identifiers allowed
     if(kind !== "Identifier" && kind !== "GlobalIdentifier" && kind !== "MemberExpr")
       throw `Invalid LHS inside assignment expr ${JSON.stringify(assignment.assignee)}; must be a local or global data element identifier or member expression`;
 
     // for a[1][2] expr, this evaluates a[1]
-    const lhs = evaluate(this.object, scope);
+    const lhs = await evaluate(this.object, scope);
 
     switch (lhs.type) {
       case "array":
-        const index = JbArray.keyValueToNumber(evaluate(this.key, scope));
+        const index = JbArray.keyValueToNumber(await evaluate(this.key, scope));
         let rhs = JbArray.checkIndex(index)
-          ? evaluate(assignment.value, scope)
+          ? await evaluate(assignment.value, scope)
           : new JbNull();
         const newValue = Scope.assign(
-          evaluate(this, scope),
+          await evaluate(this, scope),
           assignment.operator.value,
           rhs
         );
         // set appends null values if index is out of bounds
         return  (lhs as JbArray).set(index, newValue);
       case "dictionary":
-        const key = evaluate(this.key, scope);
+        const key = await evaluate(this.key, scope);
         const newVal = Scope.assign(
-          evaluate(this, scope),
+          await evaluate(this, scope),
           assignment.operator.value,
-          evaluate(assignment.value, scope)
+          await evaluate(assignment.value, scope)
         );
         return (lhs as JbDictionary).set(key, newVal);
       default:
@@ -591,9 +602,9 @@ export class Identifier implements Expr {
     this.symbol = s;
   }
 
-  eval(scope: Scope) {
+  async eval(scope: Scope) {
     const val = scope.lookupVar(this.symbol);
-    return val;;
+    return val;
   }
 }
 
@@ -624,7 +635,7 @@ export class NumericLiteral implements Expr {
     this.value = n;
   }
 
-  eval(scope: Scope): RuntimeVal {
+  async eval(scope: Scope) {
     return new JbNumber(this.value);
   }
 }
@@ -651,10 +662,10 @@ export class ArrayLiteral implements Expr {
     this.members = m;
   }
 
-  eval(scope: Scope): RuntimeVal {
+  async eval(scope: Scope) {
     let members: RuntimeVal[] = [];
     for (let elem of this.members)
-      members.push(evaluate(elem, scope));
+      members.push(await evaluate(elem, scope));
 
     return new JbArray(members);
   }
@@ -672,7 +683,7 @@ export class StringLiteral implements Expr {
     this.value = str;
   }
 
-  eval(scope: Scope): RuntimeVal {
+  async eval(scope: Scope) {
     return new JbString(this.value);
   }
 }
@@ -689,7 +700,7 @@ export class BooleanLiteral implements Expr {
     this.value = value;
   }
 
-  eval(scope: Scope): RuntimeVal {
+  async eval(scope: Scope) {
     return new JbBool(this.value);
   }
 }
@@ -710,8 +721,8 @@ export class UnaryExpr implements Expr {
     this.lhs = lhs;
   }
 
-  eval(scope: Scope): RuntimeVal {
-    const operand = evaluate(this.value, scope);
+  async eval(scope: Scope) {
+    const operand = await evaluate(this.value, scope);
     switch(this.operator) {
       case "!":
         if(this.lhs)

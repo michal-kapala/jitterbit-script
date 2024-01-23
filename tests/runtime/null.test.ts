@@ -177,23 +177,27 @@ describe('JbNull operators', function() {
     ).toStrictEqual(new JbBool(false));
   });
 
-  test('null[null]', function() {
+  test('null[null]', async function() {
     const test = `
       <trans>
         result = Null()[Null()];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('null[null] =', function() {
+  test('null[null] =', async function() {
     const test = `
       <trans>
         value = Null();
         value[Null()] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 });
 
@@ -1067,136 +1071,164 @@ describe('JbNull cross-type interactions', function() {
     ).toStrictEqual(new JbBool(false));
   });
 
-  test('null[number]', function() {
+  test('null[number]', async function() {
     const test = `
       <trans>
         result = Null()[0];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('null[bool]', function() {
+  test('null[bool]', async function() {
     const test = `
       <trans>
         result = Null()[false];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('null[string]', function() {
+  test('null[string]', async function() {
     const test = `
       <trans>
         result = Null()["0"];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('null[array]', function() {
+  test('null[array]', async function() {
     const test = `
       <trans>
         result = Null()[{0}];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('null[dictionary]', function() {
+  test('null[dictionary]', async function() {
     const test = `
       <trans>
         result = Null()[Dict()];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('null[binary]', function() {
+  test('null[binary]', async function() {
     const test = `
       <trans>
         result = Null()[HexToBinary("00")];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('null[date]', function() {
+  test('null[date]', async function() {
     const test = `
       <trans>
         result = Null()[Now()];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('null[number] =', function() {
+  test('null[number] =', async function() {
     const test = `
       <trans>
         value = Null();
         value[0] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('null[bool] =', function() {
+  test('null[bool] =', async function() {
     const test = `
       <trans>
         value = Null();
         value[true] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('null[string] =', function() {
+  test('null[string] =', async function() {
     const test = `
       <trans>
         value = Null();
         value["1"] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('null[array] =', function() {
+  test('null[array] =', async function() {
     const test = `
       <trans>
         value = Null();
         value[{1}] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('null[dictionary] =', function() {
+  test('null[dictionary] =', async function() {
     const test = `
       <trans>
         value = Null();
         value[Dict()] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('null[binary] =', function() {
+  test('null[binary] =', async function() {
     const test = `
       <trans>
         value = Null();
         value[HexToBinary("01")] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('null[date] =', function() {
+  test('null[date] =', async function() {
     const test = `
       <trans>
         value = Null();
         value[Now()] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 });

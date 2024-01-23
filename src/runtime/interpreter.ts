@@ -9,10 +9,10 @@ import { JbNull } from "./types";
  * @param scope the current scope
  * @returns 
  */
-export function evaluate(astNode: Stmt, scope: Scope): RuntimeVal {
+export async function evaluate(astNode: Stmt, scope: Scope) {
   switch (astNode.kind) {
     case "Program":
-      return (astNode as Program).execute(scope);
+      return await (astNode as Program).execute(scope);
     case "GlobalIdentifier":
       scope.getGlobal().initGlobalVar(astNode as GlobalIdentifier);
     case "NumericLiteral":
@@ -26,7 +26,7 @@ export function evaluate(astNode: Stmt, scope: Scope): RuntimeVal {
     case "UnaryExpr":
     case "CallExpr":
     case "BlockExpr":
-      return (astNode as Expr).eval(scope);
+      return await (astNode as Expr).eval(scope);
     default:
       console.error(
         "This AST Node has not yet been setup for interpretation.",

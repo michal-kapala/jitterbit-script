@@ -170,23 +170,27 @@ describe('JbBinary operators', function() {
     ).toStrictEqual(new JbBool(false));
   });
 
-  test('binary[binary]', function() {
+  test('binary[binary]', async function() {
     const test = `
       <trans>
         result = HexToBinary("11FF")[HexToBinary("FF11")];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('binary[binary] =', function() {
+  test('binary[binary] =', async function() {
     const test = `
       <trans>
         value = HexToBinary("11FF");
         value[HexToBinary("FF11")] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 });
 
@@ -1053,136 +1057,164 @@ describe('JbBinary cross-type interactions', function() {
     ).toStrictEqual(new JbBool(false));
   });
 
-  test('binary[number]', function() {
+  test('binary[number]', async function() {
     const test = `
       <trans>
         result = HexToBinary("11FF")[0];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('binary[bool]', function() {
+  test('binary[bool]', async function() {
     const test = `
       <trans>
         result = HexToBinary("11FF")[false];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('binary[string]', function() {
+  test('binary[string]', async function() {
     const test = `
       <trans>
         result = HexToBinary("11FF")["0"];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('binary[array]', function() {
+  test('binary[array]', async function() {
     const test = `
       <trans>
         result = HexToBinary("11FF")[{0}];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('binary[dictionary]', function() {
+  test('binary[dictionary]', async function() {
     const test = `
       <trans>
         result = HexToBinary("11FF")[Dict()];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('binary[binary]', function() {
+  test('binary[binary]', async function() {
     const test = `
       <trans>
         result = HexToBinary("11FF")[HexToBinary("00")];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('binary[date]', function() {
+  test('binary[date]', async function() {
     const test = `
       <trans>
         result = HexToBinary("11FF")[Now()];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('binary[number] =', function() {
+  test('binary[number] =', async function() {
     const test = `
       <trans>
         value = HexToBinary("11FF");
         value[0] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('binary[bool] =', function() {
+  test('binary[bool] =', async function() {
     const test = `
       <trans>
         value = HexToBinary("11FF");
         value[true] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('binary[string] =', function() {
+  test('binary[string] =', async function() {
     const test = `
       <trans>
         value = HexToBinary("00");
         value["1"] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('binary[array] =', function() {
+  test('binary[array] =', async function() {
     const test = `
       <trans>
         value = HexToBinary("11FF");
         value[{1}] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('binary[dictionary] =', function() {
+  test('binary[dictionary] =', async function() {
     const test = `
       <trans>
         value = HexToBinary("11FF");
         value[Dict()] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('binary[null] =', function() {
+  test('binary[null] =', async function() {
     const test = `
       <trans>
         value = HexToBinary("01");
         value[Null()] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
-  test('binary[date] =', function() {
+  test('binary[date] =', async function() {
     const test = `
       <trans>
         value = HexToBinary("11FF");
         value[Now()] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    await expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 });

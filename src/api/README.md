@@ -189,7 +189,7 @@ This file serves as a tracker and should be updated with new implementations.
 | Eval | ❌ |
 | Get | ❌ |
 | GetChunkDataElement | ❌ |
-| GetHostByIP | ❌ |
+| GetHostByIP | ✔️ |
 | GetInputString | ❌ |
 | GetLastOperationRunStartTime | ❌ |
 | GetName | ❌ |

@@ -1,6 +1,6 @@
 <trans>
-  // test for call vs member expr precedence
-  result = SortArray({2,1})[1];
+  // test for async calls
+  result = GetHostByIP("8.8.8.8");
   DebugBreak();
   
 </trans>

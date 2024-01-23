@@ -1,9 +1,11 @@
 import Scope from "../../runtime/scope";
 import { JbArray, JbDictionary, JbBinary, JbBool, JbNull, JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
-import { Func, Parameter, Signature } from "../types";
+import { AsyncFunc, Func, Parameter, Signature } from "../types";
 import { hostname } from "os";
 import { randomUUID } from "crypto";
+import { reverse } from "dns/promises";
+import { RuntimeError, UnimplementedError } from "../../errors";
 
 /**
  * The implementation of `ArgumentList` function.
@@ -278,7 +280,7 @@ export class GetChunkDataElement extends Func {
  * 
  * Resolves an IP address to a host name.
  */
-export class GetHostByIP extends Func {
+export class GetHostByIP extends AsyncFunc {
   constructor() {
     super();
     this.name = "GetHostByIP";
@@ -291,9 +293,23 @@ export class GetHostByIP extends Func {
     this.maxArgs = 1;
   }
 
+  async callAsync(args: RuntimeVal[], scope: Scope) {
+    this.chooseSignature(args);
+    // TODO: this should be thrown be typechecker
+    if(args[0].type !== "string")
+      throw new RuntimeError(`[${this.name}] Argument '${this.signature.params[0].name}' must be of type: ${this.signature.params[0].type}.`);
+    let hostnames: string[] = [];
+    try {
+      hostnames = await reverse((args[0] as JbString).value);
+    } catch (e) {
+      throw new RuntimeError(`${e}`);
+    }
+    return new JbString(hostnames[0] ?? '');
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is currently unsupported`);
+    throw new UnimplementedError("Method not implemented.");
   }
 
   protected chooseSignature(args: RuntimeVal[]) {

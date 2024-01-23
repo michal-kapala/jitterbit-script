@@ -40,50 +40,50 @@ describe('JbArray operators', function() {
     ).toStrictEqual(rhs);
   });
 
-  test('--array', function() {
+  test('--array', async function() {
     const test = `
       <trans>
         value = {0, false};
         result = --value;
       </trans>
     `;
-    expect(run(test)).toStrictEqual(
+    expect(await run(test)).toStrictEqual(
       new JbArray([new JbNumber(-1), new JbBool(true)])
     );
   });
 
-  test('array--', function() {
+  test('array--', async function() {
     const test = `
       <trans>
         value = {0, false};
         result = value--;
       </trans>
     `;
-    expect(run(test)).toStrictEqual(
+    expect(await run(test)).toStrictEqual(
       new JbArray([new JbNumber(0), new JbBool(false)])
     );
   });
 
-  test('++array', function() {
+  test('++array', async function() {
     const test = `
       <trans>
         value = {0, false};
         result = ++value;
       </trans>
     `;
-    expect(run(test)).toStrictEqual(
+    expect(await run(test)).toStrictEqual(
       new JbArray([new JbNumber(1), new JbBool(true)])
     );
   });
 
-  test('array++', function() {
+  test('array++', async function() {
     const test = `
       <trans>
         value = {0, false};
         result = value++;
       </trans>
     `;
-    expect(run(test)).toStrictEqual(
+    expect(await run(test)).toStrictEqual(
       new JbArray([new JbNumber(0), new JbBool(false)])
     );
   });

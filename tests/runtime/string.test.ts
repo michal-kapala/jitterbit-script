@@ -32,40 +32,40 @@ describe('JbString operators', function() {
     ).toStrictEqual(rhs);
   });
 
-  test('--string', function() {
+  test('--string', async function() {
     const test = `
       <trans>
         value = "13";
         result = --value;
       </trans>`;
-    expect(run(test)).toStrictEqual(new JbString("12"));
+    expect(await run(test)).toStrictEqual(new JbString("12"));
   });
 
-  test('string--', function() {
+  test('string--', async function() {
     const test = `
       <trans>
         value = "13";
         result = value--;
       </trans>`;
-    expect(run(test)).toStrictEqual(new JbString("13"));
+    expect(await run(test)).toStrictEqual(new JbString("13"));
   });
 
-  test('++string', function() {
+  test('++string', async function() {
     const test = `
       <trans>
         value = "13";
         result = ++value;
       </trans>`;
-    expect(run(test)).toStrictEqual(new JbString("14"));
+    expect(await run(test)).toStrictEqual(new JbString("14"));
   });
 
-  test('string++', function() {
+  test('string++', async function() {
     const test = `
       <trans>
         value = "13";
         result = value++;
       </trans>`;
-    expect(run(test)).toStrictEqual(new JbString("13"));
+    expect(await run(test)).toStrictEqual(new JbString("13"));
   });
 
   test('string -= string', function() {
@@ -178,7 +178,9 @@ describe('JbString operators', function() {
         result = "</trans>"["0"];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
   test('string[string] =', function() {
@@ -188,7 +190,9 @@ describe('JbString operators', function() {
         value["1"] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 });
 
@@ -1075,7 +1079,9 @@ describe('JbString cross-type interactions', function() {
         result = "result"[0];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
   test('string[bool]', function() {
@@ -1084,7 +1090,9 @@ describe('JbString cross-type interactions', function() {
         result = "$jitterbit.netsuite.async"[false];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
   test('string[null]', function() {
@@ -1093,7 +1101,9 @@ describe('JbString cross-type interactions', function() {
         result = "GeneralDate(Now_())"[Null()];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
   test('string[array]', function() {
@@ -1102,7 +1112,9 @@ describe('JbString cross-type interactions', function() {
         result = "-.56"[{0}];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
   test('string[dictionary]', function() {
@@ -1111,7 +1123,9 @@ describe('JbString cross-type interactions', function() {
         result = "<trans>"[Dict()];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
   test('string[binary]', function() {
@@ -1120,7 +1134,9 @@ describe('JbString cross-type interactions', function() {
         result = "<trans>"[HexToBinary("00")];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
   test('string[date]', function() {
@@ -1129,7 +1145,9 @@ describe('JbString cross-type interactions', function() {
         result = ""[Now()];
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
   test('string[number] =', function() {
@@ -1139,7 +1157,9 @@ describe('JbString cross-type interactions', function() {
         value[0] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
   test('string[bool] =', function() {
@@ -1149,7 +1169,9 @@ describe('JbString cross-type interactions', function() {
         value[true] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
   test('string[null] =', function() {
@@ -1159,7 +1181,9 @@ describe('JbString cross-type interactions', function() {
         value[Null()] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
   test('string[array] =', function() {
@@ -1169,7 +1193,9 @@ describe('JbString cross-type interactions', function() {
         value[{1}] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
   test('string[dictionary] =', function() {
@@ -1179,7 +1205,9 @@ describe('JbString cross-type interactions', function() {
         value[Dict()] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
   test('string[binary] =', function() {
@@ -1189,7 +1217,9 @@ describe('JbString cross-type interactions', function() {
         value[HexToBinary("01")] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 
   test('string[date] =', function() {
@@ -1199,6 +1229,8 @@ describe('JbString cross-type interactions', function() {
         value[Now()] = "new value";
       </trans>
     `;
-    expect(function() {return run(test)}).toThrow();
+    return expect(async function() {
+      return await run(test)
+    }).rejects.toThrow();
   });
 });
