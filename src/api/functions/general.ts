@@ -279,6 +279,12 @@ export class GetChunkDataElement extends Func {
  * The implementation of `GetHostByIP` function.
  * 
  * Resolves an IP address to a host name.
+ * 
+ * The original implementation performs implicit numeric conversion of the argument
+ * and supports valid number representations of an address.
+ * 
+ * This implementation only accepts strings with an IPv4 address. The range is validated, special addresses
+ * such as `0.0.0.0` are not checked for and may result in a runtime errror.
  */
 export class GetHostByIP extends AsyncFunc {
   constructor() {
@@ -295,14 +301,22 @@ export class GetHostByIP extends AsyncFunc {
 
   async callAsync(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
+    // POD: originally the function implicitly converts everything to numbers (and supports number type too)
+    // IPv4 addresses as numbers are unsupported here
     // TODO: this should be thrown be typechecker
     if(args[0].type !== "string")
-      throw new RuntimeError(`[${this.name}] Argument '${this.signature.params[0].name}' must be of type: ${this.signature.params[0].type}.`);
+      throw new RuntimeError(`Argument '${this.signature.params[0].name}' must be of type: ${this.signature.params[0].type}, ${args[0].type} passed.`);
+
+    // only supports IPv4
+    const ipRegex = /^((25[0-5]|(2[0-4]|1[0-9]|[1-9]|)[0-9])(\.(?!$)|$)){4}$/g;
+    if((args[0] as JbString).value.match(ipRegex) === null)
+      throw new RuntimeError(`'${(args[0] as JbString).value}' is not a valid IP address.`);
+    
     let hostnames: string[] = [];
     try {
       hostnames = await reverse((args[0] as JbString).value);
     } catch (e) {
-      throw new RuntimeError(`${e}`);
+      throw e;
     }
     return new JbString(hostnames[0] ?? '');
   }
