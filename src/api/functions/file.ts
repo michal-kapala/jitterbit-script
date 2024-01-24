@@ -1,7 +1,8 @@
+import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbBool } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
-import { Func, Parameter, Signature } from "../types";
+import { AsyncFunc, Func, Parameter, Signature } from "../types";
 
 /**
  * The implementation of `ArchiveFile` function.
@@ -24,7 +25,7 @@ import { Func, Parameter, Signature } from "../types";
  * If the `ArchiveFile` function fails, the operation does not fail.
  * A script will abort, a warning added to the operation log, and the operation will continue.
  */
-export class ArchiveFile extends Func {
+export class ArchiveFile extends AsyncFunc {
   constructor() {
     super();
     this.name = "ArchiveFile";
@@ -41,9 +42,14 @@ export class ArchiveFile extends Func {
     this.maxArgs = 3;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -74,7 +80,7 @@ export class ArchiveFile extends Func {
  * the file filter in the activity configuration.
  * Global variables are referenced as `[de_name]` in the activity configuration.
  */
-export class DeleteFile extends Func {
+export class DeleteFile extends AsyncFunc {
   constructor() {
     super();
     this.name = "DeleteFile";
@@ -90,9 +96,14 @@ export class DeleteFile extends Func {
     this.maxArgs = 2;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
   
   protected chooseSignature(args: RuntimeVal[]) {
@@ -127,7 +138,7 @@ export class DeleteFile extends Func {
  * the file filter in the activity configuration.
  * Global variables are referenced as `[de_name]` in the activity configuration.
  */
-export class DeleteFiles extends Func {
+export class DeleteFiles extends AsyncFunc {
   constructor() {
     super();
     this.name = "DeleteFiles";
@@ -143,9 +154,14 @@ export class DeleteFiles extends Func {
     this.maxArgs = 2;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
   
   protected chooseSignature(args: RuntimeVal[]) {
@@ -192,7 +208,7 @@ export class DirList extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
   
   protected chooseSignature(args: RuntimeVal[]) {
@@ -243,7 +259,7 @@ export class FileList extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
   
   protected chooseSignature(args: RuntimeVal[]) {
@@ -269,7 +285,7 @@ export class FileList extends Func {
  * 
  * See also the `FlushFiles` function.
  */
-export class FlushAllFiles extends Func {
+export class FlushAllFiles extends AsyncFunc {
   constructor() {
     super();
     this.name = "FlushAllFiles";
@@ -282,9 +298,14 @@ export class FlushAllFiles extends Func {
     this.maxArgs = 1;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
   
   protected chooseSignature(args: RuntimeVal[]) {
@@ -314,7 +335,7 @@ export class FlushAllFiles extends Func {
  * 
  * See also the `FlushAllFiles` function.
  */
-export class FlushFile extends Func {
+export class FlushFile extends AsyncFunc {
   constructor() {
     super();
     this.name = "FlushFile";
@@ -330,9 +351,14 @@ export class FlushFile extends Func {
     this.maxArgs = 2;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
   
   protected chooseSignature(args: RuntimeVal[]) {
@@ -367,7 +393,7 @@ export class FlushFile extends Func {
  * This method can be used to read data from an HTTP source.
  * In that case, all Jitterbit `$jitterbit.source.http.*` variables will be populated.
  */
-export class ReadFile extends Func {
+export class ReadFile extends AsyncFunc {
   constructor() {
     super();
     this.name = "ReadFile";
@@ -383,9 +409,14 @@ export class ReadFile extends Func {
     this.maxArgs = 2;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
   
   protected chooseSignature(args: RuntimeVal[]) {
@@ -418,7 +449,7 @@ export class ReadFile extends Func {
  * If the `WriteFile()` function fails, the operation does not fail.
  * A script will abort, a warning added to the operation log, and the operation will continue.
  */
-export class WriteFile extends Func {
+export class WriteFile extends AsyncFunc {
   constructor() {
     super();
     this.name = "WriteFile";
@@ -435,9 +466,14 @@ export class WriteFile extends Func {
     this.maxArgs = 3;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
   
   protected chooseSignature(args: RuntimeVal[]) {

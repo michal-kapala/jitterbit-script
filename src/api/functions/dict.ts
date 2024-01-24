@@ -2,6 +2,7 @@ import { RuntimeVal } from "../../runtime/values";
 import { JbDictionary, JbBool, JbArray, JbString } from "../../runtime/types";
 import { Func, Parameter, Signature } from "../types";
 import Scope from "../../runtime/scope";
+import { UnimplementedError } from "../../errors";
 
 /**
  * The implementation of `AddToDict` function.
@@ -171,7 +172,7 @@ export class GetSourceInstanceMap extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]): void {
@@ -209,7 +210,7 @@ export class GetSourceInstanceElementMap extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]): void {

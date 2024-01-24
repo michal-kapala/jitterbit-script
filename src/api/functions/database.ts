@@ -1,7 +1,8 @@
+import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbBool } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
-import { Func, Parameter, Signature } from "../types";
+import { AsyncFunc, Func, Parameter, Signature } from "../types";
 
 /**
  * The implementation of `CacheLookup` function.
@@ -17,7 +18,7 @@ import { Func, Parameter, Signature } from "../types";
  * The database used in this function call must be defined as a Database connection in the current project.
  * For more information, see the instructions on inserting endpoints under the Endpoints section in Jitterbit Script.
  */
-export class CacheLookup extends Func {
+export class CacheLookup extends AsyncFunc {
   constructor() {
     super();
     this.name = "CacheLookup";
@@ -33,9 +34,14 @@ export class CacheLookup extends Func {
     this.maxArgs = 2;
   }
   
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -67,7 +73,7 @@ export class CacheLookup extends Func {
  * 
  * Supports up to 100-argument calls.
  */
-export class CallStoredProcedure extends Func {
+export class CallStoredProcedure extends AsyncFunc {
   constructor() {
     super();
     this.name = "CallStoredProcedure";
@@ -85,9 +91,14 @@ export class CallStoredProcedure extends Func {
     this.maxArgs = 100;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -104,7 +115,7 @@ export class CallStoredProcedure extends Func {
  * For more information, see the instructions on inserting endpoints under the Endpoints section
  * in Jitterbit Script.
  */
-export class DBCloseConnection extends Func {
+export class DBCloseConnection extends AsyncFunc {
   constructor() {
     super();
     this.name = "DBCloseConnection";
@@ -119,9 +130,14 @@ export class DBCloseConnection extends Func {
     this.maxArgs = 1;
   }
   
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -163,7 +179,7 @@ export class DBCloseConnection extends Func {
  * 
  * Supports up to 100-argument calls.
  */
-export class DBExecute extends Func {
+export class DBExecute extends AsyncFunc {
   constructor() {
     super();
     this.name = "DBExecute";
@@ -184,9 +200,14 @@ export class DBExecute extends Func {
     this.maxArgs = 100;
   }
   
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -203,7 +224,7 @@ export class DBExecute extends Func {
  * The parameter `columnKeynames` is not used when only inserting (`mode=2`)
  * and may be omitted in that case.
  */
-export class DBLoad extends Func {
+export class DBLoad extends AsyncFunc {
   constructor() {
     super();
     this.name = "DBLoad";
@@ -238,9 +259,14 @@ export class DBLoad extends Func {
     this.maxArgs = 9;
   }
   
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -263,7 +289,7 @@ export class DBLoad extends Func {
  * For more advanced queries, where you want to retrieve more than one value or row,
  * use the functions `DBLookupAll` or `DBExecute`.
  */
-export class DBLookup extends Func {
+export class DBLookup extends AsyncFunc {
   constructor() {
     super();
     this.name = "DBLookup";
@@ -279,9 +305,14 @@ export class DBLookup extends Func {
     this.maxArgs = 2;
   }
   
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -308,7 +339,7 @@ export class DBLookup extends Func {
  * For more advanced queries, where you want to retrieve directly into global variables,
  * use the function `DBExecute`.
  */
-export class DBLookupAll extends Func {
+export class DBLookupAll extends AsyncFunc {
   constructor() {
     super();
     this.name = "DBLookupAll";
@@ -324,9 +355,14 @@ export class DBLookupAll extends Func {
     this.maxArgs = 2;
   }
   
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -344,7 +380,7 @@ export class DBLookupAll extends Func {
  * For more information, see the instructions on inserting endpoints under the Endpoints section
  * in Jitterbit Script.
  */
-export class DBRollbackTransaction extends Func {
+export class DBRollbackTransaction extends AsyncFunc {
   constructor() {
     super();
     this.name = "DBRollbackTransaction";
@@ -359,9 +395,14 @@ export class DBRollbackTransaction extends Func {
     this.maxArgs = 1;
   }
   
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -402,7 +443,7 @@ export class SetDBInsert extends Func {
   
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -431,7 +472,7 @@ export class SetDBUpdate extends Func {
   
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -469,7 +510,7 @@ export class SQLEscape extends Func {
   
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -498,7 +539,7 @@ export class Unmap extends Func {
   
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {

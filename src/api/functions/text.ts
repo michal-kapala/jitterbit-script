@@ -1,3 +1,4 @@
+import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbBool } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
@@ -40,7 +41,7 @@ export class Validate extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {

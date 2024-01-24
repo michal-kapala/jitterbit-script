@@ -1,6 +1,7 @@
+import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { RuntimeVal } from "../../runtime/values";
-import { Func, Parameter, Signature } from "../types";
+import { AsyncFunc, Func, Parameter, Signature } from "../types";
 
 /**
  * The implementation of `AESDecryption` function.
@@ -30,7 +31,7 @@ export class AESDecryption extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -69,7 +70,7 @@ export class AESEncryption extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -99,7 +100,7 @@ export class Base64Decode extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -142,7 +143,7 @@ export class Base64Encode extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -185,7 +186,7 @@ export class Base64Encode extends Func {
  * 
  * See also `Base64Decode`.
  */
-export class Base64EncodeFile extends Func {
+export class Base64EncodeFile extends AsyncFunc {
   constructor() {
     super();
     this.name = "Base64EncodeFile";
@@ -201,9 +202,14 @@ export class Base64EncodeFile extends Func {
     this.maxArgs = 2;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -235,7 +241,7 @@ export class MD5 extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -267,7 +273,7 @@ export class MD5AsTwoNumbers extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -301,7 +307,7 @@ export class SHA256 extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {

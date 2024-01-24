@@ -58,6 +58,25 @@ export class Case extends DeferrableFunc {
   }
 }
 
+/**
+ * The implemetation of `Equal` function.
+ * 
+ * Performs a recursive comparison of two arrays.
+ * Returns true if all corresponding members of the arrays are equal, otherwise it returns false.
+ * It can also be used with simple types, and follows conversion rules to promote
+ * different types to compare them.
+ * 
+ * Calling this function to compare two arrays is different from using
+ * the `==` operator on two arrays.
+ * Using the `==` operator on two arrays returns an array of booleans
+ * containing the result of a comparison of each array member.
+ * Using this function compares each corresponding element in turn.
+ * 
+ * The `Equal()` function always returns false if the two array arguments have different sizes.
+ * 
+ * Type conversion and promotion is performed if the arguments or elements being
+ * compared are of different types.
+ */
 export class Equal extends Func {
   constructor() {
     super();

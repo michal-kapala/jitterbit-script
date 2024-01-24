@@ -1,6 +1,7 @@
+import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { RuntimeVal } from "../../runtime/values";
-import { Func, Parameter, Signature } from "../types";
+import { AsyncFunc, Parameter, Signature } from "../types";
 
 /**
  * The implementation of `SendEmail` function.
@@ -12,7 +13,7 @@ import { Func, Parameter, Signature } from "../types";
  * If information is not specified, it will be read from the server configuration file.
  * If it is not available in the configuration file, the email will not be sent.
  */
-export class SendEmail extends Func {
+export class SendEmail extends AsyncFunc {
   constructor() {
     super();
     this.name = "SendEmail";
@@ -37,9 +38,14 @@ export class SendEmail extends Func {
     this.maxArgs = 11;
   }
   
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -58,7 +64,7 @@ export class SendEmail extends Func {
  * For more information, see the instructions on inserting email messages under
  * the Notifications section in Jitterbit Script.
  */
-export class SendEmailMessage extends Func {
+export class SendEmailMessage extends AsyncFunc {
   constructor() {
     super();
     this.name = "SendEmailMessage";
@@ -71,9 +77,14 @@ export class SendEmailMessage extends Func {
     this.maxArgs = 1;
   }
   
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -89,7 +100,7 @@ export class SendEmailMessage extends Func {
  * If these have not been defined, use one of the other email functions.
  * On success, an empty string is returned; otherwise, any error messages are returned.
  */
-export class SendSystemEmail extends Func {
+export class SendSystemEmail extends AsyncFunc {
   constructor() {
     super();
     this.name = "SendSystemEmail";
@@ -106,9 +117,14 @@ export class SendSystemEmail extends Func {
     this.maxArgs = 3;
   }
   
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {

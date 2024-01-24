@@ -1,7 +1,8 @@
+import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbBool } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
-import { Func, Parameter, Signature } from "../types";
+import { AsyncFunc, Func, Parameter, Signature } from "../types";
 
 /**
  * The implementation of `Attribute` function.
@@ -26,7 +27,7 @@ export class Attribute extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -69,7 +70,7 @@ export class CreateNode extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -108,7 +109,7 @@ export class GetNodeName extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -147,7 +148,7 @@ export class GetNodeValue extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -186,7 +187,7 @@ export class GetXMLString extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -226,7 +227,7 @@ export class IsNil extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -251,7 +252,7 @@ export class IsNil extends Func {
  * 
  * Supports up to 100-argument calls.
  */
-export class RunXSLT extends Func {
+export class RunXSLT extends AsyncFunc {
   constructor() {
     super();
     this.name = "RunXSLT";
@@ -269,9 +270,14 @@ export class RunXSLT extends Func {
     this.maxArgs = 100;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.name.toUpperCase()} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -308,7 +314,7 @@ export class SelectNodeFromXMLAny extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.name.toUpperCase()} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.name.toUpperCase()} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -356,7 +362,7 @@ export class SelectNodes extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.name.toUpperCase()} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.name.toUpperCase()} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -401,7 +407,7 @@ export class SelectNodesFromXMLAny extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.name.toUpperCase()} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.name.toUpperCase()} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -451,7 +457,7 @@ export class SelectSingleNode extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.name.toUpperCase()} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.name.toUpperCase()} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {

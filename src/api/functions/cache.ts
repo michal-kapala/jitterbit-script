@@ -1,14 +1,15 @@
+import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
-import { Func, Parameter, Signature } from "../types";
+import { AsyncFunc, Parameter, Signature } from "../types";
 
 /**
  * The implementation of `ReadCache` function.
  * 
  * Reads from a common cache stored on Harmony.
  */
-export class ReadCache extends Func {
+export class ReadCache extends AsyncFunc {
   constructor() {
     super();
     this.name = "ReadCache";
@@ -25,9 +26,14 @@ export class ReadCache extends Func {
     this.maxArgs = 3;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -40,7 +46,7 @@ export class ReadCache extends Func {
  * 
  * Writes to a common cache stored on Harmony.
  */
-export class WriteCache extends Func {
+export class WriteCache extends AsyncFunc {
   constructor() {
     super();
     this.name = "WriteCache";
@@ -58,9 +64,14 @@ export class WriteCache extends Func {
     this.maxArgs = 4;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {

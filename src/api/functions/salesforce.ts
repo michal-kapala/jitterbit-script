@@ -1,6 +1,7 @@
+import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { RuntimeVal } from "../../runtime/values";
-import { Func, Parameter, Signature } from "../types";
+import { AsyncFunc, Parameter, Signature } from "../types";
 
 /**
  * The implementation of `GetSalesforceTimestamp` function.
@@ -23,7 +24,7 @@ import { Func, Parameter, Signature } from "../types";
  * 
  * As an alternative to this function, see also the `LoginToSalesforceAndGetTimestamp` function.
  */
-export class GetSalesforceTimestamp extends Func {
+export class GetSalesforceTimestamp extends AsyncFunc {
   constructor() {
     super();
     this.name = "GetSalesforceTimestamp";
@@ -40,9 +41,14 @@ export class GetSalesforceTimestamp extends Func {
     this.maxArgs = 3;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -79,7 +85,7 @@ export class GetSalesforceTimestamp extends Func {
  * 
  * As an alternative to this function, see also the `GetSalesforceTimestamp` function.
  */
-export class LoginToSalesforceAndGetTimeStamp extends Func {
+export class LoginToSalesforceAndGetTimeStamp extends AsyncFunc {
   constructor() {
     super();
     this.name = "LoginToSalesforceAndGetTimeStamp";
@@ -95,9 +101,14 @@ export class LoginToSalesforceAndGetTimeStamp extends Func {
     this.maxArgs = 2;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -125,7 +136,7 @@ export class LoginToSalesforceAndGetTimeStamp extends Func {
  * The function returns true if the login was successful and false if the login failed.
  * Use the `GetLastError` function to retrieve the error message in that case.
  */
-export class SalesforceLogin extends Func {
+export class SalesforceLogin extends AsyncFunc {
   constructor() {
     super();
     this.name = "SalesforceLogin";
@@ -138,9 +149,14 @@ export class SalesforceLogin extends Func {
     this.maxArgs = 1;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -174,7 +190,7 @@ export class SalesforceLogin extends Func {
  * Use the `Eval` function to catch errors, calling the `GetLastError` function
  * to retrieve the error message.
  */
-export class SetSalesforceSession extends Func {
+export class SetSalesforceSession extends AsyncFunc {
   constructor() {
     super();
     this.name = "SetSalesforceSession";
@@ -191,9 +207,14 @@ export class SetSalesforceSession extends Func {
     this.maxArgs = 3;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -219,7 +240,7 @@ export class SetSalesforceSession extends Func {
  * The function returns `null` if the login fails, the query returns no records, or the API fails.
  * Use the `GetLastError` function to retrieve the error message in that case.
  */
-export class SfCacheLookup extends Func {
+export class SfCacheLookup extends AsyncFunc {
   constructor() {
     super();
     this.name = "SfCacheLookup";
@@ -235,9 +256,14 @@ export class SfCacheLookup extends Func {
     this.maxArgs = 2;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -261,7 +287,7 @@ export class SfCacheLookup extends Func {
  * 
  * See also the `SFLookupAll` and `SFLookupAllToFile` functions.
  */
-export class SfLookup extends Func {
+export class SfLookup extends AsyncFunc {
   constructor() {
     super();
     this.name = "SfLookup";
@@ -277,9 +303,14 @@ export class SfLookup extends Func {
     this.maxArgs = 2;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -310,7 +341,7 @@ export class SfLookup extends Func {
  * 
  * See also the `SFLookup` and `SFLookupAllToFile` functions.
  */
-export class SfLookupAll extends Func {
+export class SfLookupAll extends AsyncFunc {
   constructor() {
     super();
     this.name = "SfLookupAll";
@@ -326,9 +357,14 @@ export class SfLookupAll extends Func {
     this.maxArgs = 2;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -359,7 +395,7 @@ export class SfLookupAll extends Func {
  * 
  * See also the `SFLookup` and `SFLookupAll` functions.
  */
-export class SfLookupAllToFile extends Func {
+export class SfLookupAllToFile extends AsyncFunc {
   constructor() {
     super();
     this.name = "SfLookupAllToFile";
@@ -376,9 +412,14 @@ export class SfLookupAllToFile extends Func {
     this.maxArgs = 3;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {

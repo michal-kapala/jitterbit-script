@@ -1,3 +1,4 @@
+import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbBool, JbDate, JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
@@ -37,7 +38,7 @@ export class ConvertTimeZone extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} is currently unsupported`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -73,7 +74,7 @@ export class CVTDate extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} is currently unsupported`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -109,7 +110,7 @@ export class DateAdd extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} is currently unsupported`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -221,7 +222,7 @@ export class FormatDate extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} is currently unsupported`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -300,7 +301,7 @@ export class GetUTCFormattedDate extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} is currently unsupported`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -337,7 +338,7 @@ export class GetUTCFormattedDateTime extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} is currently unsupported`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {

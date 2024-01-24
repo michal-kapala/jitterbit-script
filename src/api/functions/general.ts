@@ -46,7 +46,7 @@ export class ArgumentList extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} is currently unsupported`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -78,7 +78,7 @@ export class AutoNumber extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is unsupported as deprecated, you should use TargetInstanceCount or SourceInstanceCount instead.`);
+    throw new UnimplementedError(`${this.name} is unsupported as deprecated, you should use TargetInstanceCount or SourceInstanceCount instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -98,7 +98,7 @@ export class AutoNumber extends Func {
  * the `GetOperationQueue` function.
  * See the `GetOperationQueue` function for details.
  */
-export class CancelOperation extends Func {
+export class CancelOperation extends AsyncFunc {
   constructor() {
     super();
     this.name = "CancelOperation";
@@ -111,9 +111,14 @@ export class CancelOperation extends Func {
     this.maxArgs = 1;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of operation API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of operation API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -132,7 +137,7 @@ export class CancelOperation extends Func {
  * This can be useful if an operation is running in a loop and the condition to stop
  * looping has been reached.
  */
-export class CancelOperationChain extends Func {
+export class CancelOperationChain extends AsyncFunc {
   constructor() {
     super();
     this.name = "CancelOperationChain";
@@ -145,9 +150,14 @@ export class CancelOperationChain extends Func {
     this.maxArgs = 1;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of operation API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of operation API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -189,7 +199,7 @@ export class Eval extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} is currently unsupported`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -235,7 +245,7 @@ export class Get extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} is currently unsupported`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -267,7 +277,7 @@ export class GetChunkDataElement extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} is currently unsupported`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -356,7 +366,7 @@ export class GetInputString extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} is currently unsupported`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -394,7 +404,7 @@ export class GetLastOperationRunStartTime extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of operation API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of operation API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -425,7 +435,7 @@ export class GetName extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} is currently unsupported`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -455,7 +465,7 @@ export class GetName extends Func {
  * For more information, see the instructions on inserting operations under
  * the *Operations* section in Jitterbit Script.
  */
-export class GetOperationQueue extends Func {
+export class GetOperationQueue extends AsyncFunc {
   constructor() {
     super();
     this.name = "GetOperationQueue";
@@ -468,9 +478,14 @@ export class GetOperationQueue extends Func {
     this.maxArgs = 1;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of operation API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of operation API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -564,7 +579,7 @@ export class IfEmpty extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} is currently unsupported`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -601,7 +616,7 @@ export class IfNull extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} is currently unsupported`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -639,7 +654,7 @@ export class InitCounter extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} is currently unsupported`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -678,7 +693,7 @@ export class InList extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} is currently unsupported`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -965,7 +980,7 @@ export class ReadArrayString extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} is currently unsupported`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -998,7 +1013,7 @@ export class RecordCount extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is unsupported as deprecated, you should use TargetInstanceCount or SourceInstanceCount instead.`);
+    throw new UnimplementedError(`${this.name} is unsupported as deprecated, you should use TargetInstanceCount or SourceInstanceCount instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -1033,7 +1048,7 @@ export class ReRunOperation extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of operation API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of operation API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -1068,7 +1083,7 @@ export class RunOperation extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of operation API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of operation API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -1092,7 +1107,7 @@ export class RunOperation extends Func {
  * Returns `false` if the plugin could not be run or the plugin implementation itself
  * returned an error. Call `GetLastError` to retrieve the error message.
  */
-export class RunPlugin extends Func {
+export class RunPlugin extends AsyncFunc {
   constructor() {
     super();
     this.name = "RunPlugin";
@@ -1107,9 +1122,14 @@ export class RunPlugin extends Func {
     this.maxArgs = 1;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -1138,7 +1158,7 @@ export class RunPlugin extends Func {
  * 
  * Supports up to 100-argument calls.
  */
-export class RunScript extends Func {
+export class RunScript extends AsyncFunc {
   constructor() {
     super();
     this.name = "RunScript";
@@ -1154,9 +1174,14 @@ export class RunScript extends Func {
     this.maxArgs = 100;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -1201,7 +1226,7 @@ export class Set extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} is currently unsupported`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -1239,7 +1264,7 @@ export class SetChunkDataElement extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} is currently unsupported`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -1252,7 +1277,7 @@ export class SetChunkDataElement extends Func {
  * 
  * Causes execution to be suspended for a specified number of seconds.
  */
-export class Sleep extends Func {
+export class Sleep extends AsyncFunc {
   constructor() {
     super();
     this.name = "Sleep";
@@ -1267,9 +1292,14 @@ export class Sleep extends Func {
     this.maxArgs = 1;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -1304,7 +1334,7 @@ export class SourceInstanceCount extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -1342,7 +1372,7 @@ export class TargetInstanceCount extends Func {
 
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of transformation API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -1377,7 +1407,7 @@ export class TargetInstanceCount extends Func {
  * The default will not be a significant performance hit but if your operations are
  * expected to run for a very long time, you may want to increase the poll interval.
  */
-export class WaitForOperation extends Func {
+export class WaitForOperation extends AsyncFunc {
   constructor() {
     super();
     this.name = "WaitForOperation";
@@ -1394,9 +1424,14 @@ export class WaitForOperation extends Func {
     this.maxArgs = 3;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of operation API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of operation API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {

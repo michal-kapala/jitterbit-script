@@ -1,6 +1,7 @@
+import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { RuntimeVal } from "../../runtime/values";
-import { Func, Parameter, Signature } from "../types";
+import { AsyncFunc, Parameter, Signature } from "../types";
 
 /**
  * The implementation of `NetSuiteGetSelectValue` function.
@@ -13,7 +14,7 @@ import { Func, Parameter, Signature } from "../types";
  * 
  * 2. The dictionary values are a map with two elements: the internal ID and the external ID for each picklist.
  */
-export class NetSuiteGetSelectValue extends Func {
+export class NetSuiteGetSelectValue extends AsyncFunc {
   constructor() {
     super();
     this.name = "NetSuiteGetSelectValues";
@@ -31,9 +32,14 @@ export class NetSuiteGetSelectValue extends Func {
     this.maxArgs = 4;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -46,7 +52,7 @@ export class NetSuiteGetSelectValue extends Func {
  * 
  * Retrieves the server date-time from a NetSuite server.
  */
-export class NetSuiteGetServerTime extends Func {
+export class NetSuiteGetServerTime extends AsyncFunc {
   constructor() {
     super();
     this.name = "NetSuiteGetServerTime";
@@ -59,9 +65,14 @@ export class NetSuiteGetServerTime extends Func {
     this.maxArgs = 1;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -77,7 +88,7 @@ export class NetSuiteGetServerTime extends Func {
  * This provides a simple way to log in to NetSuite without requiring
  * authentication headers for each web service call.
  */
-export class NetSuiteLogin extends Func {
+export class NetSuiteLogin extends AsyncFunc {
   constructor() {
     super();
     this.name = "NetSuiteLogin";
@@ -90,9 +101,14 @@ export class NetSuiteLogin extends Func {
     this.maxArgs = 1;
   }
 
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {

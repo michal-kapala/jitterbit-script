@@ -1,7 +1,8 @@
+import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbBool, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
-import { Func, Parameter, Signature } from "../types";
+import { AsyncFunc, Func, Parameter, Signature } from "../types";
 
 /**
  * The implementation of `ArrayToMultipleValues` function.
@@ -25,7 +26,7 @@ export class ArrayToMultipleValues extends Func {
   
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -46,7 +47,7 @@ export class ArrayToMultipleValues extends Func {
  * 
  * See also the `LDAPConnect` and `LDAPExecute` functions.
  */
-export class LDAPAdd extends Func {
+export class LDAPAdd extends AsyncFunc {
   constructor() {
     super();
     this.name = "LDAPAdd";
@@ -62,9 +63,14 @@ export class LDAPAdd extends Func {
     this.maxArgs = 2;
   }
   
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -79,7 +85,7 @@ export class LDAPAdd extends Func {
  * 
  * See also the `LDAPExecute` function.
  */
-export class LDAPConnect extends Func {
+export class LDAPConnect extends AsyncFunc {
   constructor() {
     super();
     this.name = "LDAPConnect";
@@ -98,9 +104,14 @@ export class LDAPConnect extends Func {
     this.maxArgs = 5;
   }
   
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -119,7 +130,7 @@ export class LDAPConnect extends Func {
  * 
  * See also the `LDAPConnect` and `LDAPExecute` functions.
  */
-export class LDAPDeleteEntry extends Func {
+export class LDAPDeleteEntry extends AsyncFunc {
   constructor() {
     super();
     this.name = "LDAPDeleteEntry";
@@ -132,9 +143,14 @@ export class LDAPDeleteEntry extends Func {
     this.maxArgs = 1;
   }
   
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -154,7 +170,7 @@ export class LDAPDeleteEntry extends Func {
  * 
  * See also the `LDAPConnect` and `LDAPExecute` functions.
  */
-export class LDAPExecute extends Func {
+export class LDAPExecute extends AsyncFunc {
   constructor() {
     super();
     this.name = "LDAPExecute";
@@ -167,9 +183,14 @@ export class LDAPExecute extends Func {
     this.maxArgs = 1;
   }
   
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -189,7 +210,7 @@ export class LDAPExecute extends Func {
  * If the attribute type of that value is not found, an error is thrown.
  * See also the `LDAPConnect` and `LDAPExecute` functions.
  */
-export class LDAPRemove extends Func {
+export class LDAPRemove extends AsyncFunc {
   constructor() {
     super();
     this.name = "LDAPRemove";
@@ -205,9 +226,14 @@ export class LDAPRemove extends Func {
     this.maxArgs = 2;
   }
   
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -226,7 +252,7 @@ export class LDAPRemove extends Func {
  * 
  * See also the `LDAPConnect` and `LDAPExecute` functions.
  */
-export class LDAPRename extends Func {
+export class LDAPRename extends AsyncFunc {
   constructor() {
     super();
     this.name = "LDAPRename";
@@ -244,9 +270,14 @@ export class LDAPRename extends Func {
     this.maxArgs = 4;
   }
   
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -265,7 +296,7 @@ export class LDAPRename extends Func {
  * 
  * See also the `LDAPConnect` and `LDAPExecute` functions.
  */
-export class LDAPReplace extends Func {
+export class LDAPReplace extends AsyncFunc {
   constructor() {
     super();
     this.name = "LDAPReplace";
@@ -281,9 +312,14 @@ export class LDAPReplace extends Func {
     this.maxArgs = 2;
   }
   
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -304,7 +340,7 @@ export class LDAPReplace extends Func {
  * 
  * Supports up to 100-argument calls.
  */
-export class LDAPSearch extends Func {
+export class LDAPSearch extends AsyncFunc {
   constructor() {
     super();
     this.name = "LDAPSearch";
@@ -323,9 +359,14 @@ export class LDAPSearch extends Func {
     this.maxArgs = 100;
   }
   
+  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new Error(`[${this.name}] Evaluation of ${this.module.toUpperCase()} API calls is currently unsupported.`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callAsync instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
