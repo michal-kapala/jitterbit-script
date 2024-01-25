@@ -12,7 +12,7 @@ describe('Cache functions', function() {
     expect(func?.signature).toBeDefined();
     await expect(async function() {
       await (func as AsyncFunc)?.callAsync([new JbString("testKey")], new Scope())
-    }).rejects.toThrowError(UnimplementedError);
+    }).rejects.toThrow(UnimplementedError);
   });
 
   test('WriteCache()', async function() {
@@ -24,6 +24,6 @@ describe('Cache functions', function() {
         [new JbString("testKey"), new JbString("the value")],
         new Scope()
       )
-    }).rejects.toThrowError(UnimplementedError);
+    }).rejects.toThrow(UnimplementedError);
   });
 });

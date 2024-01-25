@@ -2,7 +2,7 @@ import { describe, expect, test } from '@jest/globals';
 import { Api } from '../../../src/api';
 import Scope from '../../../src/runtime/scope';
 import { JbArray, JbBinary, JbBool, JbDate, JbDictionary, JbNull, JbNumber, JbString } from '../../../src/runtime/types';
-import { RuntimeError, UnimplementedError } from '../../../src/errors';
+import { RuntimeError } from '../../../src/errors';
 import { makeDate } from '../../utils';
 
 describe('Conversion functions', function() {
@@ -96,7 +96,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbArray()], new Scope())
-      }).toThrowError(`Transform Error: DE_TYPE_CONVERT_FAILED`);
+      }).toThrow(`Transform Error: DE_TYPE_CONVERT_FAILED`);
     });
   
     test('Bool(dictionary)', function() {
@@ -105,7 +105,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbDictionary()], new Scope())
-      }).toThrowError(`Transform Error: DE_TYPE_CONVERT_FAILED`);
+      }).toThrow(`Transform Error: DE_TYPE_CONVERT_FAILED`);
     });
   
     test('Bool(binary)', function() {
@@ -114,7 +114,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbBinary()], new Scope())
-      }).toThrowError(`Transform Error: DE_TYPE_CONVERT_FAILED`);
+      }).toThrow(`Transform Error: DE_TYPE_CONVERT_FAILED`);
     });
   
     test('Bool(date)', function() {
@@ -123,7 +123,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbDate()], new Scope())
-      }).toThrowError(`Transform Error: DE_TYPE_CONVERT_FAILED`);
+      }).toThrow(`Transform Error: DE_TYPE_CONVERT_FAILED`);
     });
   });
   
@@ -134,7 +134,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbBool(true)], new Scope())
-      }).toThrowError(new RuntimeError(`Cannot convert a bool to a date object`));
+      }).toThrow(new RuntimeError(`Cannot convert a bool to a date object`));
     });
   
     test('Date(number)', function() {
@@ -165,7 +165,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbString("This is some piece of casual text.")], new Scope())
-      }).toThrowError(RuntimeError);
+      }).toThrow(RuntimeError);
     });
   
     test('Date("true")', function() {
@@ -174,7 +174,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbString("true")], new Scope())
-      }).toThrowError(RuntimeError);
+      }).toThrow(RuntimeError);
     });
   
     test('Date("(M)M/(D)D/YY")', function() {
@@ -193,7 +193,7 @@ describe('Conversion functions', function() {
       // POD: the original function returns null
       expect(function() {
         func?.call([new JbNull()], new Scope())
-      }).toThrowError('Cannot convert null to a date object');
+      }).toThrow('Cannot convert null to a date object');
     });
   
     test('Date(array)', function() {
@@ -202,7 +202,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbArray()], new Scope())
-      }).toThrowError('Cannot convert array to a date object');
+      }).toThrow('Cannot convert array to a date object');
     });
   
     test('Date(dictionary)', function() {
@@ -211,7 +211,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbDictionary()], new Scope())
-      }).toThrowError('Cannot convert dictionary to a date object');
+      }).toThrow('Cannot convert dictionary to a date object');
     });
   
     test('Date(binary)', function() {
@@ -220,7 +220,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbBinary()], new Scope())
-      }).toThrowError('Cannot convert binary to a date object');
+      }).toThrow('Cannot convert binary to a date object');
     });
   
     test('Date(date)', function() {
@@ -300,7 +300,7 @@ describe('Conversion functions', function() {
       // that's against the function's return type
       expect(function() {
         func?.call([new JbArray()], new Scope())
-      }).toThrowError('Cannot convert array to a number.');
+      }).toThrow('Cannot convert array to a number.');
     });
   
     test('Double(dictionary)', function() {
@@ -309,7 +309,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbDictionary()], new Scope())
-      }).toThrowError('Transform Error: DE_TYPE_CONVERT_FAILED');
+      }).toThrow('Transform Error: DE_TYPE_CONVERT_FAILED');
     });
   
     test('Double(binary)', function() {
@@ -318,7 +318,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbBinary()], new Scope())
-      }).toThrowError('Transform Error: DE_TYPE_CONVERT_FAILED');
+      }).toThrow('Transform Error: DE_TYPE_CONVERT_FAILED');
     });
   
     test('Double(date)', function() {
@@ -398,7 +398,7 @@ describe('Conversion functions', function() {
       // that's against the function's return type
       expect(function() {
         func?.call([new JbArray()], new Scope())
-      }).toThrowError('Cannot convert array to a number.');
+      }).toThrow('Cannot convert array to a number.');
     });
   
     test('Float(dictionary)', function() {
@@ -407,7 +407,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbDictionary()], new Scope())
-      }).toThrowError('Transform Error: DE_TYPE_CONVERT_FAILED');
+      }).toThrow('Transform Error: DE_TYPE_CONVERT_FAILED');
     });
   
     test('Float(binary)', function() {
@@ -416,7 +416,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbBinary()], new Scope())
-      }).toThrowError('Transform Error: DE_TYPE_CONVERT_FAILED');
+      }).toThrow('Transform Error: DE_TYPE_CONVERT_FAILED');
     });
   
     test('Float(date)', function() {
@@ -446,7 +446,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbString("BA4DF00")], new Scope())
-      }).toThrowError(RuntimeError);
+      }).toThrow(RuntimeError);
     });
 
     test('HexToBinary(invalid type)', function() {
@@ -455,7 +455,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbNumber(2144600)], new Scope())
-      }).toThrowError(RuntimeError);
+      }).toThrow(RuntimeError);
     });
   });
   
@@ -488,7 +488,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbString("BA4DF00")], new Scope())
-      }).toThrowError(RuntimeError);
+      }).toThrow(RuntimeError);
     });
 
     test('HexToString(invalid type)', function() {
@@ -497,7 +497,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbNumber(2144600)], new Scope())
-      }).toThrowError(RuntimeError);
+      }).toThrow(RuntimeError);
     });
   });
 
@@ -567,7 +567,7 @@ describe('Conversion functions', function() {
       // that's against the function's return type
       expect(function() {
         func?.call([new JbArray()], new Scope())
-      }).toThrowError('Cannot convert array to a number.');
+      }).toThrow('Cannot convert array to a number.');
     });
   
     test('Int(dictionary)', function() {
@@ -576,7 +576,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbDictionary()], new Scope())
-      }).toThrowError('Transform Error: DE_TYPE_CONVERT_FAILED');
+      }).toThrow('Transform Error: DE_TYPE_CONVERT_FAILED');
     });
   
     test('Int(binary)', function() {
@@ -585,7 +585,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbBinary()], new Scope())
-      }).toThrowError('Transform Error: DE_TYPE_CONVERT_FAILED');
+      }).toThrow('Transform Error: DE_TYPE_CONVERT_FAILED');
     });
   
     test('Int(date)', function() {
@@ -665,7 +665,7 @@ describe('Conversion functions', function() {
       // that's against the function's return type
       expect(function() {
         func?.call([new JbArray()], new Scope())
-      }).toThrowError('Cannot convert array to a number.');
+      }).toThrow('Cannot convert array to a number.');
     });
   
     test('Long(dictionary)', function() {
@@ -674,7 +674,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbDictionary()], new Scope())
-      }).toThrowError('Transform Error: DE_TYPE_CONVERT_FAILED');
+      }).toThrow('Transform Error: DE_TYPE_CONVERT_FAILED');
     });
   
     test('Long(binary)', function() {
@@ -683,7 +683,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbBinary()], new Scope())
-      }).toThrowError('Transform Error: DE_TYPE_CONVERT_FAILED');
+      }).toThrow('Transform Error: DE_TYPE_CONVERT_FAILED');
     });
   
     test('Long(date)', function() {
@@ -827,7 +827,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbNumber(2144600)], new Scope())
-      }).toThrowError(RuntimeError);
+      }).toThrow(RuntimeError);
     });
   });
 
@@ -851,7 +851,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbString("2f46dad9-e5c2-45-b1fd-ad1b49b99aff")], new Scope())
-      }).toThrowError(RuntimeError);
+      }).toThrow(RuntimeError);
     });
 
     test('UUIDToBinary() - invalid characters', function() {
@@ -860,7 +860,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbString("Qf46dad9-e5c2-457e-b1fd_ad1b49b99aff")], new Scope())
-      }).toThrowError(RuntimeError);
+      }).toThrow(RuntimeError);
     });
 
     test('UUIDToBinary(invalid type)', function() {
@@ -869,7 +869,7 @@ describe('Conversion functions', function() {
       expect(func?.signature).toBeDefined();
       expect(function() {
         func?.call([new JbNumber(918273645)], new Scope())
-      }).toThrowError(RuntimeError);
+      }).toThrow(RuntimeError);
     });
   });
 });

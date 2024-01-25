@@ -30,7 +30,7 @@ describe('Array functions', function() {
     expect(function() {
       // node type unsupported
       func?.call([], new Scope())
-    }).toThrowError(UnimplementedError);
+    }).toThrow(UnimplementedError);
   });
 
   test('GetSourceElementNames()', function() {
@@ -40,7 +40,7 @@ describe('Array functions', function() {
     expect(function() {
       // node type unsupported
       func?.call([], new Scope())
-    }).toThrowError(UnimplementedError);
+    }).toThrow(UnimplementedError);
   });
 
   test('GetSourceInstanceArray()', function() {
@@ -50,7 +50,7 @@ describe('Array functions', function() {
     expect(function() {
       // node type unsupported
       func?.call([], new Scope())
-    }).toThrowError(UnimplementedError);
+    }).toThrow(UnimplementedError);
   });
 
   test('GetSourceInstanceElementArray()', function() {
@@ -60,7 +60,7 @@ describe('Array functions', function() {
     expect(function() {
       // node type unsupported
       func?.call([], new Scope())
-    }).toThrowError(UnimplementedError);
+    }).toThrow(UnimplementedError);
   });
 
   test('SortArray() - ascending (default)', function() {
