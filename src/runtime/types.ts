@@ -3206,9 +3206,13 @@ export class JbDate implements DateVal {
       result = isIso
         ? new JbDate(new Date(timestamp + new Date().getTimezoneOffset() * 60000), false, true)
         : new JbDate(new Date(timestamp), false);
+
+      result.isUTC = isIso;
     }
-    else if(date.type === "date")
+    else if(date.type === "date") {
       result = new JbDate((date as JbDate).value);
+      result.isUTC = (date as JbDate).isUTC;
+    }
     else
       throw new RuntimeError(`Cannot parse a ${date.type} value as date.`);
 
