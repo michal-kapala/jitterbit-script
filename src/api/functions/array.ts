@@ -1,4 +1,4 @@
-import { UnimplementedError } from "../../errors";
+import { RuntimeError, UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbArray, JbBool, JbNull, JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
@@ -227,7 +227,7 @@ export class SortArray extends Func {
 
     // TODO: this error should be thrown by type checker (too)
     if(args[0].type !== this.signature.params[0].type)
-      throw new Error(`${this.name} can only be called on array data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new RuntimeError(`${this.name} can only be called on array data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     // comparison evaluation rules:
     // generally, toInt (applies across signatures):
@@ -318,7 +318,7 @@ export class SortArray extends Func {
         return;
       default:
         // TODO: this error is thrown by parser
-        throw new Error(`Wrong number of arguments in SortArray(): number of arguments = ${args.length}, should be between 1 and 3`);
+        throw new RuntimeError(`Wrong number of arguments in SortArray(): number of arguments = ${args.length}, should be between 1 and 3`);
     }
   }
 
@@ -511,18 +511,18 @@ export class ReduceDimension extends Func {
     // POD: the original error:
     // ReduceDimension failed, err:array dimension <2.
     if(args[0].type !== this.signature.params[0].type)
-      throw new Error(`ReduceDimension can only be called on array data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new RuntimeError(`ReduceDimension can only be called on array data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     const array = args[0] as JbArray;
     if(array.members.length === 0)
-      throw new Error("ReduceDimension failed, the array does not have enough dimensions for reduction (at least 2).");
+      throw new RuntimeError("ReduceDimension failed, the array does not have enough dimensions for reduction (at least 2).");
 
     let dimension = 1;
     dimension = this.getDimension(array, dimension);
 
     // no nested arrays
     if (dimension === 1)
-      throw new Error("ReduceDimension failed, the array does not have enough dimensions for reduction (at least 2).");
+      throw new RuntimeError("ReduceDimension failed, the array does not have enough dimensions for reduction (at least 2).");
 
     this.checkDimensionality(array, dimension, 1);
     return this.reduce(array, dimension);
@@ -557,7 +557,7 @@ export class ReduceDimension extends Func {
     const members = array.members;
     if(members.length === 0) {
       if(dim + 1 !== validDim) {
-        throw new Error(`ReduceDimension failed, the array contains element ${array.toString()} of non-uniform dimensionality: ${dim}`);
+        throw new RuntimeError(`ReduceDimension failed, the array contains element ${array.toString()} of non-uniform dimensionality: ${dim}`);
       }
     }
     
@@ -579,7 +579,7 @@ export class ReduceDimension extends Func {
         // this implementation throws on any dimensionality mismatch
 
         if(dim !== validDim)
-          throw new Error(`ReduceDimension failed, the array contains element '${mem.toString()}' of non-uniform dimensionality: ${dim}`);
+          throw new RuntimeError(`ReduceDimension failed, the array contains element '${mem.toString()}' of non-uniform dimensionality: ${dim}`);
       }
       // restore the shallow value
       dim = curDim;

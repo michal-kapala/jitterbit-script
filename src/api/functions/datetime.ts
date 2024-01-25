@@ -1,4 +1,4 @@
-import { UnimplementedError } from "../../errors";
+import { RuntimeError, UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbBool, JbDate, JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
@@ -144,7 +144,7 @@ export class DayOfMonth extends Func {
     this.chooseSignature(args);
     // TODO: probably uses an implicit conversion to string instead, to be tested
     if(args[0].type !== "string" && args[0].type !== "date")
-      throw new Error(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new RuntimeError(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     let date = JbDate.parse(args[0]);
     return new JbNumber(date.value.getDate());
@@ -184,7 +184,7 @@ export class DayOfWeek extends Func {
     this.chooseSignature(args);
     // TODO: probably uses an implicit conversion to string instead, to be tested
     if(args[0].type !== "string" && args[0].type !== "date")
-      throw new Error(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new RuntimeError(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     let date = JbDate.parse(args[0]);
     return new JbNumber(date.value.getDay());
@@ -257,7 +257,7 @@ export class GeneralDate extends Func {
 
     // TODO: probably uses an implicit conversion to string instead, to be tested
     if(args[0].type !== "string" && args[0].type !== "date")
-      throw new Error(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new RuntimeError(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     let date = JbDate.parse(args[0]);
 
@@ -372,7 +372,7 @@ export class LastDayOfMonth extends Func {
     this.chooseSignature(args);
     // TODO: probably uses an implicit conversion to string instead, to be tested
     if(args[0].type !== "string" && args[0].type !== "date")
-      throw new Error(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new RuntimeError(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     let date = JbDate.parse(args[0]);
 
@@ -417,7 +417,7 @@ export class LongDate extends Func {
     this.chooseSignature(args);
     // TODO: probably uses an implicit conversion to string instead, to be tested
     if(args[0].type !== "string" && args[0].type !== "date")
-      throw new Error(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new RuntimeError(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     let date = JbDate.parse(args[0]);
 
@@ -452,7 +452,7 @@ export class LongDate extends Func {
         return "Saturday";
       default:
         // NaN
-        throw new Error(`[${this.name} Invalid date]`);
+        throw new RuntimeError(`[${this.name} Invalid date]`);
     }
   }
 
@@ -489,7 +489,7 @@ export class LongDate extends Func {
         return "December";
       default:
         // NaN
-        throw new Error(`[${this.name} Invalid date]`);
+        throw new RuntimeError(`[${this.name} Invalid date]`);
     }
   }
 }
@@ -520,7 +520,7 @@ export class LongTime extends Func {
     this.chooseSignature(args);
     // TODO: probably uses an implicit conversion to string instead, to be tested
     if(args[0].type !== "string" && args[0].type !== "date")
-      throw new Error(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new RuntimeError(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     let date = JbDate.parse(args[0]);
 
@@ -560,7 +560,7 @@ export class MediumDate extends Func {
     this.chooseSignature(args);
     // TODO: probably uses an implicit conversion to string instead, to be tested
     if(args[0].type !== "string" && args[0].type !== "date")
-      throw new Error(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new RuntimeError(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     let date = JbDate.parse(args[0]);
 
@@ -599,7 +599,7 @@ export class MediumDate extends Func {
       case 11: 
         return "Dec";
       default:
-        throw new Error(`[${this.name}] Invalid month: ${month}`);
+        throw new RuntimeError(`[${this.name}] Invalid month: ${month}`);
     }
   }
 }
@@ -630,7 +630,7 @@ export class MediumTime extends Func {
     this.chooseSignature(args);
     // TODO: probably uses an implicit conversion to string instead, to be tested
     if(args[0].type !== "string" && args[0].type !== "date")
-      throw new Error(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new RuntimeError(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     let date = JbDate.parse(args[0]);
 
@@ -671,7 +671,7 @@ export class MonthOfYear extends Func {
     // TODO: probably uses an implicit conversion to string instead, to be tested
     // TODO: to be moved into type checking
     if(args[0].type !== "string" && args[0].type !== "date")
-      throw new Error(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new RuntimeError(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     let date = JbDate.parse(args[0]);
 
@@ -768,7 +768,7 @@ export class ShortDate extends Func {
     this.chooseSignature(args);
     // TODO: probably uses an implicit conversion to string instead, to be tested
     if(args[0].type !== "string" && args[0].type !== "date")
-      throw new Error(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new RuntimeError(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     let date = JbDate.parse(args[0]);
 
@@ -807,7 +807,7 @@ export class ShortTime extends Func {
     this.chooseSignature(args);
     // TODO: probably uses an implicit conversion to string instead, to be tested
     if(args[0].type !== "string" && args[0].type !== "date")
-      throw new Error(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new RuntimeError(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     let date = JbDate.parse(args[0]);
 

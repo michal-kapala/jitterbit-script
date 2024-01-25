@@ -2,7 +2,7 @@ import { RuntimeVal } from "../../runtime/values";
 import { JbDictionary, JbBool, JbArray, JbString } from "../../runtime/types";
 import { Func, Parameter, Signature } from "../types";
 import Scope from "../../runtime/scope";
-import { UnimplementedError } from "../../errors";
+import { RuntimeError, UnimplementedError } from "../../errors";
 
 /**
  * The implementation of `AddToDict` function.
@@ -23,7 +23,8 @@ export class AddToDict extends Func {
     this.signatures = [
       new Signature("bool", [
         new Parameter("dictionary", "dict"),
-        new Parameter("string", "key"),
+        // all types but null allowed
+        new Parameter("type", "key"),
         new Parameter("type", "arg")
       ])
     ];
@@ -38,7 +39,11 @@ export class AddToDict extends Func {
     // TODO: this error should be thrown by type checker (too)
     // POD: originally the type is not validated, the value is reassigned with a new dictionary
     if(args[0].type !== this.signature.params[0].type)
-      throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new RuntimeError(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+
+    // original behaviour
+    if(args[1].type === "null")
+      throw new RuntimeError(`A dictionary key can't be null.`);
 
     const dict = args[0] as JbDictionary;
 
@@ -82,12 +87,12 @@ export class CollectValues extends Func {
     // POD: original error:
     // call CollectValues() error, argument data types must be diction, collection
     if(args[0].type !== this.signature.params[0].type)
-      throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new RuntimeError(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     const dict = args[0] as JbDictionary;
 
     if(args[1].type !== this.signature.params[1].type)
-      throw new Error(`${this.name} can only be called on ${this.signature.params[1].type} data elements. The '${this.signature.params[1].name}' argument is of type ${args[1].type}`);
+      throw new RuntimeError(`${this.name} can only be called on ${this.signature.params[1].type} data elements. The '${this.signature.params[1].name}' argument is of type ${args[1].type}`);
 
     // POD: the function will throw on null values in 'names' array
     // originally a null value is returned
@@ -130,7 +135,7 @@ export class GetKeys extends Func {
     // TODO: this error should be thrown by type checker (too)
     // POD: originally the type is not validated, the value is reassigned with a new dictionary
     if(args[0].type !== this.signature.params[0].type)
-      throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new RuntimeError(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     const dict = args[0] as JbDictionary;
     const result = new JbArray();
@@ -262,7 +267,8 @@ export class HasKey extends Func {
     this.signatures = [
       new Signature("bool", [
         new Parameter("dictionary", "dict"),
-        new Parameter("string", "key")
+        // the docs wrongly say this is a string, implicit conversion in reality
+        new Parameter("type", "key")
       ])
     ];
     this.signature = this.signatures[0];
@@ -276,7 +282,7 @@ export class HasKey extends Func {
     // TODO: this error should be thrown by type checker (too)
     // POD: originally the type is not validated, the value is reassigned with a new dictionary
     if(args[0].type !== this.signature.params[0].type)
-      throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new RuntimeError(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     const dict = args[0] as JbDictionary;
     const result = dict.members.get(JbDictionary.keyValueToString(args[1]));
@@ -312,11 +318,15 @@ export class MapCache extends Func {
     super();
     this.name = "MapCache";
     this.module = "dict/array";
+    // the docs wrongly say this is a string, can be any value
+    // in case the 3rd arg is used, its string representation is returned
     this.signatures = [
       new Signature("string", [
         new Parameter("dictionary", "dict"),
-        new Parameter("string", "key"),
-        new Parameter("string", "value")
+        // the docs wrongly say this is a string, implicit conversion in reality
+        new Parameter("type", "key"),
+        // the docs wrongly say this is a string, implicit conversion in reality
+        new Parameter("type", "value")
       ])
     ];
     this.signature = this.signatures[0];
@@ -330,10 +340,11 @@ export class MapCache extends Func {
     // TODO: this error should be thrown by type checker (too)
     // POD: originally the type is not validated, the value is reassigned with a new dictionary
     if(args[0].type !== this.signature.params[0].type)
-      throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new RuntimeError(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     const dict = args[0] as JbDictionary;
     const lookup = dict.members.get(JbDictionary.keyValueToString(args[1]));
+    // POD: the original function returns null if lookup is a null value
     const result = lookup !== undefined
       ? lookup.toString()
       : dict.set(args[1], args[2]).toString();
@@ -360,7 +371,8 @@ export class RemoveKey extends Func {
     this.signatures = [
       new Signature("bool", [
         new Parameter("dictionary", "dict"),
-        new Parameter("string", "key")
+        // the docs say this is a string, implicit conversion in reality
+        new Parameter("type", "key")
       ])
     ];
     this.signature = this.signatures[0];
@@ -374,7 +386,12 @@ export class RemoveKey extends Func {
     // TODO: this error should be thrown by type checker (too)
     // POD: originally the type is not validated, the value is reassigned with a new dictionary
     if(args[0].type !== this.signature.params[0].type)
-      throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new RuntimeError(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+
+    // 'The key must be a string or have a string representation, and null values are not allowed.'
+    // this neither throws nor affects the dictionary
+    if(args[1].type === "null")
+      return new JbBool(false);
 
     const dict = args[0] as JbDictionary;
     const key = JbDictionary.keyValueToString(args[1]);
