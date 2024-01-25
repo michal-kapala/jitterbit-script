@@ -1,5 +1,6 @@
+import { RuntimeError } from "../../errors";
 import Scope from "../../runtime/scope";
-import { JbBinary, JbBool, JbDate, JbNumber, JbString } from "../../runtime/types";
+import { JbBinary, JbBool, JbDate, JbNull, JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
 import { Func, Parameter, Signature } from "../types";
 
@@ -31,7 +32,7 @@ export class BinaryToHex extends Func {
     
     // TODO: this error should be thrown by type checker (too)
     if(args[0].type !== this.signature.params[0].type)
-      throw new Error(`${this.name} failed, the argument must be binary data.`);
+      throw new RuntimeError(`${this.name} failed, the argument must be binary data.`);
 
     const bin = args[0] as JbBinary;
     return new JbString(bin.toString());
@@ -70,7 +71,7 @@ export class BinaryToUUID extends Func {
 
     // TODO: this error should be thrown by type checker (too)
     if(args[0].type !== this.signature.params[0].type)
-      throw new Error(`${this.name} failed, the argument must be binary data.`);
+      throw new RuntimeError(`${this.name} failed, the argument must be binary data.`);
 
     return new JbString((args[0] as JbBinary).toUUID());
   }
@@ -107,8 +108,12 @@ export class Bool extends Func {
   
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
+
+    // date2bool throws here
+    if(args[0].type === "date")
+      throw new RuntimeError(`Transform Error: DE_TYPE_CONVERT_FAILED`);
     
-    // POD: standard conversion rules, no fancy exceptions
+    // POD: the original function returns null when passed a null value
     return new JbBool(args[0].toBool());
   }
 
@@ -158,20 +163,26 @@ export class DateFunc extends Func {
 
     switch (args[0].type) {
       case "bool":
-        throw new Error(`Cannot convert a ${args[0].type} to a date object`);
+        throw new RuntimeError(`Cannot convert a ${args[0].type} to a date object`);
       case "number":
         // 'the input is interpreted as the number of seconds' - epoch timestamp (UTC-based)
-        return new JbDate(new Date(Math.round((args[0] as JbNumber).value) * 1000));
+        return new JbDate(
+          new Date(
+            Math.round((args[0] as JbNumber).value) * 1000 + new Date().getTimezoneOffset() * 60000
+          )
+        );
       case "string":
         // POD: JbDate.parse supports the JS formats rather than JB's
         return JbDate.parse(args[0] as JbString);
       case "date":
         return args[0] as JbDate;
+      case "null":
+      // POD: the original function returns null when passed a null value
       case "array":
       case "binary":
       case "dictionary":
       default:
-        throw new Error(`Cannot convert ${args[0].type} object to a date object`);
+        throw new RuntimeError(`Cannot convert ${args[0].type} to a date object`);
     }
   }
 
@@ -205,12 +216,13 @@ export class Double extends Func {
 
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    try {
-      return new JbNumber(args[0].toNumber());
-    } catch(e) {
-      console.error(e);
-      return new JbNumber();
-    }
+    // POD: the original function returns an array of converted elements
+    // that violates its return type and is not supported here
+    if(args[0].type === "array")
+      throw `Cannot convert ${args[0].type} to a number.`;
+
+    // POD: the original function returns null when passed a null value
+    return new JbNumber(args[0].toNumber());
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -243,12 +255,13 @@ export class Float extends Func {
 
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    try {
-      return new JbNumber(args[0].toNumber());
-    } catch(e) {
-      console.error(e);
-      return new JbNumber();
-    }
+    // POD: the original function returns an array of converted elements
+    // that violates its return type and is not supported here
+    if(args[0].type === "array")
+      throw `Cannot convert ${args[0].type} to a number.`;
+
+    // POD: the original function returns null when passed a null value
+    return new JbNumber(args[0].toNumber());
   }
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
@@ -285,7 +298,7 @@ export class HexToBinary extends Func {
     // TODO: this error should be thrown by type checker (too)
     // POD: originally the argument is implicitly converted to string
     if(args[0].type !== this.signature.params[0].type)
-      throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new RuntimeError(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
     const hex = args[0] as JbString;
     return JbBinary.fromHex(hex.value);
   }
@@ -325,7 +338,7 @@ export class HexToString extends Func {
     // TODO: this error should be thrown by type checker (too)
     // POD: originally the argument is implicitly converted to string
     if(args[0].type !== this.signature.params[0].type)
-      throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new RuntimeError(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     const hex = args[0] as JbString;
     // originally UTF-8 encoding is opt-in, the same goes for this implementation
@@ -374,14 +387,15 @@ export class Int extends Func {
 
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    // floating-point values obtained from
-    // number-number and string-number conversions are rounded
-    try {
-      return new JbNumber(Math.round(args[0].toNumber()));
-    } catch(e) {
-      console.error(e);
-      return new JbNumber();
-    }
+    // POD: the original function returns an array of converted elements
+    // that violates the return type and is not supported here
+    if(args[0].type === "array")
+      throw new RuntimeError(`Cannot convert ${args[0].type} to a number.`);
+
+    const value = args[0].toNumber();
+    return new JbNumber(
+      value > 0 ? Math.floor(value) : Math.ceil(value)
+    );
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -414,14 +428,15 @@ export class Long extends Func {
   
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    // floating-point values obtained from
-    // number-number and string-number conversions are rounded
-    try {
-      return new JbNumber(Math.round(args[0].toNumber()));
-    } catch(e) {
-      console.error(e);
-      return new JbNumber();
-    }
+    // POD: the original function returns an array of converted elements
+    // that violates the return type and is not supported here
+    if(args[0].type === "array")
+      throw new RuntimeError(`Cannot convert ${args[0].type} to a number.`);
+
+    const value = args[0].toNumber();
+    return new JbNumber(
+      value > 0 ? Math.floor(value) : Math.ceil(value)
+    );
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -503,7 +518,7 @@ export class StringToHex extends Func {
     // TODO: this error should be thrown by type checker (too)
     // POD: originally the argument is implicitly converted to string, the docs state undefined behaviour
     if(args[0].type !== this.signature.params[0].type)
-      throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new RuntimeError(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     const str = args[0] as JbString;
 
@@ -561,7 +576,7 @@ export class UUIDToBinary extends Func {
     // original error:
     // Invalid UUID string 'x'. A UUID string has to be 36 characters long.
     if(args[0].type !== this.signature.params[0].type)
-      throw new Error(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
+      throw new RuntimeError(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
     const uuid = args[0] as JbString;
     return JbBinary.fromUUID(uuid.value);

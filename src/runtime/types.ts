@@ -1,3 +1,4 @@
+import { RuntimeError } from "../errors";
 import { 
   ArrayVal,
   BinaryVal,
@@ -2623,14 +2624,14 @@ export class JbBinary implements BinaryVal {
    */
   static fromHex(hex: string) {
     if(hex.length % 2 !== 0)
-      throw new Error(`Invalid hex string '${hex}'. The length of the hex string has to be even.`);
+      throw new RuntimeError(`Invalid hex string '${hex}'. The length of the hex string has to be even.`);
 
     const pattern = /^([a-fA-F0-9])+$/g;
     const matches = hex.match(pattern);
     
     // invalid input
     if(matches === null)
-      throw new Error(`Invalid hex string '${hex}'. A hex string can only contain hexadecimal numbers (0 through F, case insensitive).`);
+      throw new RuntimeError(`Invalid hex string '${hex}'. A hex string can only contain hexadecimal numbers (0 through F, case insensitive).`);
     
     const bytes = this.hexToBytes(hex);
     return new JbBinary(bytes);
@@ -2704,7 +2705,7 @@ export class JbBinary implements BinaryVal {
       case "F":
         return 15;
       default:
-        throw new Error(`hexToDigit internal error, invalid character`);
+        throw new RuntimeError(`hexToDigit internal error, invalid character`);
     }
   }
 
@@ -2715,7 +2716,7 @@ export class JbBinary implements BinaryVal {
   toUUID() {
     const hex = this.toString().toLowerCase();
     if(this.value.length !== 16)
-      throw new Error(`Input is not 16-byte binary data. The size of your input is ${this.value.length}.`);
+      throw new RuntimeError(`Input is not 16-byte binary data. The size of your input is ${this.value.length}.`);
 
     let result = "";
     for (let idx = 0; idx < hex.length; idx++) {
@@ -2733,11 +2734,11 @@ export class JbBinary implements BinaryVal {
    */
   static fromUUID(uuid: string) {
     if(uuid.length !== 36)
-      throw new Error(`Invalid UUID string '${uuid}'. A UUID string has to be 36 characters long.`);
+      throw new RuntimeError(`Invalid UUID string '${uuid}'. A UUID string has to be 36 characters long.`);
 
     const pattern = /^([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$/g;
     if(uuid.match(pattern) === null)
-      throw new Error(`Invalid UUID string ${uuid}. A UUID has to be of the format: 2f46dad9-e5c2-457e-b1fd-ad1b49b99aff`);
+      throw new RuntimeError(`Invalid UUID string ${uuid}. A UUID has to be of the format: 2f46dad9-e5c2-457e-b1fd-ad1b49b99aff`);
     return this.fromHex(uuid.replaceAll("-", ""));
   }
 
@@ -2790,10 +2791,10 @@ export class JbBinary implements BinaryVal {
       case ">":
       case "<=":
       case ">=":
-        throw new Error(`compare (${operator}) with binary data`);
+        throw new RuntimeError(`compare (${operator}) with binary data`);
       case "==":
       case "!=":
-        throw new Error(`compare (${operator}) binary data with data of other type`);
+        throw new RuntimeError(`compare (${operator}) binary data with data of other type`);
       case "&&":
       case "&":
         return new JbBool(false);
@@ -3196,7 +3197,7 @@ export class JbDate implements DateVal {
     if(date.type === "string") {
       const timestamp = Date.parse((date as JbString).value);
       if(isNaN(timestamp))
-        throw new Error(`[${this.name}] Invalid date string: '${(date as JbString).value}'`);
+        throw new RuntimeError(`[${this.name}] Invalid date string: '${(date as JbString).value}'`);
 
       // for ISO 8601 dates returns the date as-is (original behaviour)
       const isoDate = /(^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]{3})?Z)$/g;
@@ -3209,7 +3210,7 @@ export class JbDate implements DateVal {
     else if(date.type === "date")
       result = new JbDate((date as JbDate).value);
     else
-      throw `Cannot parse a ${date.type} value as date.`;
+      throw new RuntimeError(`Cannot parse a ${date.type} value as date.`);
 
     return result;
   }
