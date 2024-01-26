@@ -3167,8 +3167,11 @@ export class JbDate implements DateVal {
     const hour = this.value.getHours().toString().padStart(2, "0");
     const min = this.value.getMinutes().toString().padStart(2, "0");
     const sec = this.value.getSeconds().toString().padStart(2, "0");
-    const mil = this.value.getMilliseconds().toString().padStart(3, "0");
-    return `${year}-${month}-${day} ${hour}:${min}:${sec}.${mil}`;
+    if(this.value.getMilliseconds() > 0) {
+      const mil = this.value.getMilliseconds().toString().padStart(3, "0");
+      return `${year}-${month}-${day} ${hour}:${min}:${sec}.${mil}`;
+    }
+    return `${year}-${month}-${day} ${hour}:${min}:${sec}`;
   }
 
   /**

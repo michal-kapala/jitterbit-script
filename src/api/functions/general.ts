@@ -1,11 +1,13 @@
 import Scope from "../../runtime/scope";
 import { JbArray, JbDictionary, JbBinary, JbBool, JbNull, JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
-import { AsyncFunc, Func, Parameter, Signature } from "../types";
+import { AsyncFunc, DeferrableFunc, Func, Parameter, Signature } from "../types";
 import { hostname } from "os";
 import { randomUUID } from "crypto";
 import { reverse } from "dns/promises";
 import { RuntimeError, UnimplementedError } from "../../errors";
+import { Expr } from "../../frontend/ast";
+import { evaluate } from "../../runtime/interpreter";
 
 /**
  * The implementation of `ArgumentList` function.
@@ -180,8 +182,10 @@ export class CancelOperationChain extends AsyncFunc {
  * Instead, to capture failed operations, functions such as `If` and `GetLastError` can be used
  * to achieve similar functionality.
  * For more information, see the *Scripting* section in Harmony Best Practices.
+ * 
+ * This implementation evaluates `defaultResult` only if the first evaluation throws.
  */
-export class Eval extends Func {
+export class Eval extends DeferrableFunc {
   constructor() {
     super();
     this.name = "Eval";
@@ -197,9 +201,19 @@ export class Eval extends Func {
     this.maxArgs = 2;
   }
 
+  async callEval(args: Expr[], scope: Scope) {
+    let result: RuntimeVal;
+    try {
+      result = await evaluate(args[0], scope);
+    } catch {
+      result = await evaluate(args[1], scope);
+    }
+    return result;
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new UnimplementedError(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callEval instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -561,7 +575,7 @@ export class GUID extends Func {
  * 
  * See also the `IsNull` function.
  */
-export class IfEmpty extends Func {
+export class IfEmpty extends DeferrableFunc {
   constructor() {
     super();
     this.name = "IfEmpty";
@@ -577,9 +591,20 @@ export class IfEmpty extends Func {
     this.maxArgs = 2;
   }
 
+  async callEval(args: Expr[], scope: Scope) {
+    const result = await evaluate(args[0], scope);
+    if(
+      result.type === "null" ||
+      (result.type === "string" && (result as JbString).value === "")
+    )
+      return await evaluate(args[1], scope);
+
+    return result;
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new UnimplementedError(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callEval instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -598,7 +623,7 @@ export class IfEmpty extends Func {
  * 
  * See also the `IsNull` and `IfEmpty` functions.
  */
-export class IfNull extends Func {
+export class IfNull extends DeferrableFunc {
   constructor() {
     super();
     this.name = "IfNull";
@@ -614,9 +639,17 @@ export class IfNull extends Func {
     this.maxArgs = 2;
   }
 
+  async callEval(args: Expr[], scope: Scope) {
+    const result = await evaluate(args[0], scope);
+    if(result.type === "null")
+      return await evaluate(args[1], scope);
+      
+    return result;
+  }
+
   call(args: RuntimeVal[], scope: Scope): never {
     this.chooseSignature(args);
-    throw new UnimplementedError(`${this.name} is currently unsupported`);
+    throw new UnimplementedError(`${this.name} does not support synchronous calls, use callEval instead.`);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -770,7 +803,7 @@ export class IsNull extends Func {
  * 
  * Returns true if the evaluation of the argument results without an error.
  */
-export class IsValid extends Func {
+export class IsValid extends DeferrableFunc {
   constructor() {
     super();
     this.name = "IsValid";
@@ -781,6 +814,15 @@ export class IsValid extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+  }
+
+  async callEval(args: Expr[], scope: Scope) {
+    try {
+     await evaluate(args[0], scope);
+     return new JbBool(true);
+    } catch {
+      return new JbBool(false);
+    }
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -826,6 +868,7 @@ export class Length extends Func {
       case "array":
         return new JbNumber((args[0] as JbArray).members.length);
       case "dictionary":
+        // measuring the length of your dict in... entries
         return new JbNumber((args[0] as JbDictionary).members.size);
       case "binary":
         return new JbNumber((args[0] as JbBinary).value.length);
@@ -893,9 +936,13 @@ export class Random extends Func {
 
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    const min = args[0].toNumber();
-    const max = args[1].toNumber();
-    // order-proof
+    const min = args[0].toNumber() < 0
+      ? Math.ceil(args[0].toNumber())
+      : Math.floor(args[0].toNumber());
+    const max = args[1].toNumber() < 0
+      ? Math.ceil(args[1].toNumber())
+      : Math.floor(args[1].toNumber());
+    // order-proof, [min, max) range
     return new JbNumber(Math.round(Math.random() * Math.abs(max - min) + Math.min(min, max)));
   }
 
@@ -1031,7 +1078,7 @@ export class RecordCount extends Func {
  * See that function for a description of how re-running the operation synchronously
  * or asynchronously affects global global variables.
  */
-export class ReRunOperation extends Func {
+export class ReRunOperation extends AsyncFunc {
   constructor() {
     super();
     this.name = "ReRunOperation";
@@ -1044,6 +1091,11 @@ export class ReRunOperation extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 1;
+  }
+
+  async callAsync(args: RuntimeVal[], scope: Scope): Promise<never> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of operation API calls is currently unsupported.`);
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -1065,7 +1117,7 @@ export class ReRunOperation extends Func {
  * For more information, see the instructions on inserting operations under
  * the *Operations* section in Jitterbit Script.
  */
-export class RunOperation extends Func {
+export class RunOperation extends AsyncFunc {
   constructor() {
     super();
     this.name = "RunOperation";
@@ -1079,6 +1131,11 @@ export class RunOperation extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 2;
+  }
+
+  async callAsync(args: RuntimeVal[], scope: Scope): Promise<never> {
+    this.chooseSignature(args);
+    throw new UnimplementedError(`[${this.name}] Evaluation of operation API calls is currently unsupported.`);
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -1292,9 +1349,16 @@ export class Sleep extends AsyncFunc {
     this.maxArgs = 1;
   }
 
-  callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
+  async callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
     this.chooseSignature(args);
-    throw new UnimplementedError(`[${this.name}] is currently unsupported.`);
+    if(args[0].type !== this.signature.params[0].type)
+      throw new RuntimeError(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}.`);
+
+    const seconds = args[0] as JbNumber;
+    await async function(seconds: number) {
+      return new Promise(resolve => setTimeout(resolve, seconds * 1000));
+    }(seconds.value);
+    return new JbNull();
   }
 
   call(args: RuntimeVal[], scope: Scope): never {

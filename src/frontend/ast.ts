@@ -91,14 +91,8 @@ export class BlockExpr implements Expr {
 
   async eval(scope: Scope) {
     let lastValue: RuntimeVal = new JbNull();
-    try {
-      for (const expr of this.body)
-        lastValue = await evaluate(expr, scope);
-    }
-    catch(e) {
-      // TODO: this should be added as an error
-      console.error(`InterpreterError: ${e}\nLast evaluated expression:\n`, lastValue);
-    }
+    for (const expr of this.body)
+      lastValue = await evaluate(expr, scope);
     return lastValue;
   }
 }

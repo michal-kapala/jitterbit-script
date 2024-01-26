@@ -1,6 +1,8 @@
 <trans>
-  // test for async calls
-  result = GetHostByIP("8.8.8.8");
+  // test for Sleep function
+  WriteToOperationLog("starting...");
+  result = Sleep(5);
+  WriteToOperationLog("end");
   DebugBreak();
   
 </trans>

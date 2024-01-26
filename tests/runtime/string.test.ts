@@ -309,7 +309,7 @@ describe('JbString cross-type interactions', function() {
   test('string += date', function() {
     expect(
       Scope.assign(new JbString("2date: "), "+=", makeDate("1/13/24"))
-    ).toStrictEqual(new JbString("2date: 2024-01-13 00:00:00.000"));
+    ).toStrictEqual(new JbString("2date: 2024-01-13 00:00:00"));
   });
 
   test('string + number', function() {
@@ -361,7 +361,7 @@ describe('JbString cross-type interactions', function() {
   test('string + date', function() {
     expect(
       new JbString("someDate: ").binopDate("+", makeDate("1/13/24"))
-    ).toStrictEqual(new JbString("someDate: 2024-01-13 00:00:00.000"));
+    ).toStrictEqual(new JbString("someDate: 2024-01-13 00:00:00"));
   });
 
   test('string - number', function() {

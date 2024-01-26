@@ -186,7 +186,7 @@ This file serves as a tracker and should be updated with new implementations.
 | AutoNumber | ❌ |
 | CancelOperation | ❌ |
 | CancelOperationChain | ❌ |
-| Eval | ❌ |
+| Eval | ✔️ |
 | Get | ❌ |
 | GetChunkDataElement | ❌ |
 | GetHostByIP | ✔️ |
@@ -196,8 +196,8 @@ This file serves as a tracker and should be updated with new implementations.
 | GetOperationQueue | ❌ |
 | GetServerName | ✔️ |
 | GUID | ✔️ |
-| IfEmpty | ❌ |
-| IfNull | ❌ |
+| IfEmpty | ✔️ |
+| IfNull | ✔️ |
 | InitCounter | ❌ |
 | InList | ❌ |
 | IsInteger | ✔️ |
@@ -215,7 +215,7 @@ This file serves as a tracker and should be updated with new implementations.
 | RunScript | ❌ |
 | Set | ❌ |
 | SetChunkDataElement | ❌ |
-| Sleep | ❌ |
+| Sleep | ✔️ |
 | SourceInstanceCount | ❌ |
 | TargetInstanceCount | ❌ |
 | WaitForOperation | ❌ |

@@ -1088,7 +1088,7 @@ describe('JbDictionary cross-type interactions', function() {
   test('dictionary[date]', function() {
     const value = new JbNumber(3);
     expect(
-      makeDict("2024-01-13 00:00:00.000", value).get(makeDate("1/13/24"))
+      makeDict("2024-01-13 00:00:00", value).get(makeDate("1/13/24"))
     ).toStrictEqual(value);
   });
 

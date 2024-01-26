@@ -267,7 +267,7 @@ describe('JbDate cross-type interactions', function() {
     const rhs = new JbString("-2.7abcd");
     expect(
       Scope.assign(makeDate("2000-01-01T00:00:00.000Z"), "+=", rhs)
-    ).toStrictEqual(new JbString("2000-01-01 00:00:00.000-2.7abcd"));
+    ).toStrictEqual(new JbString("2000-01-01 00:00:00-2.7abcd"));
   });
 
   test('date += bool', function() {
@@ -280,10 +280,10 @@ describe('JbDate cross-type interactions', function() {
   test('date += array', function() {
     const rhs = new JbArray([new JbString("3.5"), new JbString("6")]);
     expect(
-      Scope.assign(makeDate("2000-01-01T00:00:00.000Z"), "+=", rhs)
+      Scope.assign(makeDate("2000-01-01T00:00:00.001Z"), "+=", rhs)
     ).toStrictEqual(new JbArray([
-      new JbString("2000-01-01 00:00:00.0003.5"),
-      new JbString("2000-01-01 00:00:00.0006")
+      new JbString("2000-01-01 00:00:00.0013.5"),
+      new JbString("2000-01-01 00:00:00.0016")
     ]));
   });
 
@@ -326,7 +326,7 @@ describe('JbDate cross-type interactions', function() {
     expect(
       makeDate("1/18/24").binopString("+", rhs)
     ).toStrictEqual(
-      new JbString("2024-01-18 00:00:00.000 idk")
+      new JbString("2024-01-18 00:00:00 idk")
     );
   });
 
@@ -346,7 +346,7 @@ describe('JbDate cross-type interactions', function() {
     ).toStrictEqual(
       new JbArray([
         expectedDate,
-        new JbString("2000-01-01 00:00:00.0006")
+        new JbString("2000-01-01 00:00:006")
       ])
     );
   });

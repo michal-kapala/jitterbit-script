@@ -401,7 +401,7 @@ describe('JbNumber cross-type interactions', function() {
     `;
     const result = await run(test) as JbDate;
     expect(result.type).toBe("date");
-    expect(result.toString()).toBe("2024-01-31 00:00:05.000");
+    expect(result.toString()).toBe("2024-01-31 00:00:05");
   });
 
   test('number - bool', function() {

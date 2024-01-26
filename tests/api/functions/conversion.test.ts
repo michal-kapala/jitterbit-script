@@ -794,7 +794,7 @@ describe('Conversion functions', function() {
       const date = makeDate("2024-01-13T00:00:00.000Z");
       expect(
         func?.call([date], new Scope())
-      ).toStrictEqual(new JbString("2024-01-13 00:00:00.000"));
+      ).toStrictEqual(new JbString("2024-01-13 00:00:00"));
     });
   });
 
