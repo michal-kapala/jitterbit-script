@@ -438,7 +438,10 @@ export class JbDictionary implements DictVal {
   }
 
   clone(): RuntimeVal {
-    return new JbDictionary(this.members);
+    const members = new Map<string, RuntimeVal>();
+    for(const mem of this.members)
+      members.set(mem[0], mem[1].clone());
+    return new JbDictionary(members);
   }
 
   decrement(): RuntimeVal {
@@ -2582,7 +2585,10 @@ export class JbBinary implements BinaryVal {
   }
 
   clone() {
-    return new JbBinary(this.value);
+    const bytes: number[] = [];
+    for(const b of this.value)
+      bytes.push(b);
+    return new JbBinary(new Uint8Array(bytes));
   }
 
   decrement(): never {
@@ -3118,7 +3124,7 @@ export class JbDate implements DateVal {
   }
 
   clone() {
-    return new JbDate(this.value);
+    return new JbDate(new Date(this.value));
   }
 
   decrement(): never {

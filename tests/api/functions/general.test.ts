@@ -431,7 +431,7 @@ describe('General functions', function() {
         new Scope()
       ) as JbNumber;
       expect(result.value).toBeGreaterThanOrEqual(-5);
-      expect(result.value).toBeLessThan(10);
+      expect(result.value).toBeLessThanOrEqual(10);
     });
   });
 

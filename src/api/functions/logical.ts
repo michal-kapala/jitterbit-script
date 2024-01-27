@@ -76,6 +76,8 @@ export class Case extends DeferrableFunc {
  * 
  * Type conversion and promotion is performed if the arguments or elements being
  * compared are of different types.
+ * 
+ * This implementation is type-sensitive - comparison of different types always returns `false`.
  */
 export class Equal extends Func {
   constructor() {
@@ -98,6 +100,9 @@ export class Equal extends Func {
 
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
+    // POD: this implementation is type-sensitive
+    // the original implementation performs implicit conversions
+    // e.g. originally Equal(0, "") returns true
     if(args[0].type !== args[1].type)
       return new JbBool(false);
 
@@ -110,6 +115,7 @@ export class Equal extends Func {
 
       // compares types and string representations of each element pair
       for(let idx = 0; idx < arr1.members.length; idx++) {
+        // POD: type-sensitive
         if(arr1.members[idx].type !== arr2.members[idx].type)
           return new JbBool(false);
         if(arr1.members[idx].toString() !== arr2.members[idx].toString())
@@ -205,7 +211,7 @@ export class While extends DeferrableFunc {
 
     // POD: not the original error
     if(iterCount === maxIters)
-      throw new RuntimeError(`Max number of ${maxIters} iterations reached. Set $jitterbit.scripting.while.max_iterations upstream of this function call to increase the iteration limit.`, this.name);
+      throw new RuntimeError(`Max number of ${maxIters} iterations reached. Set $jitterbit.scripting.while.max_iterations upstream of this function call to increase the iteration limit.`);
 
     return new JbNull();
   }

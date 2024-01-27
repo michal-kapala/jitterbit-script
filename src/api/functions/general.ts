@@ -942,7 +942,7 @@ export class Random extends Func {
     const max = args[1].toNumber() < 0
       ? Math.ceil(args[1].toNumber())
       : Math.floor(args[1].toNumber());
-    // order-proof, [min, max) range
+    // order-proof, [min, max] range
     return new JbNumber(Math.round(Math.random() * Math.abs(max - min) + Math.min(min, max)));
   }
 
