@@ -17,7 +17,7 @@ import { AsyncFunc, Parameter, Signature } from "../types";
 export class NetSuiteGetSelectValue extends AsyncFunc {
   constructor() {
     super();
-    this.name = "NetSuiteGetSelectValues";
+    this.name = "NetSuiteGetSelectValue";
     this.module = "netsuite";
     this.signatures = [
       new Signature("dictionary", [
