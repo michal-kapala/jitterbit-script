@@ -1,4 +1,4 @@
-import { RuntimeError } from "../../errors";
+import { RuntimeError, UnimplementedError } from "../../errors";
 import { Expr } from "../../frontend/ast";
 import { evaluate } from "../../runtime/interpreter";
 import Scope from "../../runtime/scope";
@@ -50,7 +50,7 @@ export class Case extends DeferrableFunc {
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
-    throw new Error("Method not implemented.");
+    throw new UnimplementedError("Method not implemented.");
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -168,7 +168,7 @@ export class If extends DeferrableFunc {
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
-    throw new Error("Method not implemented.");
+    throw new UnimplementedError("Method not implemented.");
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -217,7 +217,7 @@ export class While extends DeferrableFunc {
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
-    throw new Error("Method not implemented.");
+    throw new UnimplementedError("Method not implemented.");
   }
 
   protected chooseSignature(args: RuntimeVal[]) {

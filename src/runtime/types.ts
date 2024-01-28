@@ -445,27 +445,27 @@ export class JbDictionary implements DictVal {
   }
 
   decrement(): RuntimeVal {
-    throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED\nThe problematic token is at the end of the following expression: --");
+    throw new RuntimeError("Transform Error: DE_TYPE_CONVERT_FAILED\nThe problematic token is at the end of the following expression: --");
   }
 
   increment(): RuntimeVal {
-    throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED\nThe problematic token is at the end of the following expression: ++");
+    throw new RuntimeError("Transform Error: DE_TYPE_CONVERT_FAILED\nThe problematic token is at the end of the following expression: ++");
   }
 
   negate(): never {
-    throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED\nThe problematic token is at the end of the following expression: !");
+    throw new RuntimeError("Transform Error: DE_TYPE_CONVERT_FAILED\nThe problematic token is at the end of the following expression: !");
   }
 
   negative(): never {
-    throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED\nThe problematic token is at the end of the following expression: -");
+    throw new RuntimeError("Transform Error: DE_TYPE_CONVERT_FAILED\nThe problematic token is at the end of the following expression: -");
   }
 
   toBool(): never {
-    throw `Transform Error: DE_TYPE_CONVERT_FAILED`;
+    throw new RuntimeError(`Transform Error: DE_TYPE_CONVERT_FAILED`);
   }
 
   toNumber(): never {
-    throw `Transform Error: DE_TYPE_CONVERT_FAILED`;
+    throw new RuntimeError(`Transform Error: DE_TYPE_CONVERT_FAILED`);
   }
 
   toString(): string {
@@ -519,7 +519,7 @@ export class JbDictionary implements DictVal {
       case "date":
         return key.toString();
       case "null":
-        throw new Error(`A dictionary key can't be NULL`);
+        throw new RuntimeError(`A dictionary key can't be NULL`);
       default:
         throw `Unsupported member expression key type: ${key.type}`;
     }
@@ -566,7 +566,7 @@ export class JbDictionary implements DictVal {
       case "*":
       case "/":
       case "^":
-        throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+        throw new RuntimeError("Transform Error: DE_TYPE_CONVERT_FAILED");
       case "<":
         // dictionary is implicitly converted to 0
         return new JbBool(0 < rhs.value);
@@ -590,7 +590,7 @@ export class JbDictionary implements DictVal {
       case "|":
         return new JbBool(rhs.toBool());
       default:
-        throw new Error(`Unsupported operator ${operator}`);
+        throw new RuntimeError(`Unsupported operator ${operator}`);
     }
   }
 
@@ -604,15 +604,15 @@ export class JbDictionary implements DictVal {
   binopBool(operator: string, rhs: JbBool) {
     switch(operator) {
       case "+":
-        throw new Error(`Illegal operation: ${this.type} Add ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation: ${this.type} Add ${rhs.type}`);
       case "-":
-        throw new Error(`Illegal operation, SUBTRACT with incompatible data types: ${this.type} - ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, SUBTRACT with incompatible data types: ${this.type} - ${rhs.type}`);
       case "*":
-        throw new Error(`Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} * ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} * ${rhs.type}`);
       case "/":
-        throw new Error(`Illegal operation, DIVISION with incompatible data types: ${this.type} / ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, DIVISION with incompatible data types: ${this.type} / ${rhs.type}`);
       case "^":
-        throw new Error(`Illegal operation, POW with incompatible data types: ${this.type} ^ ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, POW with incompatible data types: ${this.type} ^ ${rhs.type}`);
       case "<":
         // dictionary is implicitly converted to 0
         return new JbBool(0 < rhs.toNumber());
@@ -636,7 +636,7 @@ export class JbDictionary implements DictVal {
       case "|":
         return new JbBool(rhs.value);
       default:
-        throw new Error(`Unsupported operator ${operator}`);
+        throw new RuntimeError(`Unsupported operator ${operator}`);
     }
   }
 
@@ -650,15 +650,15 @@ export class JbDictionary implements DictVal {
   binopString(operator: string, rhs: JbString) {
     switch(operator) {
       case "+":
-        throw new Error(`Transform Error: DE_TYPE_CONVERT_FAILED`);
+        throw new RuntimeError(`Transform Error: DE_TYPE_CONVERT_FAILED`);
       case "-":
-        throw new Error(`Illegal operation, SUBTRACT with incompatible data types: ${this.type} - ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, SUBTRACT with incompatible data types: ${this.type} - ${rhs.type}`);
       case "*":
-        throw new Error(`Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} * ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} * ${rhs.type}`);
       case "/":
-        throw new Error(`Illegal operation, DIVISION with incompatible data types: ${this.type} / ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, DIVISION with incompatible data types: ${this.type} / ${rhs.type}`);
       case "^":
-        throw new Error(`Illegal operation, POW with incompatible data types: ${this.type} ^ ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, POW with incompatible data types: ${this.type} ^ ${rhs.type}`);
       case "<":
         // dictionary is implicitly converted to 0
         return new JbBool(0 < rhs.toNumber());
@@ -682,7 +682,7 @@ export class JbDictionary implements DictVal {
       case "|":
         return new JbBool(rhs.toBoolAsNumber());
       default:
-        throw new Error(`Unsupported operator ${operator}`);
+        throw new RuntimeError(`Unsupported operator ${operator}`);
     }
   }
 
@@ -698,11 +698,11 @@ export class JbDictionary implements DictVal {
       case "+":
       case "-":
       case "*":
-        throw new Error(`Transform Error: DE_TYPE_CONVERT_FAILED`);
+        throw new RuntimeError(`Transform Error: DE_TYPE_CONVERT_FAILED`);
       case "/":
-        throw new Error(`Illegal operation, division by Null`);
+        throw new RuntimeError(`Illegal operation, division by Null`);
       case "^":
-        throw new Error(`Illegal operation: ${this.type} POW ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation: ${this.type} POW ${rhs.type}`);
       case "<":
       case ">":
       case "<=":
@@ -716,7 +716,7 @@ export class JbDictionary implements DictVal {
       case "!=":
         return new JbBool(true);
       default:
-        throw new Error(`Unsupported operator ${operator}`);
+        throw new RuntimeError(`Unsupported operator ${operator}`);
     }
   }
 
@@ -783,11 +783,11 @@ export class JbDictionary implements DictVal {
       case "-":
       case "*":
       case "^":
-        throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+        throw new RuntimeError("Transform Error: DE_TYPE_CONVERT_FAILED");
       // POD: original error:
       // Illegal operation: division by 0.
       case "/":
-        throw new Error(`Illegal operation, DIVISION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, DIVISION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
       case "<":
       case ">":
         // always false
@@ -804,7 +804,7 @@ export class JbDictionary implements DictVal {
       case "|":
         return new JbBool(false);
       default:
-        throw new Error(`Unsupported operator ${operator}`);
+        throw new RuntimeError(`Unsupported operator ${operator}`);
     }
   }
 
@@ -818,20 +818,20 @@ export class JbDictionary implements DictVal {
   binopBin(operator: string, rhs: JbBinary) {
     switch(operator) {
       case "+":
-        throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+        throw new RuntimeError("Transform Error: DE_TYPE_CONVERT_FAILED");
       case "-":
-        throw new Error(`Illegal operation, SUBTRACT with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, SUBTRACT with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
       case "*":
-        throw new Error(`Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
       case "/":
-        throw new Error(`Illegal operation, DIVISION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, DIVISION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
       case "^":
-        throw new Error(`Illegal operation, POW with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, POW with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
       case "<":
       case ">":
       case "<=":
       case ">=":
-        throw new Error(`compare (${operator}) with binary data`);
+        throw new RuntimeError(`compare (${operator}) with binary data`);
       case "==":
         // ref comparison, only true if compared with self
         return new JbBool(false);
@@ -844,7 +844,7 @@ export class JbDictionary implements DictVal {
       case "|":
         return new JbBool(false);
       default:
-        throw new Error(`Unsupported operator ${operator}`);
+        throw new RuntimeError(`Unsupported operator ${operator}`);
     }
   }
 
@@ -1183,15 +1183,15 @@ export class JbBool implements BooleanVal {
   binopDict(operator: string, rhs: JbDictionary) {
     switch(operator) {
       case "+":
-        throw new Error(`Illegal operation: ${this.type} Add ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation: ${this.type} Add ${rhs.type}`);
       case "-":
-        throw new Error(`Illegal operation, SUBTRACT with incompatible data types: ${this.type} - ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, SUBTRACT with incompatible data types: ${this.type} - ${rhs.type}`);
       case "*":
-        throw new Error(`Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} * ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} * ${rhs.type}`);
       case "/":
-        throw new Error(`Illegal operation, DIVISION with incompatible data types: ${this.type} / ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, DIVISION with incompatible data types: ${this.type} / ${rhs.type}`);
       case "^":
-        throw new Error(`Illegal operation, POW with incompatible data types: ${this.type} ^ ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, POW with incompatible data types: ${this.type} ^ ${rhs.type}`);
       case "<":
         // originally always false
         // POD: perhaps this should be changed
@@ -1212,7 +1212,7 @@ export class JbBool implements BooleanVal {
       case "|":
         return new JbBool(this.value);
       default:
-        throw new Error(`Unsupported operator ${operator}`);
+        throw new RuntimeError(`Unsupported operator ${operator}`);
     }
   }
 
@@ -1226,20 +1226,20 @@ export class JbBool implements BooleanVal {
   binopBin(operator: string, rhs: JbBinary) {
     switch(operator) {
       case "+":
-        throw new Error(`Illegal operation: ${this.type} Add ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation: ${this.type} Add ${rhs.type}`);
       case "-":
-        throw new Error(`Illegal operation, SUBTRACT with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, SUBTRACT with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
       case "*":
-        throw new Error(`Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
       case "/":
-        throw new Error(`Illegal operation, DIVISION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, DIVISION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
       case "^":
-        throw new Error(`Illegal operation, POW with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, POW with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
       case "<":
       case ">":
       case "<=":
       case ">=":
-        throw new Error(`compare (${operator}) with binary data`);
+        throw new RuntimeError(`compare (${operator}) with binary data`);
       case "==":
         return new JbBool(this.value === false);
       case "!=":
@@ -1251,7 +1251,7 @@ export class JbBool implements BooleanVal {
       case "|":
         return new JbBool(this.value);
       default:
-        throw new Error(`Unsupported operator ${operator}`);
+        throw new RuntimeError(`Unsupported operator ${operator}`);
     }
   }
 
@@ -1557,13 +1557,13 @@ export class JbNull implements NullVal {
       case "+":
       case "-":
       case "*":
-        throw new Error(`Transform Error: DE_TYPE_CONVERT_FAILED`);
+        throw new RuntimeError(`Transform Error: DE_TYPE_CONVERT_FAILED`);
       // POD: original error:
       // Illegal operation: division by 0.
       case "/":
-        throw new Error(`Illegal operation, DIVISION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, DIVISION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
       case "^":
-        throw new Error(`Illegal operation: ${this.type} POW ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation: ${this.type} POW ${rhs.type}`);
       case "<":
       case ">":
       case "<=":
@@ -1577,7 +1577,7 @@ export class JbNull implements NullVal {
       case "!=":
         return new JbBool(true);
       default:
-        throw new Error(`Unsupported operator ${operator}`);
+        throw new RuntimeError(`Unsupported operator ${operator}`);
     }
   }
 
@@ -1593,13 +1593,13 @@ export class JbNull implements NullVal {
       case "+":
         return rhs;
       case "-":
-        throw new Error(`Illegal operation, SUBTRACT with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, SUBTRACT with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
       case "*":
-        throw new Error(`Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
       case "/":
-        throw new Error(`Illegal operation, DIVISION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, DIVISION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
       case "^":
-        throw new Error(`Illegal operation, POW with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, POW with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
       case "<":
       case ">":
       case "<=":
@@ -1614,7 +1614,7 @@ export class JbNull implements NullVal {
       case "|":
         return new JbBool(false);
       default:
-        throw new Error(`Unsupported operator ${operator}`);
+        throw new RuntimeError(`Unsupported operator ${operator}`);
     }
   }
 
@@ -1968,11 +1968,11 @@ export class JbNumber implements NumberVal {
       case "-":
       case "*":
       case "^":
-        throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+        throw new RuntimeError("Transform Error: DE_TYPE_CONVERT_FAILED");
       // POD: original error:
       // Illegal operation: division by 0.
       case "/":
-        throw new Error(`Illegal operation, DIVISION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, DIVISION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
       case "<":
         // dictionary is implicitly converted to 0
         return new JbBool(this.value < 0);
@@ -2009,23 +2009,23 @@ export class JbNumber implements NumberVal {
   binopBin(operator: string, rhs: JbBinary) {
     switch(operator) {
       case "+":
-        throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+        throw new RuntimeError("Transform Error: DE_TYPE_CONVERT_FAILED");
       case "-":
-        throw new Error(`Illegal operation, SUBTRACT with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, SUBTRACT with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
       case "*":
-        throw new Error(`Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
       case "/":
-        throw new Error(`Illegal operation, DIVISION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, DIVISION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
       case "^":
-        throw new Error(`Illegal operation, POW with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, POW with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
       case "<":
       case ">":
       case "<=":
       case ">=":
-        throw new Error(`compare (${operator}) with binary data`);
+        throw new RuntimeError(`compare (${operator}) with binary data`);
       case "==":      
       case "!=":
-        throw new Error(`compare (${operator}) binary data with data of other type`);
+        throw new RuntimeError(`compare (${operator}) binary data with data of other type`);
       case "&&":
       case "&":
         return new JbBool(false);
@@ -2033,7 +2033,7 @@ export class JbNumber implements NumberVal {
       case "|":
         return new JbBool(this.toBool());
       default:
-        throw new Error(`Unsupported operator ${operator}`);
+        throw new RuntimeError(`Unsupported operator ${operator}`);
     }
   }
 
@@ -2454,15 +2454,15 @@ export class JbString implements StringVal {
   binopDict(operator: string, rhs: JbDictionary) {
     switch(operator) {
       case "+":
-        throw new Error(`Transform Error: DE_TYPE_CONVERT_FAILED`);
+        throw new RuntimeError(`Transform Error: DE_TYPE_CONVERT_FAILED`);
       case "-":
-        throw new Error(`Illegal operation, SUBTRACT with incompatible data types: ${this.type} - ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, SUBTRACT with incompatible data types: ${this.type} - ${rhs.type}`);
       case "*":
-        throw new Error(`Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} * ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} * ${rhs.type}`);
       case "/":
-        throw new Error(`Illegal operation, DIVISION with incompatible data types: ${this.type} / ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, DIVISION with incompatible data types: ${this.type} / ${rhs.type}`);
       case "^":
-        throw new Error(`Illegal operation, POW with incompatible data types: ${this.type} ^ ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, POW with incompatible data types: ${this.type} ^ ${rhs.type}`);
       case "<":
         // dictionary is implicitly converted to 0
         return new JbBool(this.toNumber() < 0);
@@ -2486,7 +2486,7 @@ export class JbString implements StringVal {
       case "|":
         return new JbBool(this.toBoolAsNumber());
       default:
-        throw new Error(`Unsupported operator ${operator}`);
+        throw new RuntimeError(`Unsupported operator ${operator}`);
     }
   }
 
@@ -2500,23 +2500,23 @@ export class JbString implements StringVal {
   binopBin(operator: string, rhs: JbBinary) {
     switch(operator) {
       case "+":
-        throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+        throw new RuntimeError("Transform Error: DE_TYPE_CONVERT_FAILED");
       case "-":
-        throw new Error(`Illegal operation, SUBTRACT with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, SUBTRACT with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
       case "*":
-        throw new Error(`Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, MULTIPLICATION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
       case "/":
-        throw new Error(`Illegal operation, DIVISION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, DIVISION with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
       case "^":
-        throw new Error(`Illegal operation, POW with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation, POW with incompatible data types: ${this.type} ${operator} ${rhs.type}`);
       case "<":
       case ">":
       case "<=":
       case ">=":
-        throw new Error(`compare (${operator}) with binary data`);
+        throw new RuntimeError(`compare (${operator}) with binary data`);
       case "==":
       case "!=":
-        throw new Error(`compare (${operator}) binary data with data of other type`);
+        throw new RuntimeError(`compare (${operator}) binary data with data of other type`);
       case "&&":
       case "&":
         return new JbBool(false);
@@ -2524,7 +2524,7 @@ export class JbString implements StringVal {
       case "|":
         return new JbBool(this.toBool());
       default:
-        throw new Error(`Unsupported operator ${operator}`);
+        throw new RuntimeError(`Unsupported operator ${operator}`);
     }
   }
 
@@ -2592,27 +2592,27 @@ export class JbBinary implements BinaryVal {
   }
 
   decrement(): never {
-    throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED\nThe problematic token is at the end of the following expression: --");
+    throw new RuntimeError("Transform Error: DE_TYPE_CONVERT_FAILED\nThe problematic token is at the end of the following expression: --");
   }
 
   increment(): never {
-    throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED\nThe problematic token is at the end of the following expression: ++");
+    throw new RuntimeError("Transform Error: DE_TYPE_CONVERT_FAILED\nThe problematic token is at the end of the following expression: ++");
   }
 
   negate(): never {
-    throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED\nThe problematic token is at the end of the following expression: !");
+    throw new RuntimeError("Transform Error: DE_TYPE_CONVERT_FAILED\nThe problematic token is at the end of the following expression: !");
   }
 
   negative(): never {
-    throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED\nThe problematic token is at the end of the following expression: -");
+    throw new RuntimeError("Transform Error: DE_TYPE_CONVERT_FAILED\nThe problematic token is at the end of the following expression: -");
   }
 
   toBool(): never {
-    throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+    throw new RuntimeError("Transform Error: DE_TYPE_CONVERT_FAILED");
   }
 
   toNumber(): never {
-    throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+    throw new RuntimeError("Transform Error: DE_TYPE_CONVERT_FAILED");
   }
 
   /**
@@ -2836,7 +2836,7 @@ export class JbBinary implements BinaryVal {
       case ">":
       case "<=":
       case ">=":
-        throw new Error(`compare (${operator}) with binary data`);
+        throw new RuntimeError(`compare (${operator}) with binary data`);
       case "==":
         return new JbBool(rhs.value === false);
       case "!=":
@@ -2876,10 +2876,10 @@ export class JbBinary implements BinaryVal {
       case ">":
       case "<=":
       case ">=":
-        throw new Error(`compare (${operator}) with binary data`);
+        throw new RuntimeError(`compare (${operator}) with binary data`);
       case "==":
       case "!=":
-        throw new Error(`compare (${operator}) binary data with data of other type`);
+        throw new RuntimeError(`compare (${operator}) binary data with data of other type`);
       case "&&":
       case "&":
         return new JbBool(false);
@@ -3003,7 +3003,7 @@ export class JbBinary implements BinaryVal {
       case ">":
       case "<=":
       case ">=":
-        throw new Error(`compare (${operator}) with binary data`);
+        throw new RuntimeError(`compare (${operator}) with binary data`);
       case "==":
         return new JbBool(false);
       case "!=":
@@ -3042,7 +3042,7 @@ export class JbBinary implements BinaryVal {
       case ">":
       case "<=":
       case ">=":
-        throw new Error(`compare (${operator}) with binary data`);
+        throw new RuntimeError(`compare (${operator}) with binary data`);
       case "==":
         // ref comparison, only true if compared with self
         return new JbBool(this === rhs);
@@ -3083,10 +3083,10 @@ export class JbBinary implements BinaryVal {
       case ">":
       case "<=":
       case ">=":
-        throw new Error(`compare (${operator}) with binary data`);
+        throw new RuntimeError(`compare (${operator}) with binary data`);
       case "==":
       case "!=":
-        throw new Error(`compare (${operator}) binary data with data of other type`);
+        throw new RuntimeError(`compare (${operator}) binary data with data of other type`);
       case "&&":
       case "&":
       case "||":
@@ -3129,21 +3129,21 @@ export class JbDate implements DateVal {
 
   decrement(): never {
     // org.apache.http.NoHttpResponseException: localhost:port failed to respond
-    throw new Error("Unary operator -- is unsupported for date objects.");
+    throw new RuntimeError("Unary operator -- is unsupported for date objects.");
   }
 
   increment(): never {
     // org.apache.http.NoHttpResponseException: localhost:port failed to respond
-    throw new Error("Unary operator ++ is unsupported for date objects.");
+    throw new RuntimeError("Unary operator ++ is unsupported for date objects.");
   }
 
   negate(): never {
-    throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED\nThe problematic token is at the end of the following expression: !");
+    throw new RuntimeError("Transform Error: DE_TYPE_CONVERT_FAILED\nThe problematic token is at the end of the following expression: !");
   }
 
   negative(): never {
     // org.apache.http.NoHttpResponseException: localhost:port failed to respond
-    throw new Error("Unary operator - is unsupported for date objects.");
+    throw new RuntimeError("Unary operator - is unsupported for date objects.");
   }
 
   toBool() {
@@ -3469,7 +3469,7 @@ export class JbDate implements DateVal {
   binopDict(operator: string, rhs: JbDictionary) {
     switch (operator) {
       case "+":
-        throw new Error(`Illegal operation: ${this.type} Add ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation: ${this.type} Add ${rhs.type}`);
       case "-":
         throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
       case "*":
@@ -3511,7 +3511,7 @@ export class JbDate implements DateVal {
   binopBin(operator: string, rhs: JbBinary) {
     switch (operator) {
       case "+":
-        throw new Error(`Illegal operation: ${this.type} Add ${rhs.type}`);
+        throw new RuntimeError(`Illegal operation: ${this.type} Add ${rhs.type}`);
       case "-":
         throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
       case "*":
@@ -3525,10 +3525,10 @@ export class JbDate implements DateVal {
       case "<=":
       case ">":
       case ">=":
-        throw new Error(`compare (${operator}) with binary data`);
+        throw new RuntimeError(`compare (${operator}) with binary data`);
       case "==":
       case "!=":
-        throw new Error(`compare (${operator}) binary data with data of other type`);
+        throw new RuntimeError(`compare (${operator}) binary data with data of other type`);
       case "&&":
       case "&":
       case "||":

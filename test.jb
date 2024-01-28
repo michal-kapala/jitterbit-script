@@ -1,8 +1,6 @@
 <trans>
-  // test for Sleep function
-  WriteToOperationLog("starting...");
-  result = Sleep(5);
-  WriteToOperationLog("end");
+  // test for Round function
+  result = Round(123.123456789, -7.7);
   DebugBreak();
   
 </trans>

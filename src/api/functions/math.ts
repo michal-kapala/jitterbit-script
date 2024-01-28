@@ -1,3 +1,4 @@
+import { RuntimeError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
@@ -116,9 +117,10 @@ export class Log extends Func {
     this.chooseSignature(args);
     // conversion
     const num = args[0].toNumber();
-    // TODO: the original behaviour for negative input to be checked
-    if(num <= 0)
-      throw new Error(`[${this.name}] non-positive input: ${num}`);
+    if(num < 0)
+      throw new RuntimeError(`The logarithm of a negative number (${num}) is undefined.`);
+    if(num === 0)
+      throw new RuntimeError(`The logarithm of 0 is undefined.`);
     return new JbNumber(Math.log(num));
   }
 
@@ -149,9 +151,10 @@ export class Log10 extends Func {
     this.chooseSignature(args);
     // conversion
     const num = args[0].toNumber();
-    // TODO: the original behaviour for negative input to be checked
-    if(num <= 0)
-      throw new Error(`[${this.name}] non-positive input: ${num}`);
+    if(num < 0)
+      throw new RuntimeError(`The logarithm of a negative number (${num}) is undefined.`);
+    if(num === 0)
+      throw new RuntimeError(`The logarithm of 0 is undefined.`);
     return new JbNumber(Math.log10(num));
   }
 
@@ -185,12 +188,15 @@ export class Mod extends Func {
   
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    // TODO: implicit conversions to be tested
-    const denominator = args[1].toNumber();
+    // TODO: typechecker errors
+    const numerator = Math.floor(args[0].toNumber());
+    const denominator = args[1].toNumber() < 0
+      ? Math.ceil(args[1].toNumber())
+      : Math.floor(args[1].toNumber());
 
     if(denominator === 0)
       return new JbNumber(args[0].toNumber());
-    return new JbNumber(args[0].toNumber() % denominator);
+    return new JbNumber(numerator % denominator);
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
@@ -267,11 +273,16 @@ export class Round extends Func {
     let num = args[0].toNumber();
     let numPlaces = (this.signature.params[1].defaultVal as JbNumber).value ?? 0;
 
-    // TODO: float conversion? negatives?
-    if(args.length === 2)
+    if(args.length === 2) {
+      // POD: the original implementation returns a format string for negative numPlaces
+      // e.g. Round(-13.123456789, -9.9) returns '%.0-9f'
+      if(args[1].toNumber() < 0)
+        throw new RuntimeError(`Cannot round a number to a negative number of digits.`);
+
       numPlaces = args[1].type !== "number"
-        ? Math.round(Math.abs(args[1].toNumber()))
-        : Math.round(Math.abs((args[1] as JbNumber).value));
+        ? Math.floor(Math.abs(args[1].toNumber()))
+        : Math.floor(Math.abs((args[1] as JbNumber).value));
+    }
 
     num *= 10 ** numPlaces;
     num = Math.round(num);
@@ -323,7 +334,7 @@ export class RoundToInt extends Func {
  * Returns the square root of a given value.
  * The argument should be a double and is first converted to a double if not.
  * 
- * Returns 0 for negative input.
+ * This implementation throws instead of returning `-nan` for negative input.
  */
 export class Sqrt extends Func {
   constructor() {
@@ -344,9 +355,9 @@ export class Sqrt extends Func {
     this.chooseSignature(args);
     // conversion
     const num = args[0].toNumber();
-    // TODO: the original behaviour for negative input to be checked
+    // POD: the original function returns '-nan' for negative input
     if(num < 0)
-      throw new Error(`[${this.name}] negative input: ${num}`);
+      throw new RuntimeError(`${this.name}(${num}) is not a real number.`);
     return new JbNumber(Math.sqrt(num));
   }
 
