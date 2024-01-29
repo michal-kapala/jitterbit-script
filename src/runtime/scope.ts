@@ -1,4 +1,5 @@
 import { Api } from "../api";
+import { RuntimeError, UnimplementedError } from "../errors";
 import { GlobalIdentifier } from "../frontend/ast";
 import { 
   JbArray,
@@ -41,9 +42,7 @@ export default class Scope {
               break;
             default:
               // This can happen only if you modify system vars types
-              console.error(`ScopeError: Unsupported system variable type for ${value.name}:`, value.dataType);
-              def = new JbNull();
-              break;
+              throw new UnimplementedError(`Unsupported system variable type for ${value.name}: ${value.dataType}`);
           }
           this.variables.set(value.name, def);
         }
@@ -71,7 +70,7 @@ export default class Scope {
     if(["-=", "+="].includes(operator) && oldValue === undefined) {
       // local variable
       if(!isGlobal) 
-        throw `Local variable '${varName}' hasn't been initialized`;
+        throw new RuntimeError(`Local variable '${varName}' hasn't been initialized`);
 
       // global variable
       switch(operator) {
@@ -87,7 +86,7 @@ export default class Scope {
             case "string":
             case "binary":
             case "date":
-              throw `Illegal operation, SUBTRACT with incompatible data types: unknown - ${value.type}`;
+              throw new RuntimeError(`Illegal operation, SUBTRACT with incompatible data types: unknown - ${value.type}`);
             case "array":
               // eval as null-initialized
               oldValue = new JbNull();
@@ -96,9 +95,9 @@ export default class Scope {
               this.getGlobal().variables.set(varName, value);
               return value;
             case "dictionary":
-              throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+              throw new RuntimeError("Transform Error: DE_TYPE_CONVERT_FAILED");
             default:
-              throw `Unsupported type: ${value.type}`;
+              throw new RuntimeError(`Unsupported type: ${value.type}`);
           }
         case "+=":
           switch(value.type) {
@@ -118,12 +117,12 @@ export default class Scope {
               this.getGlobal().variables.set(varName, value);
               return value;
             case "dictionary":
-              throw new Error("Transform Error: DE_TYPE_CONVERT_FAILED");
+              throw new RuntimeError("Transform Error: DE_TYPE_CONVERT_FAILED");
             default:
-              throw `Unsupported type: ${value.type}`;
+              throw new RuntimeError(`Unsupported type: ${value.type}`);
           }
         default:
-          throw `Unknown assignment operator ${operator}`;
+          throw new RuntimeError(`Unknown assignment operator ${operator}`);
       }
     }
 
@@ -173,7 +172,7 @@ export default class Scope {
       if(varname[0] === "$")
         return this;
       else
-        throw `Local variable '${varname}' hasn't been initialized`;
+        throw new RuntimeError(`Local variable '${varname}' hasn't been initialized`);
     }
 
     return this.parent.resolve(varname);
@@ -237,10 +236,10 @@ export default class Scope {
           case "string":
             return lhs.binopString(operator[0], rhs as JbString);
           default:
-            throw new Error(`Unsupported RHS runtime type: ${rhs.type}`);
+            throw new RuntimeError(`Unsupported RHS runtime type: ${rhs.type}`);
         }
       default:
-        throw `Unknown assignment operator ${operator}`;
+        throw new RuntimeError(`Unknown assignment operator ${operator}`);
     }
   }
 

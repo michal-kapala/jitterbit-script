@@ -25,7 +25,17 @@ import * as Text from "./api/functions/text";
 import * as XML from "./api/functions/xml";
 
 type SystemVariables = {
+  /**
+   * Strictly checked Jitterbit variables.
+   * 
+   * Naming: `$jitterbit.<modules>.<prop>`
+   */
   static: SystemVariable[];
+  /**
+   * Jitterbit variables with multiple valid endings.
+   * 
+   * Naming: `$jitterbit.<modules>.*`
+   */
   extendable: SystemVariable[];
 };
 
@@ -38,11 +48,6 @@ export class Api {
 
   static {
     Api.sysVars = {
-      /**
-       * Strictly checked Jitterbit variables.
-       * 
-       * Naming: `$jitterbit.<modules>.<prop>`
-       */
       static: [
         {
           name: "$jitterbit.api.request.body",
@@ -407,6 +412,14 @@ export class Api {
           description: "An array containing all the locators that will be processed. This variable is available after the source files have been fetched. It is available as long as it has not been overwritten by another operation in an operation chain."
         },
         {
+          name: "$jitterbit.source.sftp.ssh_key_id",
+          module: "source",
+          type: "Settings",
+          dataType: "String",
+          default: "",
+          description: "For configuring multiple SSH keys. By default, these are both empty, meaning the configuration in the [SSH] section of the jitterbit.conf configuration is used for all SFTP sources and targets with no password defined.\nThis allows the picking of different key sets when using public/private SSH key authentication for different SFTP sources."
+        },
+        {
           name: "$jitterbit.source.size",
           module: "source",
           type: "Informational",
@@ -700,6 +713,14 @@ export class Api {
           description: "Set the transfer time-out in seconds for HTTP target transfers. The default transfer time-out for HTTP is one hour (3,600 seconds). Set to zero to disable."
         },
         {
+          name: "$jitterbit.target.sftp.ssh_key_id",
+          module: "target",
+          type: "Settings",
+          dataType: "String",
+          default: "",
+          description: "For configuring multiple SSH keys. By default, these are both empty, meaning the configuration in the [SSH] section of the jitterbit.conf configuration is used for all SFTP sources and targets with no password defined.\nThis allows the picking of different key sets when using public/private SSH key authentication for different SFTP sources and targets."
+        },
+        {
           name: "$jitterbit.target.text.character_encoding",
           module: "target",
           type: "Settings",
@@ -908,12 +929,7 @@ export class Api {
           dataType: "Integer",
           description: "Set to true to change the behavior of the MD5 and SHA-256 functions to that prior to the 10.64 / 11.2 release. When set to true, the function output of binary files when used in a script upstream of the function call will be incorrect. Using this variable is not recommended."
         },
-      ] as SystemVariable [],
-      /**
-       * Jitterbit variables with multiple valid endings.
-       * 
-       * Naming: `$jitterbit.<modules>.*`
-       */
+      ] as SystemVariable[],
       extendable: [
         {
           name: "$jitterbit.api.request.body",
@@ -979,29 +995,13 @@ export class Api {
           description: "Set when handling a hosted web service call or an HTTP endpoint. HTTP request headers are not exposed, just the payload. This variable holds the value of the corresponding header.\nFor example, the variable jitterbit.networking.http.response.header.Content-Type would hold the MIME type of the body of the request."
         },
         {
-          name: "$jitterbit.source.sftp",
-          module: "source",
-          type: "Settings",
-          dataType: "String",
-          default: "",
-          description: "For configuring multiple SSH keys. By default, these are both empty, meaning the configuration in the [SSH] section of the jitterbit.conf configuration is used for all SFTP sources and targets with no password defined.\nThis allows the picking of different key sets when using public/private SSH key authentication for different SFTP sources."
-        },
-        {
           name: "$jitterbit.target.http.response.header",
           module: "target",
           type: "Settings",
           dataType: "String",
           description: "Set when handling a hosted web service post or an HTTP endpoint. HTTP response headers are not exposed, just the payload. When substituted by the name of an HTTP header for _HeaderName_, this variable holds the corresponding value.\nFor example, the variable $jitterbit.networking.http.response.header.Proxy-Authenticate would hold the value of the Proxy-Authenticate response-header."
         },
-        {
-          name: "$jitterbit.target.sftp",
-          module: "target",
-          type: "Informational",
-          dataType: "String",
-          default: "",
-          description: "For configuring multiple SSH keys. By default, these are both empty, meaning the configuration in the [SSH] section of the jitterbit.conf configuration is used for all SFTP sources and targets with no password defined.\nThis allows the picking of different key sets when using public/private SSH key authentication for different SFTP sources and targets."
-        },
-      ] as SystemVariable [],
+      ] as SystemVariable[],
     };
     Api.functions = [
       // cache
