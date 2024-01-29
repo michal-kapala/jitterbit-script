@@ -1,4 +1,4 @@
-import { UnimplementedError } from "../../errors";
+import { RuntimeError, UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbArray, JbBool, JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
@@ -27,8 +27,17 @@ export class CountSubString extends Func {
   
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    const matches = [...(args[0] as JbString).toString().matchAll(
-      new RegExp((args[1] as JbString).toString(), 'g')
+
+    // empty strings dont match, even on an empty string
+    const substr = args[1].toString();
+    if(substr === "")
+      return new JbNumber(0);
+
+    // POD: this implementation does not support overlapping matches
+    // e.g. CountSubString("aaaaaaa", "aa") will return 3, originally 6
+    const matches = [...args[0].toString().matchAll(
+      // escaping
+      new RegExp(substr.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&'), 'g')
     )];
     
     return new JbNumber(matches.length);
@@ -500,7 +509,7 @@ export class ParseURL extends Func {
         result.members.push(new JbString(decodeURIComponent(param[1])));
     }
     catch(e) {
-      console.error(`[${this.name}] URL parsing error: '${urlStr}'`);
+      throw new RuntimeError(`[${this.name}] URL parsing error: '${urlStr}'`);
     }
     return result;  
   }
@@ -696,9 +705,13 @@ export class Replace extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     // implicit conversions
+    const old = args[1].toString();
+    if(old === "")
+      return new JbString(args[0].toString());
+
     return new JbString(
       args[0].toString().replaceAll(
-        args[1].toString(),
+        old,
         args[2].toString()
       )
     );
@@ -780,7 +793,7 @@ export class RPad extends Func {
       return new JbString(str.substring(str.length - n, str.length));
 
     let result = str;
-    for(let i = str.length; i > n - str.length; i--)
+    for(let i = n; i > str.length; i--)
       result = result + " ";
     return new JbString(result);
   }
@@ -829,7 +842,7 @@ export class RPadChar extends Func {
       return new JbString(str);
 
     let result = str;
-    for(let i = str.length; i > n - str.length; i--)
+    for(let i = n; i > str.length; i--)
       result = result + char[0];
 
     return new JbString(result);
@@ -1329,7 +1342,7 @@ export class URLDecode extends Func {
       result = decodeURIComponent(url.searchParams.get(paramName.toLowerCase()) ?? "");
     }
     catch(e) {
-      console.error(`[${this.name}] URL parsing error: '${urlStr}'`);
+      throw new RuntimeError(`[${this.name}] URL parsing error: '${urlStr}'`);
     }
     return new JbString(result);
   }
