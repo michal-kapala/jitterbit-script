@@ -17,8 +17,7 @@ import {
   StringLiteral,
   UnaryExpr,
 } from "./ast";
-
-import { tokenize } from "./lexer";
+import Lexer from "./lexer";
 import { Position, Token, TokenType } from "./types";
 
 /**
@@ -110,7 +109,7 @@ export default class Parser {
     let curPos = new Position();
 
     try {
-      this.tokens = tokenize(sourceCode, curPos);
+      this.tokens = Lexer.tokenize(sourceCode, curPos);
     } catch(e) {
       console.error(`LexerError: ${e}`);
       return program;
