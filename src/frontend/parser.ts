@@ -97,24 +97,9 @@ export default class Parser {
     }
   }
 
-  /**
-   * Parses a Jitterbit script, returns an expression list.
-   * @param sourceCode 
-   * @returns 
-   */
-  public parse(sourceCode: string): Program {
-    const program = new Program()
-
+  private removeScopeTags(sourceCode: string) {
     // global current tokenizer position, starts at 1,1
     let curPos = new Position();
-
-    try {
-      this.tokens = Lexer.tokenize(sourceCode, curPos);
-    } catch(e) {
-      console.error(`LexerError: ${e}`);
-      return program;
-    }
-
     // find the evaluation scope - <trans>...</trans>
     let openIdx = null;
     let closeIdx = null;
@@ -139,8 +124,7 @@ export default class Parser {
       // 'The expression <expr> is missing closing tag </trans>'
       // curPos
       console.log("tokens:", JSON.stringify(this.tokens));
-      console.error(`ParserError: The expression is missing </trans> closing tag:\n${sourceCode}\n`);
-      return program;
+      throw new Error(`ParserError: The expression is missing </trans> closing tag:\n${sourceCode}\n`);
     }
     if(openIdx !== 0) {
       // Add warning:
@@ -174,6 +158,24 @@ export default class Parser {
     this.tokens.shift();
     this.tokens.pop();
     this.tokens.push(new Token("EndOfFile", TokenType.EOF, curPos, curPos));
+  }
+
+  /**
+   * Parses a Jitterbit script, returns an expression list.
+   * @param sourceCode 
+   * @returns 
+   */
+  public parse(sourceCode: string): Program {
+    const program = new Program()
+
+    try {
+      this.tokens = Lexer.tokenize(sourceCode);
+    } catch(e) {
+      console.error(`LexerError: ${e}`);
+      return program;
+    }
+
+    this.removeScopeTags(sourceCode);
 
     try {
       this.checkAdjacentLiterals();
@@ -236,6 +238,9 @@ export default class Parser {
       const block = new BlockExpr([expr]);
       while(this.at().type === TokenType.Semicolon) {
         this.consume();
+        // func(a;b;c;)
+        if(this.at().type === TokenType.CloseParen)
+          break;
         block.body.push(this.parse_expr());
       }
       return block;
@@ -545,7 +550,7 @@ export default class Parser {
           if(globalVarToken.value.substring(0, 11) === "$jitterbit.") {
             // Add a warning:
             // Global variable names should not begin with '$jitterbit.', it is a reserved namespace.
-            console.warn("ParserWarning: Global variable names should not begin with '$jitterbit.', it is a reserved namespace.");
+            console.warn(`ParserWarning: Global variable names should not begin with '$jitterbit.', it is a reserved namespace (${globalVarToken.value}).`);
           }
 
           return new GlobalIdentifier(globalVarToken.value, "global");
@@ -587,8 +592,8 @@ export default class Parser {
       case TokenType.CloseParen:
         // TODO: error handling to be unified
         // consume the token to prevent infinite loops
-        this.consume();
-        throw "Syntax error, misplaced operator \")\".";
+        const tkn = this.consume();
+        throw `Syntax error, misplaced operator \")\" (${tkn.begin.line}:${tkn.begin.character}).`;
 
       // string literals
       case TokenType.SingleQuoteString:

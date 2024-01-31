@@ -1,5 +1,8 @@
 import { Position, Token, TokenType } from "./types";
 
+/**
+ * Performs script tokenization.
+ */
 export default class Lexer {
   /**
    * Keywords supported by Jitterbit scripts.
@@ -146,8 +149,8 @@ export default class Lexer {
     tokens.push(new Token(
       value,
       type,
-      { line: curPos.line, character: curPos.character } as Position,
-      { line: curPos.line, character: curPos.character + value.length - 1 } as Position
+      new Position(curPos.line, curPos.character),
+      new Position(curPos.line, curPos.character + value.length - 1)
     ));
 
     for(let i = 0; i< value.length; i++) {
@@ -162,7 +165,8 @@ export default class Lexer {
    * @param curPos 
    * @returns 
    */
-  public static tokenize(sourceCode: string, curPos: Position): Token[] {
+  public static tokenize(sourceCode: string): Token[] {
+    const curPos = new Position();
     const tokens = new Array<Token>();
     const src = sourceCode.split("");
     // token marker
@@ -247,8 +251,8 @@ export default class Lexer {
           "<trans>",
           TokenType.OpenTransTag,
           // subtract 1 to indicate the position of the last character
-          { line: beginPos.line, character: beginPos.character } as Position,
-          { line: curPos.line, character: curPos.character - 1 } as Position
+          new Position(beginPos.line, beginPos.character),
+          new Position(curPos.line, curPos.character - 1)
         ));
         // only try to parse 1 trans tag opening
         // the subsequent ones will result in an operator expr error
@@ -274,8 +278,8 @@ export default class Lexer {
         tokens.push(new Token(
           "</trans>",
           TokenType.CloseTransTag,
-          { line: beginPos.line, character: beginPos.character } as Position,
-          { line: curPos.line, character: curPos.character - 1 } as Position
+          new Position(beginPos.line, beginPos.character),
+          new Position(curPos.line, curPos.character - 1)
         ));
         // only try to parse the first trans tag closing
         // the subsequent ones will be ignored
@@ -320,8 +324,8 @@ export default class Lexer {
         tokens.push(new Token(
           sqString,
           TokenType.SingleQuoteString,
-          { line: beginPos.line, character: beginPos.character } as Position,
-          { line: curPos.line, character: curPos.character - 1 } as Position
+          new Position(beginPos.line, beginPos.character),
+          new Position(curPos.line, curPos.character - 1)
         ));
       }
       else if(src[0] === "\"") {
@@ -355,56 +359,56 @@ export default class Lexer {
         tokens.push(new Token(
           dqString,
           TokenType.DoubleQuoteString,
-          { line: beginPos.line, character: beginPos.character } as Position,
-          { line: curPos.line, character: curPos.character - 1 } as Position
+          new Position(beginPos.line, beginPos.character),
+          new Position(curPos.line, curPos.character - 1)
         ));
       }
       else if (src[0] === "(") {
         tokens.push(new Token(
           src.shift() ?? src[0],
           TokenType.OpenParen,
-          { line: curPos.line, character: curPos.character } as Position,
-          { line: curPos.line, character: curPos.character } as Position
+          new Position(curPos.line, curPos.character),
+          new Position(curPos.line, curPos.character)
         ));
         curPos.advance();
       } else if (src[0] === ")") {
         tokens.push(new Token(
           src.shift() ?? src[0],
           TokenType.CloseParen,
-          { line: curPos.line, character: curPos.character } as Position,
-          { line: curPos.line, character: curPos.character } as Position
+          new Position(curPos.line, curPos.character),
+          new Position(curPos.line, curPos.character)
         ));
         curPos.advance();
       } else if (src[0] === "{") {
         tokens.push(new Token(
           src.shift() ?? src[0],
           TokenType.OpenBrace,
-          { line: curPos.line, character: curPos.character } as Position,
-          { line: curPos.line, character: curPos.character } as Position
+          new Position(curPos.line, curPos.character),
+          new Position(curPos.line, curPos.character)
         ));
         curPos.advance();
       } else if (src[0] === "}") {
         tokens.push(new Token(
           src.shift() ?? src[0],
           TokenType.CloseBrace,
-          { line: curPos.line, character: curPos.character } as Position,
-          { line: curPos.line, character: curPos.character } as Position
+          new Position(curPos.line, curPos.character),
+          new Position(curPos.line, curPos.character)
         ));
         curPos.advance();
       } else if (src[0] === "[") {
         tokens.push(new Token(
           src.shift() ?? src[0],
           TokenType.OpenBracket,
-          { line: curPos.line, character: curPos.character } as Position,
-          { line: curPos.line, character: curPos.character } as Position
+          new Position(curPos.line, curPos.character),
+          new Position(curPos.line, curPos.character)
         ));
         curPos.advance();
       } else if (src[0] === "]") {
         tokens.push(new Token(
           src.shift() ?? src[0],
           TokenType.CloseBracket,
-          { line: curPos.line, character: curPos.character } as Position,
-          { line: curPos.line, character: curPos.character } as Position
+          new Position(curPos.line, curPos.character),
+          new Position(curPos.line, curPos.character)
         ));
         curPos.advance();
       }
@@ -526,8 +530,8 @@ export default class Lexer {
         tokens.push(new Token(
           globalVar,
           TokenType.GlobalIdentifier,
-          { line: beginPos.line, character: beginPos.character } as Position,
-          { line: curPos.line, character: curPos.character - 1 } as Position
+          new Position(beginPos.line, beginPos.character),
+          new Position(curPos.line, curPos.character - 1)
         ));
       }
       else {
@@ -550,8 +554,8 @@ export default class Lexer {
             tokens.push(new Token(
               num,
               TokenType.UnknownToken,
-              { line: beginPos.line, character: beginPos.character } as Position,
-              { line: curPos.line, character: curPos.character - 1 } as Position
+              new Position(beginPos.line, beginPos.character),
+              new Position(curPos.line, curPos.character - 1)
             ));
           }
           // push the integer
@@ -559,8 +563,8 @@ export default class Lexer {
             tokens.push(new Token(
               num,
               TokenType.Integer,
-              { line: beginPos.line, character: beginPos.character } as Position,
-              { line: curPos.line, character: curPos.character - 1 } as Position
+              new Position(beginPos.line, beginPos.character),
+              new Position(curPos.line, curPos.character - 1)
             ));
           // read the floating point part
           else if(src[0] === "."){
@@ -586,16 +590,16 @@ export default class Lexer {
                 tokens.push(new Token(
                   num,
                   TokenType.UnknownToken,
-                  { line: beginPos.line, character: beginPos.character } as Position,
-                  { line: curPos.line, character: curPos.character - 1 } as Position
+                  new Position(beginPos.line, beginPos.character),
+                  new Position(curPos.line, curPos.character - 1)
                 ));
               }
               else
                 tokens.push(new Token(
                   num,
                   TokenType.Float,
-                  { line: beginPos.line, character: beginPos.character } as Position,
-                  { line: curPos.line, character: curPos.character - 1 } as Position
+                  new Position(beginPos.line, beginPos.character),
+                  new Position(curPos.line, curPos.character - 1)
                 ));
             }
             // other known/defined token character found after <integer part>.
@@ -604,8 +608,8 @@ export default class Lexer {
               tokens.push(new Token(
                 num,
                 TokenType.Float,
-                { line: beginPos.line, character: beginPos.character } as Position,
-                { line: curPos.line, character: curPos.character - 1 } as Position
+                new Position(beginPos.line, beginPos.character),
+                new Position(curPos.line, curPos.character - 1)
               ));
           }        
         } // identifiers/keywords
@@ -628,16 +632,16 @@ export default class Lexer {
             tokens.push(new Token(
               ident,
               reserved,
-              { line: beginPos.line, character: beginPos.character } as Position,
-              { line: curPos.line, character: curPos.character - 1 } as Position
+              new Position(beginPos.line, beginPos.character),
+              new Position(curPos.line, curPos.character - 1)
             ));
           } else {
             // identifiers
             tokens.push(new Token(
               ident,
               TokenType.Identifier,
-              { line: beginPos.line, character: beginPos.character } as Position,
-              { line: curPos.line, character: curPos.character - 1 } as Position
+              new Position(beginPos.line, beginPos.character),
+              new Position(curPos.line, curPos.character - 1)
             ));
           }
         } else if (Lexer.isSkippable(src[0])) {
@@ -660,8 +664,8 @@ export default class Lexer {
             tokens.push(new Token(
               "UnexpectedEndOfFile",
               TokenType.EOF,
-              { line: beginPos.line, character: beginPos.character } as Position,
-              { line: curPos.line, character: curPos.character - 1 } as Position
+              new Position(beginPos.line, beginPos.character),
+              new Position(curPos.line, curPos.character - 1)
             ));
             return tokens;
           }
