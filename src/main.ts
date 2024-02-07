@@ -13,10 +13,9 @@ async function run(filename: string) {
     if (err)
       return console.error(err);
     
-    const program = parser.parse(data);
-    let result;
     try {
-      result = await evaluate(program, globalScope);
+      const program = parser.parse(data);
+      let result = await evaluate(program, globalScope);
       console.log("\nScript result:\n", result);
     } catch(e) {
       console.error(e);

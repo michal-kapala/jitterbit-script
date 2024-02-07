@@ -1,5 +1,6 @@
 
 import { Api } from "../api";
+import { ParserError } from "../errors";
 import {
   ArrayLiteral,
   AssignmentExpr,
@@ -93,7 +94,7 @@ export default class Parser {
         (this.tokens[curIdx].type === TokenType.CloseParen &&
           this.tokens[curIdx+1].type === TokenType.OpenParen)
       )
-        throw `Missing operator between two operands: ${this.tokens[curIdx].value} and ${this.tokens[curIdx+1].value}`;
+        throw new ParserError(`Missing operator between two operands: '${this.tokens[curIdx].value}' and '${this.tokens[curIdx+1].value}'`);
     }
   }
 
@@ -124,7 +125,7 @@ export default class Parser {
       // 'The expression <expr> is missing closing tag </trans>'
       // curPos
       console.log("tokens:", JSON.stringify(this.tokens));
-      throw new Error(`ParserError: The expression is missing </trans> closing tag:\n${sourceCode}\n`);
+      throw new ParserError(`The expression is missing </trans> closing tag:\n${sourceCode}\n`);
     }
     if(openIdx !== 0) {
       // Add warning:
@@ -176,27 +177,20 @@ export default class Parser {
     }
 
     this.removeScopeTags(sourceCode);
+    this.checkAdjacentLiterals();
+    // Parse until end of file
+    while (this.not_eof()) {
+      program.body.push(this.parse_stmt());
 
-    try {
-      this.checkAdjacentLiterals();
-      // Parse until end of file
-      while (this.not_eof()) {
-        program.body.push(this.parse_stmt());
-  
-        // top-level statement/expression semicolon
-        // the last expression can have the semicolon dropped
-        if(this.not_eof()) {
-          this.expect(
-            TokenType.Semicolon,
-            "Expected semicolon before:"
-          );
-        }
+      // top-level statement/expression semicolon
+      // the last expression can have the semicolon dropped
+      if(this.not_eof()) {
+        this.expect(
+          TokenType.Semicolon,
+          "Expected semicolon before:"
+        );
       }
-    } catch(e) {
-      console.error(`ParserError: ${e}`);
-      return program;
     }
-    
     return program;
   }
 
@@ -448,24 +442,25 @@ export default class Parser {
 
     // prevents 3(), ()() etc.
     if(caller.kind !== "Identifier")
-      throw `Invalid call expression, the caller is not a function identifier`;
+      throw new ParserError(`Invalid call expression, the caller is not a function identifier`);
 
     const funcName = (caller as Identifier).symbol;
 
     // non-existent function name
     const func = Api.getFunc(funcName)
     if(func === undefined)
-      throw `Function '${funcName}' does not exist, refer to Jitterbit function API docs`;
+      throw new ParserError(`Function '${funcName}' does not exist, refer to Jitterbit function API docs`);
 
     let call_expr: Expr = new CallExpr(this.parse_args(), caller as Identifier);
 
     // invalid number of arguments
+    // TODO: should not throw or be moved to typechecker
     if(
       (call_expr as CallExpr).args.length < func.minArgs ||
       (call_expr as CallExpr).args.length > func.maxArgs
     )
-      throw `Wrong number of arguments for the function ${func.name}, should be `
-      + `${func.minArgs === func.maxArgs ? func.minArgs : `${func.minArgs}-${func.maxArgs}`}`;
+      throw new ParserError(`Wrong number of arguments for the function ${func.name}, should be `
+      + `${func.minArgs === func.maxArgs ? func.minArgs : `${func.minArgs}-${func.maxArgs}`}`);
 
     return call_expr;
   }
@@ -578,7 +573,7 @@ export default class Parser {
           this.tokens[0].type === TokenType.OpenParen &&
           this.tokens[1].type === TokenType.CloseParen
         )
-          throw "ParserError: Nothing between parentheses";
+          throw new ParserError("Nothing between parentheses");
         
         this.consume();
         const value = this.parse_expr();
@@ -593,7 +588,7 @@ export default class Parser {
         // TODO: error handling to be unified
         // consume the token to prevent infinite loops
         const tkn = this.consume();
-        throw `Syntax error, misplaced operator \")\" (${tkn.begin.line}:${tkn.begin.character}).`;
+        throw new ParserError(`Syntax error, misplaced operator \")\" (${tkn.begin.line}:${tkn.begin.character}).`);
 
       // string literals
       case TokenType.SingleQuoteString:
@@ -605,7 +600,7 @@ export default class Parser {
         // TODO: add an error/error detail for every other token type here
         // consume the token to prevent infinite loops
         this.consume();
-        throw `Unexpected token found during parsing: ${tk.value}`;
+        throw new ParserError(`Unexpected token found during parsing: ${tk.value}`);
     }
   }
 }
