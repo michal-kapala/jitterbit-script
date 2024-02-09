@@ -1,7 +1,7 @@
 import { evaluate } from "../runtime/interpreter";
 import Scope from "../runtime/scope";
 import { RuntimeVal } from "../runtime/values";
-import { Token } from "./types";
+import { Position, Token } from "./types";
 import { Api } from "../api";
 import {
   JbArray,
@@ -83,10 +83,14 @@ export class Program implements Stmt {
 export class BlockExpr implements Expr {
   kind: "BlockExpr";
   body: Expr[];
+  start: Position;
+  end: Position;
 
   constructor(body: Expr[] = []) {
     this.kind = "BlockExpr";
     this.body = body;
+    this.start = body[0].start;
+    this.end = body[body.length-1].end;
   }
 
   async eval(scope: Scope) {
@@ -100,12 +104,15 @@ export class BlockExpr implements Expr {
 /**
  * Expressions return a runtime value.
  * */
-export interface Expr extends Stmt {
+export abstract class Expr implements Stmt {
+  kind!: NodeType;
+  start!: Position;
+  end!: Position;
   /**
    * Evaluates the expression at runtime.
    * @param scope 
    */
-  eval(scope: Scope): Promise<RuntimeVal>;
+  abstract eval(scope: Scope): Promise<RuntimeVal>;
 }
 
 /**
@@ -116,12 +123,16 @@ export class AssignmentExpr implements Expr {
   assignee: Expr;
   value: Expr;
   operator: Token;
+  start: Position;
+  end: Position;
 
   constructor(assignee: Expr, value: Expr, operator: Token) {
     this.kind = "AssignmentExpr";
     this.assignee = assignee;
     this.value = value;
     this.operator = operator;
+    this.start = assignee.start;
+    this.end = value.end;
   }
 
   async eval(scope: Scope) {
@@ -151,12 +162,16 @@ export class BinaryExpr implements Expr {
    * One of `TokenType.BinaryOperator`s.
    */
   operator: string;
+  start: Position;
+  end: Position;
 
   constructor(left: Expr, right: Expr, operator: string) {
     this.kind = "BinaryExpr";
     this.left = left;
     this.right = right;
     this.operator = operator;
+    this.start = left.start;
+    this.end = right.end;
   }
 
   async eval(scope: Scope) {
@@ -417,11 +432,15 @@ export class CallExpr implements Expr {
   kind: "CallExpr";
   args: Expr[];
   caller: Identifier;
+  start: Position;
+  end: Position;
 
-  constructor(args: Expr[], caller: Identifier) {
+  constructor(args: Expr[], caller: Identifier, end: Position) {
     this.kind = "CallExpr";
     this.args = args;
     this.caller = caller;
+    this.start = caller.start;
+    this.end = end;
   }
 
   async eval(scope: Scope) {
@@ -486,12 +505,16 @@ export class MemberExpr implements Expr {
   object: Expr;
   key: Expr;
   computed: boolean;
+  start: Position;
+  end: Position;
 
-  constructor(object: Expr, key: Expr, computed = true) {
+  constructor(object: Expr, key: Expr, end: Position, computed = true) {
     this.kind = "MemberExpr";
     this.object = object;
     this.key = key;
     this.computed = computed;
+    this.start = object.start;
+    this.end = end;
   }
 
   async eval(scope: Scope) {
@@ -590,10 +613,14 @@ export class MemberExpr implements Expr {
 export class Identifier implements Expr {
   kind: "Identifier" | "GlobalIdentifier";
   symbol: string;
+  start: Position;
+  end: Position;
 
-  constructor(s: string) {
+  constructor(token: Token) {
     this.kind = "Identifier";
-    this.symbol = s;
+    this.symbol = token.value;
+    this.start = token.begin;
+    this.end = token.end;
   }
 
   async eval(scope: Scope) {
@@ -610,8 +637,8 @@ export class GlobalIdentifier extends Identifier {
   // project variables are currently unsupported as they require project-scoped knowledge
   type: "global" | "project" | "system";
 
-  constructor(s: string, type: "global" | "project" | "system") {
-    super(s);
+  constructor(token: Token, type: "global" | "project" | "system") {
+    super(token);
     this.kind = "GlobalIdentifier";
     this.type = type;
   }
@@ -623,10 +650,14 @@ export class GlobalIdentifier extends Identifier {
 export class NumericLiteral implements Expr {
   kind: "NumericLiteral";
   value: number;
+  start: Position;
+  end: Position;
 
-  constructor(n = 0) {
+  constructor(token: Token) {
     this.kind = "NumericLiteral";
-    this.value = n;
+    this.value = parseFloat(token.value);
+    this.start = token.begin;
+    this.end = token.end
   }
 
   async eval(scope: Scope) {
@@ -650,10 +681,14 @@ export interface FloatLiteral extends NumericLiteral {}
 export class ArrayLiteral implements Expr {
   kind: "ArrayLiteral";
   members: Expr[];
+  start: Position;
+  end: Position;
 
-  constructor(m: Expr[] = []) {
+  constructor(m: Expr[] = [], start: Position, end: Position) {
     this.kind = "ArrayLiteral";
     this.members = m;
+    this.start = start;
+    this.end = end;
   }
 
   async eval(scope: Scope) {
@@ -671,10 +706,14 @@ export class ArrayLiteral implements Expr {
 export class StringLiteral implements Expr {
   kind: "StringLiteral";
   value: string;
+  start: Position;
+  end: Position;
 
-  constructor(str = "") {
+  constructor(token: Token) {
     this.kind = "StringLiteral";
-    this.value = str;
+    this.value = token.value;
+    this.start = token.begin;
+    this.end = token.end;
   }
 
   async eval(scope: Scope) {
@@ -688,10 +727,14 @@ export class StringLiteral implements Expr {
 export class BooleanLiteral implements Expr { 
   kind: "BooleanLiteral";
   value: boolean;
+  start: Position;
+  end: Position;
 
-  constructor(value: boolean) {
+  constructor(value: boolean, token: Token) {
     this.kind = "BooleanLiteral";
     this.value = value;
+    this.start = token.begin;
+    this.end = token.end;
   }
 
   async eval(scope: Scope) {
@@ -705,19 +748,29 @@ export class BooleanLiteral implements Expr {
 export class UnaryExpr implements Expr {
   kind: "UnaryExpr";
   value: Expr;
-  operator: string;
+  operator: Token;
   lhs: boolean;
+  start: Position;
+  end: Position;
 
-  constructor(value: Expr, operator: string, lhs: boolean) {
+  constructor(value: Expr, operator: Token, lhs: boolean) {
     this.kind = "UnaryExpr";
     this.value = value;
     this.operator = operator;
     this.lhs = lhs;
+    if(lhs) {
+      this.start = operator.begin;
+      this.end = value.end;
+    } else {
+      this.start = value.start;
+      this.end = operator.end;
+    }
+    
   }
 
   async eval(scope: Scope) {
     const operand = await evaluate(this.value, scope);
-    switch(this.operator) {
+    switch(this.operator.value) {
       case "!":
         if(this.lhs)
           return operand.negate();

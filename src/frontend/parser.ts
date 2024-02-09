@@ -237,6 +237,8 @@ export default class Parser {
           break;
         block.body.push(this.parse_expr());
       }
+      // update end position
+      block.end = block.body[block.body.length - 1].end;
       return block;
     }
     else return expr;
@@ -334,7 +336,7 @@ export default class Parser {
     // LHS unary operator expr
     // for some reason Jitterbit dont parse this with other unary expressions
     if(this.at().type === TokenType.UnaryOperator && this.at().value === "!") {
-      let operator = this.consume().value;
+      let operator = this.consume();
       return new UnaryExpr(this.parse_assignment_expr(), operator, true);
     } else {
       return this.parse_power_expr();
@@ -368,7 +370,7 @@ export default class Parser {
       this.at().type === TokenType.UnaryOperator ||
       this.at().type === TokenType.Minus
     ) {
-      const operator = this.consume().value;
+      const operator = this.consume();
       return new UnaryExpr(this.parse_member_expr(), operator, true);
     } else {
       // RHS operators (post-)
@@ -378,7 +380,7 @@ export default class Parser {
         this.at().type === TokenType.UnaryOperator &&
         (this.at().value === "++" || this.at().value === "--")
       ) {
-        const operator = this.consume().value;
+        const operator = this.consume();
         left = new UnaryExpr(left, operator, false);
       }
       
@@ -397,11 +399,11 @@ export default class Parser {
       this.consume();
       // this allows obj[computedValue]
       let key = this.parse_expr();
-      this.expect(
+      const rBracket = this.expect(
         TokenType.CloseBracket,
         "Missing closing bracket in computed value.",
       );
-      expr = new MemberExpr(expr, key, true);
+      expr = new MemberExpr(expr, key, rBracket.end, true);
     }
     return expr;
   }
@@ -415,18 +417,17 @@ export default class Parser {
       return this.parse_call_expr();
     }
     // {
-    this.consume();
+    const lBrace = this.consume();
     // empty array
     if(this.at().type === TokenType.CloseBrace) {
-      this.consume();
-      return new ArrayLiteral();
+      return new ArrayLiteral([], lBrace.begin, this.consume().end);
     }
     const members = this.parse_arguments_list();
-    this.expect(
+    const rBrace = this.expect(
       TokenType.CloseBrace,
       "Array literal missing closing brace."
     );
-    return new ArrayLiteral(members);
+    return new ArrayLiteral(members, lBrace.begin, rBrace.end);
   }
 
   /**
@@ -451,7 +452,12 @@ export default class Parser {
     if(func === undefined)
       throw new ParserError(`Function '${funcName}' does not exist, refer to Jitterbit function API docs`);
 
-    let call_expr: Expr = new CallExpr(this.parse_args(), caller as Identifier);
+    const args = this.parse_args();
+    const rParen = this.expect(
+      TokenType.CloseParen,
+      "Missing closing parenthesis inside arguments list",
+    );
+    let call_expr: Expr = new CallExpr(args, caller as Identifier, rParen.end);
 
     // invalid number of arguments
     // TODO: should not throw or be moved to typechecker
@@ -471,14 +477,10 @@ export default class Parser {
    */
   private parse_args(): Expr[] {
     this.expect(TokenType.OpenParen, "Expected open parenthesis");
-    const args = this.at().type == TokenType.CloseParen
+    const args = this.at().type === TokenType.CloseParen
       ? []
       : this.parse_arguments_list();
 
-    this.expect(
-      TokenType.CloseParen,
-      "Missing closing parenthesis inside arguments list",
-    );
     return args;
   }
 
@@ -489,7 +491,7 @@ export default class Parser {
   private parse_arguments_list(): Expr[] {
     const args = [this.parse_block_expr()];
 
-    while (this.at().type == TokenType.Comma && this.consume()) {
+    while (this.at().type === TokenType.Comma && this.consume()) {
       args.push(this.parse_block_expr());
     }
 
@@ -522,7 +524,7 @@ export default class Parser {
     switch (tk.type) {
       // User-defined local variables
       case TokenType.Identifier:
-        return new Identifier(this.consume().value)
+        return new Identifier(this.consume());
 
       case TokenType.GlobalIdentifier:
         // consume the token
@@ -540,7 +542,7 @@ export default class Parser {
         // check if system variable
         let sysVar = Api.getSysVar(globalVarToken.value);
         if(sysVar !== undefined)
-          return new GlobalIdentifier(globalVarToken.value, "system");
+          return new GlobalIdentifier(globalVarToken, "system");
         else {
           if(globalVarToken.value.substring(0, 11) === "$jitterbit.") {
             // Add a warning:
@@ -548,23 +550,21 @@ export default class Parser {
             console.warn(`ParserWarning: Global variable names should not begin with '$jitterbit.', it is a reserved namespace (${globalVarToken.value}).`);
           }
 
-          return new GlobalIdentifier(globalVarToken.value, "global");
+          return new GlobalIdentifier(globalVarToken, "global");
         }
 
       // Constants and Numeric Constants
       case TokenType.Integer:
-        return new NumericLiteral(parseInt(this.consume().value));
-      
       case TokenType.Float:
-        return new NumericLiteral(parseFloat(this.consume().value));
+        return new NumericLiteral(this.consume());
 
       case TokenType.True:
-        this.consume();
-        return new BooleanLiteral(true);
+        const trueToken = this.consume();
+        return new BooleanLiteral(true, trueToken);
 
       case TokenType.False:
-        this.consume();
-        return new BooleanLiteral(false);
+        const falseToken = this.consume();
+        return new BooleanLiteral(false, falseToken);
 
       // Grouping Expressions
       case TokenType.OpenParen: {
@@ -593,7 +593,7 @@ export default class Parser {
       // string literals
       case TokenType.SingleQuoteString:
       case TokenType.DoubleQuoteString:
-        return new StringLiteral(this.consume().value);
+        return new StringLiteral(this.consume());
 
       default:
         // TODO: error message to be unified

@@ -65,13 +65,20 @@ describe('General functions', function() {
     expect(func).toBeDefined();
     expect(func?.signature).toBeDefined();
     // 3 ^ Null() - throws
+    const pos = new Position();
     const expToEvaluate = new BinaryExpr(
-      new NumericLiteral(3),
-      new CallExpr([], new Identifier("Null")),
+      new NumericLiteral(new Token("3", TokenType.Integer, pos, pos)),
+      new CallExpr(
+        [],
+        new Identifier(new Token("Null", TokenType.Identifier, pos, pos)),
+        pos
+      ),
       "^"
     );
     // "whoopsie"
-    const defaultResult = new StringLiteral("whoopsie");
+    const defaultResult = new StringLiteral(
+      new Token("whoopsie", TokenType.DoubleQuoteString, pos, pos)
+    );
     await expect(
       (func as DeferrableFunc)?.callEval([expToEvaluate, defaultResult], new Scope())
     ).resolves.toStrictEqual(new JbString("whoopsie"));
@@ -192,8 +199,9 @@ describe('General functions', function() {
     const func = Api.getFunc("IfEmpty");
     expect(func).toBeDefined();
     expect(func?.signature).toBeDefined();
-    const arg = new StringLiteral();
-    const defaultResult = new StringLiteral("got u");
+    const pos = new Position();
+    const arg = new StringLiteral(new Token("", TokenType.DoubleQuoteString, pos, pos));
+    const defaultResult = new StringLiteral(new Token("got u", TokenType.DoubleQuoteString, pos, pos));
     await expect(
       (func as DeferrableFunc)?.callEval([arg, defaultResult], new Scope())
     ).resolves.toStrictEqual(new JbString("got u"));
@@ -203,8 +211,15 @@ describe('General functions', function() {
     const func = Api.getFunc("IfNull");
     expect(func).toBeDefined();
     expect(func?.signature).toBeDefined();
-    const arg = new CallExpr([], new Identifier("Null"));
-    const defaultResult = new StringLiteral("got u");
+    const pos = new Position();
+    const arg = new CallExpr(
+      [],
+      new Identifier(new Token("Null", TokenType.Identifier, pos, pos)),
+      pos
+    );
+    const defaultResult = new StringLiteral(
+      new Token("got u", TokenType.DoubleQuoteString, pos, pos)
+    );
     await expect(
       (func as DeferrableFunc)?.callEval([arg, defaultResult], new Scope())
     ).resolves.toStrictEqual(new JbString("got u"));
@@ -287,8 +302,18 @@ describe('General functions', function() {
       const func = Api.getFunc("IsValid");
       expect(func).toBeDefined();
       expect(func?.signature).toBeDefined();
+      const pos = new Position();
       expect(
-        (func as DeferrableFunc)?.callEval([new CallExpr([], new Identifier("Null"))], new Scope())
+        (func as DeferrableFunc)?.callEval(
+          [
+            new CallExpr(
+              [],
+              new Identifier(new Token("Null", TokenType.Identifier, pos, pos)),
+              pos
+            )
+          ],
+          new Scope()
+        )
       ).resolves.toStrictEqual(new JbBool(true));
     });
 
@@ -299,13 +324,18 @@ describe('General functions', function() {
       const scope = new Scope();
       scope.assignVar("str", new JbString("whatever"));
       // str += " works"; 3 ^ ""
+      const pos = new Position();
       const expr = new BlockExpr([
         new AssignmentExpr(
-          new Identifier("str"),
-          new StringLiteral(" works"),
-          new Token("+=", TokenType.Assignment, new Position(), new Position())
+          new Identifier(new Token("str", TokenType.DoubleQuoteString, pos, pos)),
+          new StringLiteral(new Token(" works", TokenType.DoubleQuoteString, pos, pos)),
+          new Token("+=", TokenType.Assignment, pos, pos)
         ),
-        new BinaryExpr(new NumericLiteral(3), new StringLiteral(), "^")
+        new BinaryExpr(
+          new NumericLiteral(new Token("3", TokenType.Integer, pos, pos)),
+          new StringLiteral(new Token("", TokenType.DoubleQuoteString, pos, pos)),
+          "^"
+        )
       ]);
       await expect(
         (func as DeferrableFunc)?.callEval([expr], scope)

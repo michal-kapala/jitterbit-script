@@ -1,6 +1,7 @@
 import { Api } from "../../src/api";
 import { UnimplementedError } from "../../src/errors";
 import { GlobalIdentifier } from "../../src/frontend/ast";
+import { Position, Token, TokenType } from "../../src/frontend/types";
 import { evaluate } from "../../src/runtime/interpreter";
 import Scope from "../../src/runtime/scope";
 import { JbBool, JbNull, JbNumber, JbString } from "../../src/runtime/types";
@@ -9,10 +10,15 @@ const scope = new Scope();
 const jbNull = new JbNull();
 const jbTrue = new JbBool(true);
 const jbFalse = new JbBool(false);
+const pos = new Position();
 
 describe('System variable initialization', function() {
   test.each(Api.sysVars.static)('Static system variables', async function(sysVar) {
-    const value = await evaluate(new GlobalIdentifier(sysVar.name, "system"), scope);
+    const id = new GlobalIdentifier(
+      new Token(sysVar.name, TokenType.GlobalIdentifier, pos, pos),
+      "system"
+    );
+    const value = await evaluate(id, scope);
     if(sysVar.default !== undefined) {
       switch(sysVar.dataType) {
         case "Array":
@@ -35,7 +41,11 @@ describe('System variable initialization', function() {
   });
 
   test.each(Api.sysVars.extendable)('Extendable system variables', async function(sysVar) {
-    const value = await evaluate(new GlobalIdentifier(sysVar.name + ".userValue", "system"), scope);
+    const id = new GlobalIdentifier(
+      new Token(sysVar.name + ".userValue", TokenType.GlobalIdentifier, pos, pos),
+      "system"
+    );
+    const value = await evaluate(id, scope);
     expect(sysVar.default).toBeUndefined();
     expect(value).toStrictEqual(jbNull);
   });

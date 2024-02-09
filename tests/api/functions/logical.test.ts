@@ -43,40 +43,41 @@ describe('Logical functions', function() {
       //      $result = "branch 3";
       //      3;
       //  );
+      const pos = new Position();
       const cond1 = new BinaryExpr(
-        new BooleanLiteral(true),
-        new BooleanLiteral(false),
+        new BooleanLiteral(true, new Token("true", TokenType.True, pos, pos)),
+        new BooleanLiteral(false, new Token("false", TokenType.False, pos, pos)),
         "&"
       );
       const branch1 = new BlockExpr([
         new AssignmentExpr(
-          new Identifier("$result"),
-          new StringLiteral("branch 1"),
-          new Token("=", TokenType.Assignment, new Position(), new Position())
+          new Identifier(new Token("$result", TokenType.GlobalIdentifier, pos, pos)),
+          new StringLiteral(new Token("branch 1", TokenType.DoubleQuoteString, pos, pos)),
+          new Token("=", TokenType.Assignment, pos, pos)
         ),
-        new NumericLiteral(1)
+        new NumericLiteral(new Token("1", TokenType.Integer, pos, pos))
       ]);
       const cond2 = new BinaryExpr(
-        new BooleanLiteral(true),
-        new BooleanLiteral(false),
+        new BooleanLiteral(true, new Token("true", TokenType.True, pos, pos)),
+        new BooleanLiteral(false, new Token("false", TokenType.False, pos, pos)),
         "|"
       );
       const branch2 = new BlockExpr([
         new AssignmentExpr(
-          new Identifier("$result"),
-          new StringLiteral("branch 2"),
-          new Token("=", TokenType.Assignment, new Position(), new Position())
+          new Identifier(new Token("$result", TokenType.GlobalIdentifier, pos, pos)),
+          new StringLiteral(new Token("branch 2", TokenType.DoubleQuoteString, pos, pos)),
+          new Token("=", TokenType.Assignment, pos, pos)
         ),
-        new NumericLiteral(2)
+        new NumericLiteral(new Token("2", TokenType.Integer, pos, pos))
       ]);
-      const cond3 = new BooleanLiteral(false);
+      const cond3 = new BooleanLiteral(false, new Token("false", TokenType.False, pos, pos));
       const branch3 = new BlockExpr([
         new AssignmentExpr(
-          new Identifier("$result"),
-          new StringLiteral("branch 3"),
-          new Token("=", TokenType.Assignment, new Position(), new Position())
+          new Identifier(new Token("$result", TokenType.GlobalIdentifier, pos, pos)),
+          new StringLiteral(new Token("branch 3", TokenType.DoubleQuoteString, pos, pos)),
+          new Token("=", TokenType.Assignment, pos, pos)
         ),
-        new NumericLiteral(3)
+        new NumericLiteral(new Token("3", TokenType.Integer, pos, pos))
       ]);
       const scope = new Scope();
       await expect(
@@ -105,36 +106,41 @@ describe('Logical functions', function() {
       //      $result = "branch 3";
       //      3;
       //  );
+      const pos = new Position();
       const cond1 = new BinaryExpr(
-        new BooleanLiteral(true),
-        new BooleanLiteral(false),
+        new BooleanLiteral(true, new Token("true", TokenType.True, pos, pos)),
+        new BooleanLiteral(false, new Token("false", TokenType.False, pos, pos)),
         "&"
       );
       const branch1 = new BlockExpr([
         new AssignmentExpr(
-          new Identifier("$result"),
-          new StringLiteral("branch 1"),
-          new Token("=", TokenType.Assignment, new Position(), new Position())
+          new Identifier(new Token("$result", TokenType.GlobalIdentifier, pos, pos)),
+          new StringLiteral(new Token("branch 1", TokenType.DoubleQuoteString, pos, pos)),
+          new Token("=", TokenType.Assignment, pos, pos)
         ),
-        new NumericLiteral(1)
+        new NumericLiteral(new Token("1", TokenType.Integer, pos, pos))
       ]);
-      const cond2 = new CallExpr([new BooleanLiteral(false)], new Identifier("DebugBreak"));
+      const cond2 = new CallExpr(
+        [new BooleanLiteral(false, new Token("false", TokenType.False, pos, pos))],
+        new Identifier(new Token("DebugBreak", TokenType.Identifier, pos, pos)),
+        pos
+      );
       const branch2 = new BlockExpr([
         new AssignmentExpr(
-          new Identifier("$result"),
-          new StringLiteral("branch 2"),
-          new Token("=", TokenType.Assignment, new Position(), new Position())
+          new Identifier(new Token("$result", TokenType.GlobalIdentifier, pos, pos)),
+          new StringLiteral(new Token("branch 2", TokenType.DoubleQuoteString, pos, pos)),
+          new Token("=", TokenType.Assignment, pos, pos)
         ),
-        new NumericLiteral(2)
+        new NumericLiteral(new Token("2", TokenType.Integer, pos, pos))
       ]);
-      const cond3 = new BooleanLiteral(false);
+      const cond3 = new BooleanLiteral(false, new Token("false", TokenType.False, pos, pos));
       const branch3 = new BlockExpr([
         new AssignmentExpr(
-          new Identifier("$result"),
-          new StringLiteral("branch 3"),
-          new Token("=", TokenType.Assignment, new Position(), new Position())
+          new Identifier(new Token("$result", TokenType.GlobalIdentifier, pos, pos)),
+          new StringLiteral(new Token("branch 3", TokenType.DoubleQuoteString, pos, pos)),
+          new Token("=", TokenType.Assignment, pos, pos)
         ),
-        new NumericLiteral(3)
+        new NumericLiteral(new Token("3", TokenType.Integer, pos, pos))
       ]);
       const scope = new Scope();
       await expect(
@@ -224,20 +230,21 @@ describe('Logical functions', function() {
       const func = Api.getFunc("If");
       expect(func).toBeDefined();
       expect(func?.signature).toBeDefined();
+      const pos = new Position();
       // true | false
       const condition = new BinaryExpr(
-        new BooleanLiteral(true),
-        new BooleanLiteral(false),
+        new BooleanLiteral(true, new Token("true", TokenType.True, pos, pos)),
+        new BooleanLiteral(false, new Token("false", TokenType.False, pos, pos)),
         "|"
       );
       // $result = "success"; 7;
       const trueBranch = new BlockExpr([
         new AssignmentExpr(
-          new Identifier("$result"),
-          new StringLiteral("success"),
-          new Token("=", TokenType.Assignment, new Position(), new Position())
+          new Identifier(new Token("$result", TokenType.GlobalIdentifier, pos, pos)),
+          new StringLiteral(new Token("success", TokenType.DoubleQuoteString, pos, pos)),
+          new Token("=", TokenType.Assignment, pos, pos)
         ),
-        new NumericLiteral(7)
+        new NumericLiteral(new Token("7", TokenType.Integer, pos, pos))
       ]);
       const scope = new Scope();
       await expect(
@@ -250,20 +257,21 @@ describe('Logical functions', function() {
       const func = Api.getFunc("If");
       expect(func).toBeDefined();
       expect(func?.signature).toBeDefined();
+      const pos = new Position();
       // true & false
       const condition = new BinaryExpr(
-        new BooleanLiteral(true),
-        new BooleanLiteral(false),
+        new BooleanLiteral(true, new Token("true", TokenType.True, pos, pos)),
+        new BooleanLiteral(false, new Token("false", TokenType.False, pos, pos)),
         "&"
       );
       // $result = "success"; 7;
       const trueBranch = new BlockExpr([
         new AssignmentExpr(
-          new Identifier("$result"),
-          new StringLiteral("success"),
-          new Token("=", TokenType.Assignment, new Position(), new Position())
+          new Identifier(new Token("$result", TokenType.GlobalIdentifier, pos, pos)),
+          new StringLiteral(new Token("success", TokenType.DoubleQuoteString, pos, pos)),
+          new Token("=", TokenType.Assignment, pos, pos)
         ),
-        new NumericLiteral(7)
+        new NumericLiteral(new Token("7", TokenType.Integer, pos, pos))
       ]);
       const scope = new Scope();
       await expect(
@@ -276,29 +284,30 @@ describe('Logical functions', function() {
       const func = Api.getFunc("If");
       expect(func).toBeDefined();
       expect(func?.signature).toBeDefined();
+      const pos = new Position();
       // true | false
       const condition = new BinaryExpr(
-        new BooleanLiteral(true),
-        new BooleanLiteral(false),
+        new BooleanLiteral(true, new Token("true", TokenType.True, pos, pos)),
+        new BooleanLiteral(false, new Token("false", TokenType.False, pos, pos)),
         "|"
       );
       // $result = "true branch"; 7;
       const trueBranch = new BlockExpr([
         new AssignmentExpr(
-          new Identifier("$result"),
-          new StringLiteral("true branch"),
-          new Token("=", TokenType.Assignment, new Position(), new Position())
+          new Identifier(new Token("$result", TokenType.GlobalIdentifier, pos, pos)),
+          new StringLiteral(new Token("true branch", TokenType.DoubleQuoteString, pos, pos)),
+          new Token("=", TokenType.Assignment, pos, pos)
         ),
-        new NumericLiteral(7)
+        new NumericLiteral(new Token("7", TokenType.Integer, pos, pos))
       ]);
       // $result = "false branch"; -7;
       const falseBranch = new BlockExpr([
         new AssignmentExpr(
-          new Identifier("$result"),
-          new StringLiteral("false branch"),
-          new Token("=", TokenType.Assignment, new Position(), new Position())
+          new Identifier(new Token("$result", TokenType.GlobalIdentifier, pos, pos)),
+          new StringLiteral(new Token("false branch", TokenType.DoubleQuoteString, pos, pos)),
+          new Token("=", TokenType.Assignment, pos, pos)
         ),
-        new NumericLiteral(-7)
+        new NumericLiteral(new Token("-7", TokenType.Integer, pos, pos))
       ]);
       const scope = new Scope();
       await expect(
@@ -311,29 +320,30 @@ describe('Logical functions', function() {
       const func = Api.getFunc("If");
       expect(func).toBeDefined();
       expect(func?.signature).toBeDefined();
+      const pos = new Position();
       // true & false
       const condition = new BinaryExpr(
-        new BooleanLiteral(true),
-        new BooleanLiteral(false),
+        new BooleanLiteral(true, new Token("true", TokenType.True, pos, pos)),
+        new BooleanLiteral(false, new Token("false", TokenType.False, pos, pos)),
         "&"
       );
       // $result = "true branch"; 7;
       const trueBranch = new BlockExpr([
         new AssignmentExpr(
-          new Identifier("$result"),
-          new StringLiteral("true branch"),
-          new Token("=", TokenType.Assignment, new Position(), new Position())
+          new Identifier(new Token("$result", TokenType.GlobalIdentifier, pos, pos)),
+          new StringLiteral(new Token("true branch", TokenType.DoubleQuoteString, pos, pos)),
+          new Token("=", TokenType.Assignment, pos, pos)
         ),
-        new NumericLiteral(7)
+        new NumericLiteral(new Token("7", TokenType.Integer, pos, pos))
       ]);
       // $result = "false branch"; -7;
       const falseBranch = new BlockExpr([
         new AssignmentExpr(
-          new Identifier("$result"),
-          new StringLiteral("false branch"),
-          new Token("=", TokenType.Assignment, new Position(), new Position())
+          new Identifier(new Token("$result", TokenType.GlobalIdentifier, pos, pos)),
+          new StringLiteral(new Token("false branch", TokenType.DoubleQuoteString, pos, pos)),
+          new Token("=", TokenType.Assignment, pos, pos)
         ),
-        new NumericLiteral(-7)
+        new NumericLiteral(new Token("-7", TokenType.Integer, pos, pos))
       ]);
       const scope = new Scope();
       await expect(
@@ -350,9 +360,14 @@ describe('Logical functions', function() {
       expect(func?.signature).toBeDefined();
       //  $result = 0;
       //  While(false, ++$result);
-      const cond = new BooleanLiteral(false);
+      const pos = new Position();
+      const cond = new BooleanLiteral(false, new Token("true", TokenType.True, pos, pos));
       const body = new BlockExpr([
-        new UnaryExpr(new Identifier("$result"), "++", true)
+        new UnaryExpr(
+          new Identifier(new Token("$result", TokenType.GlobalIdentifier, pos, pos)),
+          new Token("++", TokenType.UnaryOperator, pos, pos),
+          true
+        )
       ]);
       const scope = new Scope();
       scope.assignVar("$result", new JbNumber(0));
@@ -368,10 +383,15 @@ describe('Logical functions', function() {
       expect(func?.signature).toBeDefined();
       //  $result = 0;
       //  While($result <= 10, ++$result);
-      const resultId = new Identifier("$result");
-      const cond = new BinaryExpr(resultId, new NumericLiteral(10), "<=");
+      const pos = new Position();
+      const resultId = new Identifier(new Token("$result", TokenType.GlobalIdentifier, pos, pos));
+      const cond = new BinaryExpr(
+        resultId,
+        new NumericLiteral(new Token("10", TokenType.Integer, pos, pos)),
+        "<="
+      );
       const body = new BlockExpr([
-        new UnaryExpr(resultId, "++", true)
+        new UnaryExpr(resultId, new Token("++", TokenType.UnaryOperator, pos, pos), true)
       ]);
       const scope = new Scope();
       scope.assignVar(resultId.symbol, new JbNumber(0));
@@ -387,10 +407,11 @@ describe('Logical functions', function() {
       expect(func?.signature).toBeDefined();
       //  $result = 0;
       //  While(true, ++$result);
-      const resultId = new Identifier("$result");
-      const cond = new BooleanLiteral(true);
+      const pos = new Position();
+      const resultId = new Identifier(new Token("$result", TokenType.GlobalIdentifier, pos, pos));
+      const cond = new BooleanLiteral(true, new Token("true", TokenType.True, pos, pos));
       const body = new BlockExpr([
-        new UnaryExpr(resultId, "++", true)
+        new UnaryExpr(resultId, new Token("++", TokenType.UnaryOperator, pos, pos), true)
       ]);
       const scope = new Scope();
       scope.assignVar(resultId.symbol, new JbNumber(0));
@@ -407,10 +428,19 @@ describe('Logical functions', function() {
       //  $result = 0;
       //  $jitterbit.scripting.while.max_iterations = 50001;
       //  While($result < 50000, ++$result);
-      const resultId = new Identifier("$result");
-      const cond = new BinaryExpr(resultId, new NumericLiteral(50000), "<");
+      const pos = new Position();
+      const resultId = new Identifier(new Token("$result", TokenType.GlobalIdentifier, pos, pos));
+      const cond = new BinaryExpr(
+        resultId,
+        new NumericLiteral(new Token("50000", TokenType.Integer, pos, pos)),
+        "<"
+      );
       const body = new BlockExpr([
-        new UnaryExpr(resultId, "++", true)
+        new UnaryExpr(
+          resultId,
+          new Token("++", TokenType.UnaryOperator, pos, pos),
+          true
+        )
       ]);
       const scope = new Scope();
       scope.assignVar(resultId.symbol, new JbNumber(0));
@@ -428,10 +458,15 @@ describe('Logical functions', function() {
       //  $result = 0;
       //  $jitterbit.scripting.while.max_iterations = 50;
       //  While(true, ++$result);
-      const resultId = new Identifier("$result");
-      const cond = new BooleanLiteral(true);
+      const pos = new Position();
+      const resultId = new Identifier(new Token("$result", TokenType.GlobalIdentifier, pos, pos));
+      const cond = new BooleanLiteral(true, new Token("true", TokenType.True, pos, pos));
       const body = new BlockExpr([
-        new UnaryExpr(resultId, "++", true)
+        new UnaryExpr(
+          resultId,
+          new Token("++", TokenType.UnaryOperator, pos, pos),
+          true
+        )
       ]);
       const scope = new Scope();
       scope.assignVar(resultId.symbol, new JbNumber(0));
