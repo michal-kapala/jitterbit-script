@@ -1,4 +1,3 @@
-import { RuntimeVal } from "./values";
 import { Expr, GlobalIdentifier, Program, Stmt } from "../frontend/ast";
 import Scope from "./scope";
 import { JbNull } from "./types";

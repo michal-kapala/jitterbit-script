@@ -35,6 +35,7 @@ export type NodeType =
   | "BooleanLiteral"
   | "Identifier"
   | "GlobalIdentifier"
+  | "FunctionIdentifier"
   | "ArrayLiteral";
 
 /**
@@ -72,32 +73,6 @@ export class Program implements Stmt {
       throw new RuntimeError(`${e}`)
     }
     return lastEval;
-  }
-}
-
-/**
- * A list of subsequent expressions delimited by semicolons.
- * 
- * The evaluation of the last expression yields the runtime value.
- */
-export class BlockExpr implements Expr {
-  kind: "BlockExpr";
-  body: Expr[];
-  start: Position;
-  end: Position;
-
-  constructor(body: Expr[] = []) {
-    this.kind = "BlockExpr";
-    this.body = body;
-    this.start = body[0].start;
-    this.end = body[body.length-1].end;
-  }
-
-  async eval(scope: Scope) {
-    let lastValue: RuntimeVal = new JbNull();
-    for (const expr of this.body)
-      lastValue = await evaluate(expr, scope);
-    return lastValue;
   }
 }
 
@@ -426,16 +401,42 @@ export class BinaryExpr implements Expr {
 }
 
 /**
+ * A list of subsequent expressions delimited by semicolons.
+ * 
+ * The evaluation of the last expression yields the runtime value.
+ */
+export class BlockExpr implements Expr {
+  kind: "BlockExpr";
+  body: Expr[];
+  start: Position;
+  end: Position;
+
+  constructor(body: Expr[] = []) {
+    this.kind = "BlockExpr";
+    this.body = body;
+    this.start = body[0].start;
+    this.end = body[body.length-1].end;
+  }
+
+  async eval(scope: Scope) {
+    let lastValue: RuntimeVal = new JbNull();
+    for (const expr of this.body)
+      lastValue = await evaluate(expr, scope);
+    return lastValue;
+  }
+}
+
+/**
  * System function call expressions.
  */
 export class CallExpr implements Expr {
   kind: "CallExpr";
   args: Expr[];
-  caller: Identifier;
+  caller: FunctionIdentifier;
   start: Position;
   end: Position;
 
-  constructor(args: Expr[], caller: Identifier, end: Position) {
+  constructor(args: Expr[], caller: FunctionIdentifier, end: Position) {
     this.kind = "CallExpr";
     this.args = args;
     this.caller = caller;
@@ -448,7 +449,7 @@ export class CallExpr implements Expr {
 
     // this is for type safety only, the error is thrown by parser
     if(func === undefined)
-      throw `Function ${this.caller.symbol} does not exist, refer to Jitterbit function API docs`;
+      throw new RuntimeError(`Function ${this.caller.symbol} does not exist, refer to Jitterbit function API docs`);
 
     // deferred argument list evaluation functions (logical/general modules)
     if((func as DeferrableFunc).callEval !== undefined) {
@@ -611,7 +612,7 @@ export class MemberExpr implements Expr {
  * Represents a user-defined variable or symbol in source.
  */
 export class Identifier implements Expr {
-  kind: "Identifier" | "GlobalIdentifier";
+  kind: "Identifier" | "GlobalIdentifier" | "FunctionIdentifier";
   symbol: string;
   start: Position;
   end: Position;
@@ -626,6 +627,16 @@ export class Identifier implements Expr {
   async eval(scope: Scope) {
     const val = scope.lookupVar(this.symbol);
     return val;
+  }
+}
+
+/**
+ * Name of a Jitterbit native function.
+ */
+export class FunctionIdentifier extends Identifier {
+  constructor(token: Token) {
+    super(token);
+    this.kind = "FunctionIdentifier";
   }
 }
 

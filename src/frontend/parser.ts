@@ -9,6 +9,7 @@ import {
   BooleanLiteral,
   CallExpr,
   Expr,
+  FunctionIdentifier,
   GlobalIdentifier,
   Identifier,
   MemberExpr,
@@ -452,12 +453,15 @@ export default class Parser {
     if(func === undefined)
       throw new ParserError(`Function '${funcName}' does not exist, refer to Jitterbit function API docs`);
 
+    const funcIdent = new FunctionIdentifier(
+      new Token((caller as Identifier).symbol, TokenType.Identifier, caller.start, caller.end)
+    );
     const args = this.parse_args();
     const rParen = this.expect(
       TokenType.CloseParen,
       "Missing closing parenthesis inside arguments list",
     );
-    let call_expr: Expr = new CallExpr(args, caller as Identifier, rParen.end);
+    let call_expr: Expr = new CallExpr(args, funcIdent, rParen.end);
 
     // invalid number of arguments
     // TODO: should not throw or be moved to typechecker

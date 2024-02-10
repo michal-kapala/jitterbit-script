@@ -60,7 +60,7 @@ export default class Scope {
    * @param operator 
    * @returns 
    */
-  public assignVar(varName: string, value: RuntimeVal, operator = "="): RuntimeVal {
+  public assignVar(varName: string, value: RuntimeVal, operator = "=") {
     let isGlobal = varName[0] === "$";
     let oldValue = isGlobal
       ? this.getGlobal().variables.get(varName)
@@ -136,7 +136,7 @@ export default class Scope {
    * @param value 
    * @returns 
    */
-  private setVar(varName: string, value: RuntimeVal): RuntimeVal {
+  private setVar(varName: string, value: RuntimeVal) {
     // global var assignment
     if(varName[0] === "$")
       this.getGlobal().variables.set(varName, value);
@@ -151,7 +151,7 @@ export default class Scope {
    * @param varname 
    * @returns 
    */
-  public lookupVar(varname: string): RuntimeVal {
+  public lookupVar(varname: string) {
     const scope = this.resolve(varname);
     return scope.variables.get(varname) as RuntimeVal;
   }

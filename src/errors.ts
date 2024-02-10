@@ -26,3 +26,15 @@ export class ParserError extends Error {
     this.message =  message;
   }
 }
+
+/**
+ * Type exceptions thrown by typechecker during AST validation.
+ */
+export class TcError extends Error {
+  constructor(message: string, src?: string) {
+    super();
+    if(src !== undefined)
+      this.name = src;
+    this.message =  message;
+  }
+}
