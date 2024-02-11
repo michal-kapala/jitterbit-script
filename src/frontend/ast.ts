@@ -39,6 +39,11 @@ export type NodeType =
   | "ArrayLiteral";
 
 /**
+ * The kind of a globally scoped variable.
+ */
+export type GlobalVarKind = "global" | "project" | "system";
+
+/**
  * Statements do not return a runtime value.
  */
 export interface Stmt {
@@ -646,7 +651,7 @@ export class FunctionIdentifier extends Identifier {
 export class GlobalIdentifier extends Identifier {
   kind: "GlobalIdentifier";
   // project variables are currently unsupported as they require project-scoped knowledge
-  type: "global" | "project" | "system";
+  type: GlobalVarKind;
 
   constructor(token: Token, type: "global" | "project" | "system") {
     super(token);
