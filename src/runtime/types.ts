@@ -1821,7 +1821,7 @@ export class JbNumber implements NumberVal {
   binopBool(operator: string, rhs: JbBool) {
     switch (operator) {
       case "+":
-        throw `Illegal operation: ${this.type} Add {${rhs.type}}`
+        throw `Illegal operation: ${this.type} Add {${rhs.type}}`;
       case "-":
         throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
       case "*":

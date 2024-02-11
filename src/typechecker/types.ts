@@ -1,340 +1,374 @@
 import { TcError } from "../errors";
-import { 
-  ArrayLiteral,
-  AssignmentExpr,
-  BinaryExpr,
-  BlockExpr,
-  BooleanLiteral,
-  CallExpr,
-  FunctionIdentifier,
-  GlobalIdentifier,
-  GlobalVarKind,
-  Identifier,
-  MemberExpr,
-  NumericLiteral,
-  StringLiteral,
-  UnaryExpr
-} from "../frontend/ast";
-import { Position, Token } from "../frontend/types";
-import { ValueType } from "../runtime/values";
-import TypeEnv from "./environment";
-import Typechecker from "./typechecker";
+import { TypeInfo } from "./ast";
 
 /**
- * Static type information of an expression.
+ * Static analysis-time number type.
  */
-export interface TypeInfo {
-  type: StaticType;
-  error?: string;
-  warning?: string;
-}
-
-/**
- * Union type, allows for ambiguous expressions such as polymorphic function calls and error recovery.
- * 
- * Only accepts runtime types.
- */
-export interface UnionType {
-  union: ValueType[];
-};
-
-/**
- * Static analysis-time types.
- */
-export type StaticType = ValueType | "error" | "unassigned" | UnionType;
-
-/**
- * Statically-typed expression.
- */
-export abstract class TypedExpr implements TypeInfo {
-  type!: StaticType;
-  start!: Position;
-  end!: Position;
-  error?: string | undefined;
-  warning?: string | undefined;
-
-  public abstract checkType(env: TypeEnv): StaticType;
-}
-
-/**
- * Array literal expression with type information.
- */
-export class TypedArrayLiteral extends TypedExpr {
-  type: "array";
-  members: TypedExpr[];
-
-  constructor(expr: ArrayLiteral, error?: string, warning?: string) {
-    super();
-    this.error = error;
-    this.warning = warning;
-    this.start = expr.start;
-    this.end = expr.end;
-    this.type = "array";
-    this.members = [];
-    for(const mem of expr.members)
-      this.members.push(Typechecker.convertExpr(mem));
+export class NumberType {
+  /**
+   * Returns the result type of a `number op number` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopNumber(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+      case "/":
+      case "^":
+        return {type: "number"};
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {type: "bool"};
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
   }
 
-  public checkType(env: TypeEnv) {
-    return this.type;
-  }
-}
-
-/**
- * Bool literal expression with type information.
- */
-export class TypedBoolLiteral extends TypedExpr {
-  type: "bool";
-
-  constructor(expr: BooleanLiteral, error?: string, warning?: string) {
-    super();
-    this.error = error;
-    this.warning = warning;
-    this.start = expr.start;
-    this.end = expr.end;
-    this.type = "bool";
-  }
-
-  public checkType(env: TypeEnv) {
-    return this.type;
-  }
-}
-
-/**
- * String literal expression with type information.
- */
-export class TypedStringLiteral extends TypedExpr {
-  type: "string";
-
-  constructor(expr: StringLiteral, error?: string, warning?: string) {
-    super();
-    this.error = error;
-    this.warning = warning;
-    this.start = expr.start;
-    this.end = expr.end;
-    this.type = "string";
+  /**
+   * Returns the result type of a `number op string` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopString(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {type: "string"};
+      case "-":
+        return {type: "error", error: `Illegal operation, SUBTRACT with incompatible types: number ${operator} string`};
+      case "*":
+        return {type: "error", error: `Illegal operation, MULTIPLICATION with incompatible types: number ${operator} string`};
+      case "/":
+        return {type: "error", error: `Illegal operation, DIVISION with incompatible types: number ${operator} string`};
+      case "^":
+        return {type: "error", error: `Illegal operation, POW with incompatible types: number ${operator} string`};
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of number and string types results in implicit string parsing at runtime.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
   }
 
-  public checkType(env: TypeEnv) {
-    return this.type;
-  }
-}
-
-/**
- * Numeric literal expression with type information.
- */
-export class TypedNumericLiteral extends TypedExpr {
-  type: "number";
-
-  constructor(expr: NumericLiteral, error?: string, warning?: string) {
-    super();
-    this.error = error;
-    this.warning = warning;
-    this.start = expr.start;
-    this.end = expr.end;
-    this.type = "number";
-  }
-
-  public checkType(env: TypeEnv) {
-    return this.type;
-  }
-}
-
-/**
- * Integer literal expression with type information.
- */
-export class TypedIntegerLiteral extends TypedNumericLiteral {}
-
-/**
- * Float literal expression with type information.
- */
-export class TypedFloatLiteral extends TypedNumericLiteral {}
-
-/**
- * Assignment expression with type information.
- */
-export class TypedAssignment extends TypedExpr {
-  assignee: TypedExpr;
-  operator: Token;
-  value: TypedExpr;
-
-  constructor(expr: AssignmentExpr, error?: string, warning?: string) {
-    super();
-    this.error = error;
-    this.warning = warning;
-    this.start = expr.start;
-    this.end = expr.end;
-    this.assignee = Typechecker.convertExpr(expr.assignee);
-    this.operator = expr.operator;
-    this.value = Typechecker.convertExpr(expr.value);
+  /**
+   * Returns the result type of a `number op bool` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopBool(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {type: "error", error: `Illegal operation: number Add bool`};
+      case "-":
+        return {type: "error", error: `Illegal operation, SUBTRACT with incompatible types: number ${operator} bool`};
+      case "*":
+        return {type: "error", error: `Illegal operation, MULTIPLICATION with incompatible types: number ${operator} bool`};
+      case "/":
+        return {type: "error", error: `Illegal operation, DIVISION with incompatible types: number ${operator} bool`};
+      case "^":
+        return {type: "error", error: `Illegal operation, POW with incompatible types: number ${operator} bool`};
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of number and bool types results in implicit bool->number conversion at runtime.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
   }
 
-  public checkType(env: TypeEnv): StaticType {
-    throw new TcError("Method not implemented.");
-  }
-}
-
-/**
- * Binary expression with type information.
- */
-export class TypedBinaryExpr extends TypedExpr {
-  left: TypedExpr;
-  operator: string;
-  right: TypedExpr;
-
-  constructor(expr: BinaryExpr, error?: string, warning?: string) {
-    super();
-    this.error = error;
-    this.warning = warning;
-    this.start = expr.start;
-    this.end = expr.end;
-    this.left = Typechecker.convertExpr(expr.left);
-    this.operator = expr.operator;
-    this.right = Typechecker.convertExpr(expr.right);
-  }
-  
-  public checkType(env: TypeEnv): StaticType {
-    throw new TcError("Method not implemented.");
-  }
-}
-
-/**
- * Block expression with type information.
- */
-export class TypedBlockExpr extends TypedExpr {
-  body: TypedExpr[];
-
-  constructor(expr: BlockExpr, error?: string, warning?: string) {
-    super();
-    this.error = error;
-    this.warning = warning;
-    this.start = expr.start;
-    this.end = expr.end;
-    this.body = [];
-    for(const ex of expr.body)
-      this.body.push(Typechecker.convertExpr(ex));
-  }
-  
-  public checkType(env: TypeEnv): StaticType {
-    throw new TcError("Method not implemented.");
-  }
-}
-
-/**
- * Call expression with type information.
- */
-export class TypedCall extends TypedExpr {
-  caller: TypedFunctionIdentifier;
-  args: TypedExpr[];
-
-  constructor(expr: CallExpr, error?: string, warning?: string) {
-    super();
-    this.error = error;
-    this.warning = warning;
-    this.start = expr.start;
-    this.end = expr.end;
-    this.caller = Typechecker.convertExpr(expr.caller) as TypedFunctionIdentifier;
-    this.args = [];
-    for(const arg of expr.args)
-      this.args.push(Typechecker.convertExpr(arg));
+  /**
+   * Returns the result type of a `number op null` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopNull(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+        return {type: "number", warning: `Null values are converted to 0 at runtime (number ${operator} 0).`};
+      case "/":
+        return {type: "error", error: `Illegal operation, division by null (converted to 0 at runtime).`};
+      case "^":
+        return {type: "error", error: `Illegal operation, POW with incompatible types: number ${operator} null`};
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+        return {
+          type: "bool",
+          warning: `Cross-type null comparison (number ${operator} null), always false.`
+        };
+      case "&&":
+      case "&":
+        return {
+          type: "bool",
+          warning: `Null values are converted to 'false', this expression is always false.`
+        };
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Null values are converted to 'false', this expression is always true.`
+        };
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of number and bool types results in implicit bool->number conversion at runtime.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
   }
 
-  public checkType(env: TypeEnv): StaticType {
-    throw new TcError("Method not implemented.");
-  }
-}
-
-/**
- * Member expression with type information.
- */
-export class TypedMemberExpr extends TypedExpr {
-  object: TypedExpr;
-  key: TypedExpr;
-
-  constructor(expr: MemberExpr, error?: string, warning?: string) {
-    super();
-    this.error = error;
-    this.warning = warning;
-    this.start = expr.start;
-    this.end = expr.end;
-    this.object = Typechecker.convertExpr(expr.object);
-    this.key = Typechecker.convertExpr(expr.key);
-  }
-
-  public checkType(env: TypeEnv): StaticType {
-    throw new TcError("Method not implemented.");
-  }
-}
-
-/**
- * Local variable identifier with type information.
- */
-export class TypedIdentifier extends TypedExpr {
-  symbol: string;
-
-  constructor(expr: Identifier, error?: string, warning?: string) {
-    super();
-    this.error = error;
-    this.warning = warning;
-    this.start = expr.start;
-    this.end = expr.end;
-    this.symbol = expr.symbol;
-  }
-  
-  public checkType(env: TypeEnv): StaticType {
-    throw new TcError("Method not implemented.");
-  }
-}
-
-/**
- * Function identifier.
- */
-export class TypedFunctionIdentifier extends TypedIdentifier {
-  constructor(expr: FunctionIdentifier, error?: string, warning?: string) {
-    super(expr, error, warning);
+  /**
+   * Returns the result type of a `number op array` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopArray(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+      case "/":
+      case "^":
+        return {
+          type: "array",
+          warning: `Cross-type expression of number ${operator} array applies the operation to each element.`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+        return {
+          type: "array",
+          warning: `Cross-type comparison of number and array types returns an array of element comparisons.`
+        };
+      case "&&":
+      case "&":
+        return {
+          type: "bool",
+          warning: `Arrays are always converted to false for logical expressions, this expression always returns false.`
+        };
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Arrays are always converted to false for logical expressions.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
   }
 
-  public checkType(env: TypeEnv): StaticType {
-    throw new TcError("Function identifiers cannot have a type.");
+  /**
+   * Returns the result type of a `number op dictionary` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopDict(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+      case "/":
+        return {
+          type: "error",
+          error: `Unsupported cross-type expression of number ${operator} dictionary (results in runtime conversion error).`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible data types: number ${operator} dictionary`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+        return {
+          type: "bool",
+          warning: "Cross-type comparison of number and dictionary types, the dictionary is implicitly converted to 0 at runtime."
+        };
+      case "==":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of number and dictionary types, always false.`
+        };
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of number and dictionary types, always true.`
+        };
+      case "&&":
+      case "&":
+        return {
+          type: "bool",
+          warning: `Dictionaries are always converted to false for logical expressions, this expression is always false.`
+        };
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Dictionaries are always converted to false for logical expressions.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
   }
-}
 
-/**
- * Global variable identifier with type information.
- */
-export class TypedGlobalIdentifier extends TypedIdentifier {
-  kind: GlobalVarKind;
-
-  constructor(expr: GlobalIdentifier, error?: string, warning?: string) {
-    super(expr, error, warning);
-    this.kind = expr.type;
+  /**
+   * Returns the result type of a `number op binary` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopBin(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {
+          type: "error",
+          error: `Unsupported cross-type expression of number ${operator} binary (results in runtime conversion error).`
+        };
+      case "-":
+        return {
+          type: "error",
+          error: `Illegal operation, SUBTRACT with incompatible data types: number ${operator} binary`
+        };
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible data types: number ${operator} binary`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible data types: number ${operator} binary`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible data types: number ${operator} binary`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+        return {
+          type: "error",
+          error: `Cross-type comparison of number and binary types ('compare (${operator}) with binary data').`
+        };
+      case "==":
+      case "!=":
+        return {
+          type: "error",
+          error: `Cross-type comparison of number and binary types ('compare (${operator}) binary data with data of other type').`
+        };
+      case "&&":
+      case "&":
+        return {
+          type: "bool",
+          warning: `Binary data is always converted to false for logical expressions, this expression is always false.`
+        };
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Binary data is always converted to false for logical expressions.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
   }
 
-  public checkType(env: TypeEnv): StaticType {
-    throw new TcError("Method not implemented.");
-  }
-}
-
-/**
- * Unary expression with type information.
- */
-export class TypedUnaryExpr extends TypedExpr {
-  value: TypedExpr;
-  operator: Token;
-  lhs: boolean;
-
-  constructor(expr: UnaryExpr, error?: string, warning?: string) {
-    super();
-    this.error = error;
-    this.warning = warning;
-    this.start = expr.start;
-    this.end = expr.end;
-    this.value = Typechecker.convertExpr(expr.value);
-    this.operator = expr.operator;
-    this.lhs = expr.lhs;
-  }
-
-  public checkType(env: TypeEnv): StaticType {
-    throw new TcError("Method not implemented.");
+  /**
+   * Returns the result type of a `number op date` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopDate(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {
+          type: "date",
+          warning: `Cross-type expression of number ${operator} date, the number is interpreted as time in seconds.`
+        };
+      case "-":
+        return {
+          type: "error",
+          error: `Illegal operation, SUBTRACT with incompatible data types: number ${operator} date`
+        };
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible data types: number ${operator} date`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible data types: number ${operator} date`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible data types: number ${operator} date`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+        return {
+          type: "bool",
+          error: `Cross-type comparison of number and date types, the date is converted to epoch timestamp in seconds.`
+        };
+      case "&&":
+      case "&":
+        return {
+          type: "bool",
+          warning: `Dates are always converted to false for logical expressions, this expression is always false.`
+        }
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Dates are always converted to false for logical expressions.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
   }
 }

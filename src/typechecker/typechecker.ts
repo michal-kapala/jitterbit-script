@@ -32,7 +32,7 @@ import {
   TypedNumericLiteral,
   TypedStringLiteral,
   TypedUnaryExpr
-} from "./types";
+} from "./ast";
 
 /**
  * Static type checker for Jitterbit script ASTs.
@@ -86,13 +86,18 @@ export default class Typechecker {
     }
   }
 
+  /**
+   * Performs static analysis of Jitterbit script AST.
+   * @param ast 
+   * @returns 
+   */
   static check(ast: Program) {
     const typedAst = this.rebuildAst(ast);
     const env = new TypeEnv();
-    console.log("Typed AST:");
     for(const expr of typedAst) {
-      console.log(expr);
+      expr.typeExpr(env);
     }
+    console.log(typedAst);
     return typedAst;
   }
 }

@@ -1,17 +1,17 @@
-import { StaticType } from "./types";
+import { TypeInfo } from "./ast";
 
 /**
  * Variable environment for static type evaluation.
  */
 export default class TypeEnv {
-  private variables: Map<string, StaticType>;
+  private variables: Map<string, TypeInfo>;
 
   constructor() {
     this.variables = new Map();
   }
 
-  public set(varName: string, type: StaticType) {
-    this.variables.set(varName, type);
+  public set(varName: string, info: TypeInfo) {
+    this.variables.set(varName, info);
   }
 
   /**

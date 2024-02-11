@@ -639,6 +639,8 @@ export class Identifier implements Expr {
  * Name of a Jitterbit native function.
  */
 export class FunctionIdentifier extends Identifier {
+  kind: "FunctionIdentifier";
+  
   constructor(token: Token) {
     super(token);
     this.kind = "FunctionIdentifier";
