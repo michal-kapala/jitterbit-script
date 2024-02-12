@@ -1,4 +1,4 @@
 <trans>
   // test for Round function
-  Now() = b + 12 + true;
+  Now() = 3 + 12 + "true";
 </trans>

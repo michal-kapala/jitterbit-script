@@ -78,7 +78,7 @@ export class NumberType {
       case "+":
         return {
           type: "string",
-          warning: `Cross-type concatenation of number ${operator} string, results in implicit bool->string conversion at runtime.`
+          warning: `Cross-type concatenation of number ${operator} string, results in implicit number->string conversion at runtime.`
         };
       case "-":
         return {
@@ -129,7 +129,7 @@ export class NumberType {
       case "+":
         return {
           type: "error",
-          error: `Illegal operation: number Add bool`
+          error: `Cross-type addition of number ${operator} bool, results in a runtime conversion error.`
         };
       case "-":
         return {
@@ -155,15 +155,23 @@ export class NumberType {
       case ">":
       case "<=":
       case ">=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of number ${operator} bool, results in implicit bool->number conversion at runtime.`
+        };
       case "==":
       case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of number ${operator} bool, results in implicit number->bool conversion at runtime.`
+        };
       case "&&":
       case "&":
       case "||":
       case "|":
         return {
           type: "bool",
-          warning: `Cross-type comparison of number ${operator} bool, results in implicit bool->number conversion at runtime.`
+          warning: `Cross-type logical expression of number ${operator} bool, results in implicit number->bool conversion at runtime.`
         };
       default:
         throw new TcError(`Unsupported binary operator ${operator}`);
@@ -281,7 +289,7 @@ export class NumberType {
       case "/":
         return {
           type: "error",
-          error: `Cross-type operation of number ${operator} dictionary, results in runtime conversion error.`
+          error: `Cross-type operation of number ${operator} dictionary, results in a runtime conversion error.`
         };
       case "^":
         return {
@@ -333,7 +341,7 @@ export class NumberType {
       case "+":
         return {
           type: "error",
-          error: `Cross-type addition of number ${operator} binary, results in runtime conversion error.`
+          error: `Cross-type addition of number ${operator} binary, results in a runtime conversion error.`
         };
       case "-":
         return {
@@ -361,7 +369,7 @@ export class NumberType {
       case ">=":
         return {
           type: "error",
-          error: `Cross-type comparison of number ${operator} binary ('compare (${operator}) with binary data').`
+          error: `Cross-type comparison of number ${operator} binary, results in a runtime error ('compare (${operator}) with binary data').`
         };
       case "==":
       case "!=":
@@ -426,7 +434,7 @@ export class NumberType {
       case "!=":
         return {
           type: "bool",
-          error: `Cross-type comparison of number ${operator} date, the date is converted to epoch timestamp in seconds.`
+          warning: `Cross-type comparison of number ${operator} date, the date is converted to epoch timestamp in seconds.`
         };
       case "&&":
       case "&":
@@ -852,7 +860,7 @@ export class BoolType {
       case ">=":
         return {
           type: "error",
-          error: `Cross-type comparison of bool and binary types ('compare (${operator}) with binary data').`
+          error: `Cross-type comparison of bool ${operator} binary, results in a runtime error ('compare (${operator}) with binary data').`
         };
       case "==":
       case "!=":
@@ -922,6 +930,506 @@ export class BoolType {
         return {
           type: "bool",
           warning: `Cross-type comparison of bool ${operator} date, the date is implicitly converted to false at runtime.`
+        };
+      case "&&":
+      case "&":
+        return {
+          type: "bool",
+          warning: `Dates are always converted to false for logical expressions, this expression is always false.`
+        }
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Dates are always converted to false for logical expressions.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+}
+
+/**
+ * Static analysis-time string type.
+ */
+export class StringType {
+  /**
+   * Returns the result type of a `string op *` expression.
+   * @param operator 
+   * @param rhs 
+   */
+  static binop(operator: string, rhs: ValueType) {
+    switch(rhs) {
+      case "array":
+        return this.binopArray(operator);
+      case "binary":
+        return this.binopBin(operator);
+      case "bool":
+        return this.binopBool(operator);
+      case "date":
+        return this.binopDate(operator);
+      case "dictionary":
+        return this.binopDict(operator);
+      case "void":
+      case "null":
+        return this.binopNull(operator);
+      case "number":
+        return this.binopNumber(operator);
+      case "string":
+        return this.binopString(operator);
+      case "node":
+        // TODO
+      case "type":
+        // TODO
+      default:
+        throw new TcError(`Unsupported RHS type in binary expression: ${rhs}.`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `string op number` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopNumber(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {
+          type: "string",
+          warning: `Cross-type concatenation of string ${operator} number, results in implicit number->string conversion at runtime.`
+        };
+      case "-":
+        return {
+          type: "error",
+          error: `Illegal operation, SUBTRACT with incompatible types: string ${operator} number`
+        };
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible types: string ${operator} number`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible types: string ${operator} number`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible types: string ${operator} number`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of string ${operator} number, results in implicit string parsing at runtime.`
+        };
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of string ${operator} number, results in implicit conversions at runtime.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `string op string` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopString(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {type: "string"};
+      case "-":
+        return {
+          type: "error",
+          error: `Illegal operation, SUBTRACT with incompatible types: string ${operator} string`
+        };
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible types: string ${operator} string`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible types: string ${operator} string`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible types: string ${operator} string`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+        return {type: "bool"};
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of string ${operator} string, results in implicit conversions at runtime.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `string op bool` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopBool(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {
+          type: "string",
+          warning: `Cross-type concatenation of string ${operator} bool, results in implicit bool->string conversion at runtime.`
+        };
+      case "-":
+        return {
+          type: "error",
+          error: `Illegal operation, SUBTRACT with incompatible types: string ${operator} bool`
+        };
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible types: string ${operator} bool`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible types: string ${operator} bool`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible types: string ${operator} bool`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of string ${operator} bool, results in multiple implicit conversions at runtime.`
+        };
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of string ${operator} bool, results in multiple implicit conversions at runtime.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `string op null` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopNull(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {
+          type: "string",
+          warning: `Cross-type concatenation of string ${operator} null, null values are implicitly converted to empty strings (string ${operator} "").`
+        };
+      case "-":
+        return {
+          type: "error",
+          error: `Illegal operation, SUBTRACT with incompatible types: string ${operator} null`
+        };
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible types: string ${operator} null`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible types: string ${operator} null`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible types: string ${operator} null`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of string ${operator} null, always false.`
+        };
+      case "&&":
+      case "&":
+        return {
+          type: "bool",
+          warning: `Null values are converted to 'false', this expression is always false.`
+        };
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of string ${operator} null, this expression is always true.`
+        };
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of number ${operator} bool, results in multiple implicit conversions at runtime.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `string op array` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopArray(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+      case "/":
+      case "^":
+        return {
+          type: "array",
+          warning: `Cross-type operation of string ${operator} array, applies the operation to each element.`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+        return {
+          type: "array",
+          warning: `Cross-type comparison of string ${operator} array returns an array of element comparison results.`
+        };
+      case "&&":
+      case "&":
+        return {
+          type: "bool",
+          warning: `Arrays are always converted to false for logical expressions, this expression always returns false.`
+        };
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Arrays are always converted to false for logical expressions. Results in multiple implicit conversions at runtime.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `string op dictionary` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopDict(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {
+          type: "error",
+          error: `Cross-type addition of string ${operator} dictionary, results in a runtime conversion error.`
+        };
+      case "-":
+        return {
+          type: "error",
+          error: `Illegal operation, SUBTRACT with incompatible data types: number ${operator} dictionary`
+        };
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible data types: number ${operator} dictionary`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible data types: number ${operator} dictionary`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible data types: number ${operator} dictionary`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of string ${operator} dictionary, results in multiple implicit conversions at runtime.`
+        };
+      case "==":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of string ${operator} dictionary, always false.`
+        };
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of string ${operator} dictionary, always true.`
+        };
+      case "&&":
+      case "&":
+        return {
+          type: "bool",
+          warning: `Dictionaries are always converted to false for logical expressions, this expression is always false.`
+        };
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Dictionaries are always converted to false for logical expressions. Results in implicit string parsing at runtime.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `string op binary` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopBin(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {
+          type: "error",
+          error: `Cross-type concatenation of string ${operator} binary, results in a runtime conversion error.`
+        };
+      case "-":
+        return {
+          type: "error",
+          error: `Illegal operation, SUBTRACT with incompatible data types: string ${operator} binary`
+        };
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible data types: string ${operator} binary`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible data types: string ${operator} binary`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible data types: string ${operator} binary`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+        return {
+          type: "error",
+          error: `Cross-type comparison of string ${operator} binary, results in a runtime error ('compare (${operator}) with binary data').`
+        };
+      case "==":
+      case "!=":
+        return {
+          type: "error",
+          error: `Cross-type comparison of number ${operator} binary ('compare (${operator}) binary data with data of other type').`
+        };
+      case "&&":
+      case "&":
+        return {
+          type: "bool",
+          warning: `Binary data is always converted to false for logical expressions, this expression is always false.`
+        };
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Binary data is always converted to false for logical expressions. Results in implicit string parsing at runtime.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `string op date` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopDate(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {
+          type: "string",
+          warning: `Cross-type concatenation of string ${operator} date, date is converted to YYYY-MM-DD HH:MM:SS format.`
+        };
+      case "-":
+        return {
+          type: "error",
+          error: `Illegal operation, SUBTRACT with incompatible data types: string ${operator} date`
+        };
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible data types: string ${operator} date`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible data types: string ${operator} date`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible data types: string ${operator} date`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of string ${operator} date, results in multiple implicit conversions at runtime.`
+        };
+      case "==":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of string ${operator} date, always false.`
+        };
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of string ${operator} date, always true.`
         };
       case "&&":
       case "&":

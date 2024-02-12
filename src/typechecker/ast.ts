@@ -22,7 +22,8 @@ import TypeEnv from "./environment";
 import Typechecker from "./typechecker";
 import { 
   BoolType,
-  NumberType
+  NumberType,
+  StringType
 } from "./types";
 
 /**
@@ -285,13 +286,11 @@ export class TypedBinaryExpr extends TypedExpr {
     if(lhs.type === "unassigned" || rhs.type === "unassigned")
       return {type: this.type} as TypeInfo;
 
-    if(lhs.type === "unknown" || rhs.type === "unknown") {
+    if(lhs.type === "unknown" || rhs.type === "unknown")
       this.type = "unknown";
-      return {type: this.type} as TypeInfo;
-    }
 
     // handle runtime types
-    let resultType: TypeInfo;
+    let resultType = {type: "unknown"} as TypeInfo;
     switch(lhs.type) {
       case "array":
       case "binary":
@@ -307,13 +306,18 @@ export class TypedBinaryExpr extends TypedExpr {
         resultType = NumberType.binop(this.operator, rhs.type as ValueType);
         break;
       case "string":
+        resultType = StringType.binop(this.operator, rhs.type as ValueType);
       case "type":
-        // TODO: could be changed in future
-        return {type: "unknown"} as TypeInfo;
+        // TODO: could be unified with "unknown" in future
+        return resultType;
+      case "unknown":
+        break;
       default:
         throw new TcError(`Binary expression with unsupported type: ${this.type}.`);
     }
     this.setTypeInfo(resultType);
+    // reset the warning before bubbling it up
+    resultType.warning = undefined;
     return resultType;
   }
 }
