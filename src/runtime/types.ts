@@ -1039,7 +1039,7 @@ export class JbBool implements BooleanVal {
   binopNumber(operator: string, rhs: JbNumber) {
     switch (operator) {
       case "+":
-        throw `Illegal operation: ${this.type} Add {${rhs.type}}`
+        throw `Illegal operation: ${this.type} Add {${rhs.type}}`;
       case "-":
         throw `Illegal operation, SUBTRACT with incompatible types: ${this.type} ${operator} ${rhs.type}`;
       case "*":
@@ -1193,11 +1193,9 @@ export class JbBool implements BooleanVal {
       case "^":
         throw new RuntimeError(`Illegal operation, POW with incompatible data types: ${this.type} ^ ${rhs.type}`);
       case "<":
-        // originally always false
-        // POD: perhaps this should be changed
+        // both values are implicitly converted to numbers
         return new JbBool(false);
       case ">":
-        // dictionary is implicitly converted to 0
         return new JbBool(this.toNumber() > 0);
       case "<=":
       case ">=":
@@ -1284,9 +1282,9 @@ export class JbBool implements BooleanVal {
       case ">=":
         return new JbBool(this.toNumber() >= rhs.toNumber());
       case "==":
-        return new JbBool(false);
+        return new JbBool(this.value === rhs.toBool());
       case "!=":
-        return new JbBool(true);
+        return new JbBool(this.value !== rhs.toBool());
       case "&&":
       case "&":
         return new JbBool(false);

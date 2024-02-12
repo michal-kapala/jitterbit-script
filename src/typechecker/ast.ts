@@ -20,6 +20,10 @@ import { Position, Token } from "../frontend/types";
 import { ValueType } from "../runtime/values";
 import TypeEnv from "./environment";
 import Typechecker from "./typechecker";
+import { 
+  BoolType,
+  NumberType
+} from "./types";
 
 /**
  * Static type information of an expression.
@@ -31,18 +35,9 @@ export interface TypeInfo {
 }
 
 /**
- * Union type, allows for ambiguous expressions such as polymorphic function calls and error recovery.
- * 
- * Only accepts runtime types.
- */
-export interface UnionType {
-  union: ValueType[];
-};
-
-/**
  * Static analysis-time types.
  */
-export type StaticTypeName = ValueType | "error" | "unassigned" | UnionType;
+export type StaticTypeName = ValueType | "error" | "unassigned" | "unknown";
 
 /**
  * Statically-typed expression.
@@ -60,6 +55,15 @@ export abstract class TypedExpr implements TypeInfo {
    * @param env
    */
   public abstract typeExpr(env: TypeEnv): TypeInfo;
+  /**
+   * Sets the type information.
+   * @param info 
+   */
+  public setTypeInfo(info: TypeInfo): void {
+    this.type = info.type;
+    this.error = info.error;
+    this.warning = info.warning;
+  };
 }
 
 /**
@@ -187,15 +191,13 @@ export class TypedAssignment extends TypedExpr {
 
   public typeExpr(env: TypeEnv) {
     const rhs = this.value.typeExpr(env);
-    if(rhs.type === "error") {
-      this.type = "null";
-      return {type: this.type} as TypeInfo;
-    }
+    if(rhs.type === "error")
+      this.type = "unknown";
 
     if(rhs.type === "unassigned") {
       this.value.type = "error";
       this.value.error = `Local variable '${(this.value as TypedIdentifier).symbol}' hasn't been initialized.`;
-      this.type = "null";
+      this.type = "unknown";
     }
 
     switch(this.assignee.kind) {
@@ -212,18 +214,16 @@ export class TypedAssignment extends TypedExpr {
       case "UnaryExpr":
         this.assignee.type = "error";
         this.assignee.error = `Cannot assign to LHS expression: ${this.assignee.kind}.`;
-        if(rhs.type !== "unassigned")
+        if(rhs.type !== "error" && rhs.type !== "unassigned")
           this.type = rhs.type;
         this.warning = rhs.warning;
         return rhs;
       case "GlobalIdentifier":
       case "Identifier":
         const id = this.assignee as TypedIdentifier;
-        id.type = rhs.type;
-        id.error = rhs.error;
-        id.warning = rhs.warning;
+        id.setTypeInfo(rhs);
         env.set(id.symbol, rhs);
-        if(rhs.type !== "unassigned")
+        if(rhs.type !== "error" && rhs.type !== "unassigned")
           this.type = rhs.type;
         this.warning = rhs.warning;
         return rhs;
@@ -260,46 +260,61 @@ export class TypedBinaryExpr extends TypedExpr {
     this.right = Typechecker.convertExpr(expr.right);
   }
   
-  public typeExpr(env: TypeEnv): TypeInfo {
+  public typeExpr(env: TypeEnv) {
     const rhs = this.right.typeExpr(env);
     const lhs = this.left.typeExpr(env);
 
+    // handle static analysis types
     if(lhs.type === "error" || rhs.type === "error") {
-      this.type = "null";
+      this.type = "unknown";
       return {type: this.type} as TypeInfo;
     }
 
     if(lhs.type === "unassigned") {
       this.left.type = "error";
       this.left.error = `Local variable '${(this.left as TypedIdentifier).symbol}' hasn't been initialized.`;
-      this.type = "null";
+      this.type = "unknown";
     }
 
     if(rhs.type === "unassigned") {
       this.right.type = "error";
       this.right.error = `Local variable '${(this.right as TypedIdentifier).symbol}' hasn't been initialized.`;
-      this.type = "null";
+      this.type = "unknown";
     }
 
     if(lhs.type === "unassigned" || rhs.type === "unassigned")
-      return {type: this.type};
+      return {type: this.type} as TypeInfo;
 
+    if(lhs.type === "unknown" || rhs.type === "unknown") {
+      this.type = "unknown";
+      return {type: this.type} as TypeInfo;
+    }
+
+    // handle runtime types
+    let resultType: TypeInfo;
     switch(lhs.type) {
       case "array":
       case "binary":
       case "bool":
+        resultType = BoolType.binop(this.operator, rhs.type as ValueType);
+        break;
       case "date":
       case "dictionary":
       case "node":
       case "void":
       case "null":
       case "number":
+        resultType = NumberType.binop(this.operator, rhs.type as ValueType);
+        break;
       case "string":
       case "type":
-        // TODO: unions?
+        // TODO: could be changed in future
+        return {type: "unknown"} as TypeInfo;
       default:
         throw new TcError(`Binary expression with unsupported type: ${this.type}.`);
     }
+    this.setTypeInfo(resultType);
+    return resultType;
   }
 }
 
