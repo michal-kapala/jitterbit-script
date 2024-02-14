@@ -1939,3 +1939,333 @@ export class NullType {
     }
   }
 }
+
+/**
+ * Static analysis-time array type.
+ */
+export class ArrayType {
+  /**
+   * Returns the result type of a `array op *` expression.
+   * @param operator 
+   * @param rhs 
+   */
+  static binop(operator: string, rhs: ValueType) {
+    switch(rhs) {
+      case "array":
+        return this.binopArray(operator);
+      case "binary":
+        return this.binopBin(operator);
+      case "bool":
+        return this.binopBool(operator);
+      case "date":
+        return this.binopDate(operator);
+      case "dictionary":
+        return this.binopDict(operator);
+      case "void":
+      case "null":
+        return this.binopNull(operator);
+      case "number":
+        return this.binopNumber(operator);
+      case "string":
+        return this.binopString(operator);
+      case "node":
+        // TODO
+      case "type":
+        // TODO
+      default:
+        throw new TcError(`Unsupported RHS type in binary expression: ${rhs}.`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `array op number` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopNumber(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+      case "/":
+      case "^":
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+        return {
+          type: "array",
+          warning: `Cross-type operation of array ${operator} number, applies the operation to each element.`
+        };
+      case "&&":
+      case "&":
+        return {
+          type: "bool",
+          warning: `Arrays are always converted to false for logical expressions, this expression always returns false.`
+        };
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Arrays are always converted to false for logical expressions.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `array op string` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopString(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+      case "/":
+      case "^":
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+        return {
+          type: "array",
+          warning: `Cross-type operation of array ${operator} string, applies the operation to each element.`
+        };
+      case "&&":
+      case "&":
+        return {
+          type: "bool",
+          warning: `Arrays are always converted to false for logical expressions, this expression always returns false.`
+        };
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Arrays are always converted to false for logical expressions.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `array op bool`expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopBool(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+      case "/":
+      case "^":
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+        return {
+          type: "array",
+          warning: `Cross-type operation of array ${operator} bool, applies the operation to each element.`
+        };
+      case "&&":
+      case "&":
+        return {
+          type: "bool",
+          warning: `Arrays are always converted to false for logical expressions, this expression always returns false.`
+        };
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Arrays are always converted to false for logical expressions.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `array op null` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopNull(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+      case "/":
+      case "^":
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+        return {
+          type: "array",
+          warning: `Cross-type operation of array ${operator} null, applies the operation to each element.`
+        };
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Arrays and null values are always converted to false for logical expressions, this expression always returns false.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `array op array` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopArray(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+      case "/":
+      case "^":
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+        return {
+          type: "array",
+          warning: `Cross-type operation of array ${operator} array, applies the operation to each element of the LHS array.`
+        };
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Arrays are always converted to false for logical expressions, this expression always returns false.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `array op dictionary` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopDict(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+      case "/":
+      case "^":
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+        return {
+          type: "array",
+          warning: `Cross-type operation of array ${operator} dictionary, applies the operation to each element.`
+        };
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Arrays and dictionaries are always converted to false for logical expressions, this expression always returns false.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `array op binary` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopBin(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+      case "/":
+      case "^":
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+        return {
+          type: "array",
+          warning: `Cross-type operation of array ${operator} binary, applies the operation to each element.`
+        };
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Arrays and binary data are always converted to false for logical expressions, this expression always returns false.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `array op date` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopDate(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+      case "/":
+      case "^":
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+        return {
+          type: "array",
+          warning: `Cross-type operation of array ${operator} date, applies the operation to each element.`
+        };
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Arrays and dates are always converted to false for logical expressions, this expression always returns false.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+}

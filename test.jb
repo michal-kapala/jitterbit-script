@@ -1,7 +1,5 @@
 <trans>
-  // test for global var inference and warnings
-  $something = "nice";
-  null = $something.else + $x;
-  $something.else = $something;
-  $jitterbit.scripting.db.max_rows
+  // test for array inference and warnings
+  $something = {1, 2, "3"};
+  result = $something.else = $something || $x;
 </trans>

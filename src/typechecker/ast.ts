@@ -22,6 +22,7 @@ import { ValueType } from "../runtime/values";
 import TypeEnv from "./environment";
 import Typechecker from "./typechecker";
 import { 
+  ArrayType,
   BoolType,
   NullType,
   NumberType,
@@ -295,6 +296,8 @@ export class TypedBinaryExpr extends TypedExpr {
     let resultType = {type: "unknown"} as TypeInfo;
     switch(lhs.type) {
       case "array":
+        resultType = ArrayType.binop(this.operator, rhs.type as ValueType);
+        break;
       case "binary":
       case "bool":
         resultType = BoolType.binop(this.operator, rhs.type as ValueType);
