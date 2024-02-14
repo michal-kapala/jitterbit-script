@@ -22,6 +22,7 @@ import TypeEnv from "./environment";
 import Typechecker from "./typechecker";
 import { 
   BoolType,
+  NullType,
   NumberType,
   StringType
 } from "./types";
@@ -302,11 +303,14 @@ export class TypedBinaryExpr extends TypedExpr {
       case "node":
       case "void":
       case "null":
+        resultType = NullType.binop(this.operator, rhs.type as ValueType);
+        break;
       case "number":
         resultType = NumberType.binop(this.operator, rhs.type as ValueType);
         break;
       case "string":
         resultType = StringType.binop(this.operator, rhs.type as ValueType);
+        break;
       case "type":
         // TODO: could be unified with "unknown" in future
         return resultType;

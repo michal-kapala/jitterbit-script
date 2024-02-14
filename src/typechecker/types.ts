@@ -106,13 +106,17 @@ export class NumberType {
       case ">=":
       case "==":
       case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of number ${operator} string, results in implicit string parsing at runtime.`
+        };
       case "&&":
       case "&":
       case "||":
       case "|":
         return {
           type: "bool",
-          warning: `Cross-type comparison of number ${operator} string, results in implicit string parsing at runtime.`
+          warning: `Cross-type logical expression of number ${operator} string, results in implicit string parsing at runtime.`
         };
       default:
         throw new TcError(`Unsupported binary operator ${operator}`);
@@ -215,18 +219,18 @@ export class NumberType {
       case "&":
         return {
           type: "bool",
-          warning: `Null values are converted to 'false', this expression is always false.`
+          warning: `Null values are converted to 'false', always false.`
         };
       case "!=":
         return {
           type: "bool",
-          warning: `Null values are converted to 'false', this expression is always true.`
+          warning: `Null values are converted to 'false', always true.`
         };
       case "||":
       case "|":
         return {
           type: "bool",
-          warning: `Cross-type comparison of number ${operator} bool, results in implicit bool->number conversion at runtime.`
+          warning: `Cross-type logical expression of number ${operator} bool, results in implicit bool->number conversion at runtime.`
         };
       default:
         throw new TcError(`Unsupported binary operator ${operator}`);
@@ -318,7 +322,7 @@ export class NumberType {
       case "&":
         return {
           type: "bool",
-          warning: `Dictionaries are always converted to false for logical expressions, this expression is always false.`
+          warning: `Dictionaries are always converted to false for logical expressions, always false.`
         };
       case "||":
       case "|":
@@ -381,7 +385,7 @@ export class NumberType {
       case "&":
         return {
           type: "bool",
-          warning: `Binary data is always converted to false for logical expressions, this expression is always false.`
+          warning: `Binary data is always converted to false for logical expressions, always false.`
         };
       case "||":
       case "|":
@@ -440,7 +444,7 @@ export class NumberType {
       case "&":
         return {
           type: "bool",
-          warning: `Dates are always converted to false for logical expressions, this expression is always false.`
+          warning: `Dates are always converted to false for logical expressions, always false.`
         }
       case "||":
       case "|":
@@ -588,13 +592,17 @@ export class BoolType {
       case ">=":
       case "==":
       case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of number and string types results in implicit string parsing at runtime.`
+        };
       case "&&":
       case "&":
       case "||":
       case "|":
         return {
           type: "bool",
-          warning: `Cross-type comparison of number and string types results in implicit string parsing at runtime.`
+          warning: `Cross-type logical expression of number and string types results in implicit string parsing at runtime.`
         };
       default:
         throw new TcError(`Unsupported binary operator ${operator}`);
@@ -698,7 +706,7 @@ export class BoolType {
       case "&":
         return {
           type: "bool",
-          warning: `Cross-type null logical operation (bool ${operator} null), this expression is always false.`
+          warning: `Cross-type logical expression of bool ${operator} null, always false.`
         };
       case "!=":
         return {
@@ -709,7 +717,7 @@ export class BoolType {
       case "|":
         return {
           type: "bool",
-          warning: `Cross-type null logical operation (bool ${operator} null), the null value is implicitly converted to false.`
+          warning: `Cross-type logical expression of bool ${operator} null, the null value is implicitly converted to false.`
         };
       default:
         throw new TcError(`Unsupported binary operator ${operator}`);
@@ -809,7 +817,7 @@ export class BoolType {
       case "&":
         return {
           type: "bool",
-          warning: `Dictionaries are always converted to false for logical expressions, this expression is always false.`
+          warning: `Dictionaries are always converted to false for logical expressions, always false.`
         };
       case "||":
       case "|":
@@ -872,7 +880,7 @@ export class BoolType {
       case "&":
         return {
           type: "bool",
-          warning: `Binary data is always converted to false for logical expressions, this expression is always false.`
+          warning: `Binary data is always converted to false for logical expressions, always false.`
         };
       case "||":
       case "|":
@@ -935,7 +943,7 @@ export class BoolType {
       case "&":
         return {
           type: "bool",
-          warning: `Dates are always converted to false for logical expressions, this expression is always false.`
+          warning: `Dates are always converted to false for logical expressions, always false.`
         }
       case "||":
       case "|":
@@ -1190,18 +1198,18 @@ export class StringType {
       case "&":
         return {
           type: "bool",
-          warning: `Null values are converted to 'false', this expression is always false.`
+          warning: `Null values are converted to 'false', always false.`
         };
       case "!=":
         return {
           type: "bool",
-          warning: `Cross-type comparison of string ${operator} null, this expression is always true.`
+          warning: `Cross-type comparison of string ${operator} null, always true.`
         };
       case "||":
       case "|":
         return {
           type: "bool",
-          warning: `Cross-type comparison of number ${operator} bool, results in multiple implicit conversions at runtime.`
+          warning: `Cross-type logical expression of number ${operator} bool, results in multiple implicit conversions at runtime.`
         };
       default:
         throw new TcError(`Unsupported binary operator ${operator}`);
@@ -1305,7 +1313,7 @@ export class StringType {
       case "&":
         return {
           type: "bool",
-          warning: `Dictionaries are always converted to false for logical expressions, this expression is always false.`
+          warning: `Dictionaries are always converted to false for logical expressions, always false.`
         };
       case "||":
       case "|":
@@ -1368,7 +1376,7 @@ export class StringType {
       case "&":
         return {
           type: "bool",
-          warning: `Binary data is always converted to false for logical expressions, this expression is always false.`
+          warning: `Binary data is always converted to false for logical expressions, always false.`
         };
       case "||":
       case "|":
@@ -1435,7 +1443,7 @@ export class StringType {
       case "&":
         return {
           type: "bool",
-          warning: `Dates are always converted to false for logical expressions, this expression is always false.`
+          warning: `Dates are always converted to false for logical expressions, always false.`
         }
       case "||":
       case "|":
@@ -1443,6 +1451,489 @@ export class StringType {
           type: "bool",
           warning: `Dates are always converted to false for logical expressions.`
         };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+}
+
+/**
+ * Static analysis-time null type.
+ */
+export class NullType {
+  /**
+   * Returns the result type of a `null op *` expression.
+   * @param operator 
+   * @param rhs 
+   */
+  static binop(operator: string, rhs: ValueType) {
+    switch(rhs) {
+      case "array":
+        return this.binopArray(operator);
+      case "binary":
+        return this.binopBin(operator);
+      case "bool":
+        return this.binopBool(operator);
+      case "date":
+        return this.binopDate(operator);
+      case "dictionary":
+        return this.binopDict(operator);
+      case "void":
+      case "null":
+        return this.binopNull(operator);
+      case "number":
+        return this.binopNumber(operator);
+      case "string":
+        return this.binopString(operator);
+      case "node":
+        // TODO
+      case "type":
+        // TODO
+      default:
+        throw new TcError(`Unsupported RHS type in binary expression: ${rhs}.`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `null op number` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopNumber(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+      case "-":
+        return {
+          type: "number",
+          warning: `Cross-type multiplication of null ${operator} number. Null values are converted to 0 at runtime.`
+        };
+      case "*":
+        return {
+          type: "number",
+          warning: `Cross-type multiplication of null ${operator} number. Null values are converted to 0 at runtime, always 0.`
+        };
+      case "/":
+        return {
+          type: "number",
+          warning: `Cross-type division of null ${operator} number. Null values are converted to 0 at runtime, this expression always results in 0 or error.`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible types: null ${operator} number`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of null ${operator} number, always false.`
+        };
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of null ${operator} number, always true.`
+        };
+      case "&&":
+      case "&":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of null ${operator} number, always false.`
+        };
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of null ${operator} number, results in implicit number->bool conversion at runtime.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `null op string` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopString(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {
+          type: "string",
+          warning: `Cross-type concatenation of null ${operator} string, the null value is implicitly converted to an empty string.`
+        };
+      case "-":
+        return {
+          type: "error",
+          error: `Illegal operation, SUBTRACT with incompatible types: null ${operator} bool`
+        };
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible types: null ${operator} bool`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible types: null ${operator} bool`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible types: null ${operator} bool`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of null ${operator} string, always false.`
+        };
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of null ${operator} string, always true.`
+        };
+      case "&&":
+      case "&":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of null ${operator} string, always false.`
+        };
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of null ${operator} string, results in implicit string parsing at runtime.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `null op bool` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopBool(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {
+          type: "error",
+          error: `Illegal operation, ADDITION with incompatible data types: null ${operator} bool`
+        };
+      case "-":
+        return {
+          type: "error",
+          error: `Illegal operation, SUBTRACTION with incompatible data types: null ${operator} bool`
+        };
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible types: null ${operator} bool`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible types: null ${operator} bool`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible types: null ${operator} bool`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of null ${operator} bool, always false.`
+        };
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of null ${operator} bool, always true.`
+        };
+      case "&&":
+      case "&":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of null ${operator} bool, always false.`
+        };
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of null ${operator} bool, null value is implicitly converted to false.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `null op null` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopNull(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+      case "-":
+        return {type: "null"};
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible types: null ${operator} null`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible types: null ${operator} null`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible types: null ${operator} null`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of null ${operator} null, always false.`
+        };
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of null ${operator} null, always true.`
+        };
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of null ${operator} null, always false.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `null op array` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopArray(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+      case "/":
+      case "^":
+        return {
+          type: "array",
+          warning: `Cross-type operation of null ${operator} array, applies the operation to each element.`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+        return {
+          type: "array",
+          warning: `Cross-type comparison of null ${operator} array, returns an array of element comparisons.`
+        };
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Arrays are always converted to false for logical expressions, this expression always returns false.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `null op dictionary` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopDict(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+        return {
+          type: "error",
+          error: `Cross-type operation of null ${operator} dictionary results in a runtime conversion error.`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Cross-type operation of null ${operator} dictionary results in a runtime error.`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible data types: null ${operator} dictionary`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of null ${operator} dictionary, always false.`
+        };
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of null ${operator} dictionary, always true.`
+        };
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Null values and dictionaries are always converted to false for logical expressions, always false.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `null op binary` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopBin(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {
+          type: "binary",
+          warning: `Cross-type addition of null ${operator} binary, returns the binary value unchanged.`
+        };
+      case "-":
+        return {
+          type: "error",
+          error: `Illegal operation, SUBTRACT with incompatible data types: null ${operator} binary`
+        };
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible data types: null ${operator} binary`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible data types: null ${operator} binary`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible data types: null ${operator} binary`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of null ${operator} binary, always false.`
+        };
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of null ${operator} binary, always true.`
+        };
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Null values and binary data are converted to false for logical expressions, always false.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `null op date` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopDate(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {
+          type: "date",
+          warning: `Cross-type addition of null ${operator} date, returns the unchanged date object.`
+        };
+      case "-":
+        return {
+          type: "error",
+          error: `Illegal operation, SUBTRACT with incompatible data types: null ${operator} date`
+        };
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible data types: null ${operator} date`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible data types: null ${operator} date`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible data types: null ${operator} date`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of null ${operator} date, always false.`
+        };
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of null ${operator} date, always true.`
+        };
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Null values and dates are always converted to false for logical expressions, always false.`
+        }
       default:
         throw new TcError(`Unsupported binary operator ${operator}`);
     }
