@@ -1,4 +1,7 @@
 <trans>
-  // test for Round function
-  Now() = 3 + 12 + "true";
+  // test for global var inference and warnings
+  $something = "nice";
+  null = $something.else + $x;
+  $something.else = $something;
+  $jitterbit.scripting.db.max_rows
 </trans>

@@ -1,3 +1,4 @@
+import { Api } from "../api";
 import { TcError } from "../errors";
 import { 
   ArrayLiteral,
@@ -452,7 +453,38 @@ export class TypedGlobalIdentifier extends TypedIdentifier {
   }
 
   public typeExpr(env: TypeEnv): TypeInfo {
-    throw new TcError("Method not implemented.");
+    const lookup = env.lookup(this.symbol);
+    // user-assigned
+    if(lookup !== undefined)
+      return lookup;
+
+    // no explicit assignment
+    let info: TypeInfo;
+    switch(this.globalKind) {
+      case "global":
+        info = {
+          type: "null",
+          warning: `Global variable ${this.symbol} used without an explicit assignment. Make sure it is assigned upstream of this expression by the calling script or operation chain. If this is a project variable you can ignore this warning.`
+        };
+        this.setTypeInfo(info);
+        env.set(this.symbol, info);
+        // reset the warning before bubbling it up
+        info.warning = undefined;
+        return info;
+      case "project":
+        throw new TcError(`Project variable identifiers are not supported yet.`);
+      case "system":
+        const sysVar = Api.getSysVar(this.symbol);
+        if(sysVar === undefined)
+          throw new TcError(`Undefined system variable ${this.symbol} at type inference time.`);
+        let type = sysVar.dataType.toLowerCase();
+        if(type === "integer")
+          type = "number";
+        info = {type: type as ValueType};
+        this.setTypeInfo(info);
+        env.set(this.symbol, info);
+        return info;
+    }
   }
 }
 
