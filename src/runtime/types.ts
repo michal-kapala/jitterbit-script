@@ -3042,11 +3042,9 @@ export class JbBinary implements BinaryVal {
       case ">=":
         throw new RuntimeError(`compare (${operator}) with binary data`);
       case "==":
-        // ref comparison, only true if compared with self
-        return new JbBool(this === rhs);
+        return new JbBool(this.toString() === rhs.toString());
       case "!=":
-        // ref comparison, only false if compared with self
-        return new JbBool(this !== rhs);
+        return new JbBool(this.toString() !== rhs.toString());
       case "&&":
       case "&":
       case "||":

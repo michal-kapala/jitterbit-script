@@ -23,6 +23,7 @@ import TypeEnv from "./environment";
 import Typechecker from "./typechecker";
 import { 
   ArrayType,
+  BinaryType,
   BoolType,
   DictionaryType,
   NullType,
@@ -300,6 +301,8 @@ export class TypedBinaryExpr extends TypedExpr {
         resultType = ArrayType.binop(this.operator, rhs.type as ValueType);
         break;
       case "binary":
+        resultType = BinaryType.binop(this.operator, rhs.type as ValueType);
+        break;
       case "bool":
         resultType = BoolType.binop(this.operator, rhs.type as ValueType);
         break;
