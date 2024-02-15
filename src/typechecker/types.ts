@@ -2269,3 +2269,481 @@ export class ArrayType {
     }
   }
 }
+
+/**
+ * Static analysis-time dictionary type.
+ */
+export class DictionaryType {
+  /**
+   * Returns the result type of a `dictionary op *` expression.
+   * @param operator 
+   * @param rhs 
+   */
+  static binop(operator: string, rhs: ValueType) {
+    switch(rhs) {
+      case "array":
+        return this.binopArray(operator);
+      case "binary":
+        return this.binopBin(operator);
+      case "bool":
+        return this.binopBool(operator);
+      case "date":
+        return this.binopDate(operator);
+      case "dictionary":
+        return this.binopDict(operator);
+      case "void":
+      case "null":
+        return this.binopNull(operator);
+      case "number":
+        return this.binopNumber(operator);
+      case "string":
+        return this.binopString(operator);
+      case "node":
+        // TODO
+      case "type":
+        // TODO
+      default:
+        throw new TcError(`Unsupported RHS type in binary expression: ${rhs}.`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `dictionary op number` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopNumber(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+      case "/":
+      case "^":
+        return {
+          type: "error",
+          error: `Cross-type operation of dictionary ${operator} number, results in a runtime conversion error.`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of dictionary ${operator} number, the dictionary value is implicitly converted to 0 at runtime.`
+        };
+      case "==":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of dictionary ${operator} number, always false.`
+        };
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of dictionary ${operator} number, always true.`
+        };
+      case "&&":
+      case "&":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of dictionary ${operator} number, always false.`
+        };
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of null ${operator} number, results in implicit number->bool conversion at runtime.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `dictionary op string` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopString(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {
+          type: "string",
+          warning: `Cross-type concatenation of dictionary ${operator} string, results in a runtime conversion error.`
+        };
+      case "-":
+        return {
+          type: "error",
+          error: `Illegal operation, SUBTRACT with incompatible types: dictionary ${operator} string`
+        };
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible types: dictionary ${operator} string`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible types: dictionary ${operator} string`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible types: dictionary ${operator} string`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of dictionary ${operator} string, both values are implicitly converted to numbers at runtime; dictionaries are always 0.`
+        };
+      case "==":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of dictionary ${operator} string, always false.`
+        };
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of dictionary ${operator} string, always true.`
+        };
+      case "&&":
+      case "&":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of dictionary ${operator} string, always false.`
+        };
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of dictionary ${operator} string, results in implicit string parsing at runtime.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `dictionary op bool` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopBool(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {
+          type: "error",
+          error: `Cross-type addition of dictionary ${operator} bool, results in a runtime error.`
+        };
+      case "-":
+        return {
+          type: "error",
+          error: `Illegal operation, SUBTRACTION with incompatible data types: dictionary ${operator} bool`
+        };
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible types: dictionary ${operator} bool`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible types: dictionary ${operator} bool`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible types: dictionary ${operator} bool`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of dictionary ${operator} bool, the implicitly converted to numbers.`
+        };
+      case "==":
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of dictionary ${operator} bool, the dictionary is implicitly converted to false.`
+        };
+      case "&&":
+      case "&":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of dictionary ${operator} bool, always false.`
+        };
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of dictionary ${operator} bool, the dictionary is implicitly converted to false.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `dictionary op null` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopNull(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+        return {
+          type: "error",
+          error: `Cross-type operation of dictionary ${operator} null results in a runtime conversion error.`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Cross-type operation of dictionary ${operator} null results in a runtime error.`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible types: dictionary ${operator} null`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of dictionary ${operator} null, always false.`
+        };
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of dictionary ${operator} null, always true.`
+        };
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of dictionary ${operator} null, always false.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `dictionary op array` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopArray(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+      case "/":
+      case "^":
+        return {
+          type: "array",
+          warning: `Cross-type operation of dictionary ${operator} array, applies the operation to each element.`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+        return {
+          type: "array",
+          warning: `Cross-type comparison of dictionary ${operator} array, returns an array of element comparisons.`
+        };
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Dictionaries and arrays are always converted to false for logical expressions, this expression always returns false.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `dictionary op dictionary` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopDict(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+        return {
+          type: "error",
+          error: `Operation of dictionary ${operator} dictionary results in a runtime conversion error.`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Operation of dictionary ${operator} dictionary results in a runtime error.`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Operation of dictionary ${operator} dictionary results in a runtime conversion error.`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Comparison of dictionary ${operator} dictionary, the values implicitly converted to numbers at runtime.`
+        };
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Dictionaries are always converted to false for logical expressions, always false.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `dictionary op binary` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopBin(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {
+          type: "error",
+          error: `Cross-type addition of dictionary ${operator} binary, results in a runtime conversion error.`
+        };
+      case "-":
+        return {
+          type: "error",
+          error: `Illegal operation, SUBTRACT with incompatible data types: dictionary ${operator} binary`
+        };
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible data types: dictionary ${operator} binary`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible data types: dictionary ${operator} binary`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible data types: dictionary ${operator} binary`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+        return {
+          type: "error",
+          error: `Cross-type comparison of dictionary ${operator} binary, results in a runtime error.`
+        };
+      case "==":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of dictionary ${operator} binary, always false.`
+        };
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of dictionary ${operator} binary, always true.`
+        };
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Dictionaries and binary data are converted to false for logical expressions, always false.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `dictionary op date` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopDate(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {
+          type: "error",
+          error: `Cross-type addition of dictionary ${operator} date, results in a runtime error.`
+        };
+      case "-":
+        return {
+          type: "error",
+          error: `Illegal operation, SUBTRACT with incompatible data types: dictionary ${operator} date`
+        };
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible data types: dictionary ${operator} date`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible data types: dictionary ${operator} date`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible data types: dictionary ${operator} date`
+        };
+      case "<":
+      case "<=":
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of dictionary ${operator} date, always true.`
+        };
+      case ">":
+      case ">=":
+      case "==":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of dictionary ${operator} date, always false.`
+        };
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Dictionaries and dates are always converted to false for logical expressions, always false.`
+        }
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+}

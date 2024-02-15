@@ -24,6 +24,7 @@ import Typechecker from "./typechecker";
 import { 
   ArrayType,
   BoolType,
+  DictionaryType,
   NullType,
   NumberType,
   StringType
@@ -304,7 +305,8 @@ export class TypedBinaryExpr extends TypedExpr {
         break;
       case "date":
       case "dictionary":
-      case "node":
+        resultType = DictionaryType.binop(this.operator, rhs.type as ValueType);
+        break;
       case "void":
       case "null":
         resultType = NullType.binop(this.operator, rhs.type as ValueType);
@@ -318,6 +320,7 @@ export class TypedBinaryExpr extends TypedExpr {
       case "type":
         // TODO: could be unified with "unknown" in future
         return resultType;
+      case "node":
       case "unknown":
         break;
       default:
