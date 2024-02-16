@@ -522,6 +522,66 @@ export class TypedUnaryExpr extends TypedExpr {
   }
 
   public typeExpr(env: TypeEnv): TypeInfo {
-    throw new TcError("Method not implemented.");
+    const valueInfo = this.value.typeExpr(env);
+
+    // handle static analysis types
+    if(valueInfo.type === "error") {
+      this.type = "unknown";
+      return {type: this.type} as TypeInfo;
+    }
+
+    if(valueInfo.type === "unassigned") {
+      this.value.type = "error";
+      this.value.error = `Local variable '${(this.value as TypedIdentifier).symbol}' hasn't been initialized.`;
+      this.type = "unknown";
+    }
+
+    if(valueInfo.type === "unassigned")
+      return {type: this.type} as TypeInfo;
+
+    if(valueInfo.type === "unknown")
+      this.type = "unknown";
+
+    // handle runtime types
+    let resultType = {type: "unknown"} as TypeInfo;
+    switch(this.value.type) {
+      case "array":
+        resultType = ArrayType.unop(this.operator.value);
+        break;
+      case "binary":
+        resultType = BinaryType.unop(this.operator.value);
+        break;
+      case "bool":
+        resultType = BoolType.unop(this.operator.value);
+        break;
+      case "date":
+        resultType = DateType.unop(this.operator.value);
+        break;
+      case "dictionary":
+        resultType = DictionaryType.unop(this.operator.value);
+        break;
+      case "void":
+      case "null":
+        resultType = NullType.unop(this.operator.value);
+        break;
+      case "number":
+        resultType = NumberType.unop(this.operator.value);
+        break;
+      case "string":
+        resultType = StringType.unop(this.operator.value);
+        break;
+      case "type":
+        // TODO: could be unified with "unknown" in future
+        return resultType;
+      case "node":
+      case "unknown":
+        break;
+      default:
+        throw new TcError(`Unary expression with unsupported type: ${this.type}.`);
+    }
+    this.setTypeInfo(resultType);
+    // reset the warning before bubbling it up
+    resultType.warning = undefined;
+    return resultType;
   }
 }

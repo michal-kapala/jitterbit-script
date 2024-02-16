@@ -1,5 +1,4 @@
 <trans>
   // test for array inference and warnings
-  $something = {1, 2, "3"};
-  result = $something.else = $something || $x;
+  $something = !"string";
 </trans>

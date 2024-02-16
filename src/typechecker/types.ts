@@ -7,6 +7,27 @@ import { TypeInfo } from "./ast";
  */
 export class NumberType {
   /**
+   * Returns the result type of a number unary expression.
+   * @param operator 
+   * @param lhs 
+   * @returns 
+   */
+  static unop(operator: string): TypeInfo {
+    switch(operator) {
+      case "!":
+        return {type: "bool"};
+      // TODO: unary + is not supported yet
+      case "+":
+      case "-":
+      case "++":
+      case "--":
+        return {type: "number"};
+      default:
+        throw new TcError(`Unsupported unary operator ${operator}`);
+    }
+  }
+
+  /**
    * Returns the result type of a `number op *` expression.
    * @param operator 
    * @param rhs 
@@ -462,6 +483,38 @@ export class NumberType {
  * Static analysis-time `bool` type.
  */
 export class BoolType {
+  /**
+   * Returns the result type of a bool unary expression.
+   * @param operator 
+   * @param lhs 
+   * @returns 
+   */
+  static unop(operator: string): TypeInfo {
+    switch(operator) {
+      case "!":
+        return {type: "bool"};
+      case "-":
+        return {
+          type: "bool",
+          warning: `Unary ${operator} operator does not affect bool values.`
+        };
+      case "++":
+        return {
+          type: "bool",
+          warning: "Bool incrementation always returns true."
+        };
+      case "--":
+        return {
+          type: "bool",
+          warning: "Bool decrementation is equivalent to negation (!)."
+        };
+      // TODO: unary + is not supported yet
+      case "+":
+      default:
+        throw new TcError(`Unsupported unary operator ${operator}`);
+    }
+  }
+
   /**
    * Returns the result type of a `bool op *` expression.
    * @param operator 
@@ -961,6 +1014,41 @@ export class BoolType {
  * Static analysis-time `string` type.
  */
 export class StringType {
+  /**
+   * Returns the result type of a string unary expression.
+   * @param operator 
+   * @param lhs 
+   * @returns 
+   */
+  static unop(operator: string): TypeInfo {
+    switch(operator) {
+      case "!":
+        return {
+          type: "bool",
+          warning: "The string is implicitly parsed as a number, non-zero values return false."
+        };
+      case "-":
+        return {
+          type: "string",
+          warning: `The string is implicitly parsed as a number, its negated value is returned as a string.`
+        };
+      case "++":
+        return {
+          type: "string",
+          warning: `The string is implicitly parsed as a number, its incremented value representation is assigned.`
+        };
+      case "--":
+        return {
+          type: "string",
+          warning: `The string is implicitly parsed as a number, its decremented value representation is assigned.`
+        };
+      // TODO: unary + is not supported yet
+      case "+":
+      default:
+        throw new TcError(`Unsupported unary operator ${operator}`);
+    }
+  }
+
   /**
    * Returns the result type of a `string op *` expression.
    * @param operator 
@@ -1462,6 +1550,33 @@ export class StringType {
  */
 export class NullType {
   /**
+   * Returns the result type of a null unary expression.
+   * @param operator 
+   * @param lhs 
+   * @returns 
+   */
+  static unop(operator: string): TypeInfo {
+    switch(operator) {
+      case "!":
+        return {
+          type: "bool",
+          warning: "Negation of a null value always returns true."
+        };
+      case "-":
+      case "++":
+      case "--":
+        return {
+          type: "error",
+          error: `Unary operator ${operator} cannot be used on null values, results in a runtime error.`
+        };
+      // TODO: unary + is not supported yet
+      case "+":
+      default:
+        throw new TcError(`Unsupported unary operator ${operator}`);
+    }
+  }
+
+  /**
    * Returns the result type of a `null op *` expression.
    * @param operator 
    * @param rhs 
@@ -1945,6 +2060,29 @@ export class NullType {
  */
 export class ArrayType {
   /**
+   * Returns the result type of a array unary expression.
+   * @param operator 
+   * @param lhs 
+   * @returns 
+   */
+  static unop(operator: string): TypeInfo {
+    switch(operator) {
+      case "!":
+      case "-":
+      case "++":
+      case "--":
+        return {
+          type: "array",
+          warning: `Unary operator ${operator} is applied to all the array members, the modified arrray is returned.`
+        };
+      // TODO: unary + is not supported yet
+      case "+":
+      default:
+        throw new TcError(`Unsupported unary operator ${operator}`);
+    }
+  }
+
+  /**
    * Returns the result type of a `array op *` expression.
    * @param operator 
    * @param rhs 
@@ -2274,6 +2412,29 @@ export class ArrayType {
  * Static analysis-time `dictionary` type.
  */
 export class DictionaryType {
+  /**
+   * Returns the result type of a dictionary unary expression.
+   * @param operator 
+   * @param lhs 
+   * @returns 
+   */
+  static unop(operator: string): TypeInfo {
+    switch(operator) {
+      case "!":
+      case "-":
+      case "++":
+      case "--":
+        return {
+          type: "error",
+          error: `Unary operator ${operator} cannot be used on dictionaries, results in a runtime conversion error.`
+        };
+      // TODO: unary + is not supported yet
+      case "+":
+      default:
+        throw new TcError(`Unsupported unary operator ${operator}`);
+    }
+  }
+
   /**
    * Returns the result type of a `dictionary op *` expression.
    * @param operator 
@@ -2752,6 +2913,29 @@ export class DictionaryType {
  * Static analysis-time `binary` type.
  */
 export class BinaryType {
+  /**
+   * Returns the result type of a binary unary expression.
+   * @param operator 
+   * @param lhs 
+   * @returns 
+   */
+  static unop(operator: string): TypeInfo {
+    switch(operator) {
+      case "!":
+      case "-":
+      case "++":
+      case "--":
+        return {
+          type: "error",
+          error: `Unary operator ${operator} cannot be used on binary data, results in a runtime conversion error.`
+        };
+      // TODO: unary + is not supported yet
+      case "+":
+      default:
+        throw new TcError(`Unsupported unary operator ${operator}`);
+    }
+  }
+
   /**
    * Returns the result type of a `binary op *` expression.
    * @param operator 
@@ -3239,6 +3423,33 @@ export class BinaryType {
  * Static analysis-time `date` type.
  */
 export class DateType {
+  /**
+   * Returns the result type of a date unary expression.
+   * @param operator 
+   * @param lhs 
+   * @returns 
+   */
+  static unop(operator: string): TypeInfo {
+    switch(operator) {
+      case "-":
+      case "++":
+      case "--":
+        return {
+          type: "error",
+          error: `Unary operator ${operator} cannot be used on dates, results in a runtime error (org.apache.http.NoHttpResponseException).`
+        };
+      case "!":
+        return {
+          type: "error",
+          error: `Unary operator ${operator} cannot be used on dates, results in a runtime conversion error.`
+        };
+      // TODO: unary + is not supported yet
+      case "+":
+      default:
+        throw new TcError(`Unsupported unary operator ${operator}`);
+    }
+  }
+
   /**
    * Returns the result type of a `date op *` expression.
    * @param operator 
