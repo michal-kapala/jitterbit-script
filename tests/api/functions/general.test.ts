@@ -6,6 +6,7 @@ import {
   BinaryExpr,
   BlockExpr,
   CallExpr,
+  FunctionIdentifier,
   Identifier,
   NumericLiteral,
   StringLiteral
@@ -70,7 +71,7 @@ describe('General functions', function() {
       new NumericLiteral(new Token("3", TokenType.Integer, pos, pos)),
       new CallExpr(
         [],
-        new Identifier(new Token("Null", TokenType.Identifier, pos, pos)),
+        new FunctionIdentifier(new Token("Null", TokenType.Identifier, pos, pos)),
         pos
       ),
       "^"
@@ -214,7 +215,7 @@ describe('General functions', function() {
     const pos = new Position();
     const arg = new CallExpr(
       [],
-      new Identifier(new Token("Null", TokenType.Identifier, pos, pos)),
+      new FunctionIdentifier(new Token("Null", TokenType.Identifier, pos, pos)),
       pos
     );
     const defaultResult = new StringLiteral(
@@ -308,7 +309,7 @@ describe('General functions', function() {
           [
             new CallExpr(
               [],
-              new Identifier(new Token("Null", TokenType.Identifier, pos, pos)),
+              new FunctionIdentifier(new Token("Null", TokenType.Identifier, pos, pos)),
               pos
             )
           ],

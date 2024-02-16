@@ -912,7 +912,7 @@ describe('JbArray cross-type interactions', function() {
   test('array == binary', function() {
     expect(
       new JbArray([new JbBinary()]).binopBin("==", new JbBinary())
-    ).toStrictEqual(new JbArray([new JbBool(false)]));
+    ).toStrictEqual(new JbArray([new JbBool(true)]));
   });
 
   test('array == date', function() {

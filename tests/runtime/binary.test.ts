@@ -134,16 +134,18 @@ describe('JbBinary operators', function() {
   });
 
   test('binary == binary', function() {
-    const bin = new JbBinary();
+    const bin = new JbBinary(new Uint8Array([3, 2, 1, 0]));
     expect(
-      bin.binopBin("==", bin)
-    ).toStrictEqual(new JbBool(true));
+      bin.binopBin("==", new JbBinary())
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('binary != binary', function() {
     expect(
-      new JbBinary().binopBin("!=", new JbBinary())
-    ).toStrictEqual(new JbBool(true));
+      new JbBinary(
+        new Uint8Array([3, 2, 1, 0])
+      ).binopBin("!=", new JbBinary(new Uint8Array([3, 2, 1, 0])))
+    ).toStrictEqual(new JbBool(false));
   });
 
   test('binary && binary', function() {
