@@ -25,6 +25,7 @@ import {
   ArrayType,
   BinaryType,
   BoolType,
+  DateType,
   DictionaryType,
   NullType,
   NumberType,
@@ -307,6 +308,8 @@ export class TypedBinaryExpr extends TypedExpr {
         resultType = BoolType.binop(this.operator, rhs.type as ValueType);
         break;
       case "date":
+        resultType = DateType.binop(this.operator, rhs.type as ValueType);
+        break;
       case "dictionary":
         resultType = DictionaryType.binop(this.operator, rhs.type as ValueType);
         break;

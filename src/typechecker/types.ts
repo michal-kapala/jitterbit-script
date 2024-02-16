@@ -1091,7 +1091,7 @@ export class StringType {
       case "|":
         return {
           type: "bool",
-          warning: `Cross-type logical expression of string ${operator} string, results in implicit conversions at runtime.`
+          warning: `Logical expression of string ${operator} string, results in implicit conversions at runtime.`
         };
       default:
         throw new TcError(`Unsupported binary operator ${operator}`);
@@ -1505,7 +1505,7 @@ export class NullType {
       case "-":
         return {
           type: "number",
-          warning: `Cross-type multiplication of null ${operator} number. Null values are converted to 0 at runtime.`
+          warning: `Cross-type operation of null ${operator} number. Null values are converted to 0 at runtime.`
         };
       case "*":
         return {
@@ -1711,12 +1711,12 @@ export class NullType {
       case "==":
         return {
           type: "bool",
-          warning: `Cross-type comparison of null ${operator} null, always false.`
+          warning: `Comparison of null ${operator} null, always false.`
         };
       case "!=":
         return {
           type: "bool",
-          warning: `Cross-type comparison of null ${operator} null, always true.`
+          warning: `Comparison of null ${operator} null, always true.`
         };
       case "&&":
       case "&":
@@ -1724,7 +1724,7 @@ export class NullType {
       case "|":
         return {
           type: "bool",
-          warning: `Cross-type logical expression of null ${operator} null, always false.`
+          warning: `Logical expression of null ${operator} null, always false.`
         };
       default:
         throw new TcError(`Unsupported binary operator ${operator}`);
@@ -2149,7 +2149,7 @@ export class ArrayType {
       case "!=":
         return {
           type: "array",
-          warning: `Cross-type operation of array ${operator} array, applies the operation to each element of the LHS array.`
+          warning: `Operation of array ${operator} array, applies the operation to each element of the LHS array.`
         };
       case "&&":
       case "&":
@@ -3228,6 +3228,489 @@ export class BinaryType {
         return {
           type: "bool",
           warning: `Binary data and dates are always converted to false for logical expressions, always false.`
+        }
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+}
+
+/**
+ * Static analysis-time `date` type.
+ */
+export class DateType {
+  /**
+   * Returns the result type of a `date op *` expression.
+   * @param operator 
+   * @param rhs 
+   */
+  static binop(operator: string, rhs: ValueType) {
+    switch(rhs) {
+      case "array":
+        return this.binopArray(operator);
+      case "binary":
+        return this.binopBin(operator);
+      case "bool":
+        return this.binopBool(operator);
+      case "date":
+        return this.binopDate(operator);
+      case "dictionary":
+        return this.binopDict(operator);
+      case "void":
+      case "null":
+        return this.binopNull(operator);
+      case "number":
+        return this.binopNumber(operator);
+      case "string":
+        return this.binopString(operator);
+      case "node":
+        // TODO
+      case "type":
+        // TODO
+      default:
+        throw new TcError(`Unsupported RHS type in binary expression: ${rhs}.`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `date op number` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopNumber(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {
+          type: "date",
+          warning: `Cross-type addition of date ${operator} number. The number is interpreted as seconds.`
+        };
+      case "-":
+        return {
+          type: "date",
+          warning: `Cross-type subtraction of date ${operator} number. Null values are converted to 0 at runtime.`
+        };
+      case "*":
+        return {
+          type: "number",
+          warning: `Illegal operation, MULTIPLICATION with incompatible types: date ${operator} number`
+        };
+      case "/":
+        return {
+          type: "number",
+          warning: `Illegal operation, DIVISION with incompatible types: date ${operator} number`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible types: date ${operator} number`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of date ${operator} number, the date is implicitly converted to epoch timestamp (in seconds).`
+        };
+      case "&&":
+      case "&":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of date ${operator} number, always false.`
+        };
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of date ${operator} number, the date is implicitly converted to false.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `date op string` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopString(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {
+          type: "string",
+          warning: `Cross-type concatenation of date ${operator} string, the date is represented in the format of YYYY-MM-DD HH:MM:SS(.mmm).`
+        };
+      case "-":
+        return {
+          type: "error",
+          error: `Illegal operation, SUBTRACT with incompatible types: date ${operator} string`
+        };
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible types: date ${operator} string`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible types: date ${operator} string`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible types: date ${operator} string`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of date ${operator} string, both values are implicitly converted to numbers.`
+        };
+      case "&&":
+      case "&":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of date ${operator} string, always false.`
+        };
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of date ${operator} string, results in implicit string parsing at runtime.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `date op bool` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopBool(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {
+          type: "error",
+          error: `Cross-type addition of date ${operator} bool, results in a runtime error.`
+        };
+      case "-":
+        return {
+          type: "error",
+          error: `Illegal operation, SUBTRACTION with incompatible data types: date ${operator} bool`
+        };
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible types: date ${operator} bool`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible types: date ${operator} bool`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible types: date ${operator} bool`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of date ${operator} bool, both values are implicitly converted to numbers.`
+        };
+      case "&&":
+      case "&":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of date ${operator} bool, always false.`
+        };
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of date ${operator} bool, results in implicit string parsing at runtime.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `date op null` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopNull(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+      case "-":
+        return {
+          type: "null",
+          warning: `Cross-type operation of date ${operator} null, the date is returned unchanged.`
+        };
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible types: date ${operator} null`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible types: date ${operator} null`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible types: date ${operator} null`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of date ${operator} null, always false.`
+        };
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of date ${operator} null, always true.`
+        };
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Cross-type logical expression of date ${operator} null, always false.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `date op array` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopArray(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+      case "-":
+      case "*":
+      case "/":
+      case "^":
+        return {
+          type: "array",
+          warning: `Cross-type operation of date ${operator} array, applies the operation to each element.`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+        return {
+          type: "array",
+          warning: `Cross-type comparison of date ${operator} array, returns an array of element comparisons.`
+        };
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Dates and arrays are always converted to false for logical expressions, this expression always returns false.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `date op dictionary` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopDict(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {
+          type: "error",
+          error: `Cross-type addition of date ${operator} dictionary, results in a runtime error.`
+        };
+      case "-":
+        return {
+          type: "error",
+          error: `Illegal operation, SUBTRACT with incompatible data types: date ${operator} dictionary`
+        };
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible data types: date ${operator} dictionary`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible data types: date ${operator} dictionary`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible data types: date ${operator} dictionary`
+        };
+      case "<":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of date ${operator} dictionary, always false.`
+        };
+      case ">":
+      case "<=":
+      case ">=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of date ${operator} dictionary, both values are implicitly converted to numbers.`
+        };
+      case "==":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of date ${operator} dictionary, always false.`
+        };
+      case "!=":
+        return {
+          type: "bool",
+          warning: `Cross-type comparison of date ${operator} dictionary, always true.`
+        };
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Dates and dictionaries are always converted to false for logical expressions, always false.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `date op binary` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopBin(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {
+          type: "error",
+          error: `Cross-type addition of date ${operator} binary, results in a runtime error.`
+        };
+      case "-":
+        return {
+          type: "error",
+          error: `Illegal operation, SUBTRACT with incompatible data types: date ${operator} binary`
+        };
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible data types: date ${operator} binary`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible data types: date ${operator} binary`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible data types: date ${operator} binary`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+        return {
+          type: "error",
+          error: `Cross-type comparison of date ${operator} binary, results in a runtime error.`
+        };
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Dates and binary data are converted to false for logical expressions, always false.`
+        };
+      default:
+        throw new TcError(`Unsupported binary operator ${operator}`);
+    }
+  }
+
+  /**
+   * Returns the result type of a `date op date` expression.
+   * @param operator 
+   * @returns 
+   */
+  static binopDate(operator: string): TypeInfo {
+    switch(operator) {
+      case "+":
+        return {
+          type: "error",
+          error: `Addition of date objects is unsupported, results in a runtime error.`
+        };
+      case "-":
+        return {
+          type: "number",
+          warning: `Subtraction of dates returns the difference in seconds as a number.`
+        };
+      case "*":
+        return {
+          type: "error",
+          error: `Illegal operation, MULTIPLICATION with incompatible data types: date ${operator} date`
+        };
+      case "/":
+        return {
+          type: "error",
+          error: `Illegal operation, DIVISION with incompatible data types: date ${operator} date`
+        };
+      case "^":
+        return {
+          type: "error",
+          error: `Illegal operation, POW with incompatible data types: date ${operator} date`
+        };
+      case "<":
+      case ">":
+      case "<=":
+      case ">=":
+      case "==":
+      case "!=":
+        return {type: "bool"};
+      case "&&":
+      case "&":
+      case "||":
+      case "|":
+        return {
+          type: "bool",
+          warning: `Dates are converted to false for logical expressions, always false.`
         }
       default:
         throw new TcError(`Unsupported binary operator ${operator}`);
