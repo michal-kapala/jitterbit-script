@@ -1,7 +1,9 @@
 import { RuntimeError } from "../../errors";
 import Scope from "../../runtime/scope";
-import { JbBinary, JbBool, JbDate, JbNull, JbNumber, JbString } from "../../runtime/types";
+import { JbBinary, JbBool, JbDate, JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
+import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import TypeEnv from "../../typechecker/environment";
 import { Func, Parameter, Signature } from "../types";
 
 /**
@@ -13,6 +15,9 @@ import { Func, Parameter, Signature } from "../types";
  * This is the reverse of the function `HexToBinary`.
  */
 export class BinaryToHex extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "BinaryToHex";
@@ -52,6 +57,9 @@ export class BinaryToHex extends Func {
  * This is the reverse of the function `UUIDToBinary`.
  */
 export class BinaryToUUID extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "BinaryToUUID";
@@ -91,6 +99,9 @@ export class BinaryToUUID extends Func {
  * In all other cases, the result is false (0).
  */
 export class Bool extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor(){
     super();
     this.name = "Bool";
@@ -144,6 +155,9 @@ export class Bool extends Func {
  * For instance, `Date("12-12-2023")` will result in `2023-12-11 23:00:00.000` for `GMT+01:00` local timezone.
  */
 export class DateFunc extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor(){
     super();
     this.name = "Date";
@@ -200,6 +214,9 @@ export class DateFunc extends Func {
  * the number of seconds from 12:00:00 AM of 1/1/1970 UTC (the start of the UNIX epoch).
  */
 export class Double extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor(){
     super();
     this.name = "Double";
@@ -239,6 +256,9 @@ export class Double extends Func {
  * the number of seconds from 12:00:00 AM of 1/1/1970 UTC (the start of the UNIX epoch).
  */
 export class Float extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor(){
     super();
     this.name = "Float";
@@ -278,6 +298,9 @@ export class Float extends Func {
  * This is the reverse of the function `BinaryToHex`.
  */
 export class HexToBinary extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "HexToBinary";
@@ -318,6 +341,9 @@ export class HexToBinary extends Func {
  * This is the reverse of the function `StringToHex`.
  */
 export class HexToString extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "HexToString";
@@ -371,6 +397,9 @@ export class HexToString extends Func {
  * the number of seconds from 12:00:00 AM of 1/1/1970 UTC (the start of the UNIX epoch).
  */
 export class Int extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Int";
@@ -412,6 +441,9 @@ export class Int extends Func {
  * the number of seconds from 12:00:00 AM of 1/1/1970 UTC (the start of the UNIX epoch).
  */
 export class Long extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Long";
@@ -459,6 +491,9 @@ export class Long extends Func {
  * For a boolean value, the strings "1" or "0" are returned.
  */
 export class String extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "String";
@@ -498,6 +533,9 @@ export class String extends Func {
  * This is the reverse of the function `HexToString`.
  */
 export class StringToHex extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "StringToHex";
@@ -554,6 +592,9 @@ export class StringToHex extends Func {
  * This is the reverse of the function `BinaryToUUID`.
  */
 export class UUIDToBinary extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "UUIDToBinary";

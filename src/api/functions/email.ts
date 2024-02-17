@@ -1,6 +1,8 @@
 import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { RuntimeVal } from "../../runtime/values";
+import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import TypeEnv from "../../typechecker/environment";
 import { AsyncFunc, Parameter, Signature } from "../types";
 
 /**
@@ -14,6 +16,9 @@ import { AsyncFunc, Parameter, Signature } from "../types";
  * If it is not available in the configuration file, the email will not be sent.
  */
 export class SendEmail extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SendEmail";
@@ -65,6 +70,9 @@ export class SendEmail extends AsyncFunc {
  * the Notifications section in Jitterbit Script.
  */
 export class SendEmailMessage extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SendEmailMessage";
@@ -101,6 +109,9 @@ export class SendEmailMessage extends AsyncFunc {
  * On success, an empty string is returned; otherwise, any error messages are returned.
  */
 export class SendSystemEmail extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SendSystemEmail";

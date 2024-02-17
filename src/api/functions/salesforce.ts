@@ -1,6 +1,8 @@
 import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { RuntimeVal } from "../../runtime/values";
+import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import TypeEnv from "../../typechecker/environment";
 import { AsyncFunc, Parameter, Signature } from "../types";
 
 /**
@@ -25,6 +27,9 @@ import { AsyncFunc, Parameter, Signature } from "../types";
  * As an alternative to this function, see also the `LoginToSalesforceAndGetTimestamp` function.
  */
 export class GetSalesforceTimestamp extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "GetSalesforceTimestamp";
@@ -86,6 +91,9 @@ export class GetSalesforceTimestamp extends AsyncFunc {
  * As an alternative to this function, see also the `GetSalesforceTimestamp` function.
  */
 export class LoginToSalesforceAndGetTimeStamp extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "LoginToSalesforceAndGetTimeStamp";
@@ -137,6 +145,9 @@ export class LoginToSalesforceAndGetTimeStamp extends AsyncFunc {
  * Use the `GetLastError` function to retrieve the error message in that case.
  */
 export class SalesforceLogin extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SalesforceLogin";
@@ -191,6 +202,9 @@ export class SalesforceLogin extends AsyncFunc {
  * to retrieve the error message.
  */
 export class SetSalesforceSession extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SetSalesforceSession";
@@ -241,6 +255,9 @@ export class SetSalesforceSession extends AsyncFunc {
  * Use the `GetLastError` function to retrieve the error message in that case.
  */
 export class SfCacheLookup extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SfCacheLookup";
@@ -288,6 +305,9 @@ export class SfCacheLookup extends AsyncFunc {
  * See also the `SFLookupAll` and `SFLookupAllToFile` functions.
  */
 export class SfLookup extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SfLookup";
@@ -342,6 +362,9 @@ export class SfLookup extends AsyncFunc {
  * See also the `SFLookup` and `SFLookupAllToFile` functions.
  */
 export class SfLookupAll extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SfLookupAll";
@@ -396,6 +419,9 @@ export class SfLookupAll extends AsyncFunc {
  * See also the `SFLookup` and `SFLookupAll` functions.
  */
 export class SfLookupAllToFile extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SfLookupAllToFile";

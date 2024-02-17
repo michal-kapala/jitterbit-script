@@ -1,6 +1,8 @@
 import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { RuntimeVal } from "../../runtime/values";
+import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import TypeEnv from "../../typechecker/environment";
 import { Func, Signature } from "../types";
 
 /**
@@ -9,6 +11,9 @@ import { Func, Signature } from "../types";
  * Returns the ID of the agent group that the operation or expression is currently running in.
  */
 export class GetAgentGroupID extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "GetAgentGroupID";
@@ -37,6 +42,9 @@ export class GetAgentGroupID extends Func {
  * Returns the name of the agent group that the operation or expression is currently running in.
  */
 export class GetAgentGroupName extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "GetAgentGroupName";
@@ -65,6 +73,9 @@ export class GetAgentGroupName extends Func {
  * Returns the ID of the agent that is running the operation or expression.
  */
 export class GetAgentID extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "GetAgentID";
@@ -93,6 +104,9 @@ export class GetAgentID extends Func {
  * Returns the name of the agent that the operation or expression is currently running in.
  */
 export class GetAgentName extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "GetAgentName";
@@ -121,6 +135,9 @@ export class GetAgentName extends Func {
  * Returns the version ID of the agent that the operation or expression is currently running in.
  */
 export class GetAgentVersionID extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "GetAgentVersionID";
@@ -149,6 +166,9 @@ export class GetAgentVersionID extends Func {
  * Returns the version name of the agent that the operation or expression is currently running in.
  */
 export class GetAgentVersionName extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "GetAgentVersionName";
@@ -177,6 +197,9 @@ export class GetAgentVersionName extends Func {
  * Returns the ID of the environment that the operation or expression is currently running in.
  */
 export class GetEnvironmentID extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "GetEnvironmentID";
@@ -205,6 +228,9 @@ export class GetEnvironmentID extends Func {
  * Returns the name of the environment that the operation or expression is currently running in.
  */
 export class GetEnvironmentName extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "GetEnvironmentName";
@@ -233,6 +259,9 @@ export class GetEnvironmentName extends Func {
  * Returns the ID of the organization that the operation or expression is currently running in.
  */
 export class GetOrganizationID extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "GetOrganizationID";
@@ -261,6 +290,9 @@ export class GetOrganizationID extends Func {
  * Returns the name of the organization that the operation or expression is currently running in.
  */
 export class GetOrganizationName extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "GetOrganizationName";

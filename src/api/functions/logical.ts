@@ -4,6 +4,8 @@ import { evaluate } from "../../runtime/interpreter";
 import Scope from "../../runtime/scope";
 import { JbArray, JbBool, JbNull } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
+import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import TypeEnv from "../../typechecker/environment";
 import { DeferrableFunc, Func, Parameter, Signature } from "../types";
 
 /**
@@ -20,6 +22,9 @@ import { DeferrableFunc, Func, Parameter, Signature } from "../types";
  * Supports up to 100-argument calls (50 pairs).
  */
 export class Case extends DeferrableFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Case";
@@ -80,6 +85,9 @@ export class Case extends DeferrableFunc {
  * This implementation is type-sensitive - comparison of different types always returns `false`.
  */
 export class Equal extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Equal";
@@ -142,6 +150,9 @@ export class Equal extends Func {
  * If the optional third argument is not specified and condition is `false`, a `null` value is returned.
  */
 export class If extends DeferrableFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "If";
@@ -186,6 +197,9 @@ export class If extends DeferrableFunc {
  * An error is reported if the maximum number of iterations is reached.
  */
 export class While extends DeferrableFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "While";

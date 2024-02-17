@@ -2,6 +2,8 @@ import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { RuntimeVal } from "../../runtime/values";
 import { Func, Parameter, Signature } from "../types";
+import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import TypeEnv from "../../typechecker/environment";
 
 /**
  * The implementation of `DiffAdd` function.
@@ -9,6 +11,9 @@ import { Func, Parameter, Signature } from "../types";
  * Requests the added records as input for the next transformation that is run.
  */
 export class DiffAdd extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "DiffAdd";
@@ -40,6 +45,9 @@ export class DiffAdd extends Func {
  * In that case, the next time the diff operation runs, no records will be processed.
  */
 export class DiffComplete extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "DiffComplete";
@@ -68,6 +76,9 @@ export class DiffComplete extends Func {
  * Requests the deleted records as input for the next transformation that is run.
  */
 export class DiffDelete extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "DiffDelete";
@@ -99,6 +110,9 @@ export class DiffDelete extends Func {
  * Supports up to 100-argument calls.
  */
 export class DiffKeyList extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "DiffKeyList";
@@ -131,6 +145,9 @@ export class DiffKeyList extends Func {
  * the repeating node that the diff is performed on.
  */
 export class DiffNode extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "DiffNode";
@@ -159,6 +176,9 @@ export class DiffNode extends Func {
  * Requests the updated records as input for the next transformation that is run.
  */
 export class DiffUpdate extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "DiffUpdate";
@@ -196,6 +216,9 @@ export class DiffUpdate extends Func {
  * that implements a diff/synchronization.
  */
 export class InitializeDiff extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "InitializeDiff";
@@ -234,6 +257,9 @@ export class InitializeDiff extends Func {
  * Supports up to 100-argument calls.
  */
 export class OrderedDiffKeyList extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "OrderedDiffKeyList";
@@ -281,6 +307,9 @@ export class OrderedDiffKeyList extends Func {
  * If no diff session is present for this `diff_id`, no action is performed.
  */
 export class ResetDiff extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "ResetDiff";
@@ -317,6 +346,9 @@ export class ResetDiff extends Func {
  * This method is typically called in conjunction with the `InitializeDiff` function.
  */
 export class SetDiffChunkSize extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SetDiffChunkSize";

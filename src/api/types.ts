@@ -1,6 +1,8 @@
 import { Expr } from "../frontend/ast";
 import Scope from "../runtime/scope";
 import { RuntimeVal, ValueType } from "../runtime/values";
+import { TypeInfo, TypedExpr } from "../typechecker/ast";
+import TypeEnv from "../typechecker/environment";
 
 /**
  * Jitterbit function definition.
@@ -20,11 +22,18 @@ export abstract class Func {
   abstract call(args: RuntimeVal[], scope: Scope): RuntimeVal;
 
   /**
-   * Selects the target signature based on the passed argument list.
+   * Selects the target signature at runtime based on the passed argument list.
    * 
    * Should always be called from `call`.
    */
   protected abstract chooseSignature(args: RuntimeVal[]): void;
+
+  /**
+   * Validates the argument list and deducts the return type at static analysis time.
+   * @param args 
+   * @param env 
+   */
+  abstract analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo;
 }
 
 /**

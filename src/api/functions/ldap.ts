@@ -2,6 +2,8 @@ import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbBool, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
+import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import TypeEnv from "../../typechecker/environment";
 import { AsyncFunc, Func, Parameter, Signature } from "../types";
 
 /**
@@ -12,6 +14,9 @@ import { AsyncFunc, Func, Parameter, Signature } from "../types";
  * The array is converted to XML and interpreted when the LDAP server is written to.
  */
 export class ArrayToMultipleValues extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "ArrayToMultipleValues";
@@ -48,6 +53,9 @@ export class ArrayToMultipleValues extends Func {
  * See also the `LDAPConnect` and `LDAPExecute` functions.
  */
 export class LDAPAdd extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "LDAPAdd";
@@ -86,6 +94,9 @@ export class LDAPAdd extends AsyncFunc {
  * See also the `LDAPExecute` function.
  */
 export class LDAPConnect extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "LDAPConnect";
@@ -131,6 +142,9 @@ export class LDAPConnect extends AsyncFunc {
  * See also the `LDAPConnect` and `LDAPExecute` functions.
  */
 export class LDAPDeleteEntry extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "LDAPDeleteEntry";
@@ -171,6 +185,9 @@ export class LDAPDeleteEntry extends AsyncFunc {
  * See also the `LDAPConnect` and `LDAPExecute` functions.
  */
 export class LDAPExecute extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "LDAPExecute";
@@ -211,6 +228,9 @@ export class LDAPExecute extends AsyncFunc {
  * See also the `LDAPConnect` and `LDAPExecute` functions.
  */
 export class LDAPRemove extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "LDAPRemove";
@@ -253,6 +273,9 @@ export class LDAPRemove extends AsyncFunc {
  * See also the `LDAPConnect` and `LDAPExecute` functions.
  */
 export class LDAPRename extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "LDAPRename";
@@ -297,6 +320,9 @@ export class LDAPRename extends AsyncFunc {
  * See also the `LDAPConnect` and `LDAPExecute` functions.
  */
 export class LDAPReplace extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "LDAPReplace";
@@ -341,6 +367,9 @@ export class LDAPReplace extends AsyncFunc {
  * Supports up to 100-argument calls.
  */
 export class LDAPSearch extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "LDAPSearch";

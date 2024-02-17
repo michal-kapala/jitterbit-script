@@ -1,6 +1,8 @@
 import Scope from "../../runtime/scope";
 import { JbBool } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
+import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import TypeEnv from "../../typechecker/environment";
 import { Func, Parameter, Signature } from "../types";
 
 /**
@@ -19,6 +21,9 @@ import { Func, Parameter, Signature } from "../types";
 * the execution does not get halted.
  */
 export class DebugBreak extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "DebugBreak";

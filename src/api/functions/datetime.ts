@@ -2,6 +2,8 @@ import { RuntimeError, UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbBool, JbDate, JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
+import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import TypeEnv from "../../typechecker/environment";
 import { Func, Parameter, Signature } from "../types";
 
 /**
@@ -10,6 +12,9 @@ import { Func, Parameter, Signature } from "../types";
  * Take a date and returns it converted from one time zone to another time zone.
  */
 export class ConvertTimeZone extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "ConvertTimeZone";
@@ -52,6 +57,9 @@ export class ConvertTimeZone extends Func {
  * Converts a date object or date string in the input format to a date string in the output format.
  */
 export class CVTDate extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "CVTDate";
@@ -88,6 +96,9 @@ export class CVTDate extends Func {
  * Returns a date string after adding a number to a specified part of a date object.
  */
 export class DateAdd extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "DateAdd";
@@ -124,6 +135,9 @@ export class DateAdd extends Func {
  * Returns the day of the month (1-31) of a date object or date string.
  */
 export class DayOfMonth extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "DayOfMonth";
@@ -164,6 +178,9 @@ export class DayOfMonth extends Func {
  * This definition is independent of locale. For the weekday name, call `FormatDate` instead.
  */
 export class DayOfWeek extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "DayOfWeek";
@@ -202,6 +219,9 @@ export class DayOfWeek extends Func {
  * This is similar to the `CVTDate` function and uses the same format strings.
  */
 export class FormatDate extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "FormatDate";
@@ -240,6 +260,9 @@ export class FormatDate extends Func {
  * In this implementation the result is always UTC-based.
  */
 export class GeneralDate extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "GeneralDate";
@@ -279,6 +302,9 @@ export class GeneralDate extends Func {
  * Converts a date object or date string to a string according to a time zone code.
  */
 export class GetUTCFormattedDate extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "GetUTCFormattedDate";
@@ -316,6 +342,9 @@ export class GetUTCFormattedDate extends Func {
  * Converts a date object or date string to a string according to a time zone code.
  */
 export class GetUTCFormattedDateTime extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "GetUTCFormattedDateTime";
@@ -356,6 +385,9 @@ export class GetUTCFormattedDateTime extends Func {
  * In this implementation the result is always UTC-based.
  */
 export class LastDayOfMonth extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "LastDayOfMonth";
@@ -401,6 +433,9 @@ export class LastDayOfMonth extends Func {
  * In this implementation the result is always UTC-based.
  */
 export class LongDate extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "LongDate";
@@ -504,6 +539,9 @@ export class LongDate extends Func {
  * In this implementation the result is always UTC-based.
  */
 export class LongTime extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "LongTime";
@@ -544,6 +582,9 @@ export class LongTime extends Func {
  * In this implementation the result is always UTC-based.
  */
 export class MediumDate extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "MediumDate";
@@ -614,6 +655,9 @@ export class MediumDate extends Func {
  * In this implementation the result is always UTC-based.
  */
 export class MediumTime extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "MediumTime";
@@ -654,6 +698,9 @@ export class MediumTime extends Func {
  * In this implementation the result is always UTC-based.
  */
 export class MonthOfYear extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "MonthOfYear";
@@ -693,6 +740,9 @@ export class MonthOfYear extends Func {
  * This implementation always returns local time.
  */
 export class Now extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Now";
@@ -722,6 +772,9 @@ export class Now extends Func {
  * This implementation always returns local time.
  */
 export class Now_ extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Now_";
@@ -752,6 +805,9 @@ export class Now_ extends Func {
  * In this implementation the result is always UTC-based.
  */
 export class ShortDate extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "ShortDate";
@@ -791,6 +847,9 @@ export class ShortDate extends Func {
  * In this implementation the result is always UTC-based.
  */
 export class ShortTime extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "ShortTime";

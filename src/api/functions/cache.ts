@@ -2,6 +2,8 @@ import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
+import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import TypeEnv from "../../typechecker/environment";
 import { AsyncFunc, Parameter, Signature } from "../types";
 
 /**
@@ -10,6 +12,9 @@ import { AsyncFunc, Parameter, Signature } from "../types";
  * Reads from a common cache stored on Harmony.
  */
 export class ReadCache extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "ReadCache";
@@ -47,6 +52,9 @@ export class ReadCache extends AsyncFunc {
  * Writes to a common cache stored on Harmony.
  */
 export class WriteCache extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "WriteCache";

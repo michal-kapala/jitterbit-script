@@ -2,6 +2,8 @@ import { RuntimeError, UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbArray, JbBool, JbNull, JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
+import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import TypeEnv from "../../typechecker/environment";
 import { Func, Parameter, Signature } from "../types";
 
 /**
@@ -27,6 +29,10 @@ export class Array extends Func {
 
   protected chooseSignature(args: RuntimeVal[]): void {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    return {type: "array"};
   }
 }
 
@@ -74,6 +80,13 @@ export class GetSourceAttrNames extends Func {
   protected chooseSignature(args: RuntimeVal[]): void {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const nInfo = args[0].typeExpr(env);
+    if(![this.signature.params[0].type, "type", "unknown"].includes(nInfo.type))
+      args[0].warning = `The type of argument '${this.signature.params[0].name}' is ${nInfo.type}, should be ${this.signature.params[0].type}.`;
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -111,6 +124,13 @@ export class GetSourceElementNames extends Func {
   protected chooseSignature(args: RuntimeVal[]): void {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const nInfo = args[0].typeExpr(env);
+    if(![this.signature.params[0].type, "type", "unknown"].includes(nInfo.type))
+      args[0].warning = `The type of argument '${this.signature.params[0].name}' is ${nInfo.type}, should be ${this.signature.params[0].type}.`;
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -146,6 +166,13 @@ export class GetSourceInstanceArray extends Func {
   protected chooseSignature(args: RuntimeVal[]): void {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const nInfo = args[0].typeExpr(env);
+    if(![this.signature.params[0].type, "type", "unknown"].includes(nInfo.type))
+      args[0].warning = `The type of argument '${this.signature.params[0].name}' is ${nInfo.type}, should be ${this.signature.params[0].type}.`;
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -179,6 +206,13 @@ export class GetSourceInstanceElementArray extends Func {
 
   protected chooseSignature(args: RuntimeVal[]): void {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const nInfo = args[0].typeExpr(env);
+    if(![this.signature.params[0].type, "type", "unknown"].includes(nInfo.type))
+      args[0].warning = `The type of argument '${this.signature.params[0].name}' is ${nInfo.type}, should be ${this.signature.params[0].type}.`;
+    return {type: this.signature.returnType};
   }
 }
 
@@ -225,7 +259,6 @@ export class SortArray extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
 
-    // TODO: this error should be thrown by type checker (too)
     if(args[0].type !== this.signature.params[0].type)
       throw new RuntimeError(`${this.name} can only be called on array data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
@@ -320,6 +353,33 @@ export class SortArray extends Func {
         // TODO: this error is thrown by parser
         throw new RuntimeError(`Wrong number of arguments in SortArray(): number of arguments = ${args.length}, should be between 1 and 3`);
     }
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const arrInfo = args[0].typeExpr(env);
+    // arrayToSort
+    if(![this.signatures[0].params[0].type, "type", "unknown"].includes(arrInfo.type)) {
+      args[0].type = "error";
+      args[0].error = `The type of argument '${this.signatures[0].params[0].name}' cannot be ${arrInfo.type}, the required type is ${this.signatures[0].params[0].type}.`;
+    }
+
+    if(args.length === 2) {
+      // isAscending or index
+      const secArgInfo = args[1].typeExpr(env);
+      if(![this.signatures[0].params[1].type, this.signatures[0].params[1].type, "type", "unknown"].includes(secArgInfo.type))
+        args[1].warning = `The type of argument '${this.signatures[0].params[1].name}' is ${secArgInfo.type}, should be ${this.signatures[0].params[1].type} or ${this.signatures[1].params[1].type}.`;
+    } else if (args.length === 3) {
+      // index
+      const idxInfo = args[1].typeExpr(env);
+      if(![this.signatures[1].params[1].type, "type", "unknown"].includes(idxInfo.type))
+        args[1].warning = `The type of argument '${this.signatures[1].params[1].name}' is ${idxInfo.type}, should be ${this.signatures[1].params[1].type}.`;
+      // isAscending
+      const ascInfo = args[2].typeExpr(env);
+      if(![this.signatures[1].params[2].type, "type", "unknown"].includes(ascInfo.type))
+        args[2].warning = `The type of argument '${this.signatures[1].params[2].name}' is ${ascInfo.type}, should be ${this.signatures[1].params[2].type}.`;
+    }
+      
+    return {type: this.signatures[0].returnType};
   }
 
   /**
@@ -530,6 +590,15 @@ export class ReduceDimension extends Func {
 
   protected chooseSignature(args: RuntimeVal[]): void {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const arrInfo = args[0].typeExpr(env);
+    if(arrInfo.type !== this.signature.params[0].type) {
+      args[0].type = "error";
+      args[0].error = `The type of argument '${this.signature.params[0].name}' cannot be ${arrInfo.type}, the required type is ${this.signature.params[0].type}.`;
+    }
+    return {type: this.signature.returnType};
   }
 
   /**

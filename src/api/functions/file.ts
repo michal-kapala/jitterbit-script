@@ -2,6 +2,8 @@ import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbBool } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
+import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import TypeEnv from "../../typechecker/environment";
 import { AsyncFunc, Func, Parameter, Signature } from "../types";
 
 /**
@@ -26,6 +28,9 @@ import { AsyncFunc, Func, Parameter, Signature } from "../types";
  * A script will abort, a warning added to the operation log, and the operation will continue.
  */
 export class ArchiveFile extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "ArchiveFile";
@@ -81,6 +86,9 @@ export class ArchiveFile extends AsyncFunc {
  * Global variables are referenced as `[de_name]` in the activity configuration.
  */
 export class DeleteFile extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "DeleteFile";
@@ -139,6 +147,9 @@ export class DeleteFile extends AsyncFunc {
  * Global variables are referenced as `[de_name]` in the activity configuration.
  */
 export class DeleteFiles extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "DeleteFiles";
@@ -190,6 +201,9 @@ export class DeleteFiles extends AsyncFunc {
  * Global variables are referenced as `[de_name]` in the activity configuration.
  */
 export class DirList extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "DirList";
@@ -241,6 +255,9 @@ export class DirList extends Func {
  * of the source activity or the overridden source.
  */
 export class FileList extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "FileList";
@@ -286,6 +303,9 @@ export class FileList extends Func {
  * See also the `FlushFiles` function.
  */
 export class FlushAllFiles extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "FlushAllFiles";
@@ -336,6 +356,9 @@ export class FlushAllFiles extends AsyncFunc {
  * See also the `FlushAllFiles` function.
  */
 export class FlushFile extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "FlushFile";
@@ -394,6 +417,9 @@ export class FlushFile extends AsyncFunc {
  * In that case, all Jitterbit `$jitterbit.source.http.*` variables will be populated.
  */
 export class ReadFile extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "ReadFile";
@@ -450,6 +476,9 @@ export class ReadFile extends AsyncFunc {
  * A script will abort, a warning added to the operation log, and the operation will continue.
  */
 export class WriteFile extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "WriteFile";

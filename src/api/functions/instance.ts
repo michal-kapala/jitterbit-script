@@ -2,6 +2,8 @@ import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbBool, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
+import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import TypeEnv from "../../typechecker/environment";
 import { Func, Parameter, Signature } from "../types";
 
 /**
@@ -14,6 +16,9 @@ import { Func, Parameter, Signature } from "../types";
  * depending on the context in which it is called.
  */
 export class Count extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Count";
@@ -46,6 +51,9 @@ export class Count extends Func {
  * See also the `SourceInstanceCount` function.
  */
 export class CountSourceRecords extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "CountSourceRecords";
@@ -78,6 +86,9 @@ export class CountSourceRecords extends Func {
  * depending on the context in which it is called.
  */
 export class Exist extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Exist";
@@ -118,6 +129,9 @@ export class Exist extends Func {
  * from the last row or element. Note that the index is 1-based.
  */
 export class FindByPos extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "FindByPos";
@@ -156,6 +170,9 @@ export class FindByPos extends Func {
  * See also the `HasKey` function.
  */
 export class FindValue extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "FindValue";
@@ -190,6 +207,9 @@ export class FindValue extends Func {
  * As an alternative to this function, see the `ArgumentList` function.
  */
 export class GetInstance extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "GetInstance";
@@ -221,6 +241,9 @@ export class GetInstance extends Func {
  * It can also be used to return the maximum value of an array.
  */
 export class Max extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Max";
@@ -252,6 +275,9 @@ export class Max extends Func {
  * It can also be used to return the minimum value of an array.
  */
 export class Min extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Min";
@@ -282,6 +308,9 @@ export class Min extends Func {
  * It can also be used with arrays, and will return the first non-null element.
  */
 export class ResolveOneOf extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "ResolveOneOf";
@@ -329,6 +358,9 @@ export class ResolveOneOf extends Func {
  * A `null` data element is returned from this function and should be ignored.
  */
 export class SetInstances extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SetInstances";
@@ -377,6 +409,9 @@ export class SetInstances extends Func {
  * A `null` value is returned from this function and should be ignored.
  */
 export class SortInstances extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SortInstances";
@@ -419,6 +454,9 @@ export class SortInstances extends Func {
  * an array with just nulls will return an error.
  */
 export class Sum extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Sum";
@@ -454,6 +492,9 @@ export class Sum extends Func {
  * See also the `SumString` function for a similar function but with additional options.
  */
 export class SumCSV extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SumCSV";
@@ -487,6 +528,9 @@ export class SumCSV extends Func {
  * See also the `SumCSV` function.
  */
 export class SumString extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SumString";

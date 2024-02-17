@@ -1,6 +1,8 @@
 import Scope from "../../runtime/scope";
 import { JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
+import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import TypeEnv from "../../typechecker/environment";
 import { Func, Parameter, Signature } from "../types";
 
 /**
@@ -9,6 +11,9 @@ import { Func, Parameter, Signature } from "../types";
  * Writes a message to the operation log.
  */
 export class WriteToOperationLog extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "WriteToOperationLog";

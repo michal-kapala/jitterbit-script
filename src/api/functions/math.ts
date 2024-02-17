@@ -2,6 +2,8 @@ import { RuntimeError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
+import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import TypeEnv from "../../typechecker/environment";
 import { Func, Parameter, Signature } from "../types";
 
 /**
@@ -11,6 +13,9 @@ import { Func, Parameter, Signature } from "../types";
  * The argument should be a double and is first converted to a double if not.
  */
 export class Ceiling extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Ceiling";
@@ -41,6 +46,9 @@ export class Ceiling extends Func {
  * The argument should be a double and is first converted to a double if not.
  */
 export class Exp extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Exp";
@@ -71,6 +79,9 @@ export class Exp extends Func {
  * The argument should be a double and is first converted to a double if not.
  */
 export class Floor extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Floor";
@@ -101,6 +112,9 @@ export class Floor extends Func {
  * The argument should be a double and is first converted to a double if not.
  */
 export class Log extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Log";
@@ -135,6 +149,9 @@ export class Log extends Func {
  * Returns the logarithm to the base 10 of a given value. The argument should be a double and is first converted to a double if not.
  */
 export class Log10 extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Log10";
@@ -171,6 +188,9 @@ export class Log10 extends Func {
  * If the denominator is 0, the numerator is returned.
  */
 export class Mod extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Mod";
@@ -213,6 +233,9 @@ export class Mod extends Func {
  * `Pow(0, 0)` returns 1.
  */
 export class Pow extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Pow";
@@ -252,6 +275,9 @@ export class Pow extends Func {
  * This function is similar to the String `Format` function.
  */
 export class Round extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Round";
@@ -303,6 +329,9 @@ export class Round extends Func {
  * The argument should be a double and is first converted to a double if not.
  */
 export class RoundToInt extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "RoundToInt";
@@ -337,6 +366,9 @@ export class RoundToInt extends Func {
  * This implementation throws instead of returning `-nan` for negative input.
  */
 export class Sqrt extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Sqrt";

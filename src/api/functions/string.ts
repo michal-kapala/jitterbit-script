@@ -2,6 +2,8 @@ import { RuntimeError, UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbArray, JbBool, JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
+import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import TypeEnv from "../../typechecker/environment";
 import { Func, Parameter, Signature } from "../types";
 
 /**
@@ -10,6 +12,9 @@ import { Func, Parameter, Signature } from "../types";
  * Returns the number of times a sub-string appears in a string.
  */
 export class CountSubString extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "CountSubString";
@@ -55,6 +60,9 @@ export class CountSubString extends Func {
  * Embedded double quotes are not escaped.
  */
 export class DQuote extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "DQuote";
@@ -96,6 +104,9 @@ export class DQuote extends Func {
  * to have it be the mapped value.
  */
 export class Format extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Format";
@@ -148,6 +159,9 @@ export class Format extends Func {
  *      - `n < 0` always returns `Length(str)`
  */
 export class Index extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Index";
@@ -182,6 +196,9 @@ export class Index extends Func {
  * carriage return (CR), or tab (TAB) characters.
  */
 export class IsValidString extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "IsValidString";
@@ -223,6 +240,9 @@ export class IsValidString extends Func {
  * See also the `Mid` and `Right` functions.
  */
 export class Left extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Left";
@@ -260,6 +280,9 @@ export class Left extends Func {
  * ~~`LPad(str, -n)` is the same as `RPad(str, n)`.~~ See the `RPad` function.
  */
 export class LPad extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "LPad";
@@ -304,6 +327,9 @@ export class LPad extends Func {
  * `LPadChar(str, " ", n)` is the same as `LPad(str, n)`. See the `LPad` function.
  */
 export class LPadChar extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "LPadChar";
@@ -352,6 +378,9 @@ export class LPadChar extends Func {
  * and returns the remaining characters.
  */
 export class LTrim extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "LTrim";
@@ -393,6 +422,9 @@ export class LTrim extends Func {
  * See also the `RTrimChars` and `TrimChars` functions.
  */
 export class LTrimChars extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "LTrimChars";
@@ -440,6 +472,9 @@ export class LTrimChars extends Func {
  * See also the `Left` and `Right` functions.
  */
 export class Mid extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Mid";
@@ -482,6 +517,9 @@ export class Mid extends Func {
  * Only index-based member access is supported.
  */
 export class ParseURL extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "ParseURL";
@@ -526,6 +564,9 @@ export class ParseURL extends Func {
  * Embedded single quotes are not escaped.
  */
 export class Quote extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Quote";
@@ -580,6 +621,9 @@ export class Quote extends Func {
  * Supports up to 100-argument calls.
  */
 export class RegExMatch extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "RegExMatch";
@@ -651,6 +695,9 @@ export class RegExMatch extends Func {
  * See also the `RegExMatch` function.
  */
 export class RegExReplace extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "RegExReplace";
@@ -686,6 +733,9 @@ export class RegExReplace extends Func {
  * For more complex search and replace operations, see the `RegExReplace` function.
  */
 export class Replace extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Replace";
@@ -730,6 +780,9 @@ export class Replace extends Func {
  * See also the `Left` and `Mid` functions.
  */
 export class Right extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Right";
@@ -769,6 +822,9 @@ export class Right extends Func {
  * ~~`RPad(str, -n)` is the same as `LPad(str, n)`.~~ See the `LPad` function.
  */
 export class RPad extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "RPad";
@@ -812,6 +868,9 @@ export class RPad extends Func {
  * `RPadChar(str, " ", n)` is the same as `RPad(str, n)`. See the `RPad` function.
  */
 export class RPadChar extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "RPadChar";
@@ -860,6 +919,9 @@ export class RPadChar extends Func {
  * and returns the remaining characters.
  */
 export class RTrim extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "RTrim";
@@ -901,6 +963,9 @@ export class RTrim extends Func {
  * See also the `LTrimChars` and `TrimChars` functions.
  */
 export class RTrimChars extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "RTrimChars";
@@ -951,6 +1016,9 @@ export class RTrimChars extends Func {
  * the original string.
  */
 export class Split extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Split";
@@ -996,6 +1064,9 @@ export class Split extends Func {
  * This can be changed by specifying the optional second and third arguments respectively.
  */
 export class SplitCSV extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SplitCSV";
@@ -1033,6 +1104,9 @@ export class SplitCSV extends Func {
  * of the individual elements.
  */
 export class StringLength extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "StringLength";
@@ -1077,6 +1151,9 @@ export class StringLength extends Func {
  * in a string to lowercase.
  */
 export class ToLower extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "ToLower";
@@ -1110,6 +1187,9 @@ export class ToLower extends Func {
  * in a string.
  */
 export class ToProper extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "ToProper";
@@ -1141,6 +1221,9 @@ export class ToProper extends Func {
  * to uppercase.
  */
 export class ToUpper extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "ToUpper";
@@ -1173,6 +1256,9 @@ export class ToUpper extends Func {
  * remaining characters.
  */
 export class Trim extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Trim";
@@ -1214,6 +1300,9 @@ export class Trim extends Func {
  * See also the `LTrimChars` and `RTrimChars` functions.
  */
 export class TrimChars extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "TrimChars";
@@ -1274,6 +1363,9 @@ export class TrimChars extends Func {
  * See also the `Left` and `Right` functions.
  */
 export class Truncate extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Truncate";
@@ -1314,6 +1406,9 @@ export class Truncate extends Func {
  * See also the `ParseURL` and `URLEncode` functions.
  */
 export class URLDecode extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "URLDecode";
@@ -1373,6 +1468,9 @@ export class URLDecode extends Func {
  * This implementation does not honor the encoding option, all strings are encoded using JavaScript's `encodeURIComponent`.
  */
 export class URLEncode extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "URLEncode";

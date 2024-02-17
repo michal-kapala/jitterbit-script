@@ -385,7 +385,15 @@ export class TypedCall extends TypedExpr {
   }
 
   public typeExpr(env: TypeEnv): TypeInfo {
-    throw new TcError("Method not implemented.");
+    const func = Api.getFunc(this.caller.symbol)
+    if(func === undefined)
+      throw new TcError(`Unknown function found in call expression: ${this.caller.symbol}.`);
+
+    const callInfo = func.analyzeCall(this.args, env);
+    this.setTypeInfo(callInfo);
+    // reset the warning before bubbling it up
+    callInfo.warning = undefined;
+    return callInfo;
   }
 }
 

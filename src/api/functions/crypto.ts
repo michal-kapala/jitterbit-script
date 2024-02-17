@@ -1,6 +1,8 @@
 import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { RuntimeVal } from "../../runtime/values";
+import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import TypeEnv from "../../typechecker/environment";
 import { AsyncFunc, Func, Parameter, Signature } from "../types";
 
 /**
@@ -11,6 +13,9 @@ import { AsyncFunc, Func, Parameter, Signature } from "../types";
  * The decrypted output is returned as a string. See `AESEncryption` for additional details.
  */
 export class AESDecryption extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "AESDecryption";
@@ -50,6 +55,9 @@ export class AESDecryption extends Func {
  * for decryption, using the same parameters as when the plaintext string was encrypted.
  */
 export class AESEncryption extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "AESEncryption";
@@ -84,6 +92,9 @@ export class AESEncryption extends Func {
  * Decodes a base64-encoded string, returning binary data. See also `Base64Encode`.
  */
 export class Base64Decode extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Base64Decode";
@@ -127,6 +138,9 @@ export class Base64Decode extends Func {
  * See also `Base64Decode`.
  */
 export class Base64Encode extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Base64Encode";
@@ -187,6 +201,9 @@ export class Base64Encode extends Func {
  * See also `Base64Decode`.
  */
 export class Base64EncodeFile extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Base64EncodeFile";
@@ -225,6 +242,9 @@ export class Base64EncodeFile extends AsyncFunc {
  * Non-string data will first be converted to a string.
  */
 export class MD5 extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "MD5";
@@ -257,6 +277,9 @@ export class MD5 extends Func {
  * Non-string data will first be converted to a string.
  */
 export class MD5AsTwoNumbers extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "MD5AsTwoNumbers";
@@ -291,6 +314,9 @@ export class MD5AsTwoNumbers extends Func {
  * Non-string data will first be converted to a string.
  */
 export class SHA256 extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SHA256";

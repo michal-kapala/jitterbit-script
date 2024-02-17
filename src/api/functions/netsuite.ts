@@ -1,6 +1,8 @@
 import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { RuntimeVal } from "../../runtime/values";
+import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import TypeEnv from "../../typechecker/environment";
 import { AsyncFunc, Parameter, Signature } from "../types";
 
 /**
@@ -15,6 +17,9 @@ import { AsyncFunc, Parameter, Signature } from "../types";
  * 2. The dictionary values are a map with two elements: the internal ID and the external ID for each picklist.
  */
 export class NetSuiteGetSelectValue extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "NetSuiteGetSelectValue";
@@ -53,6 +58,9 @@ export class NetSuiteGetSelectValue extends AsyncFunc {
  * Retrieves the server date-time from a NetSuite server.
  */
 export class NetSuiteGetServerTime extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "NetSuiteGetServerTime";
@@ -89,6 +97,9 @@ export class NetSuiteGetServerTime extends AsyncFunc {
  * authentication headers for each web service call.
  */
 export class NetSuiteLogin extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "NetSuiteLogin";

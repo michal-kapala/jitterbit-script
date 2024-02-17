@@ -3,6 +3,8 @@ import { JbNull, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
 import { Func, Parameter, Signature } from "../types";
 import { RuntimeError } from "../../errors";
+import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import TypeEnv from "../../typechecker/environment";
 
 /**
  * The implementation of `GetLastError` function.
@@ -24,6 +26,9 @@ import { RuntimeError } from "../../errors";
  * This implementation retrieves the value of `$jitterbit.operation.last_error`.
  */
 export class GetLastError extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "GetLastError";
@@ -63,6 +68,9 @@ export class GetLastError extends Func {
  * - `$jitterbit.operation.last_error`
  */
 export class RaiseError extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "RaiseError";
@@ -98,6 +106,9 @@ export class RaiseError extends Func {
  * See also the function `SetLastError`.
  */
 export class ResetLastError extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "ResetLastError";
@@ -132,6 +143,9 @@ export class ResetLastError extends Func {
  * the last error but without logging a message.
  */
 export class SetLastError extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SetLastError";

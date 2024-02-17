@@ -3,6 +3,8 @@ import { JbDictionary, JbBool, JbArray, JbString } from "../../runtime/types";
 import { Func, Parameter, Signature } from "../types";
 import Scope from "../../runtime/scope";
 import { RuntimeError, UnimplementedError } from "../../errors";
+import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import TypeEnv from "../../typechecker/environment";
 
 /**
  * The implementation of `AddToDict` function.
@@ -16,6 +18,9 @@ import { RuntimeError, UnimplementedError } from "../../errors";
  * See also the `Dict` function.
  */
 export class AddToDict extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "AddToDict";
@@ -65,6 +70,9 @@ export class AddToDict extends Func {
  * returned in the same order as the keys in the array.
  */
 export class CollectValues extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "CollectValues";
@@ -115,6 +123,9 @@ export class CollectValues extends Func {
  * Returns an array of the keys in a dictionary. The argument must be an existing dictionary.
  */
 export class GetKeys extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "GetKeys";
@@ -161,6 +172,9 @@ export class GetKeys extends Func {
  * To enter an `n` path into the function, drag and drop the desired XML node folder from the Source Objects tab of the script component palette to the script to insert its qualified path at the location of your cursor, or enter its reference path manually. For more information, see the instructions on inserting source objects.
  */
 export class GetSourceInstanceMap extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "GetSourceInstanceMap";
@@ -199,6 +213,9 @@ export class GetSourceInstanceMap extends Func {
  * For more information, see the instructions on inserting source objects.
  */
 export class GetSourceInstanceElementMap extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "GetSourceInstanceElementMap";
@@ -233,6 +250,9 @@ export class GetSourceInstanceElementMap extends Func {
  * See also the `AddToDict` function.
  */
 export class Dict extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Dict";
@@ -260,6 +280,9 @@ export class Dict extends Func {
  * As an equivalent function that works for arrays, see the examples of the `FindValue` function.
  */
 export class HasKey extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "HasKey";
@@ -300,6 +323,9 @@ export class HasKey extends Func {
  * An alias for `Dict`. See the function `Dict`.
  */
 export class Map extends Dict {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Map";
@@ -314,6 +340,9 @@ export class Map extends Dict {
  * otherwise, the third argument will be evaluated, and that value would be stored in the dictionary for the key.
  */
 export class MapCache extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "MapCache";
@@ -364,6 +393,9 @@ export class MapCache extends Func {
  * Returns `true` if the key-value pair was removed and `false` if the key didn't exist.
  */
 export class RemoveKey extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "RemoveKey";

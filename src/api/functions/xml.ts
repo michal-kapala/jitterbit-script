@@ -2,6 +2,8 @@ import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbBool } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
+import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import TypeEnv from "../../typechecker/environment";
 import { AsyncFunc, Func, Parameter, Signature } from "../types";
 
 /**
@@ -10,6 +12,9 @@ import { AsyncFunc, Func, Parameter, Signature } from "../types";
  * Creates an attribute for an XML node. See also the `CreateNode` function.
  */
 export class Attribute extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Attribute";
@@ -50,6 +55,9 @@ export class Attribute extends Func {
  * Supports up to 100-argument calls.
  */
 export class CreateNode extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "CreateNode";
@@ -92,6 +100,9 @@ export class CreateNode extends Func {
  * For more information, see the instructions on inserting source objects.
  */
 export class GetNodeName extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "GetNodeName";
@@ -131,6 +142,9 @@ export class GetNodeName extends Func {
  * For more information, see the instructions on inserting source objects.
  */
 export class GetNodeValue extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "GetNodeValue";
@@ -169,6 +183,9 @@ export class GetNodeValue extends Func {
  * For more information, see the instructions on inserting source objects.
  */
 export class GetXMLString extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "GetXMLString";
@@ -211,6 +228,9 @@ export class GetXMLString extends Func {
  * if it has the attribute `xsi:nil` with the value `true`.
  */
 export class IsNil extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "IsNil";
@@ -253,6 +273,9 @@ export class IsNil extends Func {
  * Supports up to 100-argument calls.
  */
 export class RunXSLT extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "RunXSLT";
@@ -297,6 +320,9 @@ export class RunXSLT extends AsyncFunc {
  * For more information, see the instructions on inserting source objects.
  */
 export class SelectNodeFromXMLAny extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SelectNodeFromXMLAny";
@@ -344,6 +370,9 @@ export class SelectNodeFromXMLAny extends Func {
  * Supports up to 100-argument calls.
  */
 export class SelectNodes extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SelectNodes";
@@ -389,6 +418,9 @@ export class SelectNodes extends Func {
  * Supports up to 100-argument calls.
  */
 export class SelectNodesFromXMLAny extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SelectNodesFromXMLAny";
@@ -439,6 +471,9 @@ export class SelectNodesFromXMLAny extends Func {
  * Supports up to 100-argument calls.
  */
 export class SelectSingleNode extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SelectSingleNode";

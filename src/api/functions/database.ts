@@ -2,6 +2,8 @@ import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbBool } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
+import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import TypeEnv from "../../typechecker/environment";
 import { AsyncFunc, Func, Parameter, Signature } from "../types";
 
 /**
@@ -19,6 +21,9 @@ import { AsyncFunc, Func, Parameter, Signature } from "../types";
  * For more information, see the instructions on inserting endpoints under the Endpoints section in Jitterbit Script.
  */
 export class CacheLookup extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "CacheLookup";
@@ -74,6 +79,9 @@ export class CacheLookup extends AsyncFunc {
  * Supports up to 100-argument calls.
  */
 export class CallStoredProcedure extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "CallStoredProcedure";
@@ -116,6 +124,9 @@ export class CallStoredProcedure extends AsyncFunc {
  * in Jitterbit Script.
  */
 export class DBCloseConnection extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "DBCloseConnection";
@@ -180,6 +191,9 @@ export class DBCloseConnection extends AsyncFunc {
  * Supports up to 100-argument calls.
  */
 export class DBExecute extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "DBExecute";
@@ -225,6 +239,9 @@ export class DBExecute extends AsyncFunc {
  * and may be omitted in that case.
  */
 export class DBLoad extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "DBLoad";
@@ -290,6 +307,9 @@ export class DBLoad extends AsyncFunc {
  * use the functions `DBLookupAll` or `DBExecute`.
  */
 export class DBLookup extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "DBLookup";
@@ -340,6 +360,9 @@ export class DBLookup extends AsyncFunc {
  * use the function `DBExecute`.
  */
 export class DBLookupAll extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "DBLookupAll";
@@ -381,6 +404,9 @@ export class DBLookupAll extends AsyncFunc {
  * in Jitterbit Script.
  */
 export class DBRollbackTransaction extends AsyncFunc {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "DBRollbackTransaction";
@@ -416,6 +442,9 @@ export class DBRollbackTransaction extends AsyncFunc {
  * An alias for the function `DBLoad`. See `DBLoad` for details.
  */
 export class DBWrite extends DBLoad {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "DBWrite";
@@ -429,6 +458,9 @@ export class DBWrite extends DBLoad {
  * The return value is null.
  */
 export class SetDBInsert extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SetDBInsert";
@@ -458,6 +490,9 @@ export class SetDBInsert extends Func {
  * The return value is null.
  */
 export class SetDBUpdate extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SetDBUpdate";
@@ -493,6 +528,9 @@ export class SetDBUpdate extends Func {
  * If backslash characters should also be escaped, provide and set the second parameter to `true`.
  */
 export class SQLEscape extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "SQLEscape";
@@ -525,6 +563,9 @@ export class SQLEscape extends Func {
  * The return value is null.
  */
 export class Unmap extends Func {
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    throw new Error("Method not implemented.");
+  }
   constructor() {
     super();
     this.name = "Unmap";
