@@ -1,4 +1,4 @@
 <trans>
   // test for array inference and warnings
-  $something = !"string";
+  $something = {1,2,3}[$x];
 </trans>

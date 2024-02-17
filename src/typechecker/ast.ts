@@ -409,7 +409,139 @@ export class TypedMemberExpr extends TypedExpr {
   }
 
   public typeExpr(env: TypeEnv): TypeInfo {
-    throw new TcError("Method not implemented.");
+    const idInfo = this.object.typeExpr(env);
+    const keyInfo = this.key.typeExpr(env);
+
+    // handle static analysis types
+    if(idInfo.type === "error" || keyInfo.type === "error") {
+      this.type = "unknown";
+      return {type: this.type} as TypeInfo;
+    }
+
+    if(idInfo.type === "unassigned") {
+      this.object.type = "error";
+      this.object.error = `Local variable '${(this.object as TypedIdentifier).symbol}' hasn't been initialized.`;
+      this.type = "unknown";
+    }
+
+    if(keyInfo.type === "unassigned") {
+      this.key.type = "error";
+      this.key.error = `Local variable '${(this.key as TypedIdentifier).symbol}' hasn't been initialized.`;
+      this.type = "unknown";
+    }
+
+    if(idInfo.type === "unassigned" || keyInfo.type === "unassigned")
+      return {type: this.type} as TypeInfo;
+
+    if(idInfo.type === "unknown" || keyInfo.type === "unknown")
+      this.type = "unknown";
+
+    // handle runtime types
+    // impossible to reliably type the members as arrays and dictionaries are dynamically typed
+    let resultType = {type: "unknown"} as TypeInfo;
+    switch(idInfo.type) {
+      case "array":
+        switch(keyInfo.type) {
+          case "number":
+            break;
+          case "bool":
+            resultType.warning = `Bool array indexes are implicitly converted to 0 (false) or 1 (true).`;
+            break;
+          case "string":
+            resultType.warning = `String array indexes are implicitly converted to 0, strings with numbers result in a null return value.`;
+            break;
+          case "date":
+            resultType.warning = `Date array indexes are implicitly converted to a timestamp, this may result in a runtime error due to large index values.`;
+            break;
+          case "void":
+          case "null":
+            resultType.warning = `Null array indexes are implicitly converted to 0.`;
+            break;
+          case "array":
+            this.setTypeInfo({
+              type: "error",
+              error: `Arrays used as array indexes result in a runtime evaluation error.`
+            });
+            break;
+          case "dictionary":
+            this.setTypeInfo({
+              type: "error",
+              error: `Dictionaries used as an array index result in a runtime evaluation error.`
+            });
+            break;
+          case "binary":
+            this.setTypeInfo({
+              type: "error",
+              error: `Binary data used as an array index results in a runtime evaluation error.`
+            });
+            break;
+          case "node":
+          case "type":
+          case "unknown":
+            resultType = {type: "unknown"};
+            break;
+        };
+        break;
+      case "dictionary":
+        switch(keyInfo.type) {
+          case "number":
+            resultType.warning = `Number dictionary keys are implicitly converted to strings.`;
+            break;
+          case "bool":
+            resultType.warning = `Bool dictionary keys are implicitly converted to "0" (false) or "1" (true).`;
+            break;
+          case "string":
+            break;
+          case "date":
+            resultType.warning = `Date dictionary keys are implicitly converted to strings, respectively YYYY-MM-DD format for dates and YYYY-MM-DD HH:MM:SS(.mmm) for time.`;
+            break;
+          case "void":
+          case "null":
+            this.setTypeInfo({
+              type: "error",
+              error: `Null dictionary keys result in a runtime error.`
+            });
+            break;
+          case "array":
+            resultType.warning = `Arrays used as dictionary keys are implicitly converted to their string representations.`;
+            break;
+          case "dictionary":
+            resultType.warning = `Dictionaries used as dictionary keys are implicitly converted to their string representations.`;
+            break;
+          case "binary":
+            resultType.warning = `Binary data used as a dictionary key is implicitly converted to its hexadecimal string representation.`;
+            break;
+          case "node":
+          case "type":
+          case "unknown":
+            break;
+        };
+        break;
+      case "binary":
+      case "bool":
+      case "date":
+      case "void":
+      case "null":
+      case "number":
+      case "string":
+        this.setTypeInfo({
+          type: "error",
+          error: `Operator [] cannot be applied to ${idInfo.type} values.`
+        });
+        return resultType;
+      case "type":
+        // TODO: could be unified with "unknown" in future
+        return resultType;
+      case "node":
+      case "unknown":
+        break;
+      default:
+        throw new TcError(`Member expression on unsupported type: ${this.type}.`);
+    }
+    this.setTypeInfo(resultType);
+    // reset the warning before bubbling it up
+    resultType.warning = undefined;
+    return resultType;
   }
 }
 
