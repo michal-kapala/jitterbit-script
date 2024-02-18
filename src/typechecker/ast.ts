@@ -1,4 +1,5 @@
 import { Api } from "../api";
+import { Parameter } from "../api/types";
 import { TcError } from "../errors";
 import { 
   ArrayLiteral,
@@ -70,6 +71,30 @@ export abstract class TypedExpr implements TypeInfo {
     this.type = info.type;
     this.error = info.error;
     this.warning = info.warning;
+  };
+  /**
+   * Validates the type of the expression when used as a function call argument that is required to match the defined parameter type.
+   * @param paramType 
+   * @param errMsg 
+   * @param env 
+   */
+  public checkReqArg(param: Parameter, argType: StaticTypeName) {
+    const validTypes = [param.type, "type", "unknown", "error"] as StaticTypeName[];
+    if(!validTypes.includes(argType)) {
+      this.type = "error";
+      this.error = TcError.makeArgTypeError(param, argType);
+    }
+  };
+  /**
+   * Validates the type of the expression when used as a function call argument that can be implicitly converted to the defined parameter type.
+   * @param paramType 
+   * @param warnMsg 
+   * @param env 
+   */
+  public checkOptArg(param: Parameter, argType: StaticTypeName) {
+    const validTypes = [param.type, "type", "unknown", "error"] as StaticTypeName[];
+    if(!validTypes.includes(argType))
+      this.warning = TcError.makeArgTypeWarn(param, argType);
   };
 }
 

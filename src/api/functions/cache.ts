@@ -12,9 +12,6 @@ import { AsyncFunc, Parameter, Signature } from "../types";
  * Reads from a common cache stored on Harmony.
  */
 export class ReadCache extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "ReadCache";
@@ -44,6 +41,25 @@ export class ReadCache extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // name
+    const nameInfo = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx++], nameInfo.type);
+
+    // expirationSeconds
+    if(args.length > 1) {
+      const expInfo = args[argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signature.params[argIdx++], expInfo.type);
+    }
+    // scope
+    if (args.length > 2) {
+      const scopeInfo = args[argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signature.params[argIdx], scopeInfo.type);
+    }
+    return {type: this.signature.returnType}
+  }
 }
 
 /**
@@ -52,15 +68,12 @@ export class ReadCache extends AsyncFunc {
  * Writes to a common cache stored on Harmony.
  */
 export class WriteCache extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "WriteCache";
     this.module = "cache";
     this.signatures = [
-      new Signature("type", [
+      new Signature("void", [
         new Parameter("string", "name"),
         new Parameter("type", "value"),
         new Parameter("number", "expirationSeconds", false, new JbNumber(1800)),
@@ -84,5 +97,25 @@ export class WriteCache extends AsyncFunc {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // name
+    const nameInfo = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx++], nameInfo.type);
+    // value - any type
+    args[argIdx++].typeExpr(env);
+    // expirationSeconds
+    if(args.length > 2) {
+      const expInfo = args[argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signature.params[argIdx++], expInfo.type);
+    }
+    // scope
+    if (args.length > 3) {
+      const scopeInfo = args[argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signature.params[argIdx], scopeInfo.type);
+    }
+    return {type: this.signature.returnType}
   }
 }

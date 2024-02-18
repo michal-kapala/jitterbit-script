@@ -82,9 +82,9 @@ export class GetSourceAttrNames extends Func {
   }
 
   analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    const nInfo = args[0].typeExpr(env);
-    if(![this.signature.params[0].type, "type", "unknown"].includes(nInfo.type))
-      args[0].warning = `The type of argument '${this.signature.params[0].name}' is ${nInfo.type}, should be ${this.signature.params[0].type}.`;
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
     return {type: this.signature.returnType};
   }
 }
@@ -126,9 +126,9 @@ export class GetSourceElementNames extends Func {
   }
 
   analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    const nInfo = args[0].typeExpr(env);
-    if(![this.signature.params[0].type, "type", "unknown"].includes(nInfo.type))
-      args[0].warning = `The type of argument '${this.signature.params[0].name}' is ${nInfo.type}, should be ${this.signature.params[0].type}.`;
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
     return {type: this.signature.returnType};
   }
 }
@@ -168,9 +168,9 @@ export class GetSourceInstanceArray extends Func {
   }
 
   analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    const nInfo = args[0].typeExpr(env);
-    if(![this.signature.params[0].type, "type", "unknown"].includes(nInfo.type))
-      args[0].warning = `The type of argument '${this.signature.params[0].name}' is ${nInfo.type}, should be ${this.signature.params[0].type}.`;
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
     return {type: this.signature.returnType};
   }
 }
@@ -209,9 +209,9 @@ export class GetSourceInstanceElementArray extends Func {
   }
 
   analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    const nInfo = args[0].typeExpr(env);
-    if(![this.signature.params[0].type, "type", "unknown"].includes(nInfo.type))
-      args[0].warning = `The type of argument '${this.signature.params[0].name}' is ${nInfo.type}, should be ${this.signature.params[0].type}.`;
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
     return {type: this.signature.returnType};
   }
 }
@@ -356,27 +356,26 @@ export class SortArray extends Func {
   }
 
   analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    const arrInfo = args[0].typeExpr(env);
+    let argIdx = 0;
+    const arrInfo = args[argIdx].typeExpr(env);
     // arrayToSort
-    if(![this.signatures[0].params[0].type, "type", "unknown"].includes(arrInfo.type)) {
-      args[0].type = "error";
-      args[0].error = `The type of argument '${this.signatures[0].params[0].name}' cannot be ${arrInfo.type}, the required type is ${this.signatures[0].params[0].type}.`;
-    }
+    args[argIdx].checkReqArg(this.signatures[0].params[argIdx++], arrInfo.type);
 
     if(args.length === 2) {
       // isAscending or index
-      const secArgInfo = args[1].typeExpr(env);
-      if(![this.signatures[0].params[1].type, this.signatures[0].params[1].type, "type", "unknown"].includes(secArgInfo.type))
-        args[1].warning = `The type of argument '${this.signatures[0].params[1].name}' is ${secArgInfo.type}, should be ${this.signatures[0].params[1].type} or ${this.signatures[1].params[1].type}.`;
+      const isAscInfo = args[argIdx].typeExpr(env);
+      const type1 = this.signatures[0].params[argIdx].type;
+      const type2 = this.signatures[1].params[argIdx].type;
+      const secArgTypes = [type1, type2, "type", "unknown", "error"];
+      if(!secArgTypes.includes(isAscInfo.type))
+        args[argIdx].warning = `The type of argument is ${isAscInfo.type}, should be ${type1} or ${type2}.`;
     } else if (args.length === 3) {
       // index
-      const idxInfo = args[1].typeExpr(env);
-      if(![this.signatures[1].params[1].type, "type", "unknown"].includes(idxInfo.type))
-        args[1].warning = `The type of argument '${this.signatures[1].params[1].name}' is ${idxInfo.type}, should be ${this.signatures[1].params[1].type}.`;
+      const idxInfo = args[++argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signatures[1].params[argIdx++], idxInfo.type);
       // isAscending
-      const ascInfo = args[2].typeExpr(env);
-      if(![this.signatures[1].params[2].type, "type", "unknown"].includes(ascInfo.type))
-        args[2].warning = `The type of argument '${this.signatures[1].params[2].name}' is ${ascInfo.type}, should be ${this.signatures[1].params[2].type}.`;
+      const isAscInfo = args[++argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signatures[1].params[argIdx], isAscInfo.type);
     }
       
     return {type: this.signatures[0].returnType};
@@ -593,11 +592,9 @@ export class ReduceDimension extends Func {
   }
 
   analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    const arrInfo = args[0].typeExpr(env);
-    if(arrInfo.type !== this.signature.params[0].type) {
-      args[0].type = "error";
-      args[0].error = `The type of argument '${this.signature.params[0].name}' cannot be ${arrInfo.type}, the required type is ${this.signature.params[0].type}.`;
-    }
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
     return {type: this.signature.returnType};
   }
 
