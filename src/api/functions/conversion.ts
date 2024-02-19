@@ -2,7 +2,7 @@ import { RuntimeError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbBinary, JbBool, JbDate, JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
-import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import { TypedExpr, TypedIdentifier, TypeInfo } from "../../typechecker/ast";
 import TypeEnv from "../../typechecker/environment";
 import { Func, Parameter, Signature } from "../types";
 
@@ -15,9 +15,6 @@ import { Func, Parameter, Signature } from "../types";
  * This is the reverse of the function `HexToBinary`.
  */
 export class BinaryToHex extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "BinaryToHex";
@@ -34,8 +31,6 @@ export class BinaryToHex extends Func {
 
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    
-    // TODO: this error should be thrown by type checker (too)
     if(args[0].type !== this.signature.params[0].type)
       throw new RuntimeError(`${this.name} failed, the argument must be binary data.`);
 
@@ -45,6 +40,13 @@ export class BinaryToHex extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
   }
 }
 
@@ -57,9 +59,6 @@ export class BinaryToHex extends Func {
  * This is the reverse of the function `UUIDToBinary`.
  */
 export class BinaryToUUID extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "BinaryToUUID";
@@ -76,8 +75,6 @@ export class BinaryToUUID extends Func {
 
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-
-    // TODO: this error should be thrown by type checker (too)
     if(args[0].type !== this.signature.params[0].type)
       throw new RuntimeError(`${this.name} failed, the argument must be binary data.`);
 
@@ -86,6 +83,13 @@ export class BinaryToUUID extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
   }
 }
 
@@ -99,9 +103,6 @@ export class BinaryToUUID extends Func {
  * In all other cases, the result is false (0).
  */
 export class Bool extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor(){
     super();
     this.name = "Bool";
@@ -131,6 +132,40 @@ export class Bool extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    const result = {type: "bool"} as TypeInfo;
+    switch(info.type) {
+      case "array":
+        result.type = "array";
+        args[argIdx].warning = "Arrays are converted to an array of bool conversion results.";
+        break;
+      case "void":
+      case "null":
+        result.type = "null";
+        args[argIdx].warning = `Undocumented behaviour - ${this.name}(${info.type}) returns null.`;
+        break;
+      case "dictionary":
+      case "binary":
+      case "date":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Conversion of a ${info.type} argument results in a runtime conversion error.`;
+        break;
+      case "unknown":
+      case "type":
+        args[argIdx].warning = "The conversion might result in an unexpected return type or error for arguments other than a number, string or bool.";
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        break;
+    }
+    return result;
+  }
 }
 
 /**
@@ -155,9 +190,6 @@ export class Bool extends Func {
  * For instance, `Date("12-12-2023")` will result in `2023-12-11 23:00:00.000` for `GMT+01:00` local timezone.
  */
 export class DateFunc extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor(){
     super();
     this.name = "Date";
@@ -203,6 +235,37 @@ export class DateFunc extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    const result = {type: "date"} as TypeInfo;
+    switch(info.type) {
+      case "void":
+      case "null":
+        result.type = "null";
+        args[argIdx].warning = `Undocumented behaviour - ${this.name}(${info.type}) returns null.`;
+        break;
+      case "bool":
+      case "array":
+      case "dictionary":
+      case "binary":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Conversion of a ${info.type} argument results in a runtime conversion error.`;
+        break;
+      case "unknown":
+      case "type":
+        args[argIdx].warning = "The conversion might result in an unexpected return type or error for arguments other than a number, string or date.";
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        break;
+    }
+    return result;
+  }
 }
 
 /**
@@ -214,9 +277,6 @@ export class DateFunc extends Func {
  * the number of seconds from 12:00:00 AM of 1/1/1970 UTC (the start of the UNIX epoch).
  */
 export class Double extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor(){
     super();
     this.name = "Double";
@@ -245,6 +305,39 @@ export class Double extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    const result = {type: "number"} as TypeInfo;
+    switch(info.type) {
+      case "array":
+        result.type = "array";
+        args[argIdx].warning = "Arrays are converted to an array of number conversion results.";
+        break;
+      case "void":
+      case "null":
+        result.type = "null";
+        args[argIdx].warning = `Undocumented behaviour - ${this.name}(${info.type}) returns null.`;
+        break;
+      case "dictionary":
+      case "binary":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Conversion of a ${info.type} argument results in a runtime conversion error.`;
+        break;
+      case "unknown":
+      case "type":
+        args[argIdx].warning = "The conversion might result in an unexpected return type or error for arguments other than a number, bool, string, or date.";
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        break;
+    }
+    return result;
+  }
 }
 
 /**
@@ -256,9 +349,6 @@ export class Double extends Func {
  * the number of seconds from 12:00:00 AM of 1/1/1970 UTC (the start of the UNIX epoch).
  */
 export class Float extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor(){
     super();
     this.name = "Float";
@@ -286,6 +376,39 @@ export class Float extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    const result = {type: "number"} as TypeInfo;
+    switch(info.type) {
+      case "array":
+        result.type = "array";
+        args[argIdx].warning = "Arrays are converted to an array of number conversion results.";
+        break;
+      case "void":
+      case "null":
+        result.type = "null";
+        args[argIdx].warning = `Undocumented behaviour - ${this.name}(${info.type}) returns null.`;
+        break;
+      case "dictionary":
+      case "binary":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Conversion of a ${info.type} argument results in a runtime conversion error.`;
+        break;
+      case "unknown":
+      case "type":
+        args[argIdx].warning = "The conversion might result in an unexpected return type or error for arguments other than a number, bool, string, or date.";
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        break;
+    }
+    return result;
+  }
 }
 
 /**
@@ -298,9 +421,6 @@ export class Float extends Func {
  * This is the reverse of the function `BinaryToHex`.
  */
 export class HexToBinary extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "HexToBinary";
@@ -318,7 +438,6 @@ export class HexToBinary extends Func {
   
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
-    // TODO: this error should be thrown by type checker (too)
     // POD: originally the argument is implicitly converted to string
     if(args[0].type !== this.signature.params[0].type)
       throw new RuntimeError(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
@@ -328,6 +447,13 @@ export class HexToBinary extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
   }
 }
 
@@ -341,9 +467,6 @@ export class HexToBinary extends Func {
  * This is the reverse of the function `StringToHex`.
  */
 export class HexToString extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "HexToString";
@@ -361,7 +484,6 @@ export class HexToString extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     
-    // TODO: this error should be thrown by type checker (too)
     // POD: originally the argument is implicitly converted to string
     if(args[0].type !== this.signature.params[0].type)
       throw new RuntimeError(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
@@ -386,6 +508,13 @@ export class HexToString extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -397,9 +526,6 @@ export class HexToString extends Func {
  * the number of seconds from 12:00:00 AM of 1/1/1970 UTC (the start of the UNIX epoch).
  */
 export class Int extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Int";
@@ -430,6 +556,39 @@ export class Int extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    const result = {type: "number"} as TypeInfo;
+    switch(info.type) {
+      case "array":
+        result.type = "array";
+        args[argIdx].warning = "Arrays are converted to an array of number conversion results.";
+        break;
+      case "void":
+      case "null":
+        result.type = "null";
+        args[argIdx].warning = `Undocumented behaviour - ${this.name}(${info.type}) returns null.`;
+        break;
+      case "dictionary":
+      case "binary":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Conversion of a ${info.type} argument results in a runtime conversion error.`;
+        break;
+      case "unknown":
+      case "type":
+        args[argIdx].warning = "The conversion might result in an unexpected return type or error for arguments other than a number, bool, string, or date.";
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        break;
+    }
+    return result;
+  }
 }
 
 /**
@@ -441,9 +600,6 @@ export class Int extends Func {
  * the number of seconds from 12:00:00 AM of 1/1/1970 UTC (the start of the UNIX epoch).
  */
 export class Long extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Long";
@@ -474,6 +630,39 @@ export class Long extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    const result = {type: "number"} as TypeInfo;
+    switch(info.type) {
+      case "array":
+        result.type = "array";
+        args[argIdx].warning = "Arrays are converted to an array of number conversion results.";
+        break;
+      case "void":
+      case "null":
+        result.type = "null";
+        args[argIdx].warning = `Undocumented behaviour - ${this.name}(${info.type}) returns null.`;
+        break;
+      case "dictionary":
+      case "binary":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Conversion of a ${info.type} argument results in a runtime conversion error.`;
+        break;
+      case "unknown":
+      case "type":
+        args[argIdx].warning = "The conversion might result in an unexpected return type or error for arguments other than a number, bool, string, or date.";
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        break;
+    }
+    return result;
+  }
 }
 
 /**
@@ -491,9 +680,6 @@ export class Long extends Func {
  * For a boolean value, the strings "1" or "0" are returned.
  */
 export class String extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "String";
@@ -518,6 +704,34 @@ export class String extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    const result = {type: "string"} as TypeInfo;
+    switch(info.type) {
+      case "array":
+        result.type = "array";
+        args[argIdx].warning = "Arrays are converted to an array of string conversion results.";
+        break;
+      case "void":
+      case "null":
+        result.type = "null";
+        args[argIdx].warning = `Undocumented behaviour - ${this.name}(${info.type}) returns null.`;
+        break;
+      case "unknown":
+      case "type":
+        args[argIdx].warning = "The conversion might result in an unexpected return type if the argument is an array or null.";
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        break;
+    }
+    return result;
+  }
 }
 
 /**
@@ -533,9 +747,6 @@ export class String extends Func {
  * This is the reverse of the function `HexToString`.
  */
 export class StringToHex extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "StringToHex";
@@ -553,7 +764,6 @@ export class StringToHex extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
 
-    // TODO: this error should be thrown by type checker (too)
     // POD: originally the argument is implicitly converted to string, the docs state undefined behaviour
     if(args[0].type !== this.signature.params[0].type)
       throw new RuntimeError(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
@@ -576,6 +786,13 @@ export class StringToHex extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -592,9 +809,6 @@ export class StringToHex extends Func {
  * This is the reverse of the function `BinaryToUUID`.
  */
 export class UUIDToBinary extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "UUIDToBinary";
@@ -612,7 +826,6 @@ export class UUIDToBinary extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     
-    // TODO: this error should be thrown by type checker (too)
     // POD: originally the argument is implicitly converted to string
     // original error:
     // Invalid UUID string 'x'. A UUID string has to be 36 characters long.
@@ -625,5 +838,12 @@ export class UUIDToBinary extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
   }
 }

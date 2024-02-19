@@ -79,6 +79,12 @@ export abstract class TypedExpr implements TypeInfo {
    * @param env 
    */
   public checkReqArg(param: Parameter, argType: StaticTypeName) {
+    if(argType === "unassigned") {
+      this.type = "error";
+      this.error = `Local variable '${(this as unknown as TypedIdentifier).symbol}' hasn't been initialized.`;
+      return;
+    }
+
     const validTypes = [param.type, "type", "unknown", "error"] as StaticTypeName[];
     if(!validTypes.includes(argType)) {
       this.type = "error";
@@ -92,6 +98,12 @@ export abstract class TypedExpr implements TypeInfo {
    * @param env 
    */
   public checkOptArg(param: Parameter, argType: StaticTypeName) {
+    if(argType === "unassigned") {
+      this.type = "error";
+      this.error = `Local variable '${(this as unknown as TypedIdentifier).symbol}' hasn't been initialized.`;
+      return;
+    }
+
     const validTypes = [param.type, "type", "unknown", "error"] as StaticTypeName[];
     if(!validTypes.includes(argType))
       this.warning = TcError.makeArgTypeWarn(param, argType);
@@ -596,7 +608,9 @@ export class TypedIdentifier extends TypedExpr {
   }
   
   public typeExpr(env: TypeEnv): TypeInfo {
-    return env.lookup(this.symbol) ?? {type: "unassigned"};
+    const info = env.lookup(this.symbol);
+    this.type = info ? info.type : "unassigned";
+    return {type: this.type};
   }
 }
 

@@ -2,7 +2,7 @@ import { RuntimeError, UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbArray, JbBool, JbNull, JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
-import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import { TypedExpr, TypedIdentifier, TypeInfo } from "../../typechecker/ast";
 import TypeEnv from "../../typechecker/environment";
 import { Func, Parameter, Signature } from "../types";
 
@@ -367,14 +367,18 @@ export class SortArray extends Func {
       const type1 = this.signatures[0].params[argIdx].type;
       const type2 = this.signatures[1].params[argIdx].type;
       const secArgTypes = [type1, type2, "type", "unknown", "error"];
-      if(!secArgTypes.includes(isAscInfo.type))
+      if(isAscInfo.type === "unassigned") {
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+      }
+      else if(!secArgTypes.includes(isAscInfo.type))
         args[argIdx].warning = `The type of argument is ${isAscInfo.type}, should be ${type1} or ${type2}.`;
     } else if (args.length === 3) {
       // index
-      const idxInfo = args[++argIdx].typeExpr(env);
+      const idxInfo = args[argIdx].typeExpr(env);
       args[argIdx].checkOptArg(this.signatures[1].params[argIdx++], idxInfo.type);
       // isAscending
-      const isAscInfo = args[++argIdx].typeExpr(env);
+      const isAscInfo = args[argIdx].typeExpr(env);
       args[argIdx].checkOptArg(this.signatures[1].params[argIdx], isAscInfo.type);
     }
       
@@ -566,7 +570,6 @@ export class ReduceDimension extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
 
-    // TODO: this error should be thrown by type checker (too)
     // POD: the original error:
     // ReduceDimension failed, err:array dimension <2.
     if(args[0].type !== this.signature.params[0].type)
@@ -594,7 +597,7 @@ export class ReduceDimension extends Func {
   analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
     const argIdx = 0;
     const info = args[argIdx].typeExpr(env);
-    args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
     return {type: this.signature.returnType};
   }
 

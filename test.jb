@@ -1,4 +1,4 @@
 <trans>
-  // test for array inference and warnings
-  $something = ReduceDimension(true);
+  // test for call inference and warnings
+  $something = UuidToBinary(true);
 </trans>
