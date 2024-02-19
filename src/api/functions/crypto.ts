@@ -13,9 +13,6 @@ import { AsyncFunc, Func, Parameter, Signature } from "../types";
  * The decrypted output is returned as a string. See `AESEncryption` for additional details.
  */
 export class AESDecryption extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "AESDecryption";
@@ -42,6 +39,35 @@ export class AESDecryption extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // encryptedText
+    let argInfo = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx++], argInfo.type);
+    // passphrase
+    argInfo = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx++], argInfo.type);
+
+    if(args.length > 2) {
+      // salt
+      argInfo = args[argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signature.params[argIdx++], argInfo.type);
+
+      if(args.length > 3) {
+        // keyLength
+        argInfo = args[argIdx].typeExpr(env);
+        args[argIdx].checkOptArg(this.signature.params[argIdx++], argInfo.type);
+
+        if(args.length > 4) {
+          // iterations
+          argInfo = args[argIdx].typeExpr(env);
+          args[argIdx].checkOptArg(this.signature.params[argIdx++], argInfo.type);
+        }
+      }
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -55,9 +81,6 @@ export class AESDecryption extends Func {
  * for decryption, using the same parameters as when the plaintext string was encrypted.
  */
 export class AESEncryption extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "AESEncryption";
@@ -84,6 +107,35 @@ export class AESEncryption extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // plainText
+    let argInfo = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx++], argInfo.type);
+    // passphrase
+    argInfo = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx++], argInfo.type);
+
+    if(args.length > 2) {
+      // salt
+      argInfo = args[argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signature.params[argIdx++], argInfo.type);
+
+      if(args.length > 3) {
+        // keyLength
+        argInfo = args[argIdx].typeExpr(env);
+        args[argIdx].checkOptArg(this.signature.params[argIdx++], argInfo.type);
+
+        if(args.length > 4) {
+          // iterations
+          argInfo = args[argIdx].typeExpr(env);
+          args[argIdx].checkOptArg(this.signature.params[argIdx++], argInfo.type);
+        }
+      }
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -92,9 +144,6 @@ export class AESEncryption extends Func {
  * Decodes a base64-encoded string, returning binary data. See also `Base64Encode`.
  */
 export class Base64Decode extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Base64Decode";
@@ -117,6 +166,13 @@ export class Base64Decode extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -138,9 +194,6 @@ export class Base64Decode extends Func {
  * See also `Base64Decode`.
  */
 export class Base64Encode extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Base64Encode";
@@ -162,6 +215,20 @@ export class Base64Encode extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "binary":
+      case "string":
+        break;
+      default:
+        args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+        break;
+    }
+    return {type: this.signature.returnType};
   }
 }
 
@@ -201,9 +268,6 @@ export class Base64Encode extends Func {
  * See also `Base64Decode`.
  */
 export class Base64EncodeFile extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Base64EncodeFile";
@@ -232,6 +296,19 @@ export class Base64EncodeFile extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // sourceId
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    if(args.length === 2) {
+      // filename
+      info = args[++argIdx].typeExpr(env);
+      args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -242,9 +319,6 @@ export class Base64EncodeFile extends AsyncFunc {
  * Non-string data will first be converted to a string.
  */
 export class MD5 extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "MD5";
@@ -267,6 +341,14 @@ export class MD5 extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    if(info.type !== "string")
+      args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -277,9 +359,6 @@ export class MD5 extends Func {
  * Non-string data will first be converted to a string.
  */
 export class MD5AsTwoNumbers extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "MD5AsTwoNumbers";
@@ -302,6 +381,13 @@ export class MD5AsTwoNumbers extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -314,9 +400,6 @@ export class MD5AsTwoNumbers extends Func {
  * Non-string data will first be converted to a string.
  */
 export class SHA256 extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "SHA256";
@@ -338,5 +421,13 @@ export class SHA256 extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    if(info.type !== "string")
+      args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
   }
 }
