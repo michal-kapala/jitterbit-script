@@ -1,4 +1,4 @@
 <trans>
   // test for call inference and warnings
-  $something = AESEncryption("hello there", "general kenobi", 34500, "256");
+  $something = SQLEscape(4, "hi");
 </trans>

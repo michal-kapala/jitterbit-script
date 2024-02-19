@@ -21,9 +21,6 @@ import { AsyncFunc, Func, Parameter, Signature } from "../types";
  * For more information, see the instructions on inserting endpoints under the Endpoints section in Jitterbit Script.
  */
 export class CacheLookup extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "CacheLookup";
@@ -52,6 +49,17 @@ export class CacheLookup extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // databaseId
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // sql
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -79,9 +87,6 @@ export class CacheLookup extends AsyncFunc {
  * Supports up to 100-argument calls.
  */
 export class CallStoredProcedure extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "CallStoredProcedure";
@@ -112,6 +117,30 @@ export class CallStoredProcedure extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // databaseId
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // spName
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // resultSet
+    info = args[argIdx].typeExpr(env);
+    if(args[argIdx].kind !== "GlobalIdentifier")
+      args[argIdx].warning = `Argument '${this.signature.params[argIdx].name}' is expected to be a global variable for the stored procedure call results.`;
+    argIdx++;
+    // inputOutputVariable
+    if(args.length > 3) {
+      for(argIdx; argIdx < args.length; argIdx++) {
+        info = args[argIdx].typeExpr(env);
+        if(args[argIdx].kind !== "GlobalIdentifier")
+          args[argIdx].warning = `Argument '${this.signature.params[3].name}' is expected to be a global variable.`;
+      }
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -124,9 +153,6 @@ export class CallStoredProcedure extends AsyncFunc {
  * in Jitterbit Script.
  */
 export class DBCloseConnection extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "DBCloseConnection";
@@ -153,6 +179,13 @@ export class DBCloseConnection extends AsyncFunc {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
   }
 }
 
@@ -191,9 +224,6 @@ export class DBCloseConnection extends AsyncFunc {
  * Supports up to 100-argument calls.
  */
 export class DBExecute extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "DBExecute";
@@ -206,8 +236,7 @@ export class DBExecute extends AsyncFunc {
       new Signature("number", [
         new Parameter("string", "databaseId"),
         new Parameter("string", "sql"),
-        new Parameter("string", "outputVariable"),
-        new Parameter("type", "arg1", false),
+        new Parameter("string", "outputVariable")
       ])
     ];
     this.minArgs = 2;
@@ -227,6 +256,27 @@ export class DBExecute extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args.length === 2 ? 0 : 1];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // databaseId
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // sql
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+
+    if(args.length === 2)
+      return {type: this.signatures[0].returnType};
+
+    // outputVariable
+    for(argIdx; argIdx < args.length; argIdx++) {
+      info = args[argIdx].typeExpr(env);
+      if(args[argIdx].kind !== "GlobalIdentifier" && info.type !== "string")
+        args[argIdx].warning = `Argument '${this.signatures[1].params[2]}' should be a global variable or a string with the name of a global variable.`;
+    }
+    return {type: this.signatures[1].returnType};
+  }
 }
 
 /**
@@ -239,9 +289,6 @@ export class DBExecute extends AsyncFunc {
  * and may be omitted in that case.
  */
 export class DBLoad extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "DBLoad";
@@ -259,19 +306,9 @@ export class DBLoad extends AsyncFunc {
         new Parameter("number", "skipLines", false),
         new Parameter("string", "dateFormat", false),
         new Parameter("string", "datetimeFormat", false),
-      ]),
-      new Signature("void", [
-        new Parameter("string", "source"),
-        new Parameter("string", "target"),
-        new Parameter("number", "mode"),
-        new Parameter("string", "tablename"),
-        new Parameter("string", "columnNames"),
-        new Parameter("string", "columnKeynames"),
-        new Parameter("number", "skipLines", false),
-        new Parameter("string", "dateFormat", false),
-        new Parameter("string", "datetimeFormat", false),
       ])
     ];
+    this.signature = this.signatures[0];
     this.minArgs = 5;
     this.maxArgs = 9;
   }
@@ -288,6 +325,47 @@ export class DBLoad extends AsyncFunc {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[2].toNumber() === 2 ? 0 : 1];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // source
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // target
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // mode
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx++], info.type);
+    // tablename
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // columnNames
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+
+    if(args.length > 5) {
+      // columnKeynames
+      info = args[++argIdx].typeExpr(env);
+      args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+      if(args.length > 6) {
+        // skipLines
+        info = args[++argIdx].typeExpr(env);
+        args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+        if(args.length > 7) {
+          // dateFormat
+          info = args[++argIdx].typeExpr(env);
+          args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+          if(args.length > 8) {
+            // datetimeFormat
+            info = args[++argIdx].typeExpr(env);
+            args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+          }
+        }
+      }
+    }
+    return {type: this.signature.returnType};
   }
 }
 
@@ -307,9 +385,6 @@ export class DBLoad extends AsyncFunc {
  * use the functions `DBLookupAll` or `DBExecute`.
  */
 export class DBLookup extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "DBLookup";
@@ -338,6 +413,18 @@ export class DBLookup extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // databaseId
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // sql
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -360,9 +447,6 @@ export class DBLookup extends AsyncFunc {
  * use the function `DBExecute`.
  */
 export class DBLookupAll extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "DBLookupAll";
@@ -391,6 +475,18 @@ export class DBLookupAll extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // databaseId
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // sql
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -404,9 +500,6 @@ export class DBLookupAll extends AsyncFunc {
  * in Jitterbit Script.
  */
 export class DBRollbackTransaction extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "DBRollbackTransaction";
@@ -434,6 +527,13 @@ export class DBRollbackTransaction extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -442,9 +542,6 @@ export class DBRollbackTransaction extends AsyncFunc {
  * An alias for the function `DBLoad`. See `DBLoad` for details.
  */
 export class DBWrite extends DBLoad {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "DBWrite";
@@ -458,9 +555,6 @@ export class DBWrite extends DBLoad {
  * The return value is null.
  */
 export class SetDBInsert extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "SetDBInsert";
@@ -481,6 +575,10 @@ export class SetDBInsert extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -490,9 +588,6 @@ export class SetDBInsert extends Func {
  * The return value is null.
  */
 export class SetDBUpdate extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "SetDBUpdate";
@@ -513,6 +608,10 @@ export class SetDBUpdate extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -528,9 +627,6 @@ export class SetDBUpdate extends Func {
  * If backslash characters should also be escaped, provide and set the second parameter to `true`.
  */
 export class SQLEscape extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "SQLEscape";
@@ -554,6 +650,20 @@ export class SQLEscape extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // unescapedSQL
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+
+    if(args.length === 2) {
+      // escapeBackslash
+      let info = args[argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -563,9 +673,6 @@ export class SQLEscape extends Func {
  * The return value is null.
  */
 export class Unmap extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Unmap";
@@ -585,5 +692,9 @@ export class Unmap extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    return {type: this.signature.returnType};
   }
 }
