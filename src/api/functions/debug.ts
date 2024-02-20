@@ -21,9 +21,6 @@ import { Func, Parameter, Signature } from "../types";
 * the execution does not get halted.
  */
 export class DebugBreak extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "DebugBreak";
@@ -50,11 +47,19 @@ export class DebugBreak extends Func {
       console.log("\nDebugBreak():")
       scope.logAvailable();
     }
-      
     return result;
   }
 
   protected chooseSignature(args: RuntimeVal[]): void {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    if(args.length === 1) {
+      const argIdx = 0;
+      const info = args[argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    }
+    return {type: this.signature.returnType};
   }
 }
