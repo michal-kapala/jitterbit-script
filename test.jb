@@ -1,4 +1,4 @@
 <trans>
   // test for call inference and warnings
-  $something = SQLEscape(4, "hi");
+  $something = ConvertTimeZone(4, "hi", true, x, false);
 </trans>

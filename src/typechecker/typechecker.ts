@@ -97,7 +97,7 @@ export default class Typechecker {
     for(const expr of typedAst) {
       expr.typeExpr(env);
     }
-    console.log(typedAst);
+    console.log(JSON.stringify(typedAst));
     return typedAst;
   }
 }

@@ -2,7 +2,7 @@ import { RuntimeError, UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbBool, JbDate, JbNumber, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
-import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import { TypedExpr, TypedIdentifier, TypeInfo } from "../../typechecker/ast";
 import TypeEnv from "../../typechecker/environment";
 import { Func, Parameter, Signature } from "../types";
 
@@ -12,9 +12,6 @@ import { Func, Parameter, Signature } from "../types";
  * Take a date and returns it converted from one time zone to another time zone.
  */
 export class ConvertTimeZone extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "ConvertTimeZone";
@@ -49,6 +46,53 @@ export class ConvertTimeZone extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    let sigIdx = 0;
+    // d
+    let info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "date":
+      case "error":
+        break;
+      case "type":
+      case "unknown":
+        // doesnt override the warning
+        if(!args[argIdx].warning)
+          args[argIdx].warning = `Calling ${this.name} might result in a runtime error if the argument '${this.signatures[sigIdx].params[argIdx].name}' is neither a date object nor a parseable date string.`;
+        break;
+      case "string":
+        sigIdx = 1;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].type = "error";
+        args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
+        break;
+    }
+    // fromTZ
+    info = args[++argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signatures[sigIdx].params[argIdx], info.type);
+    // toTZ
+    info = args[++argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signatures[sigIdx].params[argIdx], info.type);
+
+    if(args.length > 3) {
+      // is_european_format
+      info = args[++argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signatures[sigIdx].params[argIdx], info.type);
+      if(args.length > 4) {
+        // ignoreDST
+        info = args[++argIdx].typeExpr(env);
+        args[argIdx].checkOptArg(this.signatures[sigIdx].params[argIdx], info.type);
+      }
+    }
+    return {type: this.signatures[sigIdx].returnType};
+  }
 }
 
 /**
@@ -57,15 +101,12 @@ export class ConvertTimeZone extends Func {
  * Converts a date object or date string in the input format to a date string in the output format.
  */
 export class CVTDate extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "CVTDate";
     this.module = "datetime";
     this.minArgs = 3;
-    this.maxArgs = 5;
+    this.maxArgs = 3;
     this.signatures = [
       new Signature("string", [
         new Parameter("date", "d"),
@@ -88,6 +129,42 @@ export class CVTDate extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    let sigIdx = 0;
+    // d
+    let info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "date":
+      case "error":
+        break;
+      case "type":
+      case "unknown":
+        // doesnt override the warning
+        if(!args[argIdx].warning)
+          args[argIdx].warning = `Calling ${this.name} might result in a runtime error if the argument '${this.signatures[sigIdx].params[argIdx].name}' is neither a date object nor a parseable date string.`;
+        break;
+      case "string":
+        sigIdx = 1;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].type = "error";
+        args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
+        break;
+    }
+    // inputFormat
+    info = args[++argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signatures[sigIdx].params[argIdx], info.type);
+    // outputFormat
+    info = args[++argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signatures[sigIdx].params[argIdx], info.type);
+    return {type: this.signatures[sigIdx].returnType};
+  }
 }
 
 /**
@@ -96,9 +173,6 @@ export class CVTDate extends Func {
  * Returns a date string after adding a number to a specified part of a date object.
  */
 export class DateAdd extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "DateAdd";
@@ -127,6 +201,42 @@ export class DateAdd extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[2].type === "string" ? 1 : 0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    let sigIdx = 0;
+    // datePath
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signatures[sigIdx].params[argIdx], info.type);
+    // number
+    info = args[++argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signatures[sigIdx].params[argIdx], info.type);
+    // d
+    info = args[++argIdx].typeExpr(env);
+    switch(info.type) {
+      case "date":
+      case "error":
+        break;
+      case "type":
+      case "unknown":
+        // doesnt override the warning
+        if(!args[argIdx].warning)
+          args[argIdx].warning = `Calling ${this.name} might result in a runtime error if the argument '${this.signatures[sigIdx].params[argIdx].name}' is neither a date object nor a parseable date string.`;
+        break;
+      case "string":
+        sigIdx = 1;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].type = "error";
+        args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
+        break;
+    }
+    return {type: this.signatures[sigIdx].returnType};
+  }
 }
 
 /**
@@ -135,9 +245,6 @@ export class DateAdd extends Func {
  * Returns the day of the month (1-31) of a date object or date string.
  */
 export class DayOfMonth extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "DayOfMonth";
@@ -167,6 +274,36 @@ export class DayOfMonth extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    let sigIdx = 0;
+    // d
+    let info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "date":
+      case "error":
+        break;
+      case "type":
+      case "unknown":
+        // doesnt override the warning
+        if(!args[argIdx].warning)
+          args[argIdx].warning = `Calling ${this.name} might result in a runtime error if the argument '${this.signatures[sigIdx].params[argIdx].name}' is neither a date object nor a parseable date string.`;
+        break;
+      case "string":
+        sigIdx = 1;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].type = "error";
+        args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
+        break;
+    }
+    return {type: this.signatures[sigIdx].returnType};
+  }
 }
 
 /**
@@ -178,9 +315,6 @@ export class DayOfMonth extends Func {
  * This definition is independent of locale. For the weekday name, call `FormatDate` instead.
  */
 export class DayOfWeek extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "DayOfWeek";
@@ -210,6 +344,36 @@ export class DayOfWeek extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    let sigIdx = 0;
+    // d
+    let info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "date":
+      case "error":
+        break;
+      case "type":
+      case "unknown":
+        // doesnt override the warning
+        if(!args[argIdx].warning)
+          args[argIdx].warning = `Calling ${this.name} might result in a runtime error if the argument '${this.signatures[sigIdx].params[argIdx].name}' is neither a date object nor a parseable date string.`;
+        break;
+      case "string":
+        sigIdx = 1;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].type = "error";
+        args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
+        break;
+    }
+    return {type: this.signatures[sigIdx].returnType};
+  }
 }
 
 /**
@@ -219,9 +383,6 @@ export class DayOfWeek extends Func {
  * This is similar to the `CVTDate` function and uses the same format strings.
  */
 export class FormatDate extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "FormatDate";
@@ -248,6 +409,39 @@ export class FormatDate extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    let sigIdx = 0;
+    // d
+    let info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "date":
+      case "error":
+        break;
+      case "type":
+      case "unknown":
+        // doesnt override the warning
+        if(!args[argIdx].warning)
+          args[argIdx].warning = `Calling ${this.name} might result in a runtime error if the argument '${this.signatures[sigIdx].params[argIdx].name}' is neither a date object nor a parseable date string.`;
+        break;
+      case "string":
+        sigIdx = 1;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].type = "error";
+        args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
+        break;
+    }
+    // format
+    info = args[++argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signatures[sigIdx].params[argIdx], info.type);
+    return {type: this.signatures[sigIdx].returnType};
+  }
 }
 
 /**
@@ -260,9 +454,6 @@ export class FormatDate extends Func {
  * In this implementation the result is always UTC-based.
  */
 export class GeneralDate extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "GeneralDate";
@@ -293,6 +484,36 @@ export class GeneralDate extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    let sigIdx = 0;
+    // d
+    let info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "date":
+      case "error":
+        break;
+      case "type":
+      case "unknown":
+        // doesnt override the warning
+        if(!args[argIdx].warning)
+          args[argIdx].warning = `Calling ${this.name} might result in a runtime error if the argument '${this.signatures[sigIdx].params[argIdx].name}' is neither a date object nor a parseable date string.`;
+        break;
+      case "string":
+        sigIdx = 1;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].type = "error";
+        args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
+        break;
+    }
+    return {type: this.signatures[sigIdx].returnType};
+  }
 }
 
 /**
@@ -302,9 +523,6 @@ export class GeneralDate extends Func {
  * Converts a date object or date string to a string according to a time zone code.
  */
 export class GetUTCFormattedDate extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "GetUTCFormattedDate";
@@ -333,6 +551,45 @@ export class GetUTCFormattedDate extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    let sigIdx = 0;
+    // d
+    let info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "date":
+      case "error":
+        break;
+      case "type":
+      case "unknown":
+        // doesnt override the warning
+        if(!args[argIdx].warning)
+          args[argIdx].warning = `Calling ${this.name} might result in a runtime error if the argument '${this.signatures[sigIdx].params[argIdx].name}' is neither a date object nor a parseable date string.`;
+        break;
+      case "string":
+        sigIdx = 1;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].type = "error";
+        args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
+        break;
+    }
+    // time_zone_id
+    info = args[++argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signatures[sigIdx].params[argIdx], info.type);
+
+    if(args.length > 2) {
+      // is_european_format
+      info = args[++argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signatures[sigIdx].params[argIdx], info.type);
+    }
+    return {type: this.signatures[sigIdx].returnType};
+  }
 }
 
 /**
@@ -342,9 +599,6 @@ export class GetUTCFormattedDate extends Func {
  * Converts a date object or date string to a string according to a time zone code.
  */
 export class GetUTCFormattedDateTime extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "GetUTCFormattedDateTime";
@@ -373,6 +627,45 @@ export class GetUTCFormattedDateTime extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    let sigIdx = 0;
+    // d
+    let info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "date":
+      case "error":
+        break;
+      case "type":
+      case "unknown":
+        // doesnt override the warning
+        if(!args[argIdx].warning)
+          args[argIdx].warning = `Calling ${this.name} might result in a runtime error if the argument '${this.signatures[sigIdx].params[argIdx].name}' is neither a date object nor a parseable date string.`;
+        break;
+      case "string":
+        sigIdx = 1;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].type = "error";
+        args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
+        break;
+    }
+    // time_zone_id
+    info = args[++argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signatures[sigIdx].params[argIdx], info.type);
+
+    if(args.length > 2) {
+      // is_european_format
+      info = args[++argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signatures[sigIdx].params[argIdx], info.type);
+    }
+    return {type: this.signatures[sigIdx].returnType};
+  }
 }
 
 /**
@@ -385,9 +678,6 @@ export class GetUTCFormattedDateTime extends Func {
  * In this implementation the result is always UTC-based.
  */
 export class LastDayOfMonth extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "LastDayOfMonth";
@@ -421,6 +711,36 @@ export class LastDayOfMonth extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    let sigIdx = 0;
+    // d
+    let info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "date":
+      case "error":
+        break;
+      case "type":
+      case "unknown":
+        // doesnt override the warning
+        if(!args[argIdx].warning)
+          args[argIdx].warning = `Calling ${this.name} might result in a runtime error if the argument '${this.signatures[sigIdx].params[argIdx].name}' is neither a date object nor a parseable date string.`;
+        break;
+      case "string":
+        sigIdx = 1;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].type = "error";
+        args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
+        break;
+    }
+    return {type: this.signatures[sigIdx].returnType};
+  }
 }
 
 /**
@@ -433,9 +753,6 @@ export class LastDayOfMonth extends Func {
  * In this implementation the result is always UTC-based.
  */
 export class LongDate extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "LongDate";
@@ -527,6 +844,36 @@ export class LongDate extends Func {
         throw new RuntimeError(`[${this.name} Invalid date]`);
     }
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    let sigIdx = 0;
+    // d
+    let info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "date":
+      case "error":
+        break;
+      case "type":
+      case "unknown":
+        // doesnt override the warning
+        if(!args[argIdx].warning)
+          args[argIdx].warning = `Calling ${this.name} might result in a runtime error if the argument '${this.signatures[sigIdx].params[argIdx].name}' is neither a date object nor a parseable date string.`;
+        break;
+      case "string":
+        sigIdx = 1;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].type = "error";
+        args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
+        break;
+    }
+    return {type: this.signatures[sigIdx].returnType};
+  }
 }
 
 /**
@@ -539,9 +886,6 @@ export class LongDate extends Func {
  * In this implementation the result is always UTC-based.
  */
 export class LongTime extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "LongTime";
@@ -570,6 +914,36 @@ export class LongTime extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    let sigIdx = 0;
+    // d
+    let info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "date":
+      case "error":
+        break;
+      case "type":
+      case "unknown":
+        // doesnt override the warning
+        if(!args[argIdx].warning)
+          args[argIdx].warning = `Calling ${this.name} might result in a runtime error if the argument '${this.signatures[sigIdx].params[argIdx].name}' is neither a date object nor a parseable date string.`;
+        break;
+      case "string":
+        sigIdx = 1;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].type = "error";
+        args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
+        break;
+    }
+    return {type: this.signatures[sigIdx].returnType};
+  }
 }
 
 /**
@@ -582,9 +956,6 @@ export class LongTime extends Func {
  * In this implementation the result is always UTC-based.
  */
 export class MediumDate extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "MediumDate";
@@ -643,6 +1014,36 @@ export class MediumDate extends Func {
         throw new RuntimeError(`[${this.name}] Invalid month: ${month}`);
     }
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    let sigIdx = 0;
+    // d
+    let info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "date":
+      case "error":
+        break;
+      case "type":
+      case "unknown":
+        // doesnt override the warning
+        if(!args[argIdx].warning)
+          args[argIdx].warning = `Calling ${this.name} might result in a runtime error if the argument '${this.signatures[sigIdx].params[argIdx].name}' is neither a date object nor a parseable date string.`;
+        break;
+      case "string":
+        sigIdx = 1;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].type = "error";
+        args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
+        break;
+    }
+    return {type: this.signatures[sigIdx].returnType};
+  }
 }
 
 /**
@@ -655,9 +1056,6 @@ export class MediumDate extends Func {
  * In this implementation the result is always UTC-based.
  */
 export class MediumTime extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "MediumTime";
@@ -686,6 +1084,36 @@ export class MediumTime extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    let sigIdx = 0;
+    // d
+    let info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "date":
+      case "error":
+        break;
+      case "type":
+      case "unknown":
+        // doesnt override the warning
+        if(!args[argIdx].warning)
+          args[argIdx].warning = `Calling ${this.name} might result in a runtime error if the argument '${this.signatures[sigIdx].params[argIdx].name}' is neither a date object nor a parseable date string.`;
+        break;
+      case "string":
+        sigIdx = 1;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].type = "error";
+        args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
+        break;
+    }
+    return {type: this.signatures[sigIdx].returnType};
+  }
 }
 
 /**
@@ -698,9 +1126,6 @@ export class MediumTime extends Func {
  * In this implementation the result is always UTC-based.
  */
 export class MonthOfYear extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "MonthOfYear";
@@ -716,7 +1141,6 @@ export class MonthOfYear extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     // TODO: probably uses an implicit conversion to string instead, to be tested
-    // TODO: to be moved into type checking
     if(args[0].type !== "string" && args[0].type !== "date")
       throw new RuntimeError(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
@@ -729,6 +1153,36 @@ export class MonthOfYear extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    let sigIdx = 0;
+    // d
+    let info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "date":
+      case "error":
+        break;
+      case "type":
+      case "unknown":
+        // doesnt override the warning
+        if(!args[argIdx].warning)
+          args[argIdx].warning = `Calling ${this.name} might result in a runtime error if the argument '${this.signatures[sigIdx].params[argIdx].name}' is neither a date object nor a parseable date string.`;
+        break;
+      case "string":
+        sigIdx = 1;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].type = "error";
+        args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
+        break;
+    }
+    return {type: this.signatures[sigIdx].returnType};
+  }
 }
 
 /**
@@ -740,9 +1194,6 @@ export class MonthOfYear extends Func {
  * This implementation always returns local time.
  */
 export class Now extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Now";
@@ -761,6 +1212,10 @@ export class Now extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -772,9 +1227,6 @@ export class Now extends Func {
  * This implementation always returns local time.
  */
 export class Now_ extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Now_";
@@ -793,6 +1245,10 @@ export class Now_ extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -805,9 +1261,6 @@ export class Now_ extends Func {
  * In this implementation the result is always UTC-based.
  */
 export class ShortDate extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "ShortDate";
@@ -835,6 +1288,36 @@ export class ShortDate extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    let sigIdx = 0;
+    // d
+    let info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "date":
+      case "error":
+        break;
+      case "type":
+      case "unknown":
+        // doesnt override the warning
+        if(!args[argIdx].warning)
+          args[argIdx].warning = `Calling ${this.name} might result in a runtime error if the argument '${this.signatures[sigIdx].params[argIdx].name}' is neither a date object nor a parseable date string.`;
+        break;
+      case "string":
+        sigIdx = 1;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].type = "error";
+        args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
+        break;
+    }
+    return {type: this.signatures[sigIdx].returnType};
+  }
 }
 
 /**
@@ -847,9 +1330,6 @@ export class ShortDate extends Func {
  * In this implementation the result is always UTC-based.
  */
 export class ShortTime extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "ShortTime";
@@ -876,5 +1356,35 @@ export class ShortTime extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "string" ? 1 : 0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    let sigIdx = 0;
+    // d
+    let info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "date":
+      case "error":
+        break;
+      case "type":
+      case "unknown":
+        // doesnt override the warning
+        if(!args[argIdx].warning)
+          args[argIdx].warning = `Calling ${this.name} might result in a runtime error if the argument '${this.signatures[sigIdx].params[argIdx].name}' is neither a date object nor a parseable date string.`;
+        break;
+      case "string":
+        sigIdx = 1;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].type = "error";
+        args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
+        break;
+    }
+    return {type: this.signatures[sigIdx].returnType};
   }
 }
