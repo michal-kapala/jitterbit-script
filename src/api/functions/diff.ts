@@ -11,9 +11,6 @@ import TypeEnv from "../../typechecker/environment";
  * Requests the added records as input for the next transformation that is run.
  */
 export class DiffAdd extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "DiffAdd";
@@ -34,6 +31,10 @@ export class DiffAdd extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -45,9 +46,6 @@ export class DiffAdd extends Func {
  * In that case, the next time the diff operation runs, no records will be processed.
  */
 export class DiffComplete extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "DiffComplete";
@@ -68,6 +66,10 @@ export class DiffComplete extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -76,9 +78,6 @@ export class DiffComplete extends Func {
  * Requests the deleted records as input for the next transformation that is run.
  */
 export class DiffDelete extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "DiffDelete";
@@ -99,6 +98,10 @@ export class DiffDelete extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -110,9 +113,6 @@ export class DiffDelete extends Func {
  * Supports up to 100-argument calls.
  */
 export class DiffKeyList extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "DiffKeyList";
@@ -120,7 +120,7 @@ export class DiffKeyList extends Func {
     this.signatures = [
       new Signature("void", [
         new Parameter("string", "k1"),
-        new Parameter("string", "k2", false),
+        new Parameter("string", "k", false),
       ])
     ];
     this.signature = this.signatures[0];
@@ -136,6 +136,26 @@ export class DiffKeyList extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // k1
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx++], info.type);
+
+    // kN
+    for(argIdx; argIdx < args.length; argIdx++) {
+      info = args[argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(
+        {
+          ...this.signature.params[argIdx],
+          name: this.signature.params[argIdx].name + argIdx
+        },
+        info.type
+      );
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -145,9 +165,6 @@ export class DiffKeyList extends Func {
  * the repeating node that the diff is performed on.
  */
 export class DiffNode extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "DiffNode";
@@ -168,6 +185,14 @@ export class DiffNode extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    // nodeName
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -176,9 +201,6 @@ export class DiffNode extends Func {
  * Requests the updated records as input for the next transformation that is run.
  */
 export class DiffUpdate extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "DiffUpdate";
@@ -199,6 +221,10 @@ export class DiffUpdate extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -216,9 +242,6 @@ export class DiffUpdate extends Func {
  * that implements a diff/synchronization.
  */
 export class InitializeDiff extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "InitializeDiff";
@@ -239,6 +262,14 @@ export class InitializeDiff extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    // diffId
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -257,9 +288,6 @@ export class InitializeDiff extends Func {
  * Supports up to 100-argument calls.
  */
 export class OrderedDiffKeyList extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "OrderedDiffKeyList";
@@ -268,8 +296,8 @@ export class OrderedDiffKeyList extends Func {
       new Signature("void", [
         new Parameter("string", "k1"),
         new Parameter("bool", "isAscending1"),
-        new Parameter("string", "k2", false),
-        new Parameter("bool", "isAscending2", false),
+        new Parameter("string", "k", false),
+        new Parameter("bool", "isAscending", false),
       ])
     ];
     this.signature = this.signatures[0];
@@ -285,6 +313,48 @@ export class OrderedDiffKeyList extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    const odd = args.length % 2 === 1;
+    // k1
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // isAscending1
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx++], info.type);
+
+    // kN, isAscendingN
+    let pair = 2;
+    while(argIdx < args.length) {
+      // kN
+      info = args[argIdx].typeExpr(env);
+      args[argIdx++].checkReqArg(
+        {
+          ...this.signature.params[2],
+          name: this.signature.params[2].name + pair
+        },
+        info.type
+      );
+      // isAscendingN
+      if(argIdx === args.length)
+        break;
+      info = args[argIdx].typeExpr(env);
+      args[argIdx++].checkOptArg(
+        {
+          ...this.signature.params[3],
+          name: this.signature.params[3].name + pair
+        },
+        info.type
+      );
+      pair++;
+    }
+    const result = {type: this.signature.returnType} as TypeInfo;
+    // parity check
+    if(odd)
+      result.warning = `Odd number of arguments passed into ${this.name}, specify '${this.signature.params[3].name}' for the last column key.`
+    return result;
   }
 }
 
@@ -307,9 +377,6 @@ export class OrderedDiffKeyList extends Func {
  * If no diff session is present for this `diff_id`, no action is performed.
  */
 export class ResetDiff extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "ResetDiff";
@@ -333,6 +400,17 @@ export class ResetDiff extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // diffId
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // action
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -346,9 +424,6 @@ export class ResetDiff extends Func {
  * This method is typically called in conjunction with the `InitializeDiff` function.
  */
 export class SetDiffChunkSize extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "SetDiffChunkSize";
@@ -368,5 +443,12 @@ export class SetDiffChunkSize extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
   }
 }
