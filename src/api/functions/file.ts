@@ -2,7 +2,7 @@ import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbBool } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
-import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import { TypedExpr, TypedIdentifier, TypeInfo } from "../../typechecker/ast";
 import TypeEnv from "../../typechecker/environment";
 import { AsyncFunc, Func, Parameter, Signature } from "../types";
 
@@ -28,9 +28,6 @@ import { AsyncFunc, Func, Parameter, Signature } from "../types";
  * A script will abort, a warning added to the operation log, and the operation will continue.
  */
 export class ArchiveFile extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "ArchiveFile";
@@ -39,7 +36,7 @@ export class ArchiveFile extends AsyncFunc {
       new Signature("void", [
         new Parameter("string", "sourceId"),
         new Parameter("string", "targetId"),
-        new Parameter("string", "deleteSource", false, new JbBool(false))
+        new Parameter("bool", "deleteSource", false, new JbBool(false))
       ])
     ];
     this.signature = this.signatures[0];
@@ -59,6 +56,22 @@ export class ArchiveFile extends AsyncFunc {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // sourceId
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // targetId
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    // deleteSource
+    if(args.length > 2) {
+      info = args[++argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    }
+    return {type: this.signature.returnType};
   }
 }
 
@@ -86,9 +99,6 @@ export class ArchiveFile extends AsyncFunc {
  * Global variables are referenced as `[de_name]` in the activity configuration.
  */
 export class DeleteFile extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "DeleteFile";
@@ -116,6 +126,19 @@ export class DeleteFile extends AsyncFunc {
   
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // sourceId
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    // fileFilter
+    if(args.length > 1) {
+      info = args[++argIdx].typeExpr(env);
+      args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    }
+    return {type: this.signature.returnType};
   }
 }
 
@@ -147,9 +170,6 @@ export class DeleteFile extends AsyncFunc {
  * Global variables are referenced as `[de_name]` in the activity configuration.
  */
 export class DeleteFiles extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "DeleteFiles";
@@ -178,6 +198,19 @@ export class DeleteFiles extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // sourceId
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    // fileFilter
+    if(args.length > 1) {
+      info = args[++argIdx].typeExpr(env);
+      args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -201,9 +234,6 @@ export class DeleteFiles extends AsyncFunc {
  * Global variables are referenced as `[de_name]` in the activity configuration.
  */
 export class DirList extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "DirList";
@@ -227,6 +257,24 @@ export class DirList extends Func {
   
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // sourceId
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    // path
+    if(args.length > 1) {
+      info = args[++argIdx].typeExpr(env);
+      args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+      // fileFilter
+      if(args.length > 2) {
+        info = args[++argIdx].typeExpr(env);
+        args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+      }
+    }
+    return {type: this.signature.returnType};
   }
 }
 
@@ -255,9 +303,6 @@ export class DirList extends Func {
  * of the source activity or the overridden source.
  */
 export class FileList extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "FileList";
@@ -282,6 +327,24 @@ export class FileList extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // sourceId
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    // path
+    if(args.length > 1) {
+      info = args[++argIdx].typeExpr(env);
+      args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+      // fileFilter
+      if(args.length > 2) {
+        info = args[++argIdx].typeExpr(env);
+        args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+      }
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -303,9 +366,6 @@ export class FileList extends Func {
  * See also the `FlushFiles` function.
  */
 export class FlushAllFiles extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "FlushAllFiles";
@@ -330,6 +390,16 @@ export class FlushAllFiles extends AsyncFunc {
   
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    // targetId
+    if(args.length > 0) {
+      const argIdx = 0;
+      const info = args[argIdx].typeExpr(env);
+      args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    }
+    return {type: this.signature.returnType};
   }
 }
 
@@ -356,9 +426,6 @@ export class FlushAllFiles extends AsyncFunc {
  * See also the `FlushAllFiles` function.
  */
 export class FlushFile extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "FlushFile";
@@ -386,6 +453,19 @@ export class FlushFile extends AsyncFunc {
   
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // targetId
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    // filename
+    if(args.length > 1) {
+      info = args[argIdx].typeExpr(env);
+      args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    }
+    return {type: this.signature.returnType};
   }
 }
 
@@ -417,9 +497,6 @@ export class FlushFile extends AsyncFunc {
  * In that case, all Jitterbit `$jitterbit.source.http.*` variables will be populated.
  */
 export class ReadFile extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "ReadFile";
@@ -447,6 +524,19 @@ export class ReadFile extends AsyncFunc {
   
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // sourceId
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    // fileFilter
+    if(args.length > 1) {
+      info = args[argIdx].typeExpr(env);
+      args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    }
+    return {type: this.signature.returnType};
   }
 }
 
@@ -476,9 +566,6 @@ export class ReadFile extends AsyncFunc {
  * A script will abort, a warning added to the operation log, and the operation will continue.
  */
 export class WriteFile extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "WriteFile";
@@ -507,5 +594,37 @@ export class WriteFile extends AsyncFunc {
   
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // targetId
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // fileContents
+    info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "string":
+      case "binary":
+      case "error":
+      case "unknown":
+        break;
+      case "type":
+        args[argIdx].warning = `The argument '${this.signature.params[argIdx]}' will be implicitly converted to a string if its type is neither string nor binary.`;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].warning = `The type of argument '${this.signature.params[argIdx].name}' is ${info.type}, should be string or binary.`;
+        break;
+    }
+    // filename
+    if(args.length > 2) {
+      info = args[++argIdx].typeExpr(env);
+      args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    }
+    return {type: this.signature.returnType};
   }
 }
