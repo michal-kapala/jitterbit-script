@@ -18,9 +18,6 @@ import TypeEnv from "../../typechecker/environment";
  * See also the `Dict` function.
  */
 export class AddToDict extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "AddToDict";
@@ -41,7 +38,6 @@ export class AddToDict extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
 
-    // TODO: this error should be thrown by type checker (too)
     // POD: originally the type is not validated, the value is reassigned with a new dictionary
     if(args[0].type !== this.signature.params[0].type)
       throw new RuntimeError(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
@@ -61,6 +57,20 @@ export class AddToDict extends Func {
   protected chooseSignature(args: RuntimeVal[]): void {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // dict
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // key
+    info = args[argIdx].typeExpr(env);
+    if(info.type === "null")
+      args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // arg
+    info = args[argIdx].typeExpr(env);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -70,9 +80,6 @@ export class AddToDict extends Func {
  * returned in the same order as the keys in the array.
  */
 export class CollectValues extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "CollectValues";
@@ -91,7 +98,6 @@ export class CollectValues extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
 
-    // TODO: these errors should be thrown by type checker (too)
     // POD: original error:
     // call CollectValues() error, argument data types must be diction, collection
     if(args[0].type !== this.signature.params[0].type)
@@ -115,6 +121,17 @@ export class CollectValues extends Func {
   protected chooseSignature(args: RuntimeVal[]): void {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // dict
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // names
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -123,9 +140,6 @@ export class CollectValues extends Func {
  * Returns an array of the keys in a dictionary. The argument must be an existing dictionary.
  */
 export class GetKeys extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "GetKeys";
@@ -143,7 +157,6 @@ export class GetKeys extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
 
-    // TODO: this error should be thrown by type checker (too)
     // POD: originally the type is not validated, the value is reassigned with a new dictionary
     if(args[0].type !== this.signature.params[0].type)
       throw new RuntimeError(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
@@ -160,6 +173,14 @@ export class GetKeys extends Func {
   protected chooseSignature(args: RuntimeVal[]): void {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    // dict
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -172,9 +193,6 @@ export class GetKeys extends Func {
  * To enter an `n` path into the function, drag and drop the desired XML node folder from the Source Objects tab of the script component palette to the script to insert its qualified path at the location of your cursor, or enter its reference path manually. For more information, see the instructions on inserting source objects.
  */
 export class GetSourceInstanceMap extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "GetSourceInstanceMap";
@@ -197,6 +215,13 @@ export class GetSourceInstanceMap extends Func {
   protected chooseSignature(args: RuntimeVal[]): void {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -213,9 +238,6 @@ export class GetSourceInstanceMap extends Func {
  * For more information, see the instructions on inserting source objects.
  */
 export class GetSourceInstanceElementMap extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "GetSourceInstanceElementMap";
@@ -238,6 +260,13 @@ export class GetSourceInstanceElementMap extends Func {
   protected chooseSignature(args: RuntimeVal[]): void {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -250,9 +279,6 @@ export class GetSourceInstanceElementMap extends Func {
  * See also the `AddToDict` function.
  */
 export class Dict extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Dict";
@@ -271,6 +297,10 @@ export class Dict extends Func {
   protected chooseSignature(args: RuntimeVal[]): void {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -280,9 +310,6 @@ export class Dict extends Func {
  * As an equivalent function that works for arrays, see the examples of the `FindValue` function.
  */
 export class HasKey extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "HasKey";
@@ -290,8 +317,7 @@ export class HasKey extends Func {
     this.signatures = [
       new Signature("bool", [
         new Parameter("dictionary", "dict"),
-        // the docs wrongly say this is a string, implicit conversion in reality
-        new Parameter("type", "key")
+        new Parameter("string", "key")
       ])
     ];
     this.signature = this.signatures[0];
@@ -302,7 +328,6 @@ export class HasKey extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
 
-    // TODO: this error should be thrown by type checker (too)
     // POD: originally the type is not validated, the value is reassigned with a new dictionary
     if(args[0].type !== this.signature.params[0].type)
       throw new RuntimeError(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
@@ -315,6 +340,17 @@ export class HasKey extends Func {
   protected chooseSignature(args: RuntimeVal[]): void {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // dict
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // key
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -323,9 +359,6 @@ export class HasKey extends Func {
  * An alias for `Dict`. See the function `Dict`.
  */
 export class Map extends Dict {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Map";
@@ -340,22 +373,17 @@ export class Map extends Dict {
  * otherwise, the third argument will be evaluated, and that value would be stored in the dictionary for the key.
  */
 export class MapCache extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "MapCache";
     this.module = "dict/array";
-    // the docs wrongly say this is a string, can be any value
+    // the return type from the docs is wrong, it can be any existing value (`type`)
     // in case the 3rd arg is used, its string representation is returned
     this.signatures = [
-      new Signature("string", [
+      new Signature("type", [
         new Parameter("dictionary", "dict"),
-        // the docs wrongly say this is a string, implicit conversion in reality
-        new Parameter("type", "key"),
-        // the docs wrongly say this is a string, implicit conversion in reality
-        new Parameter("type", "value")
+        new Parameter("string", "key"),
+        new Parameter("string", "value")
       ])
     ];
     this.signature = this.signatures[0];
@@ -366,7 +394,6 @@ export class MapCache extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     
-    // TODO: this error should be thrown by type checker (too)
     // POD: originally the type is not validated, the value is reassigned with a new dictionary
     if(args[0].type !== this.signature.params[0].type)
       throw new RuntimeError(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
@@ -383,6 +410,20 @@ export class MapCache extends Func {
   protected chooseSignature(args: RuntimeVal[]): void {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // dict
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // key
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx++], info.type);
+    // value
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -393,9 +434,6 @@ export class MapCache extends Func {
  * Returns `true` if the key-value pair was removed and `false` if the key didn't exist.
  */
 export class RemoveKey extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "RemoveKey";
@@ -403,8 +441,7 @@ export class RemoveKey extends Func {
     this.signatures = [
       new Signature("bool", [
         new Parameter("dictionary", "dict"),
-        // the docs say this is a string, implicit conversion in reality
-        new Parameter("type", "key")
+        new Parameter("string", "key")
       ])
     ];
     this.signature = this.signatures[0];
@@ -415,7 +452,6 @@ export class RemoveKey extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
 
-    // TODO: this error should be thrown by type checker (too)
     // POD: originally the type is not validated, the value is reassigned with a new dictionary
     if(args[0].type !== this.signature.params[0].type)
       throw new RuntimeError(`${this.name} can only be called on ${this.signature.params[0].type} data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
@@ -432,5 +468,16 @@ export class RemoveKey extends Func {
 
   protected chooseSignature(args: RuntimeVal[]): void {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // dict
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // key
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
   }
 }

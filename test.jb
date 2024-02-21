@@ -1,4 +1,4 @@
 <trans>
   // test for call inference and warnings
-  $something = ConvertTimeZone(4, "hi", true, x, false);
+  $something = MapCache(4, "hi", true);
 </trans>
