@@ -26,9 +26,6 @@ import TypeEnv from "../../typechecker/environment";
  * This implementation retrieves the value of `$jitterbit.operation.last_error`.
  */
 export class GetLastError extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "GetLastError";
@@ -51,6 +48,10 @@ export class GetLastError extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -68,9 +69,6 @@ export class GetLastError extends Func {
  * - `$jitterbit.operation.last_error`
  */
 export class RaiseError extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "RaiseError";
@@ -96,6 +94,13 @@ export class RaiseError extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -106,9 +111,6 @@ export class RaiseError extends Func {
  * See also the function `SetLastError`.
  */
 export class ResetLastError extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "ResetLastError";
@@ -131,6 +133,10 @@ export class ResetLastError extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -143,9 +149,6 @@ export class ResetLastError extends Func {
  * the last error but without logging a message.
  */
 export class SetLastError extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "SetLastError";
@@ -171,5 +174,12 @@ export class SetLastError extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
   }
 }

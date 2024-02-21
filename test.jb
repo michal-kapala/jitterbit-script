@@ -1,4 +1,4 @@
 <trans>
   // test for call inference and warnings
-  $something = GetOrganizationName();
+  $something = SetLastError({"dont do this"});
 </trans>
