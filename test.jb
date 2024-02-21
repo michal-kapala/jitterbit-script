@@ -1,4 +1,4 @@
 <trans>
   // test for call inference and warnings
-  $something = OrderedDiffKeyList("hi", true, "m&ms", false, false);
+  $something = SendEmail("hi", true, "m&ms", false, false);
 </trans>

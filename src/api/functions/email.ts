@@ -16,9 +16,6 @@ import { AsyncFunc, Parameter, Signature } from "../types";
  * If it is not available in the configuration file, the email will not be sent.
  */
 export class SendEmail extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "SendEmail";
@@ -35,7 +32,7 @@ export class SendEmail extends AsyncFunc {
         new Parameter("string", "cc", false),
         new Parameter("string", "bcc", false),
         new Parameter("string", "replyTo", false),
-        new Parameter("string", "useSSL", false),
+        new Parameter("bool", "useSSL", false),
       ])
     ];
     this.signature = this.signatures[0];
@@ -56,6 +53,58 @@ export class SendEmail extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // from
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // to
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // subject
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // message
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    if(args.length > 4) {
+      // smtpServers
+      info = args[++argIdx].typeExpr(env);
+      args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+      if(args.length > 5) {
+        // account
+        info = args[++argIdx].typeExpr(env);
+        args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+        if(args.length > 6) {
+          // accountPassword
+          info = args[++argIdx].typeExpr(env);
+          args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+          if(args.length > 7) {
+            // cc
+            info = args[++argIdx].typeExpr(env);
+            args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+            if(args.length > 8) {
+              // bcc
+              info = args[++argIdx].typeExpr(env);
+              args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+              if(args.length > 9) {
+                // replyTo
+                info = args[++argIdx].typeExpr(env);
+                args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+                if(args.length > 10) {
+                  // useSSL
+                  info = args[++argIdx].typeExpr(env);
+                  args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -70,9 +119,6 @@ export class SendEmail extends AsyncFunc {
  * the Notifications section in Jitterbit Script.
  */
 export class SendEmailMessage extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "SendEmailMessage";
@@ -98,6 +144,13 @@ export class SendEmailMessage extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -109,9 +162,6 @@ export class SendEmailMessage extends AsyncFunc {
  * On success, an empty string is returned; otherwise, any error messages are returned.
  */
 export class SendSystemEmail extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "SendSystemEmail";
@@ -140,5 +190,19 @@ export class SendSystemEmail extends AsyncFunc {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // to
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    // subject
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    // message
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
   }
 }
