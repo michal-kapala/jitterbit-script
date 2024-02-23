@@ -96,6 +96,11 @@ export default class Typechecker {
     const env = new TypeEnv();
     for(const expr of typedAst) {
       expr.typeExpr(env);
+      // top-level unassigned identifiers
+      if(expr.type === "unassigned") {
+        expr.type = "error";
+        expr.error = `Local variable '${(expr as TypedIdentifier).symbol}' hasn't been initialized.`
+      }
     }
     console.log(JSON.stringify(typedAst));
     return typedAst;

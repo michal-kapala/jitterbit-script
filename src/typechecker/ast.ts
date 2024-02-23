@@ -610,6 +610,10 @@ export class TypedIdentifier extends TypedExpr {
   public typeExpr(env: TypeEnv): TypeInfo {
     const info = env.lookup(this.symbol);
     this.type = info ? info.type : "unassigned";
+    // default script arg identifier
+    const regex = /^_\d+/g;
+    if(!info && this.symbol.match(regex))
+      this.type = "type";
     return {type: this.type};
   }
 }
@@ -646,8 +650,10 @@ export class TypedGlobalIdentifier extends TypedIdentifier {
   public typeExpr(env: TypeEnv): TypeInfo {
     const lookup = env.lookup(this.symbol);
     // user-assigned
-    if(lookup !== undefined)
+    if(lookup !== undefined) {
+      this.type = lookup.type;
       return lookup;
+    }
 
     // no explicit assignment
     let info: TypeInfo;

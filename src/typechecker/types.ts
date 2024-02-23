@@ -1683,22 +1683,22 @@ export class NullType {
       case "-":
         return {
           type: "error",
-          error: `Illegal operation, SUBTRACT with incompatible types: null ${operator} bool`
+          error: `Illegal operation, SUBTRACT with incompatible types: null ${operator} string`
         };
       case "*":
         return {
           type: "error",
-          error: `Illegal operation, MULTIPLICATION with incompatible types: null ${operator} bool`
+          error: `Illegal operation, MULTIPLICATION with incompatible types: null ${operator} string`
         };
       case "/":
         return {
           type: "error",
-          error: `Illegal operation, DIVISION with incompatible types: null ${operator} bool`
+          error: `Illegal operation, DIVISION with incompatible types: null ${operator} string`
         };
       case "^":
         return {
           type: "error",
-          error: `Illegal operation, POW with incompatible types: null ${operator} bool`
+          error: `Illegal operation, POW with incompatible types: null ${operator} string`
         };
       case "<":
       case ">":

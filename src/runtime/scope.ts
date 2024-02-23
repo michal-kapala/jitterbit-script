@@ -69,8 +69,13 @@ export default class Scope {
     // declaration checks
     if(["-=", "+="].includes(operator) && oldValue === undefined) {
       // local variable
-      if(!isGlobal) 
-        throw new RuntimeError(`Local variable '${varName}' hasn't been initialized`);
+      if(!isGlobal) {
+        // default script argument, null-initialized if no value passed for it
+        if(varName.match(/^_\d+/g))
+          this.variables.set(varName, new JbNull());
+        else
+          throw new RuntimeError(`Local variable '${varName}' hasn't been initialized.`);
+      }
 
       // global variable
       switch(operator) {
@@ -153,7 +158,13 @@ export default class Scope {
    */
   public lookupVar(varname: string) {
     const scope = this.resolve(varname);
-    return scope.variables.get(varname) as RuntimeVal;
+    let value = scope.variables.get(varname);
+    // default script argument, null-initialized if no value passed for it
+    if(!value && varname.match(/^_\d+/g)) {
+      value = scope.setVar(varname, new JbNull());
+      return value;
+    }
+    return value as RuntimeVal;
   }
 
   /**
@@ -167,12 +178,12 @@ export default class Scope {
     }
 
     // global scope reached
-    if (this.parent === undefined) {
-      // proper scope for global/system variables
-      if(varname[0] === "$")
+    if(this.parent === undefined) {
+      // proper scope for global/system/script arg variables
+      if(varname[0] === "$" || varname.match(/^_\d+/g))
         return this;
       else
-        throw new RuntimeError(`Local variable '${varname}' hasn't been initialized`);
+        throw new RuntimeError(`Local variable '${varname}' hasn't been initialized.`);
     }
 
     return this.parent.resolve(varname);

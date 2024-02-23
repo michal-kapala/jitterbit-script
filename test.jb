@@ -1,4 +1,4 @@
 <trans>
   // test for call inference and warnings
-  $something = WriteFile({"dont do this"}, x, Dict());
+  WaitForOperation("$xd", Null(), Dict());
 </trans>

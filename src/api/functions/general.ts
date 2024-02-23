@@ -8,7 +8,7 @@ import { reverse } from "dns/promises";
 import { RuntimeError, UnimplementedError } from "../../errors";
 import { Expr } from "../../frontend/ast";
 import { evaluate } from "../../runtime/interpreter";
-import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import { TypedExpr, TypedGlobalIdentifier, TypedIdentifier, TypeInfo } from "../../typechecker/ast";
 import TypeEnv from "../../typechecker/environment";
 
 /**
@@ -33,9 +33,6 @@ import TypeEnv from "../../typechecker/environment";
  * Supports up to 100-argument calls.
  */
 export class ArgumentList extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "ArgumentList";
@@ -43,7 +40,7 @@ export class ArgumentList extends Func {
     this.signatures = [
       new Signature("null", [
         new Parameter("type", "var1"),
-        new Parameter("type", "varN", false),
+        new Parameter("type", "var", false),
       ])
     ];
     this.signature = this.signatures[0];
@@ -59,6 +56,26 @@ export class ArgumentList extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 1;
+    let info: TypeInfo;
+    for(const arg of args) {
+      info = arg.typeExpr(env);
+      if(arg.kind !== "Identifier" && arg.kind !== "GlobalIdentifier" && !arg.warning) {
+        arg.warning = `The argument passed into ${this.name} as 'var${argIdx}' should be a variable.`;
+        argIdx++;
+        continue;
+      }
+      // TODO: for future RunScript implementation, the env/scope should store script argument list (both for typechecker and runtime)
+      // assigns the unknown type to the variable args
+      info = {type: "unknown"};
+      arg.setTypeInfo(info);
+      env.set((arg as TypedIdentifier).symbol, info);
+      argIdx++;
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -71,9 +88,6 @@ export class ArgumentList extends Func {
  * The `TargetInstanceCount` function is equivalent to this function.
  */
 export class AutoNumber extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "AutoNumber";
@@ -94,6 +108,13 @@ export class AutoNumber extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    return {
+      type: this.signature.returnType,
+      warning: `This method has been deprecated and may be removed in a future version of Jitterbit. Use either the TargetInstanceCount or SourceInstanceCount functions instead. The TargetInstanceCount function is equivalent to this function.`
+    };
+  }
 }
 
 /**
@@ -109,9 +130,6 @@ export class AutoNumber extends Func {
  * See the `GetOperationQueue` function for details.
  */
 export class CancelOperation extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "CancelOperation";
@@ -137,6 +155,13 @@ export class CancelOperation extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -151,9 +176,6 @@ export class CancelOperation extends AsyncFunc {
  * looping has been reached.
  */
 export class CancelOperationChain extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "CancelOperationChain";
@@ -179,6 +201,13 @@ export class CancelOperationChain extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -200,9 +229,6 @@ export class CancelOperationChain extends AsyncFunc {
  * This implementation evaluates `defaultResult` only if the first evaluation throws.
  */
 export class Eval extends DeferrableFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Eval";
@@ -236,6 +262,23 @@ export class Eval extends DeferrableFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // expToEvaluate
+    let info = args[argIdx].typeExpr(env);
+    if(info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    // defaultResult
+    info = args[++argIdx].typeExpr(env);
+    if(info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -256,9 +299,6 @@ export class Eval extends DeferrableFunc {
  * a return value of `null`.
  */
 export class Get extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Get";
@@ -266,11 +306,11 @@ export class Get extends Func {
     this.signatures = [
       new Signature("string", [
         new Parameter("string", "name"),
-        new Parameter("number", "indexN", false)
+        new Parameter("number", "index", false)
       ]),
       new Signature("string", [
         new Parameter("array", "name"),
-        new Parameter("number", "indexN", false)
+        new Parameter("number", "index", false)
       ]),
     ];
     this.minArgs = 1;
@@ -285,6 +325,47 @@ export class Get extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "string" ? 0 : 1];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    let sigIdx = 0;
+    // name
+    let info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "string":
+      case "error":
+        break;
+      case "array":
+        sigIdx = 1;
+        break;
+      case "unknown":
+      case "type":
+        args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' should be a global variable name or an array.`;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].type = "error";
+        args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, a global variable name or an array is required.`;
+        break;
+    }
+    // index
+    if(args.length > 1) {
+      for(argIdx = 1; argIdx < args.length; argIdx++) {
+        info = args[argIdx].typeExpr(env);
+        args[argIdx].checkOptArg(
+          {
+            ...this.signatures[sigIdx].params[1],
+            name: this.signatures[sigIdx].params[1].name + argIdx
+          },
+          info.type
+        );
+      }
+    }
+    return {type: this.signatures[sigIdx].returnType};
+  }
 }
 
 /**
@@ -297,9 +378,6 @@ export class Get extends Func {
  * See also the `SetChunkDataElement` and `Set` functions.
  */
 export class GetChunkDataElement extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "GetChunkDataElement";
@@ -320,6 +398,13 @@ export class GetChunkDataElement extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -334,9 +419,6 @@ export class GetChunkDataElement extends Func {
  * such as `0.0.0.0` are not checked for and may result in a runtime errror.
  */
 export class GetHostByIP extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "GetHostByIP";
@@ -353,7 +435,6 @@ export class GetHostByIP extends AsyncFunc {
     this.chooseSignature(args);
     // POD: originally the function implicitly converts everything to numbers (and supports number type too)
     // IPv4 addresses as numbers are unsupported here
-    // TODO: this should be thrown be typechecker
     if(args[0].type !== "string")
       throw new RuntimeError(`Argument '${this.signature.params[0].name}' must be of type: ${this.signature.params[0].type}, ${args[0].type} passed.`);
 
@@ -379,6 +460,15 @@ export class GetHostByIP extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    if(info.type === "number")
+      args[argIdx].warning = `${this.name} supports IPv4 addresses as numbers, however this behaviour is not officially documented.`;
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -392,15 +482,13 @@ export class GetHostByIP extends AsyncFunc {
  * an empty string is returned.
  */
 export class GetInputString extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "GetInputString";
     this.module = "general";
     this.signatures = [
-      new Signature("string", [new Parameter("type", "arg")])
+      // the docs indicate 'type' arg type, it should be node
+      new Signature("string", [new Parameter("node", "arg")])
     ];
     this.signature = this.signatures[0];
     this.minArgs = 1;
@@ -414,6 +502,13 @@ export class GetInputString extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
   }
 }
 
@@ -433,9 +528,6 @@ export class GetInputString extends Func {
  * Use the `ConvertTimeZone` function to convert to a local time.
  */
 export class GetLastOperationRunStartTime extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "GetLastOperationRunStartTime";
@@ -456,6 +548,13 @@ export class GetLastOperationRunStartTime extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -467,9 +566,6 @@ export class GetLastOperationRunStartTime extends Func {
  * this function retrieves the name of the value.
  */
 export class GetName extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "GetName";
@@ -489,6 +585,16 @@ export class GetName extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    if(info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    return {type: this.signature.returnType};
   }
 }
 
@@ -515,9 +621,6 @@ export class GetName extends Func {
  * the *Operations* section in Jitterbit Script.
  */
 export class GetOperationQueue extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "GetOperationQueue";
@@ -543,6 +646,15 @@ export class GetOperationQueue extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    if(args.length > 0) {
+      const argIdx = 0;
+      const info = args[argIdx].typeExpr(env);
+      args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -551,9 +663,6 @@ export class GetOperationQueue extends AsyncFunc {
  * Returns the name of the machine that the agent is running on.
  */
 export class GetServerName extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "GetServerName";
@@ -574,6 +683,10 @@ export class GetServerName extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -584,9 +697,6 @@ export class GetServerName extends Func {
  * The format of the GUID is `xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx`, where M is the version (4) and N is the variant (8).
  */
 export class GUID extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "GUID";
@@ -607,6 +717,10 @@ export class GUID extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -615,14 +729,13 @@ export class GUID extends Func {
  * Returns the default value if the first argument is null or if the string representation of the argument is an empty string.
  * Otherwise, it returns the first argument. This is a shortcut for an `If` function statement:
  * 
- * `If(IsNull(arg)| |Length(arg)==0, default, arg)`
+ * `If(IsNull(arg) || Length(arg)==0, default, arg)`
  * 
  * See also the `IsNull` function.
+ * 
+ * **Warning**: the above condition is false for arrays, an empty array is not treated as empty even though `Length({}) == 0`.
  */
 export class IfEmpty extends DeferrableFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "IfEmpty";
@@ -657,6 +770,36 @@ export class IfEmpty extends DeferrableFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // arg
+    const argInfo = args[argIdx].typeExpr(env);
+    if(argInfo.type === "unassigned") {
+      argInfo.type = "error";
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    // default
+    const defaultInfo = args[++argIdx].typeExpr(env);
+    if(defaultInfo.type === "unassigned") {
+      defaultInfo.type = "error";
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    const condition = argInfo.type === "null" || argInfo.type === "void";
+    // empty string literal checks are not supported (`type` returned)
+    if(argInfo.type === "string")
+      return {type: this.signature.returnType};
+    // handle errors
+    if(
+      condition && defaultInfo.type === "error" ||
+      !condition && argInfo.type === "error"
+    )
+      return {type: "unknown"};
+
+    return {type: condition ? defaultInfo.type : argInfo.type};
+  }
 }
 
 /**
@@ -671,9 +814,6 @@ export class IfEmpty extends DeferrableFunc {
  * See also the `IsNull` and `IfEmpty` functions.
  */
 export class IfNull extends DeferrableFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "IfNull";
@@ -705,6 +845,33 @@ export class IfNull extends DeferrableFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // arg
+    const argInfo = args[argIdx].typeExpr(env);
+    if(argInfo.type === "unassigned") {
+      argInfo.type = "error";
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    // default
+    const defaultInfo = args[++argIdx].typeExpr(env);
+    if(defaultInfo.type === "unassigned") {
+      defaultInfo.type = "error";
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    const condition = argInfo.type === "null" || argInfo.type === "void";
+    // handle errors
+    if(
+      condition && defaultInfo.type === "error" ||
+      !condition && argInfo.type === "error"
+    )
+      return {type: "unknown"};
+
+    return {type: condition ? defaultInfo.type : argInfo.type};
+  }
 }
 
 /**
@@ -720,9 +887,6 @@ export class IfNull extends DeferrableFunc {
  * See also *Use Variables with Chunking* under Operation Options.
  */
 export class InitCounter extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "InitCounter";
@@ -746,6 +910,40 @@ export class InitCounter extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // counter
+    let info = args[argIdx].typeExpr(env);
+    if(info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    const result = {
+      type: this.signature.returnType,
+      warning: "This function must be used only with a single Agent as it results in an error in a multiple Agent context."
+    } as TypeInfo;
+
+    if(info.type !== "string" && args[argIdx].kind !== "GlobalIdentifier" && info.type !== "error") {
+      result.type = "error";
+      result.warning = undefined;
+      result.error = `The argument '${this.signature.params[argIdx]}' is required to be a global variable name or reference.`
+    }
+
+    // references infer the number type
+    if(args[argIdx].kind === "GlobalIdentifier") {
+      // clears 'Global variable used without an explicit assignment ...'
+      args[argIdx].warning = undefined;
+      env.set((args[argIdx] as TypedGlobalIdentifier).symbol, {type: "number"});
+    }
+    
+    // initialValue
+    if(args.length > 1) {
+      info = args[++argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    }
+    return result;
+  }
 }
 
 /**
@@ -762,9 +960,6 @@ export class InitCounter extends Func {
  * a single argument is supplied.
  */
 export class InList extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "InList";
@@ -772,12 +967,12 @@ export class InList extends Func {
     this.signatures = [
       new Signature("number", [
         new Parameter("type", "x"),
-        new Parameter("type", "argN", false)
+        new Parameter("type", "arg", false)
       ])
     ];
     this.signature = this.signatures[0];
     this.minArgs = 1;
-    this.maxArgs = 2;
+    this.maxArgs = 100;
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -788,6 +983,25 @@ export class InList extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    let info = args[argIdx].typeExpr(env);
+    if(info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx++] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    if(args.length > 1) {
+      for(argIdx; argIdx < args.length; argIdx++) {
+        info = args[argIdx].typeExpr(env);
+        if(info.type === "unassigned") {
+          args[argIdx].type = "error";
+          args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        }
+      }
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -797,9 +1011,6 @@ export class InList extends Func {
  * an integer or long without any loss of information.
  */
 export class IsInteger extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "IsInteger";
@@ -823,6 +1034,16 @@ export class IsInteger extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    if(info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -835,9 +1056,6 @@ export class IsInteger extends Func {
  * instead of this function.
  */
 export class IsNull extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "IsNull";
@@ -858,6 +1076,16 @@ export class IsNull extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    if(info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -866,9 +1094,6 @@ export class IsNull extends Func {
  * Returns true if the evaluation of the argument results without an error.
  */
 export class IsValid extends DeferrableFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "IsValid";
@@ -899,6 +1124,16 @@ export class IsValid extends DeferrableFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    if(info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -915,9 +1150,6 @@ export class IsValid extends DeferrableFunc {
  * - if the argument cannot be converted to a string, or the argument is `null` or of an unknown type, 0 is returned.
  */
 export class Length extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Length";
@@ -950,6 +1182,16 @@ export class Length extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    if(info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -958,9 +1200,6 @@ export class Length extends Func {
  * Returns null.
  */
 export class Null extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Null";
@@ -981,6 +1220,10 @@ export class Null extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -990,9 +1233,6 @@ export class Null extends Func {
  * See also the `RandomString` function.
  */
 export class Random extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Random";
@@ -1023,6 +1263,17 @@ export class Random extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // min
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx++], info.type);
+    // max
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -1033,9 +1284,6 @@ export class Random extends Func {
  * See also the `Random` function.
  */
 export class RandomString extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "RandomString";
@@ -1069,6 +1317,19 @@ export class RandomString extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // len
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx++], info.type);
+    // chars
+    if(args.length > 1) {
+      info = args[argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -1087,9 +1348,6 @@ export class RandomString extends Func {
  * The type is assumed to be string if it is not explicitly specified.
  */
 export class ReadArrayString extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "ReadArrayString";
@@ -1113,6 +1371,23 @@ export class ReadArrayString extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // arrayString
+    let info = args[argIdx].typeExpr(env);
+    if(info.type === "array") {
+      args[argIdx].warning = `The argument '${this.signature.params[argIdx].name}' already is an array.`;
+    }
+    else
+      args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    // type
+    if(args.length > 1) {
+      info = args[++argIdx].typeExpr(env);
+      args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -1126,9 +1401,6 @@ export class ReadArrayString extends Func {
  * otherwise, it returns 1 (one). The counter is reset to 0 each time a new loop is started.
  */
 export class RecordCount extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "RecordCount";
@@ -1149,6 +1421,13 @@ export class RecordCount extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    return {
+      type: this.signature.returnType,
+      warning: `This method has been deprecated and may be removed in a future version. Use SourceInstanceCount or TargetInstanceCount instead. TargetInstanceCount is equivalent to this method.`
+    };
+  }
 }
 
 /**
@@ -1162,9 +1441,6 @@ export class RecordCount extends Func {
  * or asynchronously affects global global variables.
  */
 export class ReRunOperation extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "ReRunOperation";
@@ -1192,6 +1468,15 @@ export class ReRunOperation extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    if(args.length > 0) {
+      const argIdx = 0;
+      const info = args[argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -1204,9 +1489,6 @@ export class ReRunOperation extends AsyncFunc {
  * the *Operations* section in Jitterbit Script.
  */
 export class RunOperation extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "RunOperation";
@@ -1235,6 +1517,17 @@ export class RunOperation extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    if(args.length > 1) {
+      info = args[++argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -1254,9 +1547,6 @@ export class RunOperation extends AsyncFunc {
  * returned an error. Call `GetLastError` to retrieve the error message.
  */
 export class RunPlugin extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "RunPlugin";
@@ -1284,6 +1574,13 @@ export class RunPlugin extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -1308,17 +1605,14 @@ export class RunPlugin extends AsyncFunc {
  * Supports up to 100-argument calls.
  */
 export class RunScript extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "RunScript";
     this.module = "general";
     this.signatures = [
-      new Signature("bool", [
+      new Signature("string", [
         new Parameter("string", "scriptId"),
-        new Parameter("type", "varN", false)
+        new Parameter("type", "var", false)
       ])
     ];
     this.signature = this.signatures[0];
@@ -1339,6 +1633,25 @@ export class RunScript extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // scriptId
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    // var
+    if(args.length > 1) {
+      argIdx++;
+      for(argIdx; argIdx < args.length; argIdx++) {
+        info = args[argIdx].typeExpr(env);
+        if(info.type === "unassigned") {
+          args[argIdx].type = "error";
+          args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        }
+      }
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -1350,9 +1663,6 @@ export class RunScript extends AsyncFunc {
  * Supports up to 100-argument calls.
  */
 export class Set extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Set";
@@ -1360,19 +1670,13 @@ export class Set extends Func {
     this.signatures = [
       new Signature("type", [
         new Parameter("string", "name"),
-        new Parameter("type", "value")
-      ]),
-      new Signature("type", [
-        new Parameter("string", "name"),
         new Parameter("type", "value"),
-        new Parameter("number", "index1"),
-        new Parameter("number", "indexN", false)
+        new Parameter("number", "index", false)
       ]),
       new Signature("type", [
         new Parameter("array", "name"),
         new Parameter("type", "value"),
-        new Parameter("number", "index1"),
-        new Parameter("number", "indexN", false)
+        new Parameter("number", "index", false)
       ])
     ];
     this.minArgs = 2;
@@ -1390,6 +1694,55 @@ export class Set extends Func {
     if (args.length > 2)
       this.signature = this.signatures[args[0].type === "string" ? 1 : 2];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    let sigIdx = 0;
+    // name
+    let info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "string":
+      case "error":
+        break;
+      case "array":
+        sigIdx = 1;
+        break;
+      case "unknown":
+      case "type":
+        args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' should be a global variable name or an array.`;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].type = "error";
+        args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, a global variable name or an array is required.`;
+        break;
+    }
+    // value
+    info = args[++argIdx].typeExpr(env);
+    if(info.type === "unassigned") {
+      info.type = "unknown";
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    const result = {type: info.type !== "error" ? info.type : "unknown"} as TypeInfo;
+    // index
+    if(args.length > 2) {
+      for(argIdx = 2; argIdx < args.length; argIdx++) {
+        info = args[argIdx].typeExpr(env);
+        args[argIdx].checkOptArg(
+          {
+            ...this.signatures[sigIdx].params[2],
+            name: this.signatures[sigIdx].params[2].name + (argIdx - 1)
+          },
+          info.type
+        );
+      }
+    }
+    return result;
+  }
 }
 
 /**
@@ -1402,9 +1755,6 @@ export class Set extends Func {
  * See also the `GetChunkDataElement` and `Set` functions.
  */
 export class SetChunkDataElement extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "SetChunkDataElement";
@@ -1428,6 +1778,21 @@ export class SetChunkDataElement extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // name
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // value
+    info = args[argIdx].typeExpr(env);
+    if(info.type === "unassigned") {
+      info.type = "unknown";
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    return {type: info.type !== "error" ? info.type : "unknown"};
+  }
 }
 
 /**
@@ -1436,9 +1801,6 @@ export class SetChunkDataElement extends Func {
  * Causes execution to be suspended for a specified number of seconds.
  */
 export class Sleep extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Sleep";
@@ -1473,6 +1835,13 @@ export class Sleep extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -1488,9 +1857,6 @@ export class Sleep extends AsyncFunc {
  * See also the `TargetInstanceCount` function.
  */
 export class SourceInstanceCount extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "SourceInstanceCount";
@@ -1511,6 +1877,10 @@ export class SourceInstanceCount extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -1529,9 +1899,6 @@ export class SourceInstanceCount extends Func {
  * See also the `SourceInstanceCount` function.
  */
 export class TargetInstanceCount extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "TargetInstanceCount";
@@ -1551,6 +1918,10 @@ export class TargetInstanceCount extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    return {type: this.signature.returnType};
   }
 }
 
@@ -1582,9 +1953,6 @@ export class TargetInstanceCount extends Func {
  * expected to run for a very long time, you may want to increase the poll interval.
  */
 export class WaitForOperation extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "WaitForOperation";
@@ -1613,5 +1981,20 @@ export class WaitForOperation extends AsyncFunc {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    if(args.length > 1) {
+      info = args[++argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+      if(args.length > 2) {
+        info = args[++argIdx].typeExpr(env);
+        args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+      }
+    }
+    return {type: this.signature.returnType};
   }
 }
