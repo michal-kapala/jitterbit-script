@@ -1,4 +1,4 @@
 <trans>
   // test for call inference and warnings
-  WaitForOperation("$xd", Null(), Dict());
+  SortInstances(1, {1, 2, 3}, false, "xd");
 </trans>

@@ -2,7 +2,7 @@ import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbBool, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
-import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import { TypedExpr, TypedIdentifier, TypeInfo } from "../../typechecker/ast";
 import TypeEnv from "../../typechecker/environment";
 import { Func, Parameter, Signature } from "../types";
 
@@ -16,15 +16,12 @@ import { Func, Parameter, Signature } from "../types";
  * depending on the context in which it is called.
  */
 export class Count extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Count";
     this.module = "instance";
     this.signatures = [
-      new Signature("number", [new Parameter("type", "de")]),
+      new Signature("number", [new Parameter("node", "de")]),
       new Signature("number", [new Parameter("array", "arr")])
     ];
     this.minArgs = 1;
@@ -39,6 +36,31 @@ export class Count extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "array" ? 1 : 0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    let sigIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "node":
+        break;
+      case "array":
+        sigIdx = 1;
+        break;
+      case "unknown":
+      case "type":
+        args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' should be a source/target data element path or an array.`;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' is ${info.type}, should be node or array; a null value is returned.`;
+        return {type: "null"};
+    }
+    return {type: this.signatures[sigIdx].returnType};
+  }
 }
 
 /**
@@ -51,9 +73,6 @@ export class Count extends Func {
  * See also the `SourceInstanceCount` function.
  */
 export class CountSourceRecords extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "CountSourceRecords";
@@ -74,6 +93,10 @@ export class CountSourceRecords extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -86,19 +109,15 @@ export class CountSourceRecords extends Func {
  * depending on the context in which it is called.
  */
 export class Exist extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Exist";
     this.module = "instance";
     this.signatures = [
-      // TODO: the docs say 'returns either a boolean or an array of instances'
-      // to be tested
+      // the docs say 'returns either a boolean or an array of instances'
       new Signature("bool", [
         new Parameter("type", "v"),
-        new Parameter("type", "de")
+        new Parameter("node", "de")
       ]),
       new Signature("bool", [
         new Parameter("type", "v"),
@@ -116,6 +135,39 @@ export class Exist extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[1].type === "array" ? 1 : 0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    let sigIdx = 0;
+    // v
+    let info = args[argIdx].typeExpr(env);
+    if(info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`
+    }
+    // de/arr
+    info = args[++argIdx].typeExpr(env);
+    switch(info.type) {
+      case "node":
+        break;
+      case "array":
+        sigIdx = 1;
+        break;
+      case "unknown":
+      case "type":
+        args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' should be a source/target data element path or an array.`;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].type = "error";
+        args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is node or array.`;
+        break;
+    }
+    return {type: this.signatures[sigIdx].returnType};
   }
 }
 
@@ -129,9 +181,6 @@ export class Exist extends Func {
  * from the last row or element. Note that the index is 1-based.
  */
 export class FindByPos extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "FindByPos";
@@ -139,7 +188,7 @@ export class FindByPos extends Func {
     this.signatures = [
       new Signature("type", [
         new Parameter("number", "pos"),
-        new Parameter("type", "de")
+        new Parameter("node", "de")
       ]),
       new Signature("type", [
         new Parameter("number", "pos"),
@@ -158,6 +207,35 @@ export class FindByPos extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[1].type === "array" ? 1 : 0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    let sigIdx = 0;
+    // pos
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signatures[sigIdx].params[argIdx++], info.type);
+    // de/arr
+    info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "node":
+        break;
+      case "array":
+        sigIdx = 1;
+        break;
+      case "unknown":
+      case "type":
+        args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' should be a source/target data element path or an array.`;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' is ${info.type}, should be node or array.`;
+        break;
+    }
+    return {type: this.signatures[sigIdx].returnType};
+  }
 }
 
 /**
@@ -170,9 +248,6 @@ export class FindByPos extends Func {
  * See also the `HasKey` function.
  */
 export class FindValue extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "FindValue";
@@ -197,6 +272,41 @@ export class FindValue extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // v
+    let info = args[argIdx].typeExpr(env);
+    if(args[argIdx].type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    // de1
+    info = args[++argIdx].typeExpr(env);
+    switch(info.type) {
+      case "node":
+      case "array":
+        break;
+      case "unknown":
+      case "type":
+        args[argIdx].warning = `The type of argument '${this.signature.params[argIdx].name}' should be a source/target data element path or an array.`;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].warning = `The type of argument '${this.signature.params[argIdx].name}' is ${info.type}, should be node or array.`;
+        break;
+    }
+    // de2
+    info = args[++argIdx].typeExpr(env);
+    if(args[argIdx].type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -207,9 +317,6 @@ export class FindValue extends Func {
  * As an alternative to this function, see the `ArgumentList` function.
  */
 export class GetInstance extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "GetInstance";
@@ -230,6 +337,10 @@ export class GetInstance extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -241,15 +352,12 @@ export class GetInstance extends Func {
  * It can also be used to return the maximum value of an array.
  */
 export class Max extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Max";
     this.module = "instance";
     this.signatures = [
-      new Signature("number", [new Parameter("type", "de")]),
+      new Signature("number", [new Parameter("node", "de")]),
       new Signature("number", [new Parameter("array", "arr")])
     ];
     this.minArgs = 1;
@@ -263,6 +371,31 @@ export class Max extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "array" ? 1 : 0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    let sigIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "node":
+        break;
+      case "array":
+        sigIdx = 1;
+        break;
+      case "unknown":
+      case "type":
+        args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' should be a source/target data element path or an array.`;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' is ${info.type}, should be node or array.`;
+        break;
+    }
+    return {type: this.signatures[sigIdx].returnType};
   }
 }
 
@@ -275,15 +408,12 @@ export class Max extends Func {
  * It can also be used to return the minimum value of an array.
  */
 export class Min extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Min";
     this.module = "instance";
     this.signatures = [
-      new Signature("number", [new Parameter("type", "de")]),
+      new Signature("number", [new Parameter("node", "de")]),
       new Signature("number", [new Parameter("array", "arr")])
     ];
     this.minArgs = 1;
@@ -297,6 +427,31 @@ export class Min extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "array" ? 1 : 0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    let sigIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "node":
+        break;
+      case "array":
+        sigIdx = 1;
+        break;
+      case "unknown":
+      case "type":
+        args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' should be a source/target data element path or an array.`;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' is ${info.type}, should be node or array.`;
+        break;
+    }
+    return {type: this.signatures[sigIdx].returnType};
   }
 }
 
@@ -308,15 +463,12 @@ export class Min extends Func {
  * It can also be used with arrays, and will return the first non-null element.
  */
 export class ResolveOneOf extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "ResolveOneOf";
     this.module = "instance";
     this.signatures = [
-      new Signature("number", [new Parameter("type", "de")]),
+      new Signature("number", [new Parameter("node", "de")]),
       new Signature("number", [new Parameter("array", "arr")])
     ];
     this.minArgs = 1;
@@ -330,6 +482,31 @@ export class ResolveOneOf extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "array" ? 1 : 0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    let sigIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "node":
+        break;
+      case "array":
+        sigIdx = 1;
+        break;
+      case "unknown":
+      case "type":
+        args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' should be a source/target data element path or an array.`;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' is ${info.type}, should be node or array.`;
+        break;
+    }
+    return {type: this.signatures[sigIdx].returnType};
   }
 }
 
@@ -358,9 +535,6 @@ export class ResolveOneOf extends Func {
  * A `null` data element is returned from this function and should be ignored.
  */
 export class SetInstances extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "SetInstances";
@@ -384,6 +558,20 @@ export class SetInstances extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // nodeName
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // de
+    info = args[argIdx].typeExpr(env);
+    if(info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    return {type: this.signature.returnType};
   }
 }
 
@@ -409,9 +597,6 @@ export class SetInstances extends Func {
  * A `null` value is returned from this function and should be ignored.
  */
 export class SortInstances extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "SortInstances";
@@ -419,11 +604,10 @@ export class SortInstances extends Func {
     this.signatures = [
       new Signature("null", [
         new Parameter("string", "nodeName"),
-        // the 'array' types in the docs are wrong
-        new Parameter("type", "sourceDataElements1"),
+        new Parameter("array", "sourceDataElements1"),
+        new Parameter("bool", "sortOrder1", false, new JbBool(true)),
+        new Parameter("array", "sourceDataElements", false),
         new Parameter("bool", "sortOrder", false, new JbBool(true)),
-        new Parameter("type", "sourceDataElementsN", false),
-        new Parameter("bool", "sortOrderN", false, new JbBool(true)),
       ])
     ];
     this.signature = this.signatures[0];
@@ -438,6 +622,47 @@ export class SortInstances extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // nodeName
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // sourceDataElements1
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    
+    if(args.length > 2) {
+      // sortOrder1
+      info = args[++argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+      if(args.length > 3) {
+        for(argIdx = 3; argIdx < args.length; argIdx++) {
+          // sourceDataElementsN
+          info = args[argIdx].typeExpr(env);
+          args[argIdx].checkReqArg(
+            {
+              ...this.signature.params[3],
+              name: this.signature.params[3].name + ((argIdx + 1) / 2)
+            },
+            info.type
+          );
+          if(++argIdx === args.length)
+            break;
+          // sortOrderN
+          info = args[argIdx].typeExpr(env);
+          args[argIdx].checkOptArg(
+            {
+              ...this.signature.params[4],
+              name: this.signature.params[4].name + (argIdx / 2)
+            },
+            info.type
+          );
+        }
+      }
+    }
+    return {type: this.signature.returnType};
   }
 }
 
@@ -454,15 +679,12 @@ export class SortInstances extends Func {
  * an array with just nulls will return an error.
  */
 export class Sum extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Sum";
     this.module = "instance";
     this.signatures = [
-      new Signature("type", [new Parameter("type", "de")]),
+      new Signature("type", [new Parameter("node", "de")]),
       new Signature("type", [new Parameter("array", "arr")])
     ];
     this.minArgs = 1;
@@ -476,6 +698,31 @@ export class Sum extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "array" ? 1 : 0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    let sigIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "node":
+        break;
+      case "array":
+        sigIdx = 1;
+        break;
+      case "unknown":
+      case "type":
+        args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' should be a source/target data element path or an array.`;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' is ${info.type}, should be node or array; a null value is returned.`;
+        return {type: "null"};
+    }
+    return {type: this.signatures[sigIdx].returnType};
   }
 }
 
@@ -492,15 +739,12 @@ export class Sum extends Func {
  * See also the `SumString` function for a similar function but with additional options.
  */
 export class SumCSV extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "SumCSV";
     this.module = "instance";
     this.signatures = [
-      new Signature("string", [new Parameter("type", "de")]),
+      new Signature("string", [new Parameter("node", "de")]),
       new Signature("string", [new Parameter("array", "arr")])
     ];
     this.minArgs = 1;
@@ -515,6 +759,31 @@ export class SumCSV extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "array" ? 1 : 0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    let sigIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "node":
+        break;
+      case "array":
+        sigIdx = 1;
+        break;
+      case "unknown":
+      case "type":
+        args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' should be a source/target data element path or an array.`;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' is ${info.type}, should be node or array; a null value is returned.`;
+        return {type: "null"};
+    }
+    return {type: this.signatures[sigIdx].returnType};
+  }
 }
 
 /**
@@ -528,16 +797,13 @@ export class SumCSV extends Func {
  * See also the `SumCSV` function.
  */
 export class SumString extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "SumString";
     this.module = "instance";
     this.signatures = [
       new Signature("string", [
-        new Parameter("type", "de"),
+        new Parameter("node", "de"),
         new Parameter("string", "delimiter", false, new JbString(";")),
         new Parameter("bool", "omitLast", false, new JbBool(false))
       ]),
@@ -558,5 +824,42 @@ export class SumString extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[args[0].type === "array" ? 1 : 0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    let sigIdx = 0;
+    // de/arr
+    let info = args[argIdx].typeExpr(env);
+    switch(info.type) {
+      case "node":
+        break;
+      case "array":
+        sigIdx = 1;
+        break;
+      case "unknown":
+      case "type":
+        args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' should be a source/target data element path or an array.`;
+        break;
+      case "unassigned":
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        break;
+      default:
+        args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' is ${info.type}, should be node or array; a null value is returned.`;
+        return {type: "null"};
+    }
+
+    if(args.length > 1) {
+      // delimiter
+      info = args[++argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signatures[sigIdx].params[argIdx], info.type);
+      if(args.length > 2) {
+        // omitLast
+        info = args[++argIdx].typeExpr(env);
+        args[argIdx].checkOptArg(this.signatures[sigIdx].params[argIdx], info.type);
+      }
+    } 
+    return {type: this.signatures[sigIdx].returnType};
   }
 }
