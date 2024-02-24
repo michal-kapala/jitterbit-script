@@ -4,7 +4,7 @@ import { evaluate } from "../../runtime/interpreter";
 import Scope from "../../runtime/scope";
 import { JbArray, JbBool, JbNull } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
-import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import { TypedExpr, TypedIdentifier, TypeInfo } from "../../typechecker/ast";
 import TypeEnv from "../../typechecker/environment";
 import { DeferrableFunc, Func, Parameter, Signature } from "../types";
 
@@ -22,9 +22,6 @@ import { DeferrableFunc, Func, Parameter, Signature } from "../types";
  * Supports up to 100-argument calls (50 pairs).
  */
 export class Case extends DeferrableFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Case";
@@ -33,8 +30,8 @@ export class Case extends DeferrableFunc {
       new Signature("type", [
         new Parameter("bool", "b1"),
         new Parameter("type", "arg1"),
-        new Parameter("bool", "bN", false),
-        new Parameter("type", "argN", false),
+        new Parameter("bool", "b", false),
+        new Parameter("type", "arg", false),
       ])
     ];
     this.signature = this.signatures[0];
@@ -43,7 +40,6 @@ export class Case extends DeferrableFunc {
   }
 
   async callEval(args: Expr[], scope: Scope) {
-    // TODO: to be copied into typechecker
     if(args.length % 2 === 1)
       throw new RuntimeError("Odd number of arguments", this.name);
 
@@ -60,6 +56,39 @@ export class Case extends DeferrableFunc {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // b1
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx++], info.type);
+    // arg1
+    info = args[argIdx].typeExpr(env);
+    if(info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    if(args.length > 2) {
+      for(argIdx = 2; argIdx < args.length; argIdx++) {
+        // bN
+        info = args[argIdx].typeExpr(env);
+        args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+        // odd nb of arguments
+        if(++argIdx === args.length) {
+          if(args[argIdx - 1].type !== "error")
+            args[argIdx - 1].warning = `The condition '${this.signature.params[2].name + ((argIdx + 1) / 2)}' is missing its corresponding expression '${this.signature.params[3].name + ((argIdx + 1) / 2)}'.`;
+          break;
+        }
+        // argN
+        info = args[argIdx].typeExpr(env);
+        if(info.type === "unassigned") {
+          args[argIdx].type = "error";
+          args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        }
+      }
+    }
+    return {type: this.signature.returnType};
   }
 }
 
@@ -85,9 +114,6 @@ export class Case extends DeferrableFunc {
  * This implementation is type-sensitive - comparison of different types always returns `false`.
  */
 export class Equal extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Equal";
@@ -136,8 +162,39 @@ export class Equal extends Func {
   }
 
   protected chooseSignature(args: RuntimeVal[]) {
-    const condition = args[0].type === args[1].type && args[0].type == "array";
+    const condition = args[0].type === args[1].type && args[0].type === "array";
     this.signature = this.signatures[condition ? 0 : 1];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    let sigIdx = 1;
+    // arg1/array1
+    const arg1Info = args[argIdx].typeExpr(env);
+    if(arg1Info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    // arg2/array2
+    const arg2Info = args[++argIdx].typeExpr(env);
+    if(arg2Info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    if(
+      arg1Info.type === "array" && ["array", "type", "unknown"].includes(arg2Info.type) ||
+      arg2Info.type === "array" && ["array", "type", "unknown"].includes(arg1Info.type)
+    )
+      sigIdx = 0;
+
+    const result = {type: this.signatures[sigIdx].returnType} as TypeInfo;
+    if(arg1Info.type !== arg2Info.type &&
+      !["type", "unknown", "error"].includes(arg1Info.type) &&
+      !["type", "unknown", "error"].includes(arg2Info.type)
+    )
+      result.warning = `Implicit type conversion/promotion will be performed on the argument pair (${arg1Info.type}, ${arg2Info.type}).`;
+
+    return result;
   }
 }
 
@@ -150,9 +207,6 @@ export class Equal extends Func {
  * If the optional third argument is not specified and condition is `false`, a `null` value is returned.
  */
 export class If extends DeferrableFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "If";
@@ -185,6 +239,28 @@ export class If extends DeferrableFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // condition
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx++], info.type);
+    // trueResult
+    info = args[argIdx].typeExpr(env);
+    if(info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    if(args.length > 2) {
+      // falseResult
+      info = args[++argIdx].typeExpr(env);
+      if(info.type === "unassigned") {
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+      }
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -197,9 +273,6 @@ export class If extends DeferrableFunc {
  * An error is reported if the maximum number of iterations is reached.
  */
 export class While extends DeferrableFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "While";
@@ -236,5 +309,19 @@ export class While extends DeferrableFunc {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // condition
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx++], info.type);
+    // expression
+    info = args[argIdx].typeExpr(env);
+    if(info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    return {type: this.signature.returnType};
   }
 }

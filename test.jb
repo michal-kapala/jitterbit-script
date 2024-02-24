@@ -1,4 +1,7 @@
 <trans>
   // test for call inference and warnings
-  WriteToOperationLog(Null());
+  while("true",
+    x;
+    x = true;
+  );
 </trans>

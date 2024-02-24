@@ -396,7 +396,37 @@ export class TypedBlockExpr extends TypedExpr {
   }
   
   public typeExpr(env: TypeEnv): TypeInfo {
-    throw new TcError("Method not implemented.");
+    let info = {type: "error", error: "Empty block expression."} as TypeInfo;
+    let exprIdx = 0
+    for(exprIdx; exprIdx < this.body.length; exprIdx++) {
+      info = this.body[exprIdx].typeExpr(env);
+      if(info.type === "unassigned") {
+        this.body[exprIdx].type = "error";
+        this.body[exprIdx].error = `Local variable '${(this.body[exprIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+      }
+    }
+    exprIdx -= 1;
+
+    // handle static analysis types
+    if(info.type === "error") {
+      this.type = "unknown";
+      return {type: this.type};
+    }
+
+    if(info.type === "unassigned") {
+      this.body[exprIdx].type = "error";
+      this.body[exprIdx].error = `Local variable '${(this.body[exprIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+      this.type = "unknown";
+      return {type: this.type};
+    } 
+
+    if(info.type === "unknown") {
+      this.type = "unknown";
+      return {type: this.type}
+    }
+    this.setTypeInfo(info);
+    this.warning = undefined;
+    return info;
   }
 }
 
