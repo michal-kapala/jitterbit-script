@@ -1,4 +1,4 @@
 <trans>
   // test for call inference and warnings
-  LDAPSearch("xd", "ddd", "1", "whada", true);
+  WriteToOperationLog(Null());
 </trans>
