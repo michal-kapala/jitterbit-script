@@ -14,9 +14,6 @@ import { AsyncFunc, Func, Parameter, Signature } from "../types";
  * The array is converted to XML and interpreted when the LDAP server is written to.
  */
 export class ArrayToMultipleValues extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "ArrayToMultipleValues";
@@ -37,6 +34,13 @@ export class ArrayToMultipleValues extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -53,9 +57,6 @@ export class ArrayToMultipleValues extends Func {
  * See also the `LDAPConnect` and `LDAPExecute` functions.
  */
 export class LDAPAdd extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "LDAPAdd";
@@ -84,6 +85,17 @@ export class LDAPAdd extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // ldapType
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // ldapValue
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -94,9 +106,6 @@ export class LDAPAdd extends AsyncFunc {
  * See also the `LDAPExecute` function.
  */
 export class LDAPConnect extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "LDAPConnect";
@@ -128,6 +137,30 @@ export class LDAPConnect extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // hostname
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // user
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // password
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    if(args.length > 3) {
+      // mode
+      info = args[++argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+      if(args.length > 4) {
+        // port
+        info = args[++argIdx].typeExpr(env);
+        args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+      }
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -142,9 +175,6 @@ export class LDAPConnect extends AsyncFunc {
  * See also the `LDAPConnect` and `LDAPExecute` functions.
  */
 export class LDAPDeleteEntry extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "LDAPDeleteEntry";
@@ -170,6 +200,13 @@ export class LDAPDeleteEntry extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -185,9 +222,6 @@ export class LDAPDeleteEntry extends AsyncFunc {
  * See also the `LDAPConnect` and `LDAPExecute` functions.
  */
 export class LDAPExecute extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "LDAPExecute";
@@ -213,6 +247,13 @@ export class LDAPExecute extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -228,9 +269,6 @@ export class LDAPExecute extends AsyncFunc {
  * See also the `LDAPConnect` and `LDAPExecute` functions.
  */
 export class LDAPRemove extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "LDAPRemove";
@@ -259,6 +297,17 @@ export class LDAPRemove extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // ldapType
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // ldapValue
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -273,9 +322,6 @@ export class LDAPRemove extends AsyncFunc {
  * See also the `LDAPConnect` and `LDAPExecute` functions.
  */
 export class LDAPRename extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "LDAPRename";
@@ -306,6 +352,27 @@ export class LDAPRename extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // distinguishedName
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // newRDN
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    if(args.length > 2) {
+      // newParent
+      info = args[++argIdx].typeExpr(env);
+      args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+      if(args.length > 3) {
+        // deleteOldRDN
+        info = args[++argIdx].typeExpr(env);
+        args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+      }
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -320,9 +387,6 @@ export class LDAPRename extends AsyncFunc {
  * See also the `LDAPConnect` and `LDAPExecute` functions.
  */
 export class LDAPReplace extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "LDAPReplace";
@@ -351,6 +415,17 @@ export class LDAPReplace extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // ldapType
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // ldapValue
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -367,9 +442,6 @@ export class LDAPReplace extends AsyncFunc {
  * Supports up to 100-argument calls.
  */
 export class LDAPSearch extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "LDAPSearch";
@@ -380,7 +452,7 @@ export class LDAPSearch extends AsyncFunc {
         new Parameter("string", "filter"),
         new Parameter("number", "detail"),
         new Parameter("string", "attribute1"),
-        new Parameter("string", "attributeN", false)
+        new Parameter("string", "attribute", false)
       ])
     ];
     this.signature = this.signatures[0];
@@ -400,5 +472,35 @@ export class LDAPSearch extends AsyncFunc {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // path
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // filter
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // detail
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx++], info.type);
+    // attribute1
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    if(args.length > 4) {
+      // attributeN
+      for(argIdx = 4; argIdx < args.length; argIdx++) {
+        info = args[argIdx].typeExpr(env);
+        args[argIdx].checkReqArg(
+          {
+            ...this.signature.params[4],
+            name: this.signature.params[4].name + (argIdx - 2)
+          },
+          info.type
+        );
+      }
+    }
+    return {type: this.signature.returnType};
   }
 }

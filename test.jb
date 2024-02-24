@@ -1,4 +1,4 @@
 <trans>
   // test for call inference and warnings
-  SortInstances(1, {1, 2, 3}, false, "xd");
+  LDAPSearch("xd", "ddd", "1", "whada", true);
 </trans>
