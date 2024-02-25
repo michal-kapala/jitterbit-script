@@ -1,6 +1,6 @@
 <trans>
   // test for call inference and warnings
-  while("true",
+  Exp(
     x;
     x = true;
   );
