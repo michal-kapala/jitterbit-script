@@ -1,4 +1,4 @@
 <trans>
   // test for call inference and warnings
-  URLEncode(4, "false");
+  Validate(4, "false", Null());
 </trans>

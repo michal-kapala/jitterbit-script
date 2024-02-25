@@ -25,9 +25,6 @@ import { Func, Parameter, Signature } from "../types";
  * See the `ArgumentList` function for more information on how values are passed using the `_n` syntax.
  */
 export class Validate extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Validate";
@@ -51,5 +48,21 @@ export class Validate extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // op
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // arg
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    if(args.length > 2) {
+      // ignoreCase
+      info = args[++argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    }
+    return {type: this.signature.returnType};
   }
 }
