@@ -1,4 +1,4 @@
 <trans>
   // test for call inference and warnings
-  LoginToSalesforceAndGetTimeStamp(4, "false");
+  URLEncode(4, "false");
 </trans>
