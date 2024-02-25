@@ -1,10 +1,4 @@
 <trans>
   // test for call inference and warnings
-  NetSuiteGetSelectValue(
-    x;
-    x = true,
-    "false",
-    "true",
-    3
-  );
+  LoginToSalesforceAndGetTimeStamp(4, "false");
 </trans>
