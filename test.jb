@@ -1,7 +1,10 @@
 <trans>
   // test for call inference and warnings
-  Exp(
+  NetSuiteGetSelectValue(
     x;
-    x = true;
+    x = true,
+    "false",
+    "true",
+    3
   );
 </trans>

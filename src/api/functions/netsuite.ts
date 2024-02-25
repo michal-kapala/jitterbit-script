@@ -17,9 +17,6 @@ import { AsyncFunc, Parameter, Signature } from "../types";
  * 2. The dictionary values are a map with two elements: the internal ID and the external ID for each picklist.
  */
 export class NetSuiteGetSelectValue extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "NetSuiteGetSelectValue";
@@ -50,6 +47,25 @@ export class NetSuiteGetSelectValue extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // netSuiteOrg
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // recordType
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // field
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    if(args.length > 3) {
+      // sublist
+      info = args[++argIdx].typeExpr(env);
+      args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -58,9 +74,6 @@ export class NetSuiteGetSelectValue extends AsyncFunc {
  * Retrieves the server date-time from a NetSuite server.
  */
 export class NetSuiteGetServerTime extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "NetSuiteGetServerTime";
@@ -86,6 +99,13 @@ export class NetSuiteGetServerTime extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -97,9 +117,6 @@ export class NetSuiteGetServerTime extends AsyncFunc {
  * authentication headers for each web service call.
  */
 export class NetSuiteLogin extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "NetSuiteLogin";
@@ -124,5 +141,12 @@ export class NetSuiteLogin extends AsyncFunc {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
   }
 }
