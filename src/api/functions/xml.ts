@@ -2,7 +2,7 @@ import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbBool } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
-import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import { TypedExpr, TypedIdentifier, TypeInfo } from "../../typechecker/ast";
 import TypeEnv from "../../typechecker/environment";
 import { AsyncFunc, Func, Parameter, Signature } from "../types";
 
@@ -10,17 +10,21 @@ import { AsyncFunc, Func, Parameter, Signature } from "../types";
  * The implementation of `Attribute` function.
  * 
  * Creates an attribute for an XML node. See also the `CreateNode` function.
+ * 
+ * **Warning:** this function is vulnerable to XML attribute/node injection attacks.
+ * 
+ * Example attack: `Attribute("/><!--nice",'"--><hehe:ATTR xd="')`
+ * 
+ * Result: `<jitterbit:ATTR /><!--nice=""--><hehe:ATTR xd=""/>`
  */
 export class Attribute extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "Attribute";
     this.module = "xml";
     this.signatures = [
-      new Signature("type", [
+      // returns a string with <jitterbit:ATTR> tag, the docs say it's a 'type'
+      new Signature("string", [
         new Parameter("string", "attributeName"),
         new Parameter("string", "attributeValue"),
       ])
@@ -38,6 +42,17 @@ export class Attribute extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // attributeName
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // attributeValue
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkOptArg(this.signature.params[argIdx], info.type)
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -53,25 +68,28 @@ export class Attribute extends Func {
  * functions respectively.
  * 
  * Supports up to 100-argument calls.
+ * 
+ * **Warning:** this function is vulnerable to XML attribute/node injection attacks.
+ * 
+ * Example attack: `CreateNode("", 'x/><badNode evil="true"')`
+ * 
+ * Result: `<x/><badNode evil="true"/> `
  */
 export class CreateNode extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "CreateNode";
     this.module = "xml";
     this.signatures = [
-      new Signature("type", [
+      // returns a string with the tag, the docs say it's a 'type'
+      new Signature("string", [
         new Parameter("string", "namespace"),
         new Parameter("string", "nodeName"),
-        new Parameter("type", "attributeSubelement"),
-        new Parameter("type", "attributeSubelement2", false)
+        new Parameter("type", "attributeSubelement", false)
       ])
     ];
     this.signature = this.signatures[0];
-    this.minArgs = 3;
+    this.minArgs = 2;
     // POD: subelement limit
     this.maxArgs = 100;
   }
@@ -83,6 +101,27 @@ export class CreateNode extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // namespace
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // nodeName
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    if(args.length > 2) {
+      // attributeSubelement
+      for(argIdx = 2; argIdx < args.length; argIdx++) {
+        info = args[argIdx].typeExpr(env);
+        if(info.type === "unassigned") {
+          args[argIdx].type = "error";
+          args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+        }
+      }
+    }
+    return {type: this.signature.returnType};
   }
 }
 
@@ -100,9 +139,6 @@ export class CreateNode extends Func {
  * For more information, see the instructions on inserting source objects.
  */
 export class GetNodeName extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "GetNodeName";
@@ -126,6 +162,13 @@ export class GetNodeName extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -142,9 +185,6 @@ export class GetNodeName extends Func {
  * For more information, see the instructions on inserting source objects.
  */
 export class GetNodeValue extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "GetNodeValue";
@@ -168,6 +208,13 @@ export class GetNodeValue extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -183,9 +230,6 @@ export class GetNodeValue extends Func {
  * For more information, see the instructions on inserting source objects.
  */
 export class GetXMLString extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "GetXMLString";
@@ -210,6 +254,19 @@ export class GetXMLString extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // path
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    if(args.length > 1) {
+      // qualified
+      info = args[++argIdx].typeExpr(env);
+      args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -228,9 +285,6 @@ export class GetXMLString extends Func {
  * if it has the attribute `xsi:nil` with the value `true`.
  */
 export class IsNil extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "IsNil";
@@ -253,6 +307,13 @@ export class IsNil extends Func {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    const argIdx = 0;
+    const info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -273,9 +334,6 @@ export class IsNil extends Func {
  * Supports up to 100-argument calls.
  */
 export class RunXSLT extends AsyncFunc {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "RunXSLT";
@@ -284,7 +342,7 @@ export class RunXSLT extends AsyncFunc {
       new Signature("array", [
         new Parameter("string", "xslt"),
         new Parameter("string", "xml1"),
-        new Parameter("string", "xml2", false)
+        new Parameter("string", "xml", false)
       ])
     ];
     this.signature = this.signatures[0];
@@ -306,6 +364,30 @@ export class RunXSLT extends AsyncFunc {
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // xslt
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // xml1
+    info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    if(args.length > 2) {
+      // xmlN
+      for(argIdx = 2; argIdx < args.length; argIdx++) {
+        info = args[argIdx].typeExpr(env);
+        args[argIdx].checkReqArg(
+          {
+            ...this.signature.params[2],
+            name: this.signature.params[2].name + argIdx
+          },
+          info.type
+        );
+      }
+    }
+    return {type: this.signature.returnType};
+  }
 }
 
 /**
@@ -320,9 +402,6 @@ export class RunXSLT extends AsyncFunc {
  * For more information, see the instructions on inserting source objects.
  */
 export class SelectNodeFromXMLAny extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "SelectNodeFromXMLAny";
@@ -345,6 +424,20 @@ export class SelectNodeFromXMLAny extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // nodeName
+    let info = args[argIdx].typeExpr(env);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // anyNodes
+    info = args[argIdx].typeExpr(env);
+    if(info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    return {type: this.signature.returnType};
   }
 }
 
@@ -370,9 +463,6 @@ export class SelectNodeFromXMLAny extends Func {
  * Supports up to 100-argument calls.
  */
 export class SelectNodes extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "SelectNodes";
@@ -381,7 +471,7 @@ export class SelectNodes extends Func {
       new Signature("array", [
         new Parameter("type", "node"),
         new Parameter("string", "xPathQuery"),
-        new Parameter("string", "xPathArg1", false)
+        new Parameter("string", "xPathArg", false)
       ])
     ];
     this.signature = this.signatures[0];
@@ -396,6 +486,33 @@ export class SelectNodes extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // node
+    let info = args[argIdx].typeExpr(env);
+    if(info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    // xPathQuery
+    info = args[++argIdx].typeExpr(env)
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    // xPathArg
+    if(args.length > 2) {
+      for(argIdx = 2; argIdx < args.length; argIdx++) {
+        info = args[argIdx].typeExpr(env)
+        args[argIdx].checkReqArg(
+          {
+            ...this.signature.params[2],
+            name: this.signature.params[2].name + (argIdx - 1)
+          },
+          info.type
+        );
+      }
+    }
+    return {type: this.signature.returnType};
   }
 }
 
@@ -418,9 +535,6 @@ export class SelectNodes extends Func {
  * Supports up to 100-argument calls.
  */
 export class SelectNodesFromXMLAny extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "SelectNodesFromXMLAny";
@@ -429,7 +543,7 @@ export class SelectNodesFromXMLAny extends Func {
       new Signature("array", [
         new Parameter("string", "xPathQuery"),
         new Parameter("type", "anyNodes"),
-        new Parameter("string", "xPathArg1", false)
+        new Parameter("string", "xPathArg", false)
       ])
     ];
     this.signature = this.signatures[0];
@@ -444,6 +558,33 @@ export class SelectNodesFromXMLAny extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // xPathQuery
+    let info = args[argIdx].typeExpr(env)
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    // anyNodes
+    info = args[argIdx].typeExpr(env);
+    if(info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    // xPathArgN
+    if(args.length > 2) {
+      for(argIdx = 2; argIdx < args.length; argIdx++) {
+        info = args[argIdx].typeExpr(env)
+        args[argIdx].checkReqArg(
+          {
+            ...this.signature.params[2],
+            name: this.signature.params[2].name + (argIdx - 1)
+          },
+          info.type
+        );
+      }
+    }
+    return {type: this.signature.returnType};
   }
 }
 
@@ -471,9 +612,6 @@ export class SelectNodesFromXMLAny extends Func {
  * Supports up to 100-argument calls.
  */
 export class SelectSingleNode extends Func {
-  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
-    throw new Error("Method not implemented.");
-  }
   constructor() {
     super();
     this.name = "SelectSingleNode";
@@ -481,8 +619,8 @@ export class SelectSingleNode extends Func {
     this.signatures = [
       new Signature("array", [
         new Parameter("type", "node"),
-        new Parameter("string", "xPath"),
-        new Parameter("string", "xPathArg1", false)
+        new Parameter("string", "xPathQuery"),
+        new Parameter("string", "xPathArg", false)
       ])
     ];
     this.signature = this.signatures[0];
@@ -497,5 +635,32 @@ export class SelectSingleNode extends Func {
 
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
+  }
+
+  analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
+    let argIdx = 0;
+    // node
+    let info = args[argIdx].typeExpr(env);
+    if(info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
+    // xPathQuery
+    info = args[++argIdx].typeExpr(env)
+    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    // xPathArgN
+    if(args.length > 2) {
+      for(argIdx = 2; argIdx < args.length; argIdx++) {
+        info = args[argIdx].typeExpr(env)
+        args[argIdx].checkReqArg(
+          {
+            ...this.signature.params[2],
+            name: this.signature.params[2].name + (argIdx - 1)
+          },
+          info.type
+        );
+      }
+    }
+    return {type: this.signature.returnType};
   }
 }

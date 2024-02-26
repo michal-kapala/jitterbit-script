@@ -1,4 +1,4 @@
 <trans>
   // test for call inference and warnings
-  Validate(4, "false", Null());
+  SelectNodesFromXMLAny("false", "<xml/>", {});
 </trans>
