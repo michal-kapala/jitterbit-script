@@ -33,6 +33,7 @@ import {
   TypedStringLiteral,
   TypedUnaryExpr
 } from "./ast";
+import Diagnostic from "./diagnostic";
 
 /**
  * Static type checker for Jitterbit script ASTs.
@@ -102,7 +103,23 @@ export default class Typechecker {
         expr.error = `Local variable '${(expr as TypedIdentifier).symbol}' hasn't been initialized.`
       }
     }
-    console.log(JSON.stringify(typedAst));
+    const diagnostics = this.collectDiagnostics(typedAst);
+    //console.log(JSON.stringify(typedAst));
+    console.log(diagnostics);
     return typedAst;
+  }
+
+  /**
+   * Creates a diagnostic list out of type-checked AST.
+   * @param ast 
+   * @returns 
+   */
+  static collectDiagnostics(ast: TypedExpr[]) {
+    const diagnostics: Diagnostic[] = [];
+    for(const expr of ast) {
+      for(const d of expr.collect())
+        diagnostics.push(d);
+    }
+    return diagnostics;
   }
 }

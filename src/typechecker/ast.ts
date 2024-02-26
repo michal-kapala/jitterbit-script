@@ -20,6 +20,7 @@ import {
 } from "../frontend/ast";
 import { Position, Token } from "../frontend/types";
 import { ValueType } from "../runtime/values";
+import Diagnostic from "./diagnostic";
 import TypeEnv from "./environment";
 import Typechecker from "./typechecker";
 import { 
@@ -108,6 +109,17 @@ export abstract class TypedExpr implements TypeInfo {
     if(!validTypes.includes(argType))
       this.warning = TcError.makeArgTypeWarn(param, argType);
   };
+  /**
+   * Creates a diagnostic list out of the type-checked AST subtree.
+   * @returns 
+   */
+  public collect(): Diagnostic[] {
+    if(this.type === "error" && this.error)
+      return [new Diagnostic(this.start, this.end, this.error)]
+    if(this.warning)
+      return [new Diagnostic(this.start, this.end, this.warning, false)]
+    return [];
+  }
 }
 
 /**
@@ -133,6 +145,19 @@ export class TypedArrayLiteral extends TypedExpr {
 
   public typeExpr(env: TypeEnv) {
     return {type: this.type} as TypeInfo;
+  }
+
+  public collect() {
+    let diagnostics: Diagnostic[] = [];
+    if(this.error)
+      diagnostics.push(new Diagnostic(this.start, this.end, this.error));
+    if(this.warning)
+      diagnostics.push(new Diagnostic(this.start, this.end, this.warning, false));
+    for(const expr of this.members) {
+      for(const d of expr.collect())
+        diagnostics.push(d);
+    }
+    return diagnostics;
   }
 }
 
@@ -281,6 +306,19 @@ export class TypedAssignment extends TypedExpr {
         return rhs;
     }
   }
+
+  public collect() {
+    let diagnostics: Diagnostic[] = [];
+    if(this.error)
+      diagnostics.push(new Diagnostic(this.start, this.end, this.error));
+    if(this.warning)
+      diagnostics.push(new Diagnostic(this.start, this.end, this.warning, false));
+    for(const d of this.assignee.collect())
+      diagnostics.push(d);
+    for(const d of this.value.collect())
+      diagnostics.push(d);
+    return diagnostics;
+  }
 }
 
 /**
@@ -374,6 +412,19 @@ export class TypedBinaryExpr extends TypedExpr {
     resultType.warning = undefined;
     return resultType;
   }
+
+  public collect() {
+    let diagnostics: Diagnostic[] = [];
+    if(this.error)
+      diagnostics.push(new Diagnostic(this.start, this.end, this.error));
+    if(this.warning)
+      diagnostics.push(new Diagnostic(this.start, this.end, this.warning, false));
+    for(const d of this.left.collect())
+      diagnostics.push(d);
+    for(const d of this.right.collect())
+      diagnostics.push(d);
+    return diagnostics;
+  }
 }
 
 /**
@@ -428,6 +479,19 @@ export class TypedBlockExpr extends TypedExpr {
     this.warning = undefined;
     return info;
   }
+
+  public collect() {
+    let diagnostics: Diagnostic[] = [];
+    if(this.error)
+      diagnostics.push(new Diagnostic(this.start, this.end, this.error));
+    if(this.warning)
+      diagnostics.push(new Diagnostic(this.start, this.end, this.warning, false));
+    for(const expr of this.body) {
+      for(const d of expr.collect())
+        diagnostics.push(d);
+    }
+    return diagnostics;
+  }
 }
 
 /**
@@ -461,6 +525,19 @@ export class TypedCall extends TypedExpr {
     // reset the warning before bubbling it up
     callInfo.warning = undefined;
     return callInfo;
+  }
+
+  public collect() {
+    let diagnostics: Diagnostic[] = [];
+    if(this.error)
+      diagnostics.push(new Diagnostic(this.start, this.end, this.error));
+    if(this.warning)
+      diagnostics.push(new Diagnostic(this.start, this.end, this.warning, false));
+    for(const expr of this.args) {
+      for(const d of expr.collect())
+        diagnostics.push(d);
+    }
+    return diagnostics;
   }
 }
 
@@ -617,6 +694,19 @@ export class TypedMemberExpr extends TypedExpr {
     // reset the warning before bubbling it up
     resultType.warning = undefined;
     return resultType;
+  }
+
+  public collect() {
+    let diagnostics: Diagnostic[] = [];
+    if(this.error)
+      diagnostics.push(new Diagnostic(this.start, this.end, this.error));
+    if(this.warning)
+      diagnostics.push(new Diagnostic(this.start, this.end, this.warning, false));
+    for(const d of this.object.collect())
+      diagnostics.push(d);
+    for(const d of this.key.collect())
+      diagnostics.push(d);
+    return diagnostics;
   }
 }
 
@@ -798,5 +888,16 @@ export class TypedUnaryExpr extends TypedExpr {
     // reset the warning before bubbling it up
     resultType.warning = undefined;
     return resultType;
+  }
+
+  public collect() {
+    let diagnostics: Diagnostic[] = [];
+    if(this.error)
+      diagnostics.push(new Diagnostic(this.start, this.end, this.error));
+    if(this.warning)
+      diagnostics.push(new Diagnostic(this.start, this.end, this.warning, false));
+    for(const d of this.value.collect())
+      diagnostics.push(d);
+    return diagnostics;
   }
 }
