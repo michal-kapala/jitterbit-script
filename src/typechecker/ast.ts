@@ -20,7 +20,7 @@ import {
 } from "../frontend/ast";
 import { Position, Token } from "../frontend/types";
 import { ValueType } from "../runtime/values";
-import Diagnostic from "./diagnostic";
+import Diagnostic from "../diagnostic";
 import TypeEnv from "./environment";
 import Typechecker from "./typechecker";
 import { 

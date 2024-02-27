@@ -1,7 +1,7 @@
 import { Api } from "../../../src/api";
 import { UnimplementedError } from "../../../src/errors";
 import Scope from "../../../src/runtime/scope";
-import { JbBinary, JbBool, JbNumber, JbString } from "../../../src/runtime/types";
+import { JbBool, JbNumber, JbString } from "../../../src/runtime/types";
 
 describe('Database functions', function() {
   test('CacheLookup()', function() {

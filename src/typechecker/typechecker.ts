@@ -33,7 +33,7 @@ import {
   TypedStringLiteral,
   TypedUnaryExpr
 } from "./ast";
-import Diagnostic from "./diagnostic";
+import Diagnostic from "../diagnostic";
 
 /**
  * Static type checker for Jitterbit script ASTs.
@@ -90,9 +90,10 @@ export default class Typechecker {
   /**
    * Performs static analysis of Jitterbit script AST.
    * @param ast 
+   * @param diagnostics 
    * @returns 
    */
-  static check(ast: Program) {
+  static analyze(ast: Program, diagnostics: Diagnostic[]): CodeAnalysis {
     const typedAst = this.rebuildAst(ast);
     const env = new TypeEnv();
     for(const expr of typedAst) {
@@ -103,10 +104,9 @@ export default class Typechecker {
         expr.error = `Local variable '${(expr as TypedIdentifier).symbol}' hasn't been initialized.`
       }
     }
-    const diagnostics = this.collectDiagnostics(typedAst);
-    //console.log(JSON.stringify(typedAst));
-    console.log(diagnostics);
-    return typedAst;
+    for(const d of this.collectDiagnostics(typedAst))
+      diagnostics.push(d);
+    return {ast: typedAst, diagnostics};
   }
 
   /**
@@ -123,3 +123,11 @@ export default class Typechecker {
     return diagnostics;
   }
 }
+
+/**
+ * The result of the code's static analysis.
+ */
+type CodeAnalysis = {
+  ast: TypedExpr[],
+  diagnostics: Diagnostic[];
+};

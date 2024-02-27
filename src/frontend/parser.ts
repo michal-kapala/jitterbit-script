@@ -1,5 +1,6 @@
 
 import { Api } from "../api";
+import Diagnostic from "../diagnostic";
 import { ParserError } from "../errors";
 import {
   ArrayLiteral,
@@ -165,13 +166,15 @@ export default class Parser {
   /**
    * Parses a Jitterbit script, returns an expression list.
    * @param sourceCode 
+   * @param diagnostics 
    * @returns 
    */
-  public parse(sourceCode: string): Program {
-    const program = new Program()
+  public parse(sourceCode: string, diagnostics?: Diagnostic[]): Program {
+    const program = new Program();
 
+    // currently the lexer does not throw
     try {
-      this.tokens = Lexer.tokenize(sourceCode);
+      this.tokens = Lexer.tokenize(sourceCode, diagnostics);
     } catch(e) {
       console.error(`LexerError: ${e}`);
       return program;

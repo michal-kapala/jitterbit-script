@@ -1,4 +1,4 @@
-import { Position } from "../frontend/types";
+import { Position } from "./frontend/types";
 
 /**
  * Diagnostic information emitted by Jitterbit typechecker.

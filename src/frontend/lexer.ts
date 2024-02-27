@@ -1,3 +1,4 @@
+import Diagnostic from "../diagnostic";
 import { Position, Token, TokenType } from "./types";
 
 /**
@@ -163,9 +164,10 @@ export default class Lexer {
    * possible unidentified characters.
    * @param sourceCode 
    * @param curPos 
+   * @param diagnostics 
    * @returns 
    */
-  public static tokenize(sourceCode: string): Token[] {
+  public static tokenize(sourceCode: string, diagnostics?: Diagnostic[]): Token[] {
     const curPos = new Position();
     const tokens = new Array<Token>();
     const src = sourceCode.split("");
@@ -204,31 +206,41 @@ export default class Lexer {
 
         currChar = src[0];
         if(currChar === "/") {
-          // JB throws 'Unknown token */' if the first commented character
-          // in a valid comment is a slash
-          // 'self closing comment' problem
-          // this should add an error/warning, use curPos
-          console.warn("Warning: JB throws 'Unknown token */' with comment content that begins with a slash");
+          // 'self-closing comment' problem
+          if(diagnostics) {
+            diagnostics.push(
+              new Diagnostic(
+                new Position(curPos.line, curPos.character - 2),
+                new Position(curPos.line, curPos.character),
+                "Self-closing multiline comment '/*/' prevents the execution of all subsequent code.",
+                false
+              )
+            );
+          }
+          console.warn("LexerWarning: Self-closing multiline comment '/*/' prevents the execution of all subsequent code.");
+          src.shift();
+          curPos.advance();
         }
-        
-        // skip content
-        while(src.length > 0) {
-          // it is safe to skip to the end of the file
-          // script scope tag validation should return
-          // 'Missing closing tag </trans>' error
-          skippedChar = src.shift();
+        else {
+          // skip content
+          while(src.length > 0) {
+            // it is safe to skip to the end of the file
+            // script scope tag validation should return
+            // 'Missing closing tag </trans>' error
+            skippedChar = src.shift();
 
-          // update position
-          if(skippedChar === '\n')
-            curPos.nextLine();
-          else
-            curPos.advance();
+            // update position
+            if(skippedChar === '\n')
+              curPos.nextLine();
+            else
+              curPos.advance();
 
-          // consume the ending slash
-          if(skippedChar === "*" && src[0] === "/"){  
-            src.shift();
-            curPos.advance();
-            break;
+            // consume the ending slash
+            if(skippedChar === "*" && src[0] === "/"){  
+              src.shift();
+              curPos.advance();
+              break;
+            }
           }
         }
       } else if(
@@ -550,6 +562,15 @@ export default class Lexer {
           // Add JB error:
           // 'Unknown token: <int-like literal>'
           if(isUnk) {
+            if(diagnostics) {
+              diagnostics.push(
+                new Diagnostic(
+                  new Position(curPos.line, curPos.character - num.length),
+                  new Position(curPos.line, curPos.character),
+                  `Unknown token: '${num}'.`
+                )
+              );
+            }
             console.error("Unknown token: ", num);
             tokens.push(new Token(
               num,
@@ -586,6 +607,15 @@ export default class Lexer {
               // Add JB error:
               // 'Undefined token: <float-like literal>'
               if(isUndef) {
+                if(diagnostics) {
+                  diagnostics.push(
+                    new Diagnostic(
+                      new Position(curPos.line, curPos.character - num.length),
+                      new Position(curPos.line, curPos.character),
+                      `Undefined token: '${num}'.`
+                    )
+                  );
+                }
                 console.error("Undefined token: ", num);
                 tokens.push(new Token(
                   num,
@@ -652,22 +682,26 @@ export default class Lexer {
           curPos.nextLine();
         }
         // unrecognized characters
-        // TODO: Implement better errors and error recovery.
         else {
           // only parse the unknown characters inside of the script scope
           if(transTagOpened) {
-            console.error(
-              "Unrecognized character found in source: ",
-              src[0].charCodeAt(0),
-              src,
-            );
+            if(diagnostics) {
+              diagnostics.push(
+                new Diagnostic(
+                  new Position(curPos.line, curPos.character),
+                  new Position(curPos.line, curPos.character),
+                  `Unknown token: '${src[0]}'.`
+                )
+              );
+            }
+            console.error(`LexerError: Unrecognized character found in source: ${src[0]}`);
             tokens.push(new Token(
-              "UnexpectedEndOfFile",
-              TokenType.EOF,
-              new Position(beginPos.line, beginPos.character),
-              new Position(curPos.line, curPos.character - 1)
+              src.shift() ?? "",
+              TokenType.UnknownToken,
+              curPos,
+              curPos
             ));
-            return tokens;
+            curPos.advance();
           }
           // pre-scope unhandled characters
           else {

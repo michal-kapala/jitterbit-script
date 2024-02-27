@@ -1,4 +1,5 @@
 <trans>
-  // test for call inference and warnings
-  SelectNodesFromXMLAny("false", "<xml/>", {});
+  // test for lexer warnings
+  /*/
+  abc = Pow("2", "1");
 </trans>
