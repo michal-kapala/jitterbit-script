@@ -1,5 +1,5 @@
 <trans>
   // test for lexer warnings
   /*/
-  abc = Pow("2", "1");
-</trans>
+  1
+

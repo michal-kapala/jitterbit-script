@@ -74,8 +74,9 @@ export default class Parser {
 
   /**
    * Validates if there are no adjacent primary expressions.
+   * @param diagnostics 
    */
-  private checkAdjacentLiterals() {
+  private checkAdjacentLiterals(diagnostics?: Diagnostic[]) {
     // TODO: handling to be extended for other applicable expression pairs
     for(let curIdx = 0; curIdx < this.tokens.length - 1; curIdx++) {
       const primaryTokens = [
@@ -95,12 +96,30 @@ export default class Parser {
           primaryTokens.includes(this.tokens[curIdx+1].type)) ||
         (this.tokens[curIdx].type === TokenType.CloseParen &&
           this.tokens[curIdx+1].type === TokenType.OpenParen)
-      )
-        throw new ParserError(`Missing operator between two operands: '${this.tokens[curIdx].value}' and '${this.tokens[curIdx+1].value}'`);
+      ) {
+        // static analysis
+        if(diagnostics) {
+          diagnostics.push(
+            new Diagnostic(
+              this.tokens[curIdx].begin,
+              this.tokens[curIdx+1].end,
+              `Missing operator between two operands: '${this.tokens[curIdx].value}' and '${this.tokens[curIdx+1].value}'.`
+            )
+          );
+        }
+        // runtime
+        else
+          throw new ParserError(`Missing operator between two operands: '${this.tokens[curIdx].value}' and '${this.tokens[curIdx+1].value}'.`);
+      }
     }
   }
 
-  private removeScopeTags(sourceCode: string) {
+  /**
+   * Validates the script's scope and removes the `trans` tag tokens.
+   * @param sourceCode 
+   * @param diagnostics 
+   */
+  private removeScopeTags(sourceCode: string, diagnostics?: Diagnostic[]) {
     // global current tokenizer position, starts at 1,1
     let curPos = new Position();
     // find the evaluation scope - <trans>...</trans>
@@ -118,7 +137,15 @@ export default class Parser {
       // Add warning:
       // 'No <trans> tag, script returns its content as string.'
       // pos 1,1
-      console.warn('ParserWarning: No <trans> tag, script returns its content as string.');
+      if(diagnostics) {
+        const pos = new Position(1, 1);
+        diagnostics.push(
+          new Diagnostic(
+            pos, pos, 'No <trans> tag, the script returns its content as string.', false
+          )
+        );
+      }
+      console.warn('ParserWarning: No <trans> tag, the script returns its content as string.');
       
       // return the script source as a string
 
@@ -126,13 +153,33 @@ export default class Parser {
       // Add JB error:
       // 'The expression <expr> is missing closing tag </trans>'
       // curPos
-      console.log("tokens:", JSON.stringify(this.tokens));
-      throw new ParserError(`The expression is missing </trans> closing tag:\n${sourceCode}\n`);
+
+      // static analysis
+      if(diagnostics) {
+        const start = this.tokens[this.tokens.length - 1].begin ?? new Position(1, 1);
+        const end = this.tokens[this.tokens.length - 1].end ?? start;
+        diagnostics.push(
+          new Diagnostic(start, end, "The script is missing '</trans>' scope closing tag.")
+        );
+      }
+      // runtime
+      else
+        throw new ParserError(`The expression is missing </trans> closing tag:\n${sourceCode}\n`);
     }
-    if(openIdx !== 0) {
+    if(openIdx && openIdx !== 0) {
       // Add warning:
       // 'Script content before <trans> is not evaluated and may result in unexpected behaviour.'
       // pos 1,1 - trans tag pos
+      if(diagnostics) {
+        diagnostics.push(
+          new Diagnostic(
+            this.tokens[0].begin,
+            this.tokens[openIdx - 1].end,
+            "Script content before <trans> is not evaluated and may result in unexpected behaviour.",
+            false
+          )
+        );
+      }
       console.warn("ParserWarning: Script content before <trans> is not evaluated and may result in unexpected behaviour.");
 
       // Remove the front tail
@@ -141,13 +188,24 @@ export default class Parser {
       }
     }
 
-    if(closeIdx !== this.tokens.length - 1) {
+    if(closeIdx && closeIdx > 0 && closeIdx !== this.tokens.length - 1) {
       // Add warning:
       // 'Script content after </trans> is not evaluated and may result in unexpected behaviour.'
       // ignore the eof token
       // </trans> pos - curPos
-      if(closeIdx !== this.tokens.length - 2)
+      if(closeIdx !== this.tokens.length - 2) {
+        if(diagnostics) {
+          diagnostics.push(
+            new Diagnostic(
+              this.tokens[closeIdx + 1].begin,
+              this.tokens[this.tokens.length - 1].end,
+              "Script content after </trans> is not evaluated and may result in unexpected behaviour.",
+              false
+            )
+          );
+        }
         console.warn("ParserWarning: Script content after </trans> is not evaluated and may result in unexpected behaviour.");
+      }
 
       // Remove the back tail
       let len = this.tokens.length - 1;
@@ -180,8 +238,8 @@ export default class Parser {
       return program;
     }
 
-    this.removeScopeTags(sourceCode);
-    this.checkAdjacentLiterals();
+    this.removeScopeTags(sourceCode, diagnostics);
+    this.checkAdjacentLiterals(diagnostics);
     // Parse until end of file
     while (this.not_eof()) {
       program.body.push(this.parse_stmt());
