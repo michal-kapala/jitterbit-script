@@ -16,14 +16,15 @@ async function run(filename: string) {
       return console.error(err);
     
     try {
-      const diagnostics: Diagnostic[] = [];
-      const program = parser.parse(data, diagnostics);
       const script = process.env.npm_lifecycle_event;
       if(script === "exec") {
+        const program = parser.parse(data);
         let result = await evaluate(program, globalScope);
         console.log("\nScript result:\n", result);
       }
       else if(script === "typecheck") {
+        const diagnostics: Diagnostic[] = [];
+        const program = parser.parse(data, diagnostics);
         const result = Typechecker.analyze(program, diagnostics);
         console.log(result.diagnostics);
       }

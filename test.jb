@@ -1,5 +1,6 @@
-<trans>
-  // test for lexer warnings
+do not type here <trans>
+  // test for script scope warnings
   /*/
   1
-
+</trans>
+or there, it's no use

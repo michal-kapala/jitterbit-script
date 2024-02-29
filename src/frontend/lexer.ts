@@ -1,4 +1,5 @@
 import Diagnostic from "../diagnostic";
+import { RuntimeError } from "../errors";
 import { Position, Token, TokenType } from "./types";
 
 /**
@@ -165,6 +166,7 @@ export default class Lexer {
    * @param sourceCode 
    * @param curPos 
    * @param diagnostics 
+   * @throws Multiple use of `trans` tags results in `RuntimeError` (runtime-only)
    * @returns 
    */
   public static tokenize(sourceCode: string, diagnostics?: Diagnostic[]): Token[] {
@@ -217,7 +219,8 @@ export default class Lexer {
               )
             );
           }
-          console.warn("LexerWarning: Self-closing multiline comment '/*/' prevents the execution of all subsequent code.");
+          else
+            console.warn("LexerWarning: Self-closing multiline comment '/*/' prevents the execution of all subsequent code.");
           src.shift();
           curPos.advance();
         }
@@ -244,7 +247,6 @@ export default class Lexer {
           }
         }
       } else if(
-        !transTagOpened &&
         src.length >= 7 &&
         src[0] === "<" &&
         src[1] === "t" &&
@@ -266,12 +268,24 @@ export default class Lexer {
           new Position(beginPos.line, beginPos.character),
           new Position(curPos.line, curPos.character - 1)
         ));
-        // only try to parse 1 trans tag opening
-        // the subsequent ones will result in an operator expr error
+        if(transTagOpened) {
+          const msg = "Repeated use of <trans> script opening tag.";
+          if(diagnostics) {
+            diagnostics.push(
+              new Diagnostic(
+                tokens[tokens.length - 1].begin,
+                tokens[tokens.length - 1].end,
+                msg
+              )
+            );
+          }
+          // runtime-only error
+          else
+            throw new RuntimeError(msg);
+        }
         transTagOpened = true;
       }
       else if(
-        !transTagClosed && transTagOpened &&
         src.length >= 8 &&
         src[0] === "<" &&
         src[1] === "/" &&
@@ -293,8 +307,21 @@ export default class Lexer {
           new Position(beginPos.line, beginPos.character),
           new Position(curPos.line, curPos.character - 1)
         ));
-        // only try to parse the first trans tag closing
-        // the subsequent ones will be ignored
+        if(transTagClosed) {
+          const msg = "Repeated use of </trans> script closing tag.";
+          if(diagnostics) {
+            diagnostics.push(
+              new Diagnostic(
+                tokens[tokens.length - 1].begin,
+                tokens[tokens.length - 1].end,
+                msg
+              )
+            );
+          }
+          // runtime-only error
+          else
+            throw new RuntimeError(msg);
+        }
         transTagClosed = true;
       }
       // strings

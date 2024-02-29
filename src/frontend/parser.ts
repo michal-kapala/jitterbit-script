@@ -115,6 +115,22 @@ export default class Parser {
   }
 
   /**
+   * Assigns the last of the found opening and closing tag indices as the script scope boundaries.
+   * @returns
+   */
+  private findScopeTags(): (number | null)[] {
+    let openIdx: number | null = null;
+    let closeIdx: number | null = null;
+    for(const idx in this.tokens) {
+      if(this.tokens[idx].type === TokenType.OpenTransTag)
+        openIdx = parseInt(idx);
+      if(this.tokens[idx].type === TokenType.CloseTransTag)
+        closeIdx = parseInt(idx);
+    }
+    return [openIdx, closeIdx];
+  }
+
+  /**
    * Validates the script's scope and removes the `trans` tag tokens.
    * @param sourceCode 
    * @param diagnostics 
@@ -123,14 +139,9 @@ export default class Parser {
     // global current tokenizer position, starts at 1,1
     let curPos = new Position();
     // find the evaluation scope - <trans>...</trans>
-    let openIdx = null;
-    let closeIdx = null;
-    this.tokens.forEach( (token, index) => {
-      if(token.type === TokenType.OpenTransTag)
-        openIdx = index;
-      if(token.type === TokenType.CloseTransTag)
-        closeIdx = index;
-    });
+    let openIdx: number | null = null;
+    let closeIdx: number | null = null;
+    [openIdx, closeIdx] = this.findScopeTags();
 
     // validate the evaluation scope
     if(openIdx === null) {
@@ -146,10 +157,9 @@ export default class Parser {
         );
       }
       console.warn('ParserWarning: No <trans> tag, the script returns its content as string.');
-      
       // return the script source as a string
-
-    } else if(closeIdx === null) {
+    }
+    if(closeIdx === null) {
       // Add JB error:
       // 'The expression <expr> is missing closing tag </trans>'
       // curPos
@@ -180,12 +190,13 @@ export default class Parser {
           )
         );
       }
-      console.warn("ParserWarning: Script content before <trans> is not evaluated and may result in unexpected behaviour.");
+      else
+        console.warn("ParserWarning: Script content before <trans> is not evaluated and may result in unexpected behaviour.");
 
-      // Remove the front tail
-      while(this.tokens[0].type !== TokenType.OpenTransTag) {
+      // Remove the front tail and update the scope indices
+      while(this.tokens[0].type !== TokenType.OpenTransTag)
         this.tokens.shift();
-      }
+      [openIdx, closeIdx] = this.findScopeTags();
     }
 
     if(closeIdx && closeIdx > 0 && closeIdx !== this.tokens.length - 1) {
@@ -204,7 +215,8 @@ export default class Parser {
             )
           );
         }
-        console.warn("ParserWarning: Script content after </trans> is not evaluated and may result in unexpected behaviour.");
+        else
+          console.warn("ParserWarning: Script content after </trans> is not evaluated and may result in unexpected behaviour.");
       }
 
       // Remove the back tail
@@ -230,14 +242,14 @@ export default class Parser {
   public parse(sourceCode: string, diagnostics?: Diagnostic[]): Program {
     const program = new Program();
 
-    // currently the lexer does not throw
+    // currently the lexer can only throw at runtime
     try {
       this.tokens = Lexer.tokenize(sourceCode, diagnostics);
     } catch(e) {
-      console.error(`LexerError: ${e}`);
+      console.error(e);
       return program;
     }
-
+    
     this.removeScopeTags(sourceCode, diagnostics);
     this.checkAdjacentLiterals(diagnostics);
     // Parse until end of file
