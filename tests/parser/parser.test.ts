@@ -5,7 +5,6 @@ import {
   BlockExpr,
   BooleanLiteral,
   CallExpr,
-  FunctionIdentifier,
   GlobalIdentifier,
   Identifier,
   MemberExpr,
@@ -40,7 +39,7 @@ const astTests: ParserTest[] = [
         ),
         new CallExpr(
           [],
-          new FunctionIdentifier(
+          new Identifier(
             new Token("Null", TokenType.Identifier, new Position(4, 12), new Position(4, 15))
           ),
           new Position(4, 17)
@@ -73,14 +72,14 @@ const astTests: ParserTest[] = [
               true
             )
           ],
-          new FunctionIdentifier(new Token("Round", TokenType.Identifier, new Position(3, 12), new Position(3, 16))),
+          new Identifier(new Token("Round", TokenType.Identifier, new Position(3, 12), new Position(3, 16))),
           new Position(3, 37)
         ),
         new Token("=", TokenType.Assignment, new Position(3, 10), new Position(3, 10))
       ),
       new CallExpr(
         [],
-        new FunctionIdentifier(
+        new Identifier(
           new Token("DebugBreak", TokenType.Identifier, new Position(4, 3), new Position(4, 12))
         ),
         new Position(4, 14)
@@ -123,7 +122,7 @@ DebugBreak();
     ast: makeAST([
       new CallExpr(
         [],
-        new FunctionIdentifier(
+        new Identifier(
           new Token("DebugBreak", TokenType.Identifier, new Position(2, 1), new Position(2, 10))
         ),
         new Position(2, 12)
@@ -164,7 +163,7 @@ DebugBreak();
         ),
         new CallExpr(
           [],
-          new FunctionIdentifier(new Token("Null", TokenType.Identifier, new Position(9, 19), new Position(9, 22))),
+          new Identifier(new Token("Null", TokenType.Identifier, new Position(9, 19), new Position(9, 22))),
           new Position(9, 24)
         ),
         new Token("=", TokenType.Assignment, new Position(9, 17), new Position(9, 17))
@@ -200,7 +199,7 @@ DebugBreak();
                   )
                 )
               ],
-              new FunctionIdentifier(
+              new Identifier(
                 new Token(
                   "RunOperation",
                   TokenType.Identifier,
@@ -217,7 +216,7 @@ DebugBreak();
             [
               new CallExpr(
                 [],
-                new FunctionIdentifier(
+                new Identifier(
                   new Token(
                     "GetLastError",
                     TokenType.Identifier,
@@ -228,7 +227,7 @@ DebugBreak();
                 new Position(11, 105)
               )
             ],
-            new FunctionIdentifier(
+            new Identifier(
               new Token(
                 "RaiseError",
                 TokenType.Identifier,
@@ -239,14 +238,14 @@ DebugBreak();
             new Position(11, 106)
           )
         ],
-        new FunctionIdentifier(
+        new Identifier(
           new Token("If", TokenType.Identifier, new Position(11, 1), new Position(11, 2))
         ),
         new Position(11, 107)
       ),
       new CallExpr(
         [],
-        new FunctionIdentifier(
+        new Identifier(
           new Token("DebugBreak", TokenType.Identifier, new Position(13, 1), new Position(13, 10))
         ),
         new Position(13, 12)
@@ -266,7 +265,7 @@ DebugBreak();
                   "global"
                 )
               ],
-              new FunctionIdentifier(
+              new Identifier(
                 new Token(
                   "Length",
                   TokenType.Identifier,
@@ -319,7 +318,7 @@ DebugBreak();
                     "global"
                   )
                 ],
-                new FunctionIdentifier(
+                new Identifier(
                   new Token("DateAdd", TokenType.Identifier, new Position(19, 16), new Position(19, 22))
                 ),
                 new Position(19, 46)
@@ -334,7 +333,7 @@ DebugBreak();
                   ),
                   new CallExpr(
                     [],
-                    new FunctionIdentifier(
+                    new Identifier(
                       new Token("Now", TokenType.Identifier, new Position(20, 19), new Position(20, 21))
                     ),
                     new Position(20, 23)
@@ -357,14 +356,14 @@ DebugBreak();
                   new Token("=", TokenType.Assignment, new Position(20, 35), new Position(20, 35))
                 )
               ],
-              new FunctionIdentifier(
+              new Identifier(
                 new Token("If", TokenType.Identifier, new Position(20, 9), new Position(20, 10))
               ),
               new Position(20, 41)
             )
           ])
         ],
-        new FunctionIdentifier(
+        new Identifier(
           new Token("If", TokenType.Identifier, new Position(15, 1), new Position(15, 2))
         ),
         new Position(22, 1)
@@ -393,7 +392,7 @@ DebugBreak();
                   )
                 )
               ],
-              new FunctionIdentifier(
+              new Identifier(
                 new Token("SendEmailMessage", TokenType.Identifier, new Position(26, 9), new Position(26, 24))
               ),
               new Position(26, 82)
@@ -410,7 +409,7 @@ DebugBreak();
               ),
               new CallExpr(
                 [],
-                new FunctionIdentifier(
+                new Identifier(
                   new Token("Now", TokenType.Identifier, new Position(27, 27), new Position(27, 29))
                 ),
                 new Position(27, 31)
@@ -431,7 +430,7 @@ DebugBreak();
                         )
                       )
                     ],
-                    new FunctionIdentifier(
+                    new Identifier(
                       new Token(
                         "RunOperation",
                         TokenType.Identifier,
@@ -448,7 +447,7 @@ DebugBreak();
                   [
                     new CallExpr(
                       [],
-                      new FunctionIdentifier(
+                      new Identifier(
                         new Token(
                           "GetLastError",
                           TokenType.Identifier,
@@ -459,7 +458,7 @@ DebugBreak();
                       new Position(28, 110)
                     )
                   ],
-                  new FunctionIdentifier(
+                  new Identifier(
                     new Token(
                       "RaiseError",
                       TokenType.Identifier,
@@ -470,21 +469,21 @@ DebugBreak();
                   new Position(28, 111)
                 )
               ],
-              new FunctionIdentifier(
+              new Identifier(
                 new Token("If", TokenType.Identifier, new Position(28, 9), new Position(28, 10))
               ),
               new Position(28, 112)
             )
           ])
         ],
-        new FunctionIdentifier(
+        new Identifier(
           new Token("If", TokenType.Identifier, new Position(24, 1), new Position(24, 2))
         ),
         new Position(29, 1)
       ),
       new CallExpr(
         [],
-        new FunctionIdentifier(
+        new Identifier(
           new Token("DebugBreak", TokenType.Identifier, new Position(30, 1), new Position(30, 10))
         ),
         new Position(30, 12)
@@ -645,7 +644,7 @@ RunScript("<TAG>Scripts/jitterbit/core/jb.core.wtol</TAG>",$jb.log.message);
             "global"
           )
         ],
-        new FunctionIdentifier(
+        new Identifier(
           new Token("RunScript", TokenType.Identifier, new Position(7, 1), new Position(7, 9))
         ),
         new Position(7, 75)
@@ -719,7 +718,7 @@ RunScript("<TAG>Scripts/jitterbit/core/jb.core.wtol</TAG>",headers);
                   new Token("enum", TokenType.Identifier, new Position(6, 16), new Position(6, 19))
                 )
               ],
-                new FunctionIdentifier(
+                new Identifier(
                   new Token("length", TokenType.Identifier, new Position(6, 9), new Position(6, 14))
                 ),
                 new Position(6, 20)
@@ -775,7 +774,7 @@ RunScript("<TAG>Scripts/jitterbit/core/jb.core.wtol</TAG>",headers);
                         new Token("name", TokenType.Identifier, new Position(8, 47), new Position(8, 50))
                       )
                     ],
-                    new FunctionIdentifier(
+                    new Identifier(
                       new Token("Get", TokenType.Identifier, new Position(8, 43), new Position(8, 45))
                     ),
                     new Position(8, 51)
@@ -806,7 +805,7 @@ RunScript("<TAG>Scripts/jitterbit/core/jb.core.wtol</TAG>",headers);
             )
           ])
         ],
-        new FunctionIdentifier(
+        new Identifier(
           new Token("while", TokenType.Identifier, new Position(6, 1), new Position(6, 5))
         ),
         new Position(10, 3)
@@ -838,7 +837,7 @@ RunScript("<TAG>Scripts/jitterbit/core/jb.core.wtol</TAG>",headers);
             new Token("=", TokenType.Assignment, new Position(11, 18), new Position(11, 18))
           )
         ],
-        new FunctionIdentifier(
+        new Identifier(
           new Token("if", TokenType.Identifier, new Position(11, 1), new Position(11, 2))
         ),
         new Position(11, 42)
@@ -857,7 +856,7 @@ RunScript("<TAG>Scripts/jitterbit/core/jb.core.wtol</TAG>",headers);
             new Token("headers", TokenType.Identifier, new Position(13, 60), new Position(13, 66))
           )
         ],
-        new FunctionIdentifier(
+        new Identifier(
           new Token("RunScript", TokenType.Identifier, new Position(13, 1), new Position(13, 9))
         ),
         new Position(13, 67)
@@ -906,7 +905,7 @@ case(
               "system"
             )
           ],
-          new FunctionIdentifier(
+          new Identifier(
             new Token("ToLower", TokenType.Identifier, new Position(8, 6), new Position(8, 12))
           ),
           new Position(8, 51)
@@ -1110,7 +1109,7 @@ case(
             )
           ]),
         ],
-        new FunctionIdentifier(
+        new Identifier(
           new Token("case", TokenType.Identifier, new Position(9, 1), new Position(9, 4))
         ),
         new Position(22, 1)
@@ -1174,7 +1173,7 @@ If(Length($jb.postgres.db.tableName) == 0
                   "global"
                 )
               ],
-              new FunctionIdentifier(
+              new Identifier(
                 new Token("Length", TokenType.Identifier, new Position(14, 4), new Position(14, 9))
               ),
               new Position(14, 36)
@@ -1193,7 +1192,7 @@ If(Length($jb.postgres.db.tableName) == 0
                 )
               )
             ],
-            new FunctionIdentifier(
+            new Identifier(
               new Token("RaiseError", TokenType.Identifier, new Position(16, 9), new Position(16, 18))
             ),
             new Position(16, 55)
@@ -1250,7 +1249,7 @@ If(Length($jb.postgres.db.tableName) == 0
                   new Token("sql_str", TokenType.Identifier, new Position(19, 68), new Position(19, 74))
                 )
               ],
-              new FunctionIdentifier(
+              new Identifier(
                 new Token("RunScript", TokenType.Identifier, new Position(19, 9), new Position(19, 17))
               ),
               new Position(19, 75)
@@ -1276,7 +1275,7 @@ If(Length($jb.postgres.db.tableName) == 0
                       )
                     )
                   ],
-                  new FunctionIdentifier(
+                  new Identifier(
                     new Token("DbExecute", TokenType.Identifier, new Position(20, 14), new Position(20, 22))
                   ),
                   new Position(20, 88)
@@ -1284,7 +1283,7 @@ If(Length($jb.postgres.db.tableName) == 0
                 new BlockExpr([
                   new CallExpr(
                     [],
-                    new FunctionIdentifier(
+                    new Identifier(
                       new Token(
                         "DebugBreak",
                         TokenType.Identifier,
@@ -1298,7 +1297,7 @@ If(Length($jb.postgres.db.tableName) == 0
                     [
                       new CallExpr(
                         [],
-                        new FunctionIdentifier(
+                        new Identifier(
                           new Token(
                             "GetLastError",
                             TokenType.Identifier,
@@ -1309,7 +1308,7 @@ If(Length($jb.postgres.db.tableName) == 0
                         new Position(20, 127)
                       )
                     ],
-                    new FunctionIdentifier(
+                    new Identifier(
                       new Token(
                         "RaiseError",
                         TokenType.Identifier,
@@ -1321,14 +1320,14 @@ If(Length($jb.postgres.db.tableName) == 0
                   )
                 ])
               ],
-              new FunctionIdentifier(
+              new Identifier(
                 new Token("Eval", TokenType.Identifier, new Position(20, 9), new Position(20, 12))
               ),
               new Position(20, 129)
             )
           ])
         ],
-        new FunctionIdentifier(
+        new Identifier(
           new Token("If", TokenType.Identifier, new Position(14, 1), new Position(14, 2))
         ),
         new Position(23, 1)

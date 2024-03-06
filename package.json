@@ -4,10 +4,9 @@
   "description": "Static typechecker and interpreter for Jitterbit Script",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --removeComments && tsc --declaration --emitDeclarationOnly",
     "exec": "tsc && node ./build/main.js",
     "typecheck": "tsc && node ./build/main.js",
-    "prepublish": "tsc",
     "test": "jest --config=./jest.config.js ./tests --silent" 
   },
   "repository": {

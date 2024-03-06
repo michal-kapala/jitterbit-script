@@ -7,7 +7,6 @@ import {
   BlockExpr,
   BooleanLiteral,
   CallExpr,
-  FunctionIdentifier,
   Identifier,
   NumericLiteral,
   StringLiteral,
@@ -123,7 +122,7 @@ describe('Logical functions', function() {
       ]);
       const cond2 = new CallExpr(
         [new BooleanLiteral(false, new Token("false", TokenType.False, pos, pos))],
-        new FunctionIdentifier(new Token("DebugBreak", TokenType.Identifier, pos, pos)),
+        new Identifier(new Token("DebugBreak", TokenType.Identifier, pos, pos)),
         pos
       );
       const branch2 = new BlockExpr([

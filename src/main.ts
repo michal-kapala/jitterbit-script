@@ -26,6 +26,7 @@ async function run(filename: string) {
         const diagnostics: Diagnostic[] = [];
         const program = parser.parse(data, diagnostics);
         const result = Typechecker.analyze(program, diagnostics);
+        console.log(JSON.stringify(result.ast));
         console.log(result.diagnostics);
       }
     } catch(e) {

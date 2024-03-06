@@ -7,9 +7,9 @@ import {
   BooleanLiteral,
   CallExpr,
   Expr,
-  FunctionIdentifier,
   GlobalIdentifier,
   Identifier,
+  InvalidExpr,
   MemberExpr,
   NumericLiteral,
   Program,
@@ -25,9 +25,9 @@ import {
   TypedBoolLiteral,
   TypedCall,
   TypedExpr,
-  TypedFunctionIdentifier,
   TypedGlobalIdentifier,
   TypedIdentifier,
+  TypedInvalidExpr,
   TypedMemberExpr,
   TypedNumericLiteral,
   TypedStringLiteral,
@@ -68,8 +68,8 @@ export default class Typechecker {
         return new TypedCall(expr as CallExpr);
       case "Identifier":
         return new TypedIdentifier(expr as Identifier);
-      case "FunctionIdentifier":
-        return new TypedFunctionIdentifier(expr as FunctionIdentifier);
+      case "InvalidExpr":
+        return new TypedInvalidExpr(expr as InvalidExpr);
       case "GlobalIdentifier":
         return new TypedGlobalIdentifier(expr as GlobalIdentifier);
       case "MemberExpr":

@@ -29,13 +29,14 @@ export type NodeType =
   | "BinaryExpr"
   | "UnaryExpr"
   | "BlockExpr"
+  // typechecker-only
+  | "InvalidExpr"
   // Literals
   | "NumericLiteral"
   | "StringLiteral"
   | "BooleanLiteral"
   | "Identifier"
   | "GlobalIdentifier"
-  | "FunctionIdentifier"
   | "ArrayLiteral";
 
 /**
@@ -93,6 +94,34 @@ export abstract class Expr implements Stmt {
    * @param scope 
    */
   abstract eval(scope: Scope): Promise<RuntimeVal>;
+}
+
+/**
+ * An unrecognized expression, only parsed at static analysis time.
+ */
+export class InvalidExpr implements Expr {
+  kind: "InvalidExpr";
+  start: Position;
+  end: Position;
+  str: string;
+  error: string;
+
+  constructor(str: string, error: string, start: Position, end: Position) {
+    this.kind = "InvalidExpr";
+    this.start = start;
+    this.end = end;
+    this.str = str;
+    this.error = error;
+  }
+
+  /**
+   * This method should never be called as invalid expressions only exist in the AST at static analysis time.
+   * @param scope
+   * @throws `RuntimeError`
+   */
+  eval(scope: Scope): never {
+    throw new RuntimeError("Attempted to evaluate an invalid expression.");
+  }
 }
 
 /**
@@ -437,11 +466,11 @@ export class BlockExpr implements Expr {
 export class CallExpr implements Expr {
   kind: "CallExpr";
   args: Expr[];
-  caller: FunctionIdentifier;
+  caller: Expr;
   start: Position;
   end: Position;
 
-  constructor(args: Expr[], caller: FunctionIdentifier, end: Position) {
+  constructor(args: Expr[], caller: Expr, end: Position) {
     this.kind = "CallExpr";
     this.args = args;
     this.caller = caller;
@@ -450,14 +479,20 @@ export class CallExpr implements Expr {
   }
 
   async eval(scope: Scope) {
-    const func = Api.getFunc(this.caller.symbol);
+    // the caller should always be an identifier
+    if(this.caller.kind !== "Identifier")
+      throw new RuntimeError(`Invalid call expression, the caller is not a function identifier.`);
+    
+    const func = Api.getFunc((this.caller as Identifier).symbol);
 
-    // this is for type safety only, the error is thrown by parser
-    if(func === undefined)
-      throw new RuntimeError(`Function ${this.caller.symbol} does not exist, refer to Jitterbit function API docs`);
+    if(!func)
+      throw new RuntimeError(`Function ${(this.caller as Identifier).symbol} does not exist, refer to Jitterbit function API docs.`);
+
+    if(this.args.length < func.minArgs || this.args.length > func.maxArgs)
+      throw new RuntimeError(`Wrong number of arguments for the function ${func.name}, should be ${func.minArgs === func.maxArgs ? func.minArgs : `${func.minArgs}-${func.maxArgs}`}.`);
 
     // deferred argument list evaluation functions (logical/general modules)
-    if((func as DeferrableFunc).callEval !== undefined) {
+    if((func as DeferrableFunc).callEval) {
       try {
         return await (func as DeferrableFunc).callEval(this.args, scope);
       } catch(e) {
@@ -617,7 +652,7 @@ export class MemberExpr implements Expr {
  * Represents a user-defined variable or symbol in source.
  */
 export class Identifier implements Expr {
-  kind: "Identifier" | "GlobalIdentifier" | "FunctionIdentifier";
+  kind: "Identifier" | "GlobalIdentifier";
   symbol: string;
   start: Position;
   end: Position;
@@ -632,18 +667,6 @@ export class Identifier implements Expr {
   async eval(scope: Scope) {
     const val = scope.lookupVar(this.symbol);
     return val;
-  }
-}
-
-/**
- * Name of a Jitterbit native function.
- */
-export class FunctionIdentifier extends Identifier {
-  kind: "FunctionIdentifier";
-  
-  constructor(token: Token) {
-    super(token);
-    this.kind = "FunctionIdentifier";
   }
 }
 

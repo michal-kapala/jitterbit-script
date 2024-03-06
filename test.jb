@@ -1,6 +1,8 @@
-do not type here <trans>
-  // test for script scope warnings
-  /*/
-  1
+<trans>
+  // test for call expression inference and error handling
+  x = 1;
+  If(true,
+    true(x,
+    "nice"; false
+  );
 </trans>
-or there, it's no use

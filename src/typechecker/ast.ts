@@ -8,10 +8,10 @@ import {
   BlockExpr,
   BooleanLiteral,
   CallExpr,
-  FunctionIdentifier,
   GlobalIdentifier,
   GlobalVarKind,
   Identifier,
+  InvalidExpr,
   MemberExpr,
   NodeType,
   NumericLiteral,
@@ -56,8 +56,8 @@ export abstract class TypedExpr implements TypeInfo {
   type!: StaticTypeName;
   start!: Position;
   end!: Position;
-  error?: string | undefined;
-  warning?: string | undefined;
+  error?: string;
+  warning?: string;
 
   /**
    * Assigns the runtime type of the expression.
@@ -123,6 +123,37 @@ export abstract class TypedExpr implements TypeInfo {
 }
 
 /**
+ * Invalid expression node.
+ */
+export class TypedInvalidExpr extends TypedExpr {
+  kind: NodeType;
+  type: "error";
+  start: Position;
+  end: Position;
+  error: string;
+
+  constructor(expr: InvalidExpr) {
+    super();
+    this.kind = expr.kind;
+    this.error = expr.error;
+    this.start = expr.start;
+    this.end = expr.end;
+    this.type = "error";
+  }
+
+  public typeExpr(env: TypeEnv) {
+    return {
+      type: this.type,
+      error: this.error
+    } as TypeInfo;
+  }
+  
+  public collect(): Diagnostic[] {
+    return [new Diagnostic(this.start, this.end, this.error)];
+  }
+}
+
+/**
  * Array literal expression with type information.
  */
 export class TypedArrayLiteral extends TypedExpr {
@@ -144,6 +175,8 @@ export class TypedArrayLiteral extends TypedExpr {
   }
 
   public typeExpr(env: TypeEnv) {
+    for(const expr of this.members)
+      expr.typeExpr(env);
     return {type: this.type} as TypeInfo;
   }
 
@@ -276,33 +309,41 @@ export class TypedAssignment extends TypedExpr {
       case "BlockExpr":
       case "BooleanLiteral":
       case "CallExpr":
-      case "FunctionIdentifier":
       case "NumericLiteral":
       case "Program":
       case "StringLiteral":
       case "UnaryExpr":
         this.assignee.type = "error";
         this.assignee.error = `Cannot assign to LHS expression: ${this.assignee.kind}.`;
-        if(rhs.type !== "error" && rhs.type !== "unassigned")
-          this.type = rhs.type;
-        this.warning = rhs.warning;
+        if(rhs.type === "error" || rhs.type === "unassigned")
+          return {type: "unknown"} as TypeInfo;
+        this.type = rhs.type;
         return rhs;
       case "GlobalIdentifier":
       case "Identifier":
         const id = this.assignee as TypedIdentifier;
+        if(rhs.type === "error" || rhs.type === "unassigned") {
+          const info = {type: "unknown"} as TypeInfo;
+          id.setTypeInfo(info);
+          env.set(id.symbol, info);
+          return info;
+        }
+        this.type = rhs.type;
         id.setTypeInfo(rhs);
         env.set(id.symbol, rhs);
-        if(rhs.type !== "error" && rhs.type !== "unassigned")
-          this.type = rhs.type;
-        this.warning = rhs.warning;
         return rhs;
       case "MemberExpr":
         const memExpr = this.assignee as TypedMemberExpr;
         const memExprType = memExpr.typeExpr(env);
         // TODO: array/dict environments?
-        if(rhs.type !== "unassigned")
-          this.type = rhs.type;
-        this.warning = rhs.warning;
+        if(rhs.type === "error" || rhs.type === "unassigned")
+          return {type: "unknown"} as TypeInfo;  
+        this.type = rhs.type;
+        return rhs;
+      case "InvalidExpr":
+        if(rhs.type === "error" || rhs.type === "unassigned")
+          return {type: "unknown"} as TypeInfo;  
+        this.type = rhs.type;
         return rhs;
     }
   }
@@ -448,7 +489,7 @@ export class TypedBlockExpr extends TypedExpr {
   
   public typeExpr(env: TypeEnv): TypeInfo {
     let info = {type: "error", error: "Empty block expression."} as TypeInfo;
-    let exprIdx = 0
+    let exprIdx = 0;
     for(exprIdx; exprIdx < this.body.length; exprIdx++) {
       info = this.body[exprIdx].typeExpr(env);
       if(info.type === "unassigned") {
@@ -499,7 +540,7 @@ export class TypedBlockExpr extends TypedExpr {
  */
 export class TypedCall extends TypedExpr {
   kind: "CallExpr";
-  caller: TypedFunctionIdentifier;
+  caller: TypedExpr;
   args: TypedExpr[];
 
   constructor(expr: CallExpr, error?: string, warning?: string) {
@@ -509,18 +550,55 @@ export class TypedCall extends TypedExpr {
     this.warning = warning;
     this.start = expr.start;
     this.end = expr.end;
-    this.caller = Typechecker.convertExpr(expr.caller) as TypedFunctionIdentifier;
+    this.caller = Typechecker.convertExpr(expr.caller);
     this.args = [];
     for(const arg of expr.args)
       this.args.push(Typechecker.convertExpr(arg));
   }
 
-  public typeExpr(env: TypeEnv): TypeInfo {
-    const func = Api.getFunc(this.caller.symbol)
-    if(func === undefined)
-      throw new TcError(`Unknown function found in call expression: ${this.caller.symbol}.`);
+  public typeExpr(env: TypeEnv) {
+    let callInfo: TypeInfo;
+    // the caller should always be an identifier
+    if(this.caller.kind !== "Identifier") {
+      const errInfo = {
+        type: "error",
+        error: `Invalid call expression, the caller is not a function identifier.`
+      } as TypeInfo;
+      this.caller.setTypeInfo(errInfo);
+      for(const arg of this.args)
+        arg.typeExpr(env);
+      callInfo = {type: "unknown"};
+      this.setTypeInfo(callInfo);
+      return callInfo;
+    }
 
-    const callInfo = func.analyzeCall(this.args, env);
+    const func = Api.getFunc((this.caller as TypedIdentifier).symbol)
+    if(!func) {
+      const errInfo = {
+        type: "error",
+        error: `Function '${(this.caller as TypedIdentifier).symbol}' does not exist, refer to Jitterbit function API docs.`
+      } as TypeInfo;
+      this.caller.setTypeInfo(errInfo);
+      callInfo = {type: "unknown"};
+      this.setTypeInfo(callInfo);
+      // argument inference
+      for(const arg of this.args)
+        arg.typeExpr(env);
+      return callInfo;
+    }
+
+    if(this.args.length < func.minArgs || this.args.length > func.maxArgs) {
+      callInfo = {
+        type: "error",
+        error: `Wrong number of arguments for the function ${func.name}, should be ${func.minArgs === func.maxArgs ? func.minArgs : `${func.minArgs}-${func.maxArgs}`}.`
+      };
+      this.setTypeInfo(callInfo);
+      // argument inference
+      for(const arg of this.args)
+        arg.typeExpr(env);
+      return callInfo;
+    }
+    callInfo = func.analyzeCall(this.args, env);
     this.setTypeInfo(callInfo);
     // reset the warning before bubbling it up
     callInfo.warning = undefined;
@@ -529,6 +607,8 @@ export class TypedCall extends TypedExpr {
 
   public collect() {
     let diagnostics: Diagnostic[] = [];
+    if(this.caller.error)
+      diagnostics.push(new Diagnostic(this.caller.start, this.caller.end, this.caller.error));
     if(this.error)
       diagnostics.push(new Diagnostic(this.start, this.end, this.error));
     if(this.warning)
@@ -560,7 +640,7 @@ export class TypedMemberExpr extends TypedExpr {
     this.key = Typechecker.convertExpr(expr.key);
   }
 
-  public typeExpr(env: TypeEnv): TypeInfo {
+  public typeExpr(env: TypeEnv) {
     const idInfo = this.object.typeExpr(env);
     const keyInfo = this.key.typeExpr(env);
 
@@ -714,7 +794,7 @@ export class TypedMemberExpr extends TypedExpr {
  * Local variable identifier with type information.
  */
 export class TypedIdentifier extends TypedExpr {
-  kind: "Identifier" | "GlobalIdentifier" | "FunctionIdentifier";
+  kind: "Identifier" | "GlobalIdentifier";
   symbol: string;
 
   constructor(expr: Identifier, error?: string, warning?: string) {
@@ -735,22 +815,6 @@ export class TypedIdentifier extends TypedExpr {
     if(!info && this.symbol.match(regex))
       this.type = "type";
     return {type: this.type};
-  }
-}
-
-/**
- * Function identifier.
- */
-export class TypedFunctionIdentifier extends TypedIdentifier {
-  kind: "FunctionIdentifier";
-
-  constructor(expr: FunctionIdentifier, error?: string, warning?: string) {
-    super(expr, error, warning);
-    this.kind = expr.kind;
-  }
-
-  public typeExpr(env: TypeEnv): TypeInfo {
-    throw new TcError(`Standalone function identifier found: ${this.symbol}.`);
   }
 }
 
