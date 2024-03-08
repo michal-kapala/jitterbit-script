@@ -49,6 +49,16 @@ export interface TypeInfo {
 export type StaticTypeName = ValueType | "error" | "unassigned" | "unknown";
 
 /**
+ * The result of the code's static analysis.
+ */
+export type CodeAnalysis = {
+  ast: TypedExpr[],
+  diagnostics: Diagnostic[];
+  vars: TypedIdentifier[];
+  callees: TypedIdentifier[];
+};
+
+/**
  * Statically-typed expression.
  */
 export abstract class TypedExpr implements TypeInfo {
@@ -110,15 +120,17 @@ export abstract class TypedExpr implements TypeInfo {
       this.warning = TcError.makeArgTypeWarn(param, argType);
   };
   /**
-   * Creates a diagnostic list out of the type-checked AST subtree.
+   * Populates diagnostics and identifier type information lists.
+   * @param analysis
    * @returns 
    */
-  public collect(): Diagnostic[] {
+  public collect(analysis: CodeAnalysis) {
+    // diagnostics
     if(this.type === "error" && this.error)
-      return [new Diagnostic(this.start, this.end, this.error)]
+      analysis.diagnostics.push(new Diagnostic(this.start, this.end, this.error));
     if(this.warning)
-      return [new Diagnostic(this.start, this.end, this.warning, false)]
-    return [];
+      analysis.diagnostics.push(new Diagnostic(this.start, this.end, this.warning, false));
+    // no identifiers by default
   }
 }
 
@@ -148,8 +160,8 @@ export class TypedInvalidExpr extends TypedExpr {
     } as TypeInfo;
   }
   
-  public collect(): Diagnostic[] {
-    return [new Diagnostic(this.start, this.end, this.error)];
+  public collect(analysis: CodeAnalysis) {
+    analysis.diagnostics.push(new Diagnostic(this.start, this.end, this.error));
   }
 }
 
@@ -180,17 +192,14 @@ export class TypedArrayLiteral extends TypedExpr {
     return {type: this.type} as TypeInfo;
   }
 
-  public collect() {
-    let diagnostics: Diagnostic[] = [];
+  public collect(analysis: CodeAnalysis) {
     if(this.error)
-      diagnostics.push(new Diagnostic(this.start, this.end, this.error));
+      analysis.diagnostics.push(new Diagnostic(this.start, this.end, this.error));
     if(this.warning)
-      diagnostics.push(new Diagnostic(this.start, this.end, this.warning, false));
+      analysis.diagnostics.push(new Diagnostic(this.start, this.end, this.warning, false));
     for(const expr of this.members) {
-      for(const d of expr.collect())
-        diagnostics.push(d);
+      expr.collect(analysis);
     }
-    return diagnostics;
   }
 }
 
@@ -348,17 +357,13 @@ export class TypedAssignment extends TypedExpr {
     }
   }
 
-  public collect() {
-    let diagnostics: Diagnostic[] = [];
+  public collect(analysis: CodeAnalysis) {
     if(this.error)
-      diagnostics.push(new Diagnostic(this.start, this.end, this.error));
+      analysis.diagnostics.push(new Diagnostic(this.start, this.end, this.error));
     if(this.warning)
-      diagnostics.push(new Diagnostic(this.start, this.end, this.warning, false));
-    for(const d of this.assignee.collect())
-      diagnostics.push(d);
-    for(const d of this.value.collect())
-      diagnostics.push(d);
-    return diagnostics;
+      analysis.diagnostics.push(new Diagnostic(this.start, this.end, this.warning, false));
+    this.assignee.collect(analysis);
+    this.value.collect(analysis);
   }
 }
 
@@ -454,17 +459,13 @@ export class TypedBinaryExpr extends TypedExpr {
     return resultType;
   }
 
-  public collect() {
-    let diagnostics: Diagnostic[] = [];
+  public collect(analysis: CodeAnalysis) {
     if(this.error)
-      diagnostics.push(new Diagnostic(this.start, this.end, this.error));
+      analysis.diagnostics.push(new Diagnostic(this.start, this.end, this.error));
     if(this.warning)
-      diagnostics.push(new Diagnostic(this.start, this.end, this.warning, false));
-    for(const d of this.left.collect())
-      diagnostics.push(d);
-    for(const d of this.right.collect())
-      diagnostics.push(d);
-    return diagnostics;
+      analysis.diagnostics.push(new Diagnostic(this.start, this.end, this.warning, false));
+    this.left.collect(analysis);
+    this.right.collect(analysis);
   }
 }
 
@@ -521,17 +522,13 @@ export class TypedBlockExpr extends TypedExpr {
     return info;
   }
 
-  public collect() {
-    let diagnostics: Diagnostic[] = [];
+  public collect(analysis: CodeAnalysis) {
     if(this.error)
-      diagnostics.push(new Diagnostic(this.start, this.end, this.error));
+      analysis.diagnostics.push(new Diagnostic(this.start, this.end, this.error));
     if(this.warning)
-      diagnostics.push(new Diagnostic(this.start, this.end, this.warning, false));
-    for(const expr of this.body) {
-      for(const d of expr.collect())
-        diagnostics.push(d);
-    }
-    return diagnostics;
+      analysis.diagnostics.push(new Diagnostic(this.start, this.end, this.warning, false));
+    for(const expr of this.body)
+      expr.collect(analysis);
   }
 }
 
@@ -605,19 +602,21 @@ export class TypedCall extends TypedExpr {
     return callInfo;
   }
 
-  public collect() {
-    let diagnostics: Diagnostic[] = [];
+  public collect(analysis: CodeAnalysis) {
+    // diagnostics
     if(this.caller.error)
-      diagnostics.push(new Diagnostic(this.caller.start, this.caller.end, this.caller.error));
+      analysis.diagnostics.push(new Diagnostic(this.caller.start, this.caller.end, this.caller.error));
     if(this.error)
-      diagnostics.push(new Diagnostic(this.start, this.end, this.error));
+      analysis.diagnostics.push(new Diagnostic(this.start, this.end, this.error));
     if(this.warning)
-      diagnostics.push(new Diagnostic(this.start, this.end, this.warning, false));
-    for(const expr of this.args) {
-      for(const d of expr.collect())
-        diagnostics.push(d);
+      analysis.diagnostics.push(new Diagnostic(this.start, this.end, this.warning, false));
+    // callee/caller
+    if(this.caller.kind === "Identifier") {
+      if(Api.getFunc((this.caller as TypedIdentifier).symbol))
+        analysis.callees.push(this.caller as TypedIdentifier);
     }
-    return diagnostics;
+    for(const expr of this.args)
+      expr.collect(analysis);
   }
 }
 
@@ -776,17 +775,13 @@ export class TypedMemberExpr extends TypedExpr {
     return resultType;
   }
 
-  public collect() {
-    let diagnostics: Diagnostic[] = [];
+  public collect(analysis: CodeAnalysis) {
     if(this.error)
-      diagnostics.push(new Diagnostic(this.start, this.end, this.error));
+      analysis.diagnostics.push(new Diagnostic(this.start, this.end, this.error));
     if(this.warning)
-      diagnostics.push(new Diagnostic(this.start, this.end, this.warning, false));
-    for(const d of this.object.collect())
-      diagnostics.push(d);
-    for(const d of this.key.collect())
-      diagnostics.push(d);
-    return diagnostics;
+      analysis.diagnostics.push(new Diagnostic(this.start, this.end, this.warning, false));
+    this.object.collect(analysis);
+    this.key.collect(analysis);
   }
 }
 
@@ -815,6 +810,10 @@ export class TypedIdentifier extends TypedExpr {
     if(!info && this.symbol.match(regex))
       this.type = "type";
     return {type: this.type};
+  }
+
+  public collect(analysis: CodeAnalysis) {
+    analysis.vars.push(this);
   }
 }
 
@@ -954,14 +953,11 @@ export class TypedUnaryExpr extends TypedExpr {
     return resultType;
   }
 
-  public collect() {
-    let diagnostics: Diagnostic[] = [];
+  public collect(analysis: CodeAnalysis) {
     if(this.error)
-      diagnostics.push(new Diagnostic(this.start, this.end, this.error));
+      analysis.diagnostics.push(new Diagnostic(this.start, this.end, this.error));
     if(this.warning)
-      diagnostics.push(new Diagnostic(this.start, this.end, this.warning, false));
-    for(const d of this.value.collect())
-      diagnostics.push(d);
-    return diagnostics;
+      analysis.diagnostics.push(new Diagnostic(this.start, this.end, this.warning, false));
+    this.value.collect(analysis);
   }
 }

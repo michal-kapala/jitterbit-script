@@ -18,6 +18,7 @@ import {
 } from "../frontend/ast";
 import TypeEnv from "./environment";
 import {
+  CodeAnalysis,
   TypedArrayLiteral,
   TypedAssignment,
   TypedBinaryExpr,
@@ -104,30 +105,24 @@ export default class Typechecker {
         expr.error = `Local variable '${(expr as TypedIdentifier).symbol}' hasn't been initialized.`
       }
     }
-    for(const d of this.collectDiagnostics(typedAst))
-      diagnostics.push(d);
-    return {ast: typedAst, diagnostics};
+    const analysis = {
+      ast: typedAst,
+      diagnostics,
+      vars: [],
+      callees: []
+    } as CodeAnalysis;
+    return this.collect(typedAst, analysis);
   }
 
   /**
-   * Creates a diagnostic list out of type-checked AST.
+   * Populates diagnostics and identifier type information lists.
    * @param ast 
+   * @param analysis 
    * @returns 
    */
-  static collectDiagnostics(ast: TypedExpr[]) {
-    const diagnostics: Diagnostic[] = [];
-    for(const expr of ast) {
-      for(const d of expr.collect())
-        diagnostics.push(d);
-    }
-    return diagnostics;
+  static collect(ast: TypedExpr[], analysis: CodeAnalysis) {
+    for(const expr of ast)
+      expr.collect(analysis);
+    return analysis;
   }
 }
-
-/**
- * The result of the code's static analysis.
- */
-type CodeAnalysis = {
-  ast: TypedExpr[],
-  diagnostics: Diagnostic[];
-};

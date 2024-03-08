@@ -28,6 +28,8 @@ async function run(filename: string) {
         const result = Typechecker.analyze(program, diagnostics);
         console.log(JSON.stringify(result.ast));
         console.log(result.diagnostics);
+        console.log(result.vars);
+        console.log(result.callees);
       }
     } catch(e) {
       console.error(e);
