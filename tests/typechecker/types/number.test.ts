@@ -552,14 +552,14 @@ describe('Number inference', function() {
       expect(result.warning).toBeDefined();
     });
 
-    test('number || array', function() {
-      const result = NumberType.binop("||", "array");
+    test('number || dictionary', function() {
+      const result = NumberType.binop("||", "dictionary");
       expect(result.type).toStrictEqual("bool");
       expect(result.warning).toBeDefined();
     });
 
-    test('number | array', function() {
-      const result = NumberType.binop("|", "array");
+    test('number | dictionary', function() {
+      const result = NumberType.binop("|", "dictionary");
       expect(result.type).toStrictEqual("bool");
       expect(result.warning).toBeDefined();
     });
