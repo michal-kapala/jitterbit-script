@@ -202,7 +202,7 @@ describe('String inference', function() {
       expect(result.warning).toBeDefined();
     });
 
-    test('number | string', function() {
+    test('string | string', function() {
       const result = StringType.binop("|", "string");
       expect(result.type).toStrictEqual("bool");
       expect(result.warning).toBeDefined();
@@ -400,85 +400,85 @@ describe('String inference', function() {
       expect(result.warning).toBeDefined();
     });
 
-    test('number - array', function() {
+    test('string - array', function() {
       const result = StringType.binop("-", "array");
       expect(result.type).toStrictEqual("array");
       expect(result.warning).toBeDefined();
     });
 
-    test('number * array', function() {
+    test('string * array', function() {
       const result = StringType.binop("*", "array");
       expect(result.type).toStrictEqual("array");
       expect(result.warning).toBeDefined();
     });
 
-    test('number / array', function() {
+    test('string / array', function() {
       const result = StringType.binop("/", "array");
       expect(result.type).toStrictEqual("array");
       expect(result.warning).toBeDefined();
     });
 
-    test('number ^ array', function() {
+    test('string ^ array', function() {
       const result = StringType.binop("^", "array");
       expect(result.type).toStrictEqual("array");
       expect(result.warning).toBeDefined();
     });
 
-    test('number > array', function() {
+    test('string > array', function() {
       const result = StringType.binop(">", "array");
       expect(result.type).toStrictEqual("array");
       expect(result.warning).toBeDefined();
     });
 
-    test('number < array', function() {
+    test('string < array', function() {
       const result = StringType.binop("<", "array");
       expect(result.type).toStrictEqual("array");
       expect(result.warning).toBeDefined();
     });
 
-    test('number >= array', function() {
+    test('string >= array', function() {
       const result = StringType.binop(">=", "array");
       expect(result.type).toStrictEqual("array");
       expect(result.warning).toBeDefined();
     });
 
-    test('number <= array', function() {
+    test('string <= array', function() {
       const result = StringType.binop("<=", "array");
       expect(result.type).toStrictEqual("array");
       expect(result.warning).toBeDefined();
     });
 
-    test('number == array', function() {
+    test('string == array', function() {
       const result = StringType.binop("==", "array");
       expect(result.type).toStrictEqual("array");
       expect(result.warning).toBeDefined();
     });
 
-    test('number != array', function() {
+    test('string != array', function() {
       const result = StringType.binop("!=", "array");
       expect(result.type).toStrictEqual("array");
       expect(result.warning).toBeDefined();
     });
 
-    test('number && array', function() {
+    test('string && array', function() {
       const result = StringType.binop("&&", "array");
       expect(result.type).toStrictEqual("bool");
       expect(result.warning).toBeDefined();
     });
 
-    test('number & array', function() {
+    test('string & array', function() {
       const result = StringType.binop("&", "array");
       expect(result.type).toStrictEqual("bool");
       expect(result.warning).toBeDefined();
     });
 
-    test('number || array', function() {
+    test('string || array', function() {
       const result = StringType.binop("||", "array");
       expect(result.type).toStrictEqual("bool");
       expect(result.warning).toBeDefined();
     });
 
-    test('number | array', function() {
+    test('string | array', function() {
       const result = StringType.binop("|", "array");
       expect(result.type).toStrictEqual("bool");
       expect(result.warning).toBeDefined();
