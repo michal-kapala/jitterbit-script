@@ -3670,7 +3670,7 @@ export class DateType {
       case "+":
       case "-":
         return {
-          type: "null",
+          type: "date",
           warning: `Cross-type operation of date ${operator} null, the date is returned unchanged.`
         };
       case "*":
