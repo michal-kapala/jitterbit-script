@@ -860,6 +860,8 @@ export class TypedGlobalIdentifier extends TypedIdentifier {
         let type = sysVar.dataType.toLowerCase();
         if(type === "integer")
           type = "number";
+        else if(type === "boolean")
+          type = "bool";
         info = {type: type as ValueType};
         this.setTypeInfo(info);
         env.set(this.symbol, info);
