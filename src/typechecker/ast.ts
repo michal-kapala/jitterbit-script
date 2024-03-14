@@ -813,6 +813,10 @@ export class TypedIdentifier extends TypedExpr {
   }
 
   public collect(analysis: CodeAnalysis) {
+    if(this.error)
+      analysis.diagnostics.push(new Diagnostic(this.start, this.end, this.error));
+    if(this.warning)
+      analysis.diagnostics.push(new Diagnostic(this.start, this.end, this.warning, false));
     analysis.vars.push(this);
   }
 }

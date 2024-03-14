@@ -45,7 +45,6 @@ export class TcError extends Error {
    * Warning message for call expr argument type validation.
    * @param param 
    * @param argType 
-   * @param paramType 
    * @returns 
    */
   static makeArgTypeWarn(param: Parameter, argType: StaticTypeName) {
@@ -54,9 +53,8 @@ export class TcError extends Error {
 
   /**
    * Error message for call expr argument type validation.
-   * @param paramName 
+   * @param param 
    * @param argType 
-   * @param paramType 
    * @returns 
    */
   static makeArgTypeError(param: Parameter, argType: StaticTypeName) {

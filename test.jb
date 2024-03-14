@@ -1,8 +1,1 @@
-<trans>
-  // test for call expression inference and error handling
-  x = 1;
-  If(true,
-    true(x,
-    "nice"; false
-  );
-</trans>
+<trans>arr = GetSourceInstanceElementArray($a)</trans>
