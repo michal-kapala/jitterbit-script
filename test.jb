@@ -1,1 +1,1 @@
-<trans>data = WriteCache(name = "someData", value = "value", expSec = 30000, scope = "project")</trans>
+<trans>int = Int(dict = Dict());</trans>
