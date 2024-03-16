@@ -3,7 +3,7 @@ import { JbDictionary, JbBool, JbArray, JbString } from "../../runtime/types";
 import { Func, Parameter, Signature } from "../types";
 import Scope from "../../runtime/scope";
 import { RuntimeError, UnimplementedError } from "../../errors";
-import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import { TypedExpr, TypedIdentifier, TypeInfo } from "../../typechecker/ast";
 import TypeEnv from "../../typechecker/environment";
 
 /**
@@ -66,9 +66,13 @@ export class AddToDict extends Func {
     // key
     info = args[argIdx].typeExpr(env);
     if(info.type === "null")
-      args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+      args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
     // arg
-    info = args[argIdx].typeExpr(env);
+    info = args[++argIdx].typeExpr(env);
+    if(info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
     return {type: this.signature.returnType};
   }
 }

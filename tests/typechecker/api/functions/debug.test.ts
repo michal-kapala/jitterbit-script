@@ -3,7 +3,7 @@ import { typecheck } from '../../../utils';
 
 describe('Debug functions', function() {
   test('DebugBreak()', function() {
-    const script = `<trans>tz = DebugBreak()</trans>`;
+    const script = `<trans>result = DebugBreak()</trans>`;
     const result = typecheck(script);
     expect(result.vars[0].type).toStrictEqual("bool");
     expect(result.diagnostics.length).toStrictEqual(0);

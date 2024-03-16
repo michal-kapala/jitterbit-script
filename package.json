@@ -1,5 +1,5 @@
 {
-  "name": "jitterbit-interpreter",
+  "name": "jitterbit-script",
   "version": "0.1.1",
   "description": "Static typechecker and interpreter for Jitterbit Script",
   "main": "index.js",
