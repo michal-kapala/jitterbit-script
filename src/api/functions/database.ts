@@ -2,7 +2,7 @@ import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbBool } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
-import { TypedExpr, TypeInfo } from "../../typechecker/ast";
+import { TypedExpr, TypedIdentifier, TypeInfo } from "../../typechecker/ast";
 import TypeEnv from "../../typechecker/environment";
 import { AsyncFunc, Func, Parameter, Signature } from "../types";
 
@@ -259,23 +259,28 @@ export class DBExecute extends AsyncFunc {
 
   analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
     let argIdx = 0;
+    const sigIdx = args.length > 2 ? 1 : 0;
     // databaseId
     let info = args[argIdx].typeExpr(env);
-    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    args[argIdx].checkReqArg(this.signatures[sigIdx].params[argIdx++], info.type);
     // sql
     info = args[argIdx].typeExpr(env);
-    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
+    args[argIdx].checkReqArg(this.signatures[sigIdx].params[argIdx], info.type);
 
     if(args.length === 2)
-      return {type: this.signatures[0].returnType};
+      return {type: this.signatures[sigIdx].returnType};
 
     // outputVariable
-    for(argIdx; argIdx < args.length; argIdx++) {
+    for(argIdx = 2; argIdx < args.length; argIdx++) {
       info = args[argIdx].typeExpr(env);
-      if(args[argIdx].kind !== "GlobalIdentifier" && info.type !== "string")
-        args[argIdx].warning = `Argument '${this.signatures[1].params[2]}' should be a global variable or a string with the name of a global variable.`;
+      if(info.type === "unassigned") {
+        args[argIdx].type = "error";
+        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+      }
+      else if(args[argIdx].kind !== "GlobalIdentifier" && info.type !== "string")
+        args[argIdx].warning = `Argument '${this.signatures[sigIdx].params[2].name + (argIdx - 1)}' should be a global variable or a string with the name of a global variable.`;
     }
-    return {type: this.signatures[1].returnType};
+    return {type: this.signatures[sigIdx].returnType};
   }
 }
 

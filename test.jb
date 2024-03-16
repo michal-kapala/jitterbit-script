@@ -1,1 +1,1 @@
-<trans>int = Int(dict = Dict());</trans>
+<trans>rows = DBExecute(db = "some db", sql = "select * from users", true)</trans>
