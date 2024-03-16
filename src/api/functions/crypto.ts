@@ -346,7 +346,7 @@ export class MD5 extends Func {
     const argIdx = 0;
     const info = args[argIdx].typeExpr(env);
     if(info.type !== "string")
-      args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+      args[argIdx].checkOptArg(new Parameter("string", this.signature.params[argIdx].name), info.type);
     return {type: this.signature.returnType};
   }
 }
@@ -385,7 +385,7 @@ export class MD5AsTwoNumbers extends Func {
   analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
     const argIdx = 0;
     const info = args[argIdx].typeExpr(env);
-    args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    args[argIdx].checkOptArg(new Parameter("string", this.signature.params[argIdx].name), info.type);
     return {type: this.signature.returnType};
   }
 }
@@ -427,7 +427,7 @@ export class SHA256 extends Func {
     const argIdx = 0;
     const info = args[argIdx].typeExpr(env);
     if(info.type !== "string")
-      args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+      args[argIdx].checkOptArg(new Parameter("string", this.signature.params[argIdx].name), info.type);
     return {type: this.signature.returnType};
   }
 }
