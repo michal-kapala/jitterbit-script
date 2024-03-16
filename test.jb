@@ -1,1 +1,1 @@
-<trans>rows = DBExecute(db = "some db", sql = "select * from users", true)</trans>
+<trans>d = DayOfMonth(part="dd", n=123, date=Now())</trans>

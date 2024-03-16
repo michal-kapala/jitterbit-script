@@ -251,13 +251,16 @@ export class If extends DeferrableFunc {
       args[argIdx].type = "error";
       args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
     }
-    if(args.length > 2) {
-      // falseResult
-      info = args[++argIdx].typeExpr(env);
-      if(info.type === "unassigned") {
-        args[argIdx].type = "error";
-        args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
-      }
+
+    // single-branch inference
+    if(args.length === 2)
+      return {type: info.type !== "error" ? info.type : "unknown"};
+
+    // falseResult
+    info = args[++argIdx].typeExpr(env);
+    if(info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
     }
     return {type: this.signature.returnType};
   }
