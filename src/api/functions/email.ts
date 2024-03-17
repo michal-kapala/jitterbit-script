@@ -196,10 +196,10 @@ export class SendSystemEmail extends AsyncFunc {
     let argIdx = 0;
     // to
     let info = args[argIdx].typeExpr(env);
-    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
     // subject
     info = args[argIdx].typeExpr(env);
-    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
     // message
     info = args[argIdx].typeExpr(env);
     args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
