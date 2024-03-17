@@ -640,6 +640,12 @@ export class TypedMemberExpr extends TypedExpr {
   }
 
   public typeExpr(env: TypeEnv) {
+    let explicitGlobal = true;
+    if(this.object.kind === "GlobalIdentifier") {
+      const global = this.object as TypedGlobalIdentifier;
+      if(global.globalKind === "global" && !env.lookup(global.symbol))
+        explicitGlobal = false;
+    }
     const idInfo = this.object.typeExpr(env);
     const keyInfo = this.key.typeExpr(env);
 
@@ -660,6 +666,10 @@ export class TypedMemberExpr extends TypedExpr {
       this.key.error = `Local variable '${(this.key as TypedIdentifier).symbol}' hasn't been initialized.`;
       this.type = "unknown";
     }
+
+    // ignore the type of unassigned global variables
+    if(!explicitGlobal)
+      idInfo.type = "unknown";
 
     if(idInfo.type === "unassigned" || keyInfo.type === "unassigned")
       return {type: this.type} as TypeInfo;

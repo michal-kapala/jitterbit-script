@@ -1,1 +1,1 @@
-<trans>value = RemoveKey(dict=if(true,true,false), key=Null())</trans>
+<trans>void = RaiseError($msg[1]="whoopsie")</trans>
