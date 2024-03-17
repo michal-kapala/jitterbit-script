@@ -148,8 +148,8 @@ export class DiffKeyList extends Func {
       info = args[argIdx].typeExpr(env);
       args[argIdx].checkOptArg(
         {
-          ...this.signature.params[argIdx],
-          name: this.signature.params[argIdx].name + argIdx
+          ...this.signature.params[1],
+          name: this.signature.params[1].name + argIdx
         },
         info.type
       );
@@ -301,7 +301,6 @@ export class OrderedDiffKeyList extends Func {
       ])
     ];
     this.signature = this.signatures[0];
-    // TODO: the type checker should validate arg parity
     this.minArgs = 2;
     this.maxArgs = 100;
   }
