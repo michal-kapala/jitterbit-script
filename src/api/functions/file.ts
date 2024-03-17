@@ -462,7 +462,7 @@ export class FlushFile extends AsyncFunc {
     args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
     // filename
     if(args.length > 1) {
-      info = args[argIdx].typeExpr(env);
+      info = args[++argIdx].typeExpr(env);
       args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
     }
     return {type: this.signature.returnType};
@@ -533,7 +533,7 @@ export class ReadFile extends AsyncFunc {
     args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
     // fileFilter
     if(args.length > 1) {
-      info = args[argIdx].typeExpr(env);
+      info = args[++argIdx].typeExpr(env);
       args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
     }
     return {type: this.signature.returnType};

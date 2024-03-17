@@ -1,1 +1,1 @@
-<trans>void = RaiseError($msg[1]="whoopsie")</trans>
+<trans>void = ArchiveFile(src="srcId", target=$targets[1], delSrc=1)</trans>
