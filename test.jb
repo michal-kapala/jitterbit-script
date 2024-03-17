@@ -1,1 +1,1 @@
-<trans>void = ArchiveFile(src="srcId", target=$targets[1], delSrc=1)</trans>
+<trans>value = RemoveKey(dict=if(true,true,false), key=Null())</trans>

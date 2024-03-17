@@ -147,10 +147,11 @@ describe('Dictionary functions', function() {
       const script = `<trans>value = RemoveKey(dict=if(true,true,false), key=Null())</trans>`;
       const result = typecheck(script);
       expect(result.vars[0].type).toStrictEqual("bool");
-      expect(result.vars[1].type).toStrictEqual("type");
+      expect(result.vars[1].type).toStrictEqual("bool");
       expect(result.vars[2].type).toStrictEqual("null");
-      expect(result.diagnostics.length).toStrictEqual(1);
-      expect(result.diagnostics[0].error).toStrictEqual(false);
+      expect(result.diagnostics.length).toStrictEqual(2);
+      expect(result.diagnostics[0].error).toStrictEqual(true);
+      expect(result.diagnostics[1].error).toStrictEqual(false);
     });
   });
 });

@@ -304,11 +304,11 @@ export class Get extends Func {
     this.name = "Get";
     this.module = "general";
     this.signatures = [
-      new Signature("string", [
+      new Signature("type", [
         new Parameter("string", "name"),
         new Parameter("number", "index", false)
       ]),
-      new Signature("string", [
+      new Signature("type", [
         new Parameter("array", "name"),
         new Parameter("number", "index", false)
       ]),
@@ -927,7 +927,7 @@ export class InitCounter extends Func {
     if(info.type !== "string" && args[argIdx].kind !== "GlobalIdentifier" && info.type !== "error") {
       result.type = "error";
       result.warning = undefined;
-      result.error = `The argument '${this.signature.params[argIdx]}' is required to be a global variable name or reference.`
+      result.error = `The argument '${this.signature.params[argIdx].name}' is required to be a global variable name or reference.`
     }
 
     // references infer the number type
@@ -1376,9 +1376,8 @@ export class ReadArrayString extends Func {
     let argIdx = 0;
     // arrayString
     let info = args[argIdx].typeExpr(env);
-    if(info.type === "array") {
+    if(info.type === "array")
       args[argIdx].warning = `The argument '${this.signature.params[argIdx].name}' already is an array.`;
-    }
     else
       args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
     // type

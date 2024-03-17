@@ -259,6 +259,10 @@ export class If extends DeferrableFunc {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
       }
+
+      // narrow return type if both branches have the same type
+      if(args[1].type === args[argIdx].type && args[argIdx].type !== "error")
+        return {type: args[argIdx].type};
     }
     return {type: this.signature.returnType};
   }
