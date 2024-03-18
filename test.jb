@@ -1,1 +1,1 @@
-<trans>value = RemoveKey(dict=if(true,true,false), key=Null())</trans>
+<trans>result = SumString(de="something", delim=";", omit=true)</trans>

@@ -2,7 +2,7 @@ import { UnimplementedError } from "../../errors";
 import Scope from "../../runtime/scope";
 import { JbBool, JbString } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";
-import { TypedExpr, TypedIdentifier, TypeInfo } from "../../typechecker/ast";
+import { TypedArrayLiteral, TypedExpr, TypedIdentifier, TypeInfo } from "../../typechecker/ast";
 import TypeEnv from "../../typechecker/environment";
 import { Func, Parameter, Signature } from "../types";
 
@@ -357,8 +357,8 @@ export class Max extends Func {
     this.name = "Max";
     this.module = "instance";
     this.signatures = [
-      new Signature("number", [new Parameter("node", "de")]),
-      new Signature("number", [new Parameter("array", "arr")])
+      new Signature("type", [new Parameter("node", "de")]),
+      new Signature("type", [new Parameter("array", "arr")])
     ];
     this.minArgs = 1;
     this.maxArgs = 1;
@@ -394,6 +394,25 @@ export class Max extends Func {
       default:
         args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' is ${info.type}, should be node or array.`;
         break;
+    }
+
+    // array literal inference
+    if(args[argIdx].kind === "ArrayLiteral") {
+      const arr = args[argIdx] as TypedArrayLiteral;
+      if(arr.members.length === 0)
+        return {type: "null"};
+      const arrType = arr.members[0].type;
+      for(const elem of arr.members) {
+        if(
+          elem.type !== arrType && elem.type !== "error" &&
+          elem.type !== "unknown" && elem.type !== "type"
+        ) {
+          elem.error = `The array contains element(s) of type '${elem.type}', expected '${arrType}'.`;
+          elem.type = "error";
+          return {type: this.signatures[sigIdx].returnType};
+        }
+      }
+      return {type: arrType};
     }
     return {type: this.signatures[sigIdx].returnType};
   }
@@ -413,8 +432,8 @@ export class Min extends Func {
     this.name = "Min";
     this.module = "instance";
     this.signatures = [
-      new Signature("number", [new Parameter("node", "de")]),
-      new Signature("number", [new Parameter("array", "arr")])
+      new Signature("type", [new Parameter("node", "de")]),
+      new Signature("type", [new Parameter("array", "arr")])
     ];
     this.minArgs = 1;
     this.maxArgs = 1;
@@ -451,6 +470,25 @@ export class Min extends Func {
         args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' is ${info.type}, should be node or array.`;
         break;
     }
+
+    // array literal inference
+    if(args[argIdx].kind === "ArrayLiteral") {
+      const arr = args[argIdx] as TypedArrayLiteral;
+      if(arr.members.length === 0)
+        return {type: "null"};
+      const arrType = arr.members[0].type;
+      for(const elem of arr.members) {
+        if(
+          elem.type !== arrType && elem.type !== "error" &&
+          elem.type !== "unknown" && elem.type !== "type"
+        ) {
+          elem.error = `Element of type '${elem.type}', expected '${arrType}'.`;
+          elem.type = "error";
+          return {type: this.signatures[sigIdx].returnType};
+        }
+      }
+      return {type: arrType};
+    }
     return {type: this.signatures[sigIdx].returnType};
   }
 }
@@ -468,8 +506,8 @@ export class ResolveOneOf extends Func {
     this.name = "ResolveOneOf";
     this.module = "instance";
     this.signatures = [
-      new Signature("number", [new Parameter("node", "de")]),
-      new Signature("number", [new Parameter("array", "arr")])
+      new Signature("type", [new Parameter("node", "de")]),
+      new Signature("type", [new Parameter("array", "arr")])
     ];
     this.minArgs = 1;
     this.maxArgs = 1;
@@ -505,6 +543,18 @@ export class ResolveOneOf extends Func {
       default:
         args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' is ${info.type}, should be node or array.`;
         break;
+    }
+
+    // array literal inference
+    if(args[argIdx].kind === "ArrayLiteral") {
+      const arr = args[argIdx] as TypedArrayLiteral;
+      if(arr.members.length === 0)
+        return {type: "null"};
+      for(const elem of arr.members) {
+        if(elem.type !== "error" && elem.type !== "unknown" && elem.type !== "null")
+          return {type: elem.type};
+      }
+      return {type: "null"};
     }
     return {type: this.signatures[sigIdx].returnType};
   }
@@ -722,6 +772,24 @@ export class Sum extends Func {
         args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' is ${info.type}, should be node or array; a null value is returned.`;
         return {type: "null"};
     }
+
+    // array literal inference
+    if(args[argIdx].kind === "ArrayLiteral") {
+      const arr = args[argIdx] as TypedArrayLiteral;
+      if(arr.members.length === 0)
+        return {type: "null"};
+      const arrType = arr.members[0].type;
+      for(const elem of arr.members) {
+        if(
+          elem.type !== arrType && elem.type !== "error" &&
+          elem.type !== "unknown" && elem.type !== "type"
+        ) {
+          elem.error = `Element of type '${elem.type}', expected '${arrType}'.`;
+          elem.type = "error";
+        }
+      }
+      return {type: arrType};
+    }
     return {type: this.signatures[sigIdx].returnType};
   }
 }
@@ -831,6 +899,7 @@ export class SumString extends Func {
     let sigIdx = 0;
     // de/arr
     let info = args[argIdx].typeExpr(env);
+    let retNull: TypeInfo | undefined;
     switch(info.type) {
       case "node":
         break;
@@ -847,7 +916,7 @@ export class SumString extends Func {
         break;
       default:
         args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' is ${info.type}, should be node or array; a null value is returned.`;
-        return {type: "null"};
+        retNull = {type: "null"};
     }
 
     if(args.length > 1) {
@@ -859,7 +928,9 @@ export class SumString extends Func {
         info = args[++argIdx].typeExpr(env);
         args[argIdx].checkOptArg(this.signatures[sigIdx].params[argIdx], info.type);
       }
-    } 
+    }
+    if(retNull)
+      return retNull;
     return {type: this.signatures[sigIdx].returnType};
   }
 }
