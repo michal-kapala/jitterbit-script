@@ -447,7 +447,7 @@ export class LDAPSearch extends AsyncFunc {
     this.name = "LDAPSearch";
     this.module = "ldap";
     this.signatures = [
-      new Signature("bool", [
+      new Signature("string", [
         new Parameter("string", "path"),
         new Parameter("string", "filter"),
         new Parameter("number", "detail"),
