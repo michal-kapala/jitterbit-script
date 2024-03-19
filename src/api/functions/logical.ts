@@ -73,7 +73,7 @@ export class Case extends DeferrableFunc {
       for(argIdx = 2; argIdx < args.length; argIdx++) {
         // bN
         info = args[argIdx].typeExpr(env);
-        args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+        args[argIdx].checkOptArg(this.signature.params[2], info.type);
         // odd nb of arguments
         if(++argIdx === args.length) {
           if(args[argIdx - 1].type !== "error")

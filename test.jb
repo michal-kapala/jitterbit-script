@@ -1,1 +1,1 @@
-<trans>result = SumString(de="something", delim=";", omit=true)</trans>
+<trans>i=0; result = While(cond=i, log;);</trans>

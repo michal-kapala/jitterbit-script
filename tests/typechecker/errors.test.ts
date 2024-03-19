@@ -29,4 +29,24 @@ describe('Error handling', function() {
       )
     );
   });
+
+  test('Backtick outside the script scope.', function() {
+    const script = `<trans>
+msg = Case(
+  $condition == true, x=1,
+  $condition == false, x=0; y=Null(),
+  true, x=-1;
+);
+</trans>\``;
+    const result = typecheck(script);
+    expect(result.diagnostics.length).toStrictEqual(4);
+    // unknown token
+    expect(result.diagnostics[0].error).toStrictEqual(true);
+    // cross-type comparison
+    expect(result.diagnostics[1].error).toStrictEqual(false);
+    // global variable without assignment
+    expect(result.diagnostics[2].error).toStrictEqual(false);
+    // cross-type comparison
+    expect(result.diagnostics[3].error).toStrictEqual(false);
+  })
 });
