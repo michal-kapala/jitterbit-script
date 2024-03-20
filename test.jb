@@ -1,1 +1,1 @@
-<trans>i=0; result = While(cond=i, log;);</trans>
+<trans>node = SelectNodeFromXMLAny(name="false", nodes="")</trans>

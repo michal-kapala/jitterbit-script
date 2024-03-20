@@ -145,8 +145,7 @@ export class GetNodeName extends Func {
     this.module = "xml";
     this.signatures = [
       new Signature("string", [
-        // the type from the docs is wrong
-        new Parameter("string", "path")
+        new Parameter("type", "path")
       ])
     ];
     this.signature = this.signatures[0];
@@ -166,7 +165,10 @@ export class GetNodeName extends Func {
   analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
     const argIdx = 0;
     const info = args[argIdx].typeExpr(env);
-    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    if(info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
     return {type: this.signature.returnType};
   }
 }
@@ -191,8 +193,7 @@ export class GetNodeValue extends Func {
     this.module = "xml";
     this.signatures = [
       new Signature("string", [
-        // the type from the docs is wrong
-        new Parameter("string", "path")
+        new Parameter("type", "path")
       ])
     ];
     this.signature = this.signatures[0];
@@ -212,7 +213,10 @@ export class GetNodeValue extends Func {
   analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
     const argIdx = 0;
     const info = args[argIdx].typeExpr(env);
-    args[argIdx].checkReqArg(this.signature.params[argIdx], info.type);
+    if(info.type === "unassigned") {
+      args[argIdx].type = "error";
+      args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
+    }
     return {type: this.signature.returnType};
   }
 }
