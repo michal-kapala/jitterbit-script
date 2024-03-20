@@ -784,8 +784,8 @@ export class RegExMatch extends Func {
         info = args[argIdx].typeExpr(env);
         args[argIdx].checkReqArg(
           {
-            ...this.signature.params[argIdx],
-            name: this.signature.params[argIdx].name + (argIdx - 1)
+            ...this.signature.params[2],
+            name: this.signature.params[2].name + (argIdx - 1)
           },
           info.type
         );
@@ -1180,7 +1180,7 @@ export class RTrimChars extends Func {
     let argIdx = 0;
     // str
     let info = args[argIdx].typeExpr(env);
-    args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
+    args[argIdx].checkOptArg(this.signature.params[argIdx++], info.type);
     // trimChars
     info = args[argIdx].typeExpr(env);
     args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
