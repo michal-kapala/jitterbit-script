@@ -1,1 +1,1 @@
-<trans>node = SelectNodeFromXMLAny(name="false", nodes="")</trans>
+<trans>a=Dict(); a["1"] = 3;</trans>

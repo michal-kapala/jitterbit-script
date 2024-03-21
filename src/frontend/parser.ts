@@ -136,11 +136,15 @@ export default class Parser {
 
   /**
    * Validates the script's scope and removes the `trans` tag tokens.
+   * 
+   * Returns `true` on a script scope error.
    * @param diagnostics 
+   * @returns
    * @throws `ParserError` (runtime-only)
    */
-  private removeScopeTags(diagnostics?: Diagnostic[]) {
+  private removeScopeTags(diagnostics?: Diagnostic[]): boolean {
     // find the evaluation scope - <trans>...</trans>
+    let result = false;
     let openIdx: number | null = null;
     let closeIdx: number | null = null;
     [openIdx, closeIdx] = this.findScopeTags();
@@ -151,7 +155,8 @@ export default class Parser {
       // static analysis / runtime
       if(diagnostics) {
         const pos = new Position(1, 1);
-        diagnostics.push(new Diagnostic(pos, pos, msg, false));
+        diagnostics.push(new Diagnostic(pos, pos, msg));
+        result = true;
       }
       else
         console.warn(`ParserWarning: ${msg}`);
@@ -164,6 +169,7 @@ export default class Parser {
         const start = this.tokens[this.tokens.length - 1].begin ?? new Position(1, 1);
         const end = this.tokens[this.tokens.length - 1].end ?? start;
         diagnostics.push(new Diagnostic(start, end, msg));
+        result = true;
       }
       else
         throw new ParserError(msg);
@@ -201,6 +207,7 @@ export default class Parser {
     this.tokens.shift();
     const last = this.tokens.pop() as Token;
     this.tokens.push(new Token("EndOfFile", TokenType.EOF, last.end, last.end));
+    return result;
   }
 
   /**
@@ -218,7 +225,11 @@ export default class Parser {
       console.error(e);
       return program;
     }
-    this.removeScopeTags(diagnostics);
+    const scopeError = this.removeScopeTags(diagnostics);
+    // missing script tags
+    if(scopeError)
+      return program;
+
     this.checkAdjacentLiterals(diagnostics);
     // Parse until end of file
     while (this.not_eof()) {
@@ -227,8 +238,12 @@ export default class Parser {
       program.body.push(expr);
       // top-level statement/expression semicolon
       // the last expression can have the semicolon dropped
-      if(this.not_eof())
-        this.expect(TokenType.Semicolon, "Expected semicolon before:", expr.start, expr.end, diagnostics);
+      if(this.not_eof()) {
+        // array literal/call error handling
+        // TODO: to be extended
+        if(this.at().type !== TokenType.Comma)
+          this.expect(TokenType.Semicolon, "Expected ';' at the expression's end.", expr.start, expr.end, diagnostics);
+      }
     }
     return program;
   }
@@ -458,7 +473,7 @@ export default class Parser {
       const key = this.parseExpr(diagnostics);
       const rBracketPos = this.expect(
         TokenType.CloseBracket,
-        "Missing closing bracket in computed value.",
+        "Expected ']'.",
         expr.start,
         key.end,
         diagnostics
@@ -514,7 +529,7 @@ export default class Parser {
 
     const lParenPos = this.expect(
       TokenType.OpenParen,
-      "Expected open parenthesis for the call expression.",
+      "Expected '(' for the call expression.",
       caller.start,
       caller.end,
       diagnostics
@@ -523,7 +538,7 @@ export default class Parser {
     const endPos = args.length > 0 ? args[args.length - 1].end : lParenPos;
     const rParenPos = this.expect(
       TokenType.CloseParen,
-      "Missing closing parenthesis of the call expression.",
+      "Expected ')' at the call expression's end.",
       caller.start,
       endPos,
       diagnostics
@@ -613,7 +628,7 @@ export default class Parser {
         const value = this.parseExpr();
         this.expect(
           TokenType.CloseParen,
-          "Expected closing parenthesis for grouping expression.",
+          "Expected ')' at the grouping expression's end.",
           lParen.begin,
           value.end,
           diagnostics
@@ -622,7 +637,7 @@ export default class Parser {
       case TokenType.CloseParen:
         // consume the token to prevent infinite loops
         const tkn = this.consume();
-        const parenErr = "Syntax error, misplaced operator ')'.";
+        const parenErr = "Unexpected ')'.";
         // static analysis / runtime
         if(diagnostics)
           return new InvalidExpr(tkn.value, parenErr, tkn.begin, tkn.end);
