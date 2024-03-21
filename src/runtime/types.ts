@@ -534,7 +534,7 @@ export class JbDictionary implements DictVal {
     if(this.members.size !== dict.members.size)
       return false;
 
-    for (let [key, val] of this.members) {
+    for (const [key, val] of this.members) {
       // missing key
       if(!dict.members.has(key))
         return false;
@@ -2136,7 +2136,7 @@ export class JbString implements StringVal {
   }
 
   toBool() {
-    let parseResult = parseFloat(this.value);
+    const parseResult = parseFloat(this.value);
     // POD: "T"/"t" strings are not supported
     // see: https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/conversion-functions/#description_2
     return (!Number.isNaN(parseResult) && parseResult !== 0) || this.value === "true";
@@ -2177,7 +2177,7 @@ export class JbString implements StringVal {
    * @returns 
    */
   toBoolAsNumber(): boolean {
-    let parseResult = this.toNumber();
+    const parseResult = this.toNumber();
     return (!Number.isNaN(parseResult) && parseResult !== 0) || this.value === "true";
   }
 
@@ -2192,8 +2192,8 @@ export class JbString implements StringVal {
    * @returns 
    */
   compareWithBool(operator: string, boolVal: JbBool): boolean {
-    let strIntVal = this.toNumber();
-    let boolIntVal = boolVal.toNumber();
+    const strIntVal = this.toNumber();
+    const boolIntVal = boolVal.toNumber();
 
     switch(operator) {
       case "<":

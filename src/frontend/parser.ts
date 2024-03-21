@@ -309,7 +309,7 @@ export default class Parser {
   private parseAssign(diagnostics?: Diagnostic[]): Expr {
     const left = this.parseLogical(diagnostics);
     if(this.at().type == TokenType.Assignment) {
-      let operator = this.consume();
+      const operator = this.consume();
       const value = this.parseAssign(diagnostics);
       return new AssignmentExpr(left, value, operator);
     }
@@ -391,7 +391,7 @@ export default class Parser {
     // LHS unary operator expr
     // for some reason Jitterbit dont parse this with other unary expressions
     if(this.at().type === TokenType.UnaryOperator && this.at().value === "!") {
-      let operator = this.consume();
+      const operator = this.consume();
       return new UnaryExpr(this.parseAssign(diagnostics), operator, true);
     } else {
       return this.parsePower(diagnostics);
@@ -455,7 +455,7 @@ export default class Parser {
       // [
       this.consume();
       // this allows obj[computedValue]
-      let key = this.parseExpr(diagnostics);
+      const key = this.parseExpr(diagnostics);
       const rBracketPos = this.expect(
         TokenType.CloseBracket,
         "Missing closing bracket in computed value.",
@@ -555,7 +555,7 @@ export default class Parser {
       case TokenType.Identifier:
         return new Identifier(this.consume());
       case TokenType.GlobalIdentifier:
-        let globalVar = this.consume();
+        const globalVar = this.consume();
         // if the name is '$' then the var acts as an untracked global var
         // i.e. it doesnt appear in the debugger
         if(globalVar.value === "$") {
@@ -570,7 +570,7 @@ export default class Parser {
           else
             console.warn(`ParserWarning: ${warn}`);
         }
-        let sysVar = Api.getSysVar(globalVar.value);
+        const sysVar = Api.getSysVar(globalVar.value);
         if(sysVar !== undefined)
           return new GlobalIdentifier(globalVar, "system");
         else {

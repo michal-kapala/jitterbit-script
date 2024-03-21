@@ -1257,7 +1257,7 @@ describe('JbArray cross-type interactions', function() {
     const arr = new JbArray([value]);
     const key = new JbDictionary();
     expect(function() {
-      arr.set(key.toNumber(), newValue);;
+      arr.set(key.toNumber(), newValue);
       return arr.get(key);
     }).toThrow();
   });

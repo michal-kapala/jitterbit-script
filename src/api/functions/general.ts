@@ -444,11 +444,7 @@ export class GetHostByIP extends AsyncFunc {
       throw new RuntimeError(`'${(args[0] as JbString).value}' is not a valid IP address.`);
     
     let hostnames: string[] = [];
-    try {
-      hostnames = await reverse((args[0] as JbString).value);
-    } catch (e) {
-      throw e;
-    }
+    hostnames = await reverse((args[0] as JbString).value);
     return new JbString(hostnames[0] ?? '');
   }
 

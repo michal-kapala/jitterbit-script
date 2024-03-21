@@ -48,5 +48,5 @@ msg = Case(
     expect(result.diagnostics[2].error).toStrictEqual(false);
     // cross-type comparison
     expect(result.diagnostics[3].error).toStrictEqual(false);
-  })
+  });
 });

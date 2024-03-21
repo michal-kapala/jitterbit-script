@@ -61,7 +61,7 @@ export default class Lexer {
    */
   private static isUnknown(char: string): boolean {
     // '(' returns unrecognized in JB
-    let undefinedTokens = ['`', '~', '@', '#', '$', '%', '_', ':', '?', '('];
+    const undefinedTokens = ['`', '~', '@', '#', '$', '%', '_', ':', '?', '('];
     if(undefinedTokens.includes(char) || this.isAlpha(char))
       return true;
     return false;
@@ -75,7 +75,7 @@ export default class Lexer {
   private static isUndefined(char: string): boolean {
     // '(' returns unrecognized in JB
     // <integer part>.. results in undefined too
-    let undefinedTokens = ['`', '~', '@', '#', '$', '%', '_', ':', '?', '.', '('];
+    const undefinedTokens = ['`', '~', '@', '#', '$', '%', '_', ':', '?', '.', '('];
     if(undefinedTokens.includes(char) || this.isAlpha(char))
       return true;
     return false;
@@ -106,7 +106,7 @@ export default class Lexer {
    */
   private static isGlobalVarChar(char: string): boolean {
     // allowed special characters
-    let allowed = ['`', '~', '@', '#', '$', '%', '_', ':', '.', '?'];
+    const allowed = ['`', '~', '@', '#', '$', '%', '_', ':', '.', '?'];
     return (allowed.includes(char) || this.isAlpha(char) || this.isNumber(char));
   }
 

@@ -61,7 +61,7 @@ export default class Scope {
    * @returns 
    */
   public assignVar(varName: string, value: RuntimeVal, operator = "=") {
-    let isGlobal = varName[0] === "$";
+    const isGlobal = varName[0] === "$";
     let oldValue = isGlobal
       ? this.getGlobal().variables.get(varName)
       : this.variables.get(varName);
@@ -83,7 +83,7 @@ export default class Scope {
           switch(value.type) {
             // zero-initialized
             case "number":
-              let newValue = value as JbNumber;
+              const newValue = value as JbNumber;
               newValue.value = 0 - newValue.value;
               this.getGlobal().variables.set(varName, newValue);
               return newValue;
@@ -108,7 +108,7 @@ export default class Scope {
           switch(value.type) {
             // zero-initialized
             case "number":
-              let newValue = value as JbNumber;
+              const newValue = value as JbNumber;
               newValue.value = 0 + newValue.value;
               this.getGlobal().variables.set(varName, newValue);
               return newValue;
@@ -131,7 +131,7 @@ export default class Scope {
       }
     }
 
-    let newValue = Scope.assign(oldValue ?? new JbNull(), operator, value);
+    const newValue = Scope.assign(oldValue ?? new JbNull(), operator, value);
     return this.setVar(varName, newValue);
   }
 

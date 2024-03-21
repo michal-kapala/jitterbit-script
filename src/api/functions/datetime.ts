@@ -267,7 +267,7 @@ export class DayOfMonth extends Func {
     if(args[0].type !== "string" && args[0].type !== "date")
       throw new RuntimeError(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
-    let date = JbDate.parse(args[0]);
+    const date = JbDate.parse(args[0]);
     return new JbNumber(date.value.getDate());
   }
 
@@ -279,7 +279,7 @@ export class DayOfMonth extends Func {
     const argIdx = 0;
     let sigIdx = 0;
     // d
-    let info = args[argIdx].typeExpr(env);
+    const info = args[argIdx].typeExpr(env);
     switch(info.type) {
       case "date":
       case "error":
@@ -337,7 +337,7 @@ export class DayOfWeek extends Func {
     if(args[0].type !== "string" && args[0].type !== "date")
       throw new RuntimeError(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
-    let date = JbDate.parse(args[0]);
+    const date = JbDate.parse(args[0]);
     return new JbNumber(date.value.getDay());
   }
 
@@ -349,7 +349,7 @@ export class DayOfWeek extends Func {
     const argIdx = 0;
     let sigIdx = 0;
     // d
-    let info = args[argIdx].typeExpr(env);
+    const info = args[argIdx].typeExpr(env);
     switch(info.type) {
       case "date":
       case "error":
@@ -473,7 +473,7 @@ export class GeneralDate extends Func {
     if(args[0].type !== "string" && args[0].type !== "date")
       throw new RuntimeError(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
-    let date = JbDate.parse(args[0]);
+    const date = JbDate.parse(args[0]);
 
     // "MM/DD/YYYY HH:MM:SS AM/PM"
     return new JbString(
@@ -489,7 +489,7 @@ export class GeneralDate extends Func {
     const argIdx = 0;
     let sigIdx = 0;
     // d
-    let info = args[argIdx].typeExpr(env);
+    const info = args[argIdx].typeExpr(env);
     switch(info.type) {
       case "date":
       case "error":
@@ -696,7 +696,7 @@ export class LastDayOfMonth extends Func {
     if(args[0].type !== "string" && args[0].type !== "date")
       throw new RuntimeError(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
-    let date = JbDate.parse(args[0]);
+    const date = JbDate.parse(args[0]);
 
     // local timezone-based last day of the month
     return new JbDate(
@@ -716,7 +716,7 @@ export class LastDayOfMonth extends Func {
     const argIdx = 0;
     let sigIdx = 0;
     // d
-    let info = args[argIdx].typeExpr(env);
+    const info = args[argIdx].typeExpr(env);
     switch(info.type) {
       case "date":
       case "error":
@@ -771,7 +771,7 @@ export class LongDate extends Func {
     if(args[0].type !== "string" && args[0].type !== "date")
       throw new RuntimeError(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
-    let date = JbDate.parse(args[0]);
+    const date = JbDate.parse(args[0]);
 
     // "Saturday, September 16, 2000"
     return new JbString(`${this.getWeekdayName(date.value)}, ${this.getMonthName(date.value)} ${date.value.getDate()}, ${date.value.getFullYear()}`);
@@ -849,7 +849,7 @@ export class LongDate extends Func {
     const argIdx = 0;
     let sigIdx = 0;
     // d
-    let info = args[argIdx].typeExpr(env);
+    const info = args[argIdx].typeExpr(env);
     switch(info.type) {
       case "date":
       case "error":
@@ -904,7 +904,7 @@ export class LongTime extends Func {
     if(args[0].type !== "string" && args[0].type !== "date")
       throw new RuntimeError(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
-    let date = JbDate.parse(args[0]);
+    const date = JbDate.parse(args[0]);
 
     // "HH:MM:SS AM/PM"
     // TODO: leading zero presence to be tested
@@ -919,7 +919,7 @@ export class LongTime extends Func {
     const argIdx = 0;
     let sigIdx = 0;
     // d
-    let info = args[argIdx].typeExpr(env);
+    const info = args[argIdx].typeExpr(env);
     switch(info.type) {
       case "date":
       case "error":
@@ -974,7 +974,7 @@ export class MediumDate extends Func {
     if(args[0].type !== "string" && args[0].type !== "date")
       throw new RuntimeError(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
-    let date = JbDate.parse(args[0]);
+    const date = JbDate.parse(args[0]);
 
     // "DD-Mth-YY"
     return new JbString(`${date.value.getDate().toString().padStart(2, '0')}-${this.getShortMonth(date.value.getMonth())}-${date.value.getFullYear().toString().substring(2)}`);
@@ -1019,7 +1019,7 @@ export class MediumDate extends Func {
     const argIdx = 0;
     let sigIdx = 0;
     // d
-    let info = args[argIdx].typeExpr(env);
+    const info = args[argIdx].typeExpr(env);
     switch(info.type) {
       case "date":
       case "error":
@@ -1074,7 +1074,7 @@ export class MediumTime extends Func {
     if(args[0].type !== "string" && args[0].type !== "date")
       throw new RuntimeError(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
-    let date = JbDate.parse(args[0]);
+    const date = JbDate.parse(args[0]);
 
     // "HH:MM AM/PM"
     // TODO: leading zero presence to be tested
@@ -1089,7 +1089,7 @@ export class MediumTime extends Func {
     const argIdx = 0;
     let sigIdx = 0;
     // d
-    let info = args[argIdx].typeExpr(env);
+    const info = args[argIdx].typeExpr(env);
     switch(info.type) {
       case "date":
       case "error":
@@ -1144,7 +1144,7 @@ export class MonthOfYear extends Func {
     if(args[0].type !== "string" && args[0].type !== "date")
       throw new RuntimeError(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
-    let date = JbDate.parse(args[0]);
+    const date = JbDate.parse(args[0]);
 
     // 1-12
     return new JbNumber(date.value.getMonth() + 1);
@@ -1158,7 +1158,7 @@ export class MonthOfYear extends Func {
     const argIdx = 0;
     let sigIdx = 0;
     // d
-    let info = args[argIdx].typeExpr(env);
+    const info = args[argIdx].typeExpr(env);
     switch(info.type) {
       case "date":
       case "error":
@@ -1279,7 +1279,7 @@ export class ShortDate extends Func {
     if(args[0].type !== "string" && args[0].type !== "date")
       throw new RuntimeError(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
-    let date = JbDate.parse(args[0]);
+    const date = JbDate.parse(args[0]);
 
     // "(M)M/(D)D/YY"
     return new JbString(`${date.value.getMonth()+1}/${date.value.getDate()}/${date.value.getFullYear().toString().substring(2)}`);
@@ -1293,7 +1293,7 @@ export class ShortDate extends Func {
     const argIdx = 0;
     let sigIdx = 0;
     // d
-    let info = args[argIdx].typeExpr(env);
+    const info = args[argIdx].typeExpr(env);
     switch(info.type) {
       case "date":
       case "error":
@@ -1348,7 +1348,7 @@ export class ShortTime extends Func {
     if(args[0].type !== "string" && args[0].type !== "date")
       throw new RuntimeError(`${this.name} can only be called on date or string data elements. The '${this.signature.params[0].name}' argument is of type ${args[0].type}`);
 
-    let date = JbDate.parse(args[0]);
+    const date = JbDate.parse(args[0]);
 
     // "HH:MM"
     return new JbString(`${date.value.getHours().toString().padStart(2, '0')}:${date.value.getMinutes().toString().padStart(2, '0')}`);
@@ -1362,7 +1362,7 @@ export class ShortTime extends Func {
     const argIdx = 0;
     let sigIdx = 0;
     // d
-    let info = args[argIdx].typeExpr(env);
+    const info = args[argIdx].typeExpr(env);
     switch(info.type) {
       case "date":
       case "error":

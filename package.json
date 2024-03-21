@@ -7,7 +7,8 @@
     "build": "tsc --removeComments && tsc --declaration --emitDeclarationOnly",
     "exec": "tsc && node ./build/main.js",
     "typecheck": "tsc && node ./build/main.js",
-    "test": "jest --config=./jest.config.js ./tests --silent" 
+    "lint": "npx eslint src && npx eslint tests",
+    "test": "jest --config=./jest.config.js ./tests --silent"
   },
   "repository": {
     "type": "git",
@@ -22,13 +23,15 @@
   "author": "michal-kapala",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/michal-kapala/jitterbit-interpreter/issues"
+    "url": "https://github.com/michal-kapala/jitterbit-script/issues"
   },
-  "homepage": "https://github.com/michal-kapala/jitterbit-interpreter#readme",
+  "homepage": "https://github.com/michal-kapala/jitterbit-script#readme",
   "devDependencies": {
     "@types/jest": "^29.5.11",
     "@types/node": "^18.11.18",
+    "eslint": "^8.57.0",
     "ts-jest": "^29.1.1",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.5",
+    "typescript-eslint": "^7.3.1"
   }
 }

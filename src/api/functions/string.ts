@@ -943,7 +943,7 @@ export class Right extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     // implicit conversions
-    let str = args[0].toString();
+    const str = args[0].toString();
 
     return new JbString(
       str.substring(str.length - args[1].toNumber(), str.length)
@@ -1157,7 +1157,7 @@ export class RTrimChars extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     // implicit conversions
-    let str = args[0].toString();
+    const str = args[0].toString();
     const trimChars = args[1].toString();
     let strIdx = str.length - 1;
 
@@ -1218,7 +1218,7 @@ export class Split extends Func {
   call(args: RuntimeVal[], scope: Scope) {
     this.chooseSignature(args);
     // implicit conversions
-    let str = args[0].toString();
+    const str = args[0].toString();
     const delimiter = args[1].toString();
     const result = new JbArray();
 

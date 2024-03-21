@@ -659,12 +659,12 @@ export class SQLEscape extends Func {
   analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo {
     let argIdx = 0;
     // unescapedSQL
-    let info = args[argIdx].typeExpr(env);
+    const info = args[argIdx].typeExpr(env);
     args[argIdx].checkReqArg(this.signature.params[argIdx++], info.type);
 
     if(args.length === 2) {
       // escapeBackslash
-      let info = args[argIdx].typeExpr(env);
+      const info = args[argIdx].typeExpr(env);
       args[argIdx].checkOptArg(this.signature.params[argIdx], info.type);
     }
     return {type: this.signature.returnType};

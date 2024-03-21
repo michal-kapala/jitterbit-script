@@ -392,7 +392,7 @@ export class SortArray extends Func {
    */
   private sort(array: JbArray, index?: number) {
     // not that much in-place
-    let evaluations: Evaluation[] = index === undefined
+    const evaluations: Evaluation[] = index === undefined
     ? this.evalOneDimArray(array)
     : this.evalMultiDimArray(array, index);
     
@@ -631,7 +631,7 @@ export class ReduceDimension extends Func {
     }
     
     for(const mem of members) {
-      let curDim = dim;
+      const curDim = dim;
       if(mem.type === "array")
         this.checkDimensionality(mem as JbArray, validDim, ++dim);
       else {
@@ -669,7 +669,7 @@ export class ReduceDimension extends Func {
       }
       else {
         // only arrays of simple value arrays here
-        let newArr = new JbArray();
+        const newArr = new JbArray();
         for(const mem of array.members) {
           // array of simple values
           if(mem.type == "array") {

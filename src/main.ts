@@ -19,7 +19,7 @@ async function run(filename: string) {
       const script = process.env.npm_lifecycle_event;
       if(script === "exec") {
         const program = parser.parse(data);
-        let result = await evaluate(program, globalScope);
+        const result = await evaluate(program, globalScope);
         console.log("\nScript result:\n", result);
       }
       else if(script === "typecheck") {

@@ -500,7 +500,7 @@ export class HexToString extends Func {
       return new JbString(Buffer.from(bin.value).toString("utf-8"));
     }
     else {
-      let bin = JbBinary.fromHex(hex.value);
+      const bin = JbBinary.fromHex(hex.value);
       return new JbString(Buffer.from(bin.value).toString());
     }
   }

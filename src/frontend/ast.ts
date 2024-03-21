@@ -624,7 +624,7 @@ export class MemberExpr implements Expr {
     switch (lhs.type) {
       case "array":
         const index = JbArray.keyValueToNumber(await evaluate(this.key, scope));
-        let rhs = JbArray.checkIndex(index)
+        const rhs = JbArray.checkIndex(index)
           ? await evaluate(assignment.value, scope)
           : new JbNull();
         const newValue = Scope.assign(
@@ -733,8 +733,8 @@ export class ArrayLiteral implements Expr {
   }
 
   async eval(scope: Scope) {
-    let members: RuntimeVal[] = [];
-    for (let elem of this.members)
+    const members: RuntimeVal[] = [];
+    for (const elem of this.members)
       members.push(await evaluate(elem, scope));
 
     return new JbArray(members);
