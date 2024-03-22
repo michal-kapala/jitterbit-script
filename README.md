@@ -1,7 +1,7 @@
-# Overview
-This is an experimental standalone community interpreter shell for [Jitterbit Script Language](https://success.jitterbit.com/design-studio/design-studio-reference/scripts/jitterbit-script-language/) created for dedicated [LSP server](https://github.com/michal-kapala/vscode-jitterbit). It aims to provide editor support for Jitterbit Script outside of proprietary [Jitterbit Studio (Jitterbit Harmony Design Studio)](https://success.jitterbit.com/design-studio/) and extend the script-scoped error handling.
- 
-This repo is a fork of [tlaceby/guide-to-interpreters-series](https://github.com/tlaceby/guide-to-interpreters-series).
+# Jitterbit Script
+Community-made Node.js package for static code analysis and execution of [Jitterbit scripts](https://success.jitterbit.com/design-studio/design-studio-reference/scripts/jitterbit-script-language/).
+
+Provides language support capabilities for [Jitterbit VS Code extension](https://github.com/michal-kapala/vscode-jitterbit).
  
 <table>
   <tr>
@@ -18,117 +18,58 @@ This repo is a fork of [tlaceby/guide-to-interpreters-series](https://github.com
   </tr>
 </table>
 
-# Disclaimer
+## Usage
 
-Please note this is **not** an official Jitterbit interpreter. It *may* differ in behaviour and support from actual Jitterbit runtimes which execute scripts in Jitterbit Harmony.
+### Static analysis
 
-[Jitterbit LSP server](https://github.com/michal-kapala/vscode-jitterbit) which utilizes this interpreter provides original editor and runtime error messages from Jitterbit Studio, extended where needed. It also provides additional warnings about potential runtime errors.
+Create a typed AST along with detected errors and warnings.
 
-# Language support
+```ts
+import {Diagnostic, Parser, Typechecker} from 'jitterbit-script';
 
-Below tables track the current language feature support for both this interpreter and its Jitterbit Studio equivalent.
+const script = '<trans> $hi = "hello world!" </trans>';
+const diagnostics: Diagnostic[] = [];
+const parser = new Parser();
 
-| Interpreter | Version |
+const ast = parser.parse(script, diagnostics);
+const analysis = Typechecker.analyze(ast, diagnostics);
+```
+
+The above code should never throw, if it does please raise an issue with a bug report.
+
+### Runtime
+
+Execute a script.
+
+```ts
+import {evaluate, Parser, Scope} from 'jitterbit-script';
+
+async function run(script: string) {
+  const parser = new Parser();
+  try {
+    const ast = parser.parse(script);
+    return await evaluate(ast, new Scope());
+  } catch(err) {
+    // error handling
+  }
+}
+
+const result = run('<trans> $hi = "hello world!" </trans>');
+```
+
+## Disclaimer
+
+Please note this is **not** official Jitterbit tooling. It **does** differ in behaviour and support from the original Jitterbit runtimes executing scripts in Jitterbit Harmony.
+
+The static analysis system was redesigned to provide static typing and improve problem reporting for better DX and high quality code development.
+
+Currently runtime APIs support is limited. See [README](https://github.com/michal-kapala/jitterbit-script/tree/main/src/api#readme) for details on runtime API support.
+
+The runtime implementation's behaviour is based on the cloud agent and editor versions below.
+
+| Component | Version |
 |---|---|
-| jitterbit-interpreter | - |
+| Cloud agent | 11.23.0.9 |
 | Jitterbit Studio |  10.55.0.27 |
 
-## Tokens
-
-The tables below shows the lexer's symbol support.
-
-### Literals
-
-#### Identifiers
-
-| Symbol | jitterbit-interpreter | Jitterbit Studio |
-|---|---|---|
-| Local variables   | ✔️ | ✔️ |
-| Global variables  | ✔️ | ✔️ |
-| System variables  | ✔️ | ✔️ |
-
-#### Constants
-
-| Symbol | jitterbit-interpreter | Jitterbit Studio |
-|---|---|---|
-| Integer        | ✔️ | ✔️ |
-| Float          | ✔️ | ✔️ |
-| String         | ✔️ | ✔️ |
-| `true`/`false` | ✔️ | ✔️ |
-| `null`         | ❌ | ❌ |
-
-### Keywords
-As of current version, no keywords are supported by Jitterbit Script Language. Control statements like branching and loops are implemented as [Logical Functions](https://success.jitterbit.com/design-studio/design-studio-reference/formula-builder/logical-functions/).
-
-### Operators
-The list of recognized operator tokens.
-
-#### Comparison
-
-| Symbol | jitterbit-interpreter | Jitterbit Studio |
-|-----|---|---|
-| `<`   | ✔️ | ✔️ |
-| `>`   | ✔️ | ✔️ |
-| `<=`  | ✔️ | ✔️ |
-| `>=`  | ✔️ | ✔️ |
-| `==`  | ✔️ | ✔️ |
-| `!=`  | ✔️ | ✔️ |
-
-#### Assignment
-
-| Symbol | jitterbit-interpreter | Jitterbit Studio |
-|-----|---|---|
-| `=`   | ✔️ | ✔️ |
-| `+=`  | ✔️ | ✔️ |
-| `-=`  | ✔️ | ✔️ |
-| `*=`  | ❌ | ❌ |
-| `/=`  | ❌ | ❌ |
-| `^=`  | ❌ | ❌ |
-
-#### Other binary operators
-
-| Symbol | jitterbit-interpreter | Jitterbit Studio |
-|-------|---|---|
-| `+`     | ✔️ | ✔️ |
-| `-`     | ✔️ | ✔️ |
-| `*`     | ✔️ | ✔️ |
-| `/`     | ✔️ | ✔️ |
-| `^`     | ✔️ | ✔️ |
-| `%`     | ❌ | ❌ |
-| `&&`/`&`    | ✔️ | ✔️ |
-| `\|\|`/`\|`    | ✔️ | ✔️ |
-
-#### Unary
-
-| Symbol | jitterbit-interpreter | Jitterbit Studio |
-|----|---|---|
-| `!`  | ✔️ | ✔️ |
-| `-`  | ✔️ | ✔️ |
-| `+`  |  | ✔️ (unofficial support) |
-| `++` | ✔️ | ✔️ |
-| `--` | ✔️ | ✔️ |
-
-#### Objects
-
-| Symbol | jitterbit-interpreter | Jitterbit Studio |
-|----|---|---|
-| `{}` | ✔️ | ✔️ |
-| `[]` | ✔️ | ✔️ |
-
-## Other expressions
-
-The list of statements and expressions supported by the interpreter.
-
-| Expr | jitterbit-interpreter | Jitterbit Studio |
-|---|---|---|
-| `<trans></trans>`  | ✔️ | ✔️ |
-| `()`                 | ✔️ | ✔️ |
-| Function calls       | ✔️ | ✔️ |
-
-## APIs
-
-[System variables](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/variables/jitterbit-variables/) and [functions](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/) were implemented as specified by the documentation:
-- [system variables](https://github.com/michal-kapala/jitterbit-interpreter/blob/main/src/api.ts)
-- [functions](https://github.com/michal-kapala/jitterbit-interpreter/tree/main/src/api/functions)
-
-The runtime support matrix can be found [here](https://github.com/michal-kapala/jitterbit-interpreter/tree/main/src/api).
+This repo is a fork of [tlaceby/guide-to-interpreters-series](https://github.com/tlaceby/guide-to-interpreters-series).
