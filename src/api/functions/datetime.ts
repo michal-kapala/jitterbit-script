@@ -69,6 +69,10 @@ export class ConvertTimeZone extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global errors
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].type = "error";
         args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
@@ -152,6 +156,10 @@ export class CVTDate extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global errors
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].type = "error";
         args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
@@ -230,6 +238,10 @@ export class DateAdd extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global errors
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].type = "error";
         args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
@@ -297,6 +309,10 @@ export class DayOfMonth extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global errors
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].type = "error";
         args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
@@ -367,6 +383,10 @@ export class DayOfWeek extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global errors
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].type = "error";
         args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
@@ -432,6 +452,10 @@ export class FormatDate extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global errors
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].type = "error";
         args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
@@ -507,6 +531,10 @@ export class GeneralDate extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global errors
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].type = "error";
         args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
@@ -574,6 +602,10 @@ export class GetUTCFormattedDate extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global errors
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].type = "error";
         args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
@@ -650,6 +682,10 @@ export class GetUTCFormattedDateTime extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global errors
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].type = "error";
         args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
@@ -734,6 +770,10 @@ export class LastDayOfMonth extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global errors
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].type = "error";
         args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
@@ -867,6 +907,10 @@ export class LongDate extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global errors
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].type = "error";
         args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
@@ -937,6 +981,10 @@ export class LongTime extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global errors
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].type = "error";
         args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
@@ -1037,6 +1085,10 @@ export class MediumDate extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global errors
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].type = "error";
         args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
@@ -1107,6 +1159,10 @@ export class MediumTime extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global errors
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].type = "error";
         args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
@@ -1176,6 +1232,10 @@ export class MonthOfYear extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global errors
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].type = "error";
         args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
@@ -1311,6 +1371,10 @@ export class ShortDate extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global errors
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].type = "error";
         args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`
@@ -1380,6 +1444,10 @@ export class ShortTime extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global errors
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].type = "error";
         args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is ${this.signatures[0].params[argIdx].type} or ${this.signatures[1].params[argIdx].type}.`

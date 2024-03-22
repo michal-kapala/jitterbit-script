@@ -55,6 +55,10 @@ export class Count extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global warnings
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' is ${info.type}, should be node or array; a null value is returned.`;
         return {type: "null"};
@@ -162,6 +166,10 @@ export class Exist extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global warnings
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].type = "error";
         args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, the required type is node or array.`;
@@ -230,6 +238,10 @@ export class FindByPos extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global warnings
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' is ${info.type}, should be node or array.`;
         break;
@@ -295,6 +307,10 @@ export class FindValue extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global warnings
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].warning = `The type of argument '${this.signature.params[argIdx].name}' is ${info.type}, should be node or array.`;
         break;
@@ -391,6 +407,10 @@ export class Max extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global warnings
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' is ${info.type}, should be node or array.`;
         break;
@@ -466,6 +486,10 @@ export class Min extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global warnings
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' is ${info.type}, should be node or array.`;
         break;
@@ -540,6 +564,10 @@ export class ResolveOneOf extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global warnings
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' is ${info.type}, should be node or array.`;
         break;
@@ -768,6 +796,10 @@ export class Sum extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global warnings
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' is ${info.type}, should be node or array; a null value is returned.`;
         return {type: "null"};
@@ -846,6 +878,10 @@ export class SumCSV extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global warnings
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' is ${info.type}, should be node or array; a null value is returned.`;
         return {type: "null"};
@@ -914,6 +950,10 @@ export class SumString extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global warnings
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].warning = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' is ${info.type}, should be node or array; a null value is returned.`;
         retNull = {type: "null"};

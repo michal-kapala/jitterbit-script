@@ -97,7 +97,7 @@ export abstract class TypedExpr implements TypeInfo {
     }
 
     const validTypes = [param.type, "type", "unknown", "error"] as StaticTypeName[];
-    if(!validTypes.includes(argType)) {
+    if(!validTypes.includes(argType) && !(this.kind === "GlobalIdentifier" && this.type === "null")) {
       this.type = "error";
       this.error = TcError.makeArgTypeError(param, argType);
     }
@@ -116,7 +116,7 @@ export abstract class TypedExpr implements TypeInfo {
     }
 
     const validTypes = [param.type, "type", "unknown", "error"] as StaticTypeName[];
-    if(!validTypes.includes(argType))
+    if(!validTypes.includes(argType) && !(this.kind === "GlobalIdentifier" && this.type === "null"))
       this.warning = TcError.makeArgTypeWarn(param, argType);
   }
   /**
@@ -763,6 +763,9 @@ export class TypedMemberExpr extends TypedExpr {
       case "date":
       case "void":
       case "null":
+        // suppress unassigned global var errors
+        if(this.object.kind === "GlobalIdentifier")
+          return resultType;
       case "number":
       case "string":
         this.setTypeInfo({

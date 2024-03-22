@@ -616,6 +616,10 @@ export class WriteFile extends AsyncFunc {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global warnings
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].warning = `The type of argument '${this.signature.params[argIdx].name}' is ${info.type}, should be string or binary.`;
         break;

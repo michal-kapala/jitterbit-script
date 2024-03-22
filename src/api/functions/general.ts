@@ -346,6 +346,10 @@ export class Get extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global errors
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].type = "error";
         args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, a global variable name or an array is required.`;
@@ -1710,6 +1714,10 @@ export class Set extends Func {
         args[argIdx].type = "error";
         args[argIdx].error = `Local variable '${(args[argIdx] as TypedIdentifier).symbol}' hasn't been initialized.`;
         break;
+      case "null":
+        // suppress unassigned global errors
+        if(args[argIdx].kind === "GlobalIdentifier")
+          break;
       default:
         args[argIdx].type = "error";
         args[argIdx].error = `The type of argument '${this.signatures[sigIdx].params[argIdx].name}' cannot be ${info.type}, a global variable name or an array is required.`;

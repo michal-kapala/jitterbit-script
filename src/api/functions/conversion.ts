@@ -145,7 +145,11 @@ export class Bool extends Func {
       case "void":
       case "null":
         result.type = "null";
-        args[argIdx].warning = `Undocumented behaviour - ${this.name}(${info.type}) returns null.`;
+        // unassigned global warning
+        if(args[argIdx].kind === "GlobalIdentifier")
+          args[argIdx].warning = "The conversion might result in an unexpected return type or error for arguments other than a number, string or bool.";
+        else
+          args[argIdx].warning = `Undocumented behaviour - ${this.name}(${info.type}) returns null.`;
         break;
       case "dictionary":
       case "binary":
@@ -244,7 +248,11 @@ export class DateFunc extends Func {
       case "void":
       case "null":
         result.type = "null";
-        args[argIdx].warning = `Undocumented behaviour - ${this.name}(${info.type}) returns null.`;
+        // unassigned global warning
+        if(args[argIdx].kind === "GlobalIdentifier")
+          args[argIdx].warning = "The conversion might result in an unexpected return type or error for arguments other than a number, string or date.";
+        else
+          args[argIdx].warning = `Undocumented behaviour - ${this.name}(${info.type}) returns null.`;
         break;
       case "bool":
       case "array":
@@ -318,7 +326,11 @@ export class Double extends Func {
       case "void":
       case "null":
         result.type = "null";
-        args[argIdx].warning = `Undocumented behaviour - ${this.name}(${info.type}) returns null.`;
+        // unassigned global warning
+        if(args[argIdx].kind === "GlobalIdentifier")
+          args[argIdx].warning = "The conversion might result in an unexpected return type or error for arguments other than a number, bool, string, or date.";
+        else
+          args[argIdx].warning = `Undocumented behaviour - ${this.name}(${info.type}) returns null.`;
         break;
       case "dictionary":
       case "binary":
@@ -389,7 +401,11 @@ export class Float extends Func {
       case "void":
       case "null":
         result.type = "null";
-        args[argIdx].warning = `Undocumented behaviour - ${this.name}(${info.type}) returns null.`;
+        // unassigned global warning
+        if(args[argIdx].kind === "GlobalIdentifier")
+          args[argIdx].warning = "The conversion might result in an unexpected return type or error for arguments other than a number, bool, string, or date.";
+        else
+          args[argIdx].warning = `Undocumented behaviour - ${this.name}(${info.type}) returns null.`;
         break;
       case "dictionary":
       case "binary":
@@ -569,7 +585,11 @@ export class Int extends Func {
       case "void":
       case "null":
         result.type = "null";
-        args[argIdx].warning = `Undocumented behaviour - ${this.name}(${info.type}) returns null.`;
+        // unassigned global warning
+        if(args[argIdx].kind === "GlobalIdentifier")
+          args[argIdx].warning = "The conversion might result in an unexpected return type or error for arguments other than a number, bool, string, or date.";
+        else
+          args[argIdx].warning = `Undocumented behaviour - ${this.name}(${info.type}) returns null.`;
         break;
       case "dictionary":
       case "binary":
@@ -643,7 +663,11 @@ export class Long extends Func {
       case "void":
       case "null":
         result.type = "null";
-        args[argIdx].warning = `Undocumented behaviour - ${this.name}(${info.type}) returns null.`;
+        // unassigned global warning
+        if(args[argIdx].kind === "GlobalIdentifier")
+          args[argIdx].warning = "The conversion might result in an unexpected return type or error for arguments other than a number, bool, string, or date.";
+        else
+          args[argIdx].warning = `Undocumented behaviour - ${this.name}(${info.type}) returns null.`;
         break;
       case "dictionary":
       case "binary":
@@ -717,7 +741,11 @@ export class String extends Func {
       case "void":
       case "null":
         result.type = "null";
-        args[argIdx].warning = `Undocumented behaviour - ${this.name}(${info.type}) returns null.`;
+        // unassigned global warning
+        if(args[argIdx].kind === "GlobalIdentifier")
+          args[argIdx].warning = "The conversion might result in an unexpected return type if the argument is an array or null.";
+        else
+          args[argIdx].warning = `Undocumented behaviour - ${this.name}(${info.type}) returns null.`;
         break;
       case "unknown":
       case "type":
