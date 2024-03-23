@@ -7,7 +7,7 @@ import { randomUUID } from "crypto";
 import { reverse } from "dns/promises";
 import { RuntimeError, UnimplementedError } from "../../errors";
 import { Expr } from "../../frontend/ast";
-import { evaluate } from "../../runtime/interpreter";
+import evaluate from "../../runtime/interpreter";
 import { TypedExpr, TypedGlobalIdentifier, TypedIdentifier, TypeInfo } from "../../typechecker/ast";
 import TypeEnv from "../../typechecker/environment";
 

@@ -8,7 +8,7 @@ import { JbNull } from "./types";
  * @param scope the current scope
  * @returns 
  */
-export async function evaluate(astNode: Stmt, scope: Scope) {
+export default async function evaluate(astNode: Stmt, scope: Scope) {
   switch (astNode.kind) {
     case "Program":
       return await (astNode as Program).execute(scope);

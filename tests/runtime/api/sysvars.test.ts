@@ -2,7 +2,7 @@ import { Api } from "../../../src/api";
 import { UnimplementedError } from "../../../src/errors";
 import { GlobalIdentifier } from "../../../src/frontend/ast";
 import { Position, Token, TokenType } from "../../../src/frontend/types";
-import { evaluate } from "../../../src/runtime/interpreter";
+import evaluate from "../../../src/runtime/interpreter";
 import Scope from "../../../src/runtime/scope";
 import { JbBool, JbNull, JbNumber, JbString } from "../../../src/runtime/types";
 

@@ -1,6 +1,6 @@
 import { RuntimeError, UnimplementedError } from "../../errors";
 import { Expr } from "../../frontend/ast";
-import { evaluate } from "../../runtime/interpreter";
+import evaluate from "../../runtime/interpreter";
 import Scope from "../../runtime/scope";
 import { JbArray, JbBool, JbNull } from "../../runtime/types";
 import { RuntimeVal } from "../../runtime/values";

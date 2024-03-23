@@ -1,6 +1,6 @@
 import Parser from "../src/frontend/parser";
 import Scope from "../src/runtime/scope";
-import { evaluate } from "../src/runtime/interpreter";
+import evaluate from "../src/runtime/interpreter";
 import { RuntimeVal } from "../src/runtime/values";
 import { JbDate, JbDictionary, JbNull, JbString } from "../src/runtime/types";
 import { Expr, Program } from "../src/frontend/ast";

@@ -13,6 +13,9 @@ import {
 } from "./types";
 import { RuntimeVal } from "./values";
 
+/**
+ * Runtime scope with evaluation results.
+ */
 export default class Scope {
   private parent?: Scope;
   private variables: Map<string, RuntimeVal>;

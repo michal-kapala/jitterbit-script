@@ -1,6 +1,6 @@
 import Parser from "./frontend/parser";
 import Scope from "./runtime/scope";
-import { evaluate } from "./runtime/interpreter";
+import evaluate from "./runtime/interpreter";
 import fs from "fs";
 import Typechecker from "./typechecker/typechecker";
 import Diagnostic from "./diagnostic";
