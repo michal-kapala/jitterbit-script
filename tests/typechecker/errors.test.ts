@@ -217,4 +217,22 @@ msg = Case(
     expect(result.diagnostics.length).toStrictEqual(1);
     expect(result.diagnostics[0].error).toStrictEqual(true);
   });
+
+  test('Unexpected token.', function() {
+    const script = `
+<trans>
+  // user-defined system variable
+  $myGlobalVar = $jitterbit.web_service_call.sync_response;
+  // multiline string assignment
+  $niceTokenLol = '$jitterbit.web_service_call.sync_response
+  lol nice';
+  // assignment of an unknown token
+  $bad = 5345bnj435;
+</trans>`;
+    const result = typecheck(script);
+    expect(result.diagnostics.length).toStrictEqual(1);
+    expect(result.diagnostics[0].error).toStrictEqual(true);
+    expect(result.diagnostics[0].start.character).toStrictEqual(10);
+    expect(result.diagnostics[0].end.character).toStrictEqual(19);
+  });
 });

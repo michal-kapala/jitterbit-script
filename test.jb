@@ -1,12 +1,9 @@
 <trans>
-/*
-https://success.jitterbit.com/display/DOC/Text+Validation+Functions
-_1: The input value, as a string
-_2: A string with the data type of the input value (the "Type" field as used in the File Format)
-_3: A format string of the input value (the "Format" field as used in the File Format)
-*/
-ArgumentList(value,type,format);
-
-If(HasKey($jb.core.dict.keys,value),false,$jb.core.dict.keys[value] = value);
-
+  // user-defined system variable
+  $myGlobalVar = $jitterbit.web_service_call.sync_response;
+  // multiline string assignment
+  $niceTokenLol = '$jitterbit.web_service_call.sync_response
+  lol nice';
+  // assignment of an unknown token
+  $bad = 5b;
 </trans>

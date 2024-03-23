@@ -589,16 +589,10 @@ export default class Lexer {
           // Add JB error:
           // 'Unknown token: <int-like literal>'
           if(isUnk) {
-            if(diagnostics) {
-              diagnostics.push(
-                new Diagnostic(
-                  new Position(curPos.line, curPos.character - num.length),
-                  new Position(curPos.line, curPos.character),
-                  `Unknown token: '${num}'.`
-                )
-              );
-            }
-            console.error("Unknown token: ", num);
+            // for static analysis this is reported later by parser
+            // runtime
+            if(!diagnostics)
+              console.error("Unknown token: ", num);
             tokens.push(new Token(
               num,
               TokenType.UnknownToken,
