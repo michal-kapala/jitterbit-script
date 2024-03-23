@@ -16,7 +16,7 @@ Provides language support capabilities for [Jitterbit VS Code extension](https:/
   </tr>
   <tr>
     <th>Stable version</th>
-    <td>-</td>
+    <td>1.0.0</td>
   </tr>
 </table>
 
@@ -65,7 +65,7 @@ Please note this is **not** official Jitterbit tooling. It **does** differ in be
 
 The static analysis system was redesigned to provide static typing and improve problem reporting for better DX and high quality code development.
 
-Currently runtime APIs support is limited. See [README](https://github.com/michal-kapala/jitterbit-script/tree/main/src/api#readme) for details on runtime API support.
+Currently the support for runtime APIs is limited. See [README](https://github.com/michal-kapala/jitterbit-script/tree/main/src/api#readme) for details on runtime API support.
 
 The runtime implementation's behaviour is based on the cloud agent and editor versions below.
 
