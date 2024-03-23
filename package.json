@@ -2,7 +2,7 @@
   "name": "jitterbit-script",
   "version": "0.2.0",
   "description": "Static typechecker and interpreter for Jitterbit Script",
-  "main": "index.js",
+  "main": "build/main.js",
   "scripts": {
     "build": "tsc --removeComments && tsc --declaration --emitDeclarationOnly",
     "exec": "tsc && node ./build/main.js",
