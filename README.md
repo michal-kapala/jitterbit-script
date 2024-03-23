@@ -1,6 +1,5 @@
 # Jitterbit Script
 ![tests](https://github.com/michal-kapala/jitterbit-script/actions/workflows/tests.yml/badge.svg)
-![npm](https://github.com/michal-kapala/jitterbit-script/actions/workflows/release.yml/badge.svg)
 
 Community-made Node.js package for static code analysis and execution of [Jitterbit scripts](https://success.jitterbit.com/design-studio/design-studio-reference/scripts/jitterbit-script-language/).
 

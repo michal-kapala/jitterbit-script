@@ -7,3 +7,6 @@ tests
 eslint.config.js
 jest.config.js
 tsconfig.json
+
+build/main.js
+build/main.d.ts
