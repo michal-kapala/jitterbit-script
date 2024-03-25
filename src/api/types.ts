@@ -34,6 +34,30 @@ export abstract class Func {
    * @param env 
    */
   abstract analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo;
+
+  /**
+   * The function's signature string.
+   * @returns 
+   */
+  toString() {
+    if(this.signature) {
+      let signature = `${this.name}(`;
+      let optionals = false;
+      const params = this.signature.params;
+      for(let idx = 0; idx < this.signature.params.length; idx++) {
+        if(!optionals && !params[idx].required) {
+          optionals = true;
+          signature += "[";
+        }
+        signature += `${params[idx].type} ${params[idx].name}, `;
+      }
+      signature = signature.substring(0, signature.length - 2);
+      signature += optionals ? "])" : ")";
+      signature += `: ${this.signature.returnType}`;
+      return signature;
+    }
+    else return `${this.name} (polymorphic)`;
+  }
 }
 
 /**
@@ -145,11 +169,11 @@ export interface SystemVariable {
   /**
    * Variable's intended usage:
    * 
-   * - `Informational` - readable
+   * - `info` - readable
    * 
-   * - `Settings` - writable
+   * - `setting` - writable
    */
-  type: "Informational" | "Settings";
+  type: "info" | "setting";
   /**
    * Variable's expected data type.
    */
@@ -159,7 +183,7 @@ export interface SystemVariable {
    */
   default?: string;
   /**
-   * Variable description.
+   * Variable description (markdown format).
    */
   description: string;
 }
