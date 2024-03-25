@@ -28,6 +28,8 @@ import { Position, Token, TokenType } from "./types";
  */
 export default class Parser {
   private tokens: Token[] = [];
+  private endTagStart?: Position;
+  private endTagEnd?: Position;
 
   /**
    * Determines if the parsing is complete and the EOF was reached.
@@ -206,6 +208,10 @@ export default class Parser {
     // Remove <trans> and </trans>, restore EOF
     this.tokens.shift();
     const last = this.tokens.pop() as Token;
+    if(last.type === TokenType.CloseTransTag) {
+      this.endTagStart = last.begin;
+      this.endTagEnd = last.end;
+    }
     this.tokens.push(new Token("EndOfFile", TokenType.EOF, last.end, last.end));
     return result;
   }
@@ -647,6 +653,10 @@ export default class Parser {
       case TokenType.SingleQuoteString:
       case TokenType.DoubleQuoteString:
         return new StringLiteral(this.consume());
+      case TokenType.EOF:
+        const start = this.endTagStart ?? tk.begin;
+        const end = this.endTagEnd ?? tk.end;
+        return new InvalidExpr("EOF", "Expected expression before the end of script.", start, end);
       default:
         // consume the token to prevent infinite loops
         const unk = this.consume();

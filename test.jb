@@ -1,13 +1,3 @@
 <trans>
-  // user-defined system variable
-  someFlag = true;
-  $myGlobalVar = 'someFlag: ' + someFlag;
-  WriteToOperationLog($myGlobalVar);
-  if(someFlag,
-    $myGlobalVar = 'something',
-    $myGlobalVar = 'something else'
-  );
-  // assignment of an unknown token
-  $bad = 5345bnj435;
-  #x
+  x +
 </trans>
