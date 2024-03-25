@@ -14,10 +14,6 @@ Provides language support capabilities for [Jitterbit VS Code extension](https:/
     <th>Platform</th>
     <td>NodeJS</td>
   </tr>
-  <tr>
-    <th>Stable version</th>
-    <td>1.0.0</td>
-  </tr>
 </table>
 
 ## Usage
