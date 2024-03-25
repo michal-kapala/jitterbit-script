@@ -1,4 +1,4 @@
-import { Api } from "../../../src/api";
+import Api from "../../../src/api";
 import { UnimplementedError } from "../../../src/errors";
 import { GlobalIdentifier } from "../../../src/frontend/ast";
 import { Position, Token, TokenType } from "../../../src/frontend/types";

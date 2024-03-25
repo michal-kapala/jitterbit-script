@@ -1,4 +1,4 @@
-import { Api } from "../api";
+import Api from "../api";
 import { RuntimeError, UnimplementedError } from "../errors";
 import { GlobalIdentifier } from "../frontend/ast";
 import { 

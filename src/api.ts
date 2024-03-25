@@ -42,7 +42,7 @@ type SystemVariables = {
 /**
  * Jitterbit script API.
  */
-export class Api {
+export default class Api {
   static sysVars: SystemVariables;
   static functions: Func[];
 

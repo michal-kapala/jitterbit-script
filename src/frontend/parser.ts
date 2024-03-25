@@ -1,5 +1,5 @@
 
-import { Api } from "../api";
+import Api from "../api";
 import Diagnostic from "../diagnostic";
 import { ParserError } from "../errors";
 import {

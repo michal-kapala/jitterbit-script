@@ -1,4 +1,4 @@
-import { Api } from "../../../../src/api";
+import Api from "../../../../src/api";
 import { UnimplementedError } from "../../../../src/errors";
 import Scope from "../../../../src/runtime/scope";
 

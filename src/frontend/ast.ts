@@ -2,7 +2,7 @@ import evaluate from "../runtime/interpreter";
 import Scope from "../runtime/scope";
 import { RuntimeVal } from "../runtime/values";
 import { Position, Token } from "./types";
-import { Api } from "../api";
+import Api from "../api";
 import {
   JbArray,
   JbDictionary,

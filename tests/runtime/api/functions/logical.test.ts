@@ -1,4 +1,4 @@
-import { Api } from "../../../../src/api";
+import Api from "../../../../src/api";
 import { DeferrableFunc } from "../../../../src/api/types";
 import { RuntimeError } from "../../../../src/errors";
 import {

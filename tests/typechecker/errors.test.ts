@@ -39,15 +39,13 @@ msg = Case(
 );
 </trans>\``;
     const result = typecheck(script);
-    expect(result.diagnostics.length).toStrictEqual(4);
-    // unknown token
-    expect(result.diagnostics[0].error).toStrictEqual(true);
+    expect(result.diagnostics.length).toStrictEqual(3);
     // cross-type comparison
-    expect(result.diagnostics[1].error).toStrictEqual(false);
+    expect(result.diagnostics[0].error).toStrictEqual(false);
     // global variable without assignment
-    expect(result.diagnostics[2].error).toStrictEqual(false);
+    expect(result.diagnostics[1].error).toStrictEqual(false);
     // cross-type comparison
-    expect(result.diagnostics[3].error).toStrictEqual(false);
+    expect(result.diagnostics[2].error).toStrictEqual(false);
   });
 
   test('Missing script opening tag.', function() {
@@ -218,7 +216,7 @@ msg = Case(
     expect(result.diagnostics[0].error).toStrictEqual(true);
   });
 
-  test('Unexpected token.', function() {
+  test('Unexpected token 1.', function() {
     const script = `
 <trans>
   // user-defined system variable
@@ -234,5 +232,34 @@ msg = Case(
     expect(result.diagnostics[0].error).toStrictEqual(true);
     expect(result.diagnostics[0].start.character).toStrictEqual(10);
     expect(result.diagnostics[0].end.character).toStrictEqual(19);
+  });
+
+  test('Unexpected token 2.', function() {
+    const script = `
+    <trans>
+    // user-defined system variable
+    someFlag = true;
+    $myGlobalVar = 'someFlag: ' + someFlag;
+    WriteToOperationLog($myGlobalVar);
+    if(someFlag,
+      $myGlobalVar = 'something',
+      $myGlobalVar = 'something else'
+    );
+    // assignment of an unknown token
+    $bad = 5345bnj435;
+    #x
+  </trans>`;
+    const result = typecheck(script);
+    expect(result.diagnostics.length).toStrictEqual(5);
+    // Expected ';' at the expression's end
+    expect(result.diagnostics[0].error).toStrictEqual(true);
+    // Cross-type concatenation of string + bool
+    expect(result.diagnostics[1].error).toStrictEqual(false);
+    // Unexpected token '5345bnj435'
+    expect(result.diagnostics[2].error).toStrictEqual(true);
+    // Unexpected token '#'
+    expect(result.diagnostics[3].error).toStrictEqual(true);
+    // Local variable 'x' hasn't been initialized
+    expect(result.diagnostics[4].error).toStrictEqual(true);
   });
 });

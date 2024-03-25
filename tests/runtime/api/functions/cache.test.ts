@@ -1,5 +1,5 @@
 import { describe, expect, test } from '@jest/globals';
-import { Api } from '../../../../src/api';
+import Api from '../../../../src/api';
 import Scope from '../../../../src/runtime/scope';
 import { UnimplementedError } from '../../../../src/errors';
 import { AsyncFunc } from '../../../../src/api/types';

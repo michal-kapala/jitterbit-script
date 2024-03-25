@@ -21,7 +21,7 @@ export default class Lexer {
    */
   private static isAlpha(src: string): boolean {
     // to be changed
-    return src.toUpperCase() != src.toLowerCase();
+    return src.toUpperCase() !== src.toLowerCase();
   }
 
   /**
@@ -592,7 +592,7 @@ export default class Lexer {
             // for static analysis this is reported later by parser
             // runtime
             if(!diagnostics)
-              console.error("Unknown token: ", num);
+              console.error("LexerError: Unknown token: ", num);
             tokens.push(new Token(
               num,
               TokenType.UnknownToken,
@@ -705,22 +705,15 @@ export default class Lexer {
         // unrecognized characters
         else {
           // only parse the unknown characters inside of the script scope
-          if(transTagOpened) {
-            if(diagnostics) {
-              diagnostics.push(
-                new Diagnostic(
-                  new Position(curPos.line, curPos.character),
-                  new Position(curPos.line, curPos.character),
-                  `Unknown token: '${src[0]}'.`
-                )
-              );
-            }
-            console.error(`LexerError: Unrecognized character found in source: ${src[0]}`);
+          if(transTagOpened && !transTagClosed) {
+            // runtime
+            if(!diagnostics)
+              console.error(`LexerError: Unrecognized character found in source: ${src[0]}`);
             tokens.push(new Token(
               src.shift() ?? "",
               TokenType.UnknownToken,
-              curPos,
-              curPos
+              beginPos,
+              beginPos
             ));
             curPos.advance();
           }

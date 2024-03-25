@@ -1,4 +1,4 @@
-import { Api } from "../api";
+import Api from "../api";
 import { Parameter } from "../api/types";
 import { TcError } from "../errors";
 import { 

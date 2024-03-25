@@ -1,4 +1,4 @@
-import { Api } from "../../../../src/api";
+import Api from "../../../../src/api";
 import Scope from "../../../../src/runtime/scope";
 import { JbString } from "../../../../src/runtime/types";
 

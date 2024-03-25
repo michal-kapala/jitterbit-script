@@ -1,9 +1,13 @@
 <trans>
   // user-defined system variable
-  $myGlobalVar = $jitterbit.web_service_call.sync_response;
-  // multiline string assignment
-  $niceTokenLol = '$jitterbit.web_service_call.sync_response
-  lol nice';
+  someFlag = true;
+  $myGlobalVar = 'someFlag: ' + someFlag;
+  WriteToOperationLog($myGlobalVar);
+  if(someFlag,
+    $myGlobalVar = 'something',
+    $myGlobalVar = 'something else'
+  );
   // assignment of an unknown token
-  $bad = 5b;
+  $bad = 5345bnj435;
+  #x
 </trans>

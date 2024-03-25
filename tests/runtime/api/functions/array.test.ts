@@ -1,5 +1,5 @@
 import { describe, expect, test } from '@jest/globals';
-import { Api } from '../../../../src/api';
+import Api from '../../../../src/api';
 import Scope from '../../../../src/runtime/scope';
 import { JbArray, JbBool, JbNull, JbNumber, JbString } from '../../../../src/runtime/types';
 import { UnimplementedError } from '../../../../src/errors';
