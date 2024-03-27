@@ -21,6 +21,7 @@ export class WriteToOperationLog extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Writes a message to the operation log.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {

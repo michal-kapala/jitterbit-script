@@ -42,6 +42,7 @@ export class ArchiveFile extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 3;
+    this.docs = "Reads a file from a file-type source activity and writes it to a file-type target activity.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/file-functions/#filefunctions-archivefile).";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -112,6 +113,7 @@ export class DeleteFile extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 2;
+    this.docs = "Deletes a file from the specified source.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/file-functions/#filefunctions-deletefile).";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -183,6 +185,7 @@ export class DeleteFiles extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 2;
+    this.docs = "Deletes one or more files from the specified source.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/file-functions/#filefunctions-deletefiles).";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -248,6 +251,7 @@ export class DirList extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 3;
+    this.docs = "Returns a list of directories contained in a source, optionally specifying a path and a filter to restrict the results.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/file-functions/#filefunctions-dirlist).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -317,6 +321,7 @@ export class FileList extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 3;
+    this.docs = "Returns a list of filenames contained in a source.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/file-functions/#filefunctions-filelist).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -376,6 +381,7 @@ export class FlushAllFiles extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 1;
+    this.docs = "Persists data written to file buffers with `WriteFile`.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/file-functions/#filefunctions-flushallfiles).";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -439,6 +445,7 @@ export class FlushFile extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 2;
+    this.docs = "Persists data written to a file buffer with `WriteFile`.\n\nWhen `FlushFile` is called, the current contents of the buffer is written to the target and the local buffer is discarded.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/file-functions/#filefunctions-flushfile).";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -510,6 +517,7 @@ export class ReadFile extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 2;
+    this.docs = "Reads the contents of a file from a source.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/file-functions/#filefunctions-readfile).";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -580,6 +588,7 @@ export class WriteFile extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 3;
+    this.docs = "Writes the `fileContents` to the target specified by `targetId`.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/file-functions/#filefunctions-writefile).";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {

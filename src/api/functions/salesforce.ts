@@ -41,6 +41,7 @@ export class GetSalesforceTimestamp extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 3;
+    this.docs = "Retrieves the current system time from Salesforce.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/salesforce-functions/#salesforcefunctions-getsalesforcetimestamp).";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -117,6 +118,7 @@ export class LoginToSalesforceAndGetTimeStamp extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 2;
+    this.docs = "Logs in to Salesforce using a Salesforce endpoint and retrieves the current system time from Salesforce.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/salesforce-functions/#salesforcefunctions-logintosalesforceandgettimestamp).";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -178,6 +180,7 @@ export class SalesforceLogin extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Logs into Salesforce, using the specified Salesforce endpoint.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/salesforce-functions/#salesforcefunctions-salesforcelogin).";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -243,6 +246,7 @@ export class SetSalesforceSession extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 3;
     this.maxArgs = 3;
+    this.docs = "Sets Salesforce session information for the specified Salesforce endpoint.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/salesforce-functions/#salesforcefunctions-setsalesforcesession).";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -306,6 +310,7 @@ export class SfCacheLookup extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Logs into Salesforce (if necessary) and retrieves the result of the query from Salesforce.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/salesforce-functions/#salesforcefunctions-sfcachelookup).";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -364,6 +369,7 @@ export class SfLookup extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Logs into Salesforce (if necessary) and retrieves the result of the query from Salesforce. Only the value from the first field of the first record is returned.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/salesforce-functions/#salesforcefunctions-sflookup).";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -429,6 +435,7 @@ export class SfLookupAll extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Logs into Salesforce (if necessary) and retrieves the result of the query from Salesforce. The returned array is two-dimenional; an array of records, with each record an array of named fields.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/salesforce-functions/#salesforcefunctions-sflookupall).";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -460,8 +467,7 @@ export class SfLookupAll extends AsyncFunc {
 /**
  * The implementation of `SfLookupAllToFile` function.
  * 
- * Logs into Salesforce (if necessary) and writes the results
- * from Salesforce query to a CSV file.
+ * Logs into Salesforce (if necessary) and writes the results from Salesforce query to a CSV file.
  * The function returns the number of records retrieved.
  * 
  * The login call is made using the credentials in the specified Salesforce endpoint.
@@ -495,6 +501,7 @@ export class SfLookupAllToFile extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 3;
     this.maxArgs = 3;
+    this.docs = "Logs into Salesforce (if necessary) and writes the results from Salesforce query to a CSV file. Returns the number of retrieved records.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/salesforce-functions/#salesforcefunctions-sflookupalltofile).";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {

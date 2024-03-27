@@ -25,6 +25,7 @@ export class CountSubString extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Returns the number of times a sub-string appears in a string.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -80,6 +81,7 @@ export class DQuote extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Places a string in double quotes and returns the result. Embedded double quotes are not escaped.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -132,6 +134,7 @@ export class Format extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Returns a string in the format specified by a format string.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/string-functions/#stringfunctions-format).";
   }
   
   call(args: RuntimeVal[], scope: Scope): never {
@@ -199,6 +202,7 @@ export class Index extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 3;
+    this.docs = "Returns the position of a sub-string within a string.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/string-functions/#stringfunctions-index).";
   }
   
   call(args: RuntimeVal[], scope: Scope): never {
@@ -230,9 +234,9 @@ export class Index extends Func {
 /**
  * The implementation of `IsValidString` function.
  * 
- * Returns true if each character in a string is valid.
- * Valid characters are ASCII codes 32 through 126 inclusive and any of linefeed (LF),
- * carriage return (CR), or tab (TAB) characters.
+ * Returns `true` if each character in a string is valid.
+ * Valid characters are ASCII codes 32 through 126 inclusive and any of linefeed (`LF`),
+ * carriage return (`CR`), or tab (`TAB`) characters.
  */
 export class IsValidString extends Func {
   constructor() {
@@ -247,6 +251,7 @@ export class IsValidString extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns `true` if each character in a string is valid. Valid characters are ASCII codes 32 through 126 inclusive and any of linefeed (`LF`), carriage return (`CR`), or tab (`TAB`) characters.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -296,6 +301,7 @@ export class Left extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Returns `n` characters of a string, counting from the left (the beginning) of a string.\n\nSee also [`Mid`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/string-functions/#stringfunctions-mid) and [`Right`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/string-functions/#stringfunctions-right).";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -344,6 +350,7 @@ export class LPad extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Adds spaces to the left (the beginning) of a string until the string contains `n` characters. Strings containing `n` or more characters are truncated to `n` characters.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -400,6 +407,7 @@ export class LPadChar extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 3;
     this.maxArgs = 3;
+    this.docs = "Adds a padding character to the left (the beginning) of a string until the string contains `n` characters. Strings containing `n` or more characters are truncated to `n` characters.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -460,6 +468,7 @@ export class LTrim extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Removes whitespace (spaces, tabs) from the left (the beginning) of a string and returns the remaining characters.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -509,6 +518,7 @@ export class LTrimChars extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Removes any leading characters in a string from the left (the beginning) that match those in the trimming characters and returns the remaining characters.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/string-functions/#stringfunctions-ltrimchars).";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -568,6 +578,7 @@ export class Mid extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 3;
     this.maxArgs = 3;
+    this.docs = "Returns a portion of a string, starting with the character at position `m` for a length of `n` characters.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -622,6 +633,7 @@ export class ParseURL extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Parses a URL string and returns an array of decoded parameter values.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -673,6 +685,7 @@ export class Quote extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Places a string in single quotes and returns the result. Embedded single quotes are not escaped.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -737,6 +750,7 @@ export class RegExMatch extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 100;
+    this.docs = "Matches a regular expression with an input string, stores the marked sub-expressions in variables, and returns the number of matches.\n\nReturns the total number of marked sub-expressions (which could be more or less than the number of variables actually supplied). Any additional matches that exceed the number of variables supplied are discarded. If there are no matches, `-1` is returned.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/string-functions/#stringfunctions-regexmatch).";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -832,6 +846,7 @@ export class RegExReplace extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 3;
     this.maxArgs = 3;
+    this.docs = "Replaces all sub-strings in a string that match an expression, using a specifed format to replace each sub-string. Any sections of the string that do not match the expression are passed through to the returned string unchanged.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/string-functions/#stringfunctions-regexreplace).";
   }
   
   call(args: RuntimeVal[], scope: Scope): never {
@@ -881,6 +896,7 @@ export class Replace extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 3;
     this.maxArgs = 3;
+    this.docs = "Searches a string for sub-strings matching the `old` argument and replaces a matching sub-string with the `new` argument.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -938,6 +954,7 @@ export class Right extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Returns `n` characters of a string, counting from the right (the end) of a string.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -988,6 +1005,7 @@ export class RPad extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Adds spaces to the right (the end) of a string until the string contains `n` characters. Strings containing `n` or more characters are truncated to `n` characters.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -1043,6 +1061,7 @@ export class RPadChar extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 3;
     this.maxArgs = 3;
+    this.docs = "Adds a padding character to the right (the end) of a string until the string contains `n` characters. Strings containing `n` or more characters are truncated to `n` characters.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -1103,6 +1122,7 @@ export class RTrim extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Removes whitespace (spaces, tabs) from the right (the end) of a string and returns the remaining characters.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -1152,6 +1172,7 @@ export class RTrimChars extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Removes any trailing characters in a string from the end that match those in the trimming characters and returns the remaining characters.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/string-functions/#stringfunctions-rtrimchars).";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -1213,6 +1234,7 @@ export class Split extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Splits a string using a delimiter string, returning the result as an array.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/string-functions/#stringfunctions-split).";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -1272,6 +1294,7 @@ export class SplitCSV extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 3;
+    this.docs = "Splits a CSV-formatted string and returns an array with the individual column values.\n\nBy default, the delimiter is a comma (`,`) and the string qualifier is a double quote (`\"`). This can be changed by specifying the optional second and third arguments respectively.";
   }
   
   call(args: RuntimeVal[], scope: Scope): never {
@@ -1333,6 +1356,7 @@ export class StringLength extends Func {
     ];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns the length of a string.\n\nThe function returns an array if the argument is an array, with each element of the returned array the length of the corresponding element of the argument array.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -1387,6 +1411,7 @@ export class ToLower extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Converts all ASCII uppercase characters (A through Z, ASCII 65 through 90) in a string to lowercase.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -1427,6 +1452,7 @@ export class ToProper extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Converts a string to proper case (the first letter of every word being capitalized). This is distinct from title case, which only capitalizes selected and longer words in a string.";
   }
   
   call(args: RuntimeVal[], scope: Scope): never {
@@ -1465,6 +1491,7 @@ export class ToUpper extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Converts all ASCII lowercase characters (a through z, ASCII 97 through 122) in a string to uppercase.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -1504,6 +1531,7 @@ export class Trim extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Removes whitespace from the beginning and end of a string and returns the remaining characters.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -1553,6 +1581,7 @@ export class TrimChars extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Removes any leading or trailing characters in a string that match those in the trimming characters and returns the remaining characters.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/string-functions/#stringfunctions-trimchars).";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -1625,6 +1654,7 @@ export class Truncate extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 3;
     this.maxArgs = 3;
+    this.docs = "Deletes `firstChars` characters from the left (the beginning) and `lastChars` characters from the right (the end) of a string and returns the remaining string.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -1678,6 +1708,7 @@ export class URLDecode extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Parse a URL string and return the decoded value of the URL parameter with the specified name. The case of the name is ignored. If the name is not found in parameters of the URL, an empty string (`\"\"`) is returned.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -1748,6 +1779,7 @@ export class URLEncode extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 2;
+    this.docs = "Encodes a string following RFC 1738.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/string-functions/#stringfunctions-urlencode).";
   }
   
   call(args: RuntimeVal[], scope: Scope) {

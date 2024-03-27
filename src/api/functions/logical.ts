@@ -12,7 +12,7 @@ import { DeferrableFunc, Func, Parameter, Signature } from "../types";
  * The implementation of `Case` function.
  * 
  * This function evaluates pairs of arguments: if the evaluation of the expression
- * in the first argument of a pair is true, it stops checking and returns the second argument
+ * in the first argument of a pair is `true`, it stops checking and returns the second argument
  * with the type preserved. Otherwise it will check the next pair, and so on.
  * If none of the pairs evaluate to `true`, `null` is returned.
  * 
@@ -37,6 +37,7 @@ export class Case extends DeferrableFunc {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 100;
+    this.docs = "This function evaluates pairs of arguments: if the evaluation of the expression in the first argument of a pair is `true`, it stops checking and returns the second argument with the type preserved. Otherwise it will check the next pair, and so on. If none of the pairs evaluate to `true`, `null` is returned.\n\nTo create a default or fall-through case, use `true` and the desired return value as the last pair.";
   }
 
   async callEval(args: Expr[], scope: Scope) {
@@ -96,7 +97,7 @@ export class Case extends DeferrableFunc {
  * The implemetation of `Equal` function.
  * 
  * Performs a recursive comparison of two arrays.
- * Returns true if all corresponding members of the arrays are equal, otherwise it returns false.
+ * Returns `true` if all corresponding members of the arrays are equal, otherwise it returns `false`.
  * It can also be used with simple types, and follows conversion rules to promote
  * different types to compare them.
  * 
@@ -130,6 +131,7 @@ export class Equal extends Func {
     ];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Performs a recursive comparison of two arrays. Returns `true` if all corresponding members of the arrays are equal, otherwise it returns `false`. It can also be used with simple types, and follows conversion rules to promote different types to compare them.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/logical-functions/#logicalfunctions-equal).";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -203,8 +205,8 @@ export class Equal extends Func {
  * 
  * Returns `trueResult` if condition is `true`, else it returns `falseResult`.
  * 
- * If the first argument (condition) is not a boolean data type, it is converted to a boolean before it is evaluated.
- * If the optional third argument is not specified and condition is `false`, a `null` value is returned.
+ * If the first argument (`condition`) is not a boolean data type, it is converted to a boolean before it is evaluated.
+ * If the optional third argument is not specified and `condition` is `false`, a `null` value is returned.
  */
 export class If extends DeferrableFunc {
   constructor() {
@@ -221,6 +223,7 @@ export class If extends DeferrableFunc {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 3;
+    this.docs = "Returns `trueResult` if condition is `true`, else it returns `falseResult`.\n\nIf the first argument (`condition`) is not a boolean data type, it is converted to a boolean before it is evaluated.\n\nIf the optional third argument is not specified and `condition` is `false`, a `null` value is returned.";
   }
 
   async callEval(args: Expr[], scope: Scope) {
@@ -271,7 +274,7 @@ export class If extends DeferrableFunc {
 /**
  * The implementation of `While` function.
  * 
- * Repeatedly executes an expression as long as a condition is true.
+ * Repeatedly executes an expression as long as a condition is `true`.
  * 
  * The Jitterbit variable `jitterbit.scripting.while.max_iterations` limits
  * the number of iterations.
@@ -291,6 +294,7 @@ export class While extends DeferrableFunc {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Repeatedly executes an expression as long as a condition is `true`.\n\nThe Jitterbit variable `jitterbit.scripting.while.max_iterations` limits the number of iterations. An error is reported if the maximum number of iterations is reached.";
   }
 
   async callEval(args: Expr[], scope: Scope) {

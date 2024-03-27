@@ -29,6 +29,7 @@ export class AESDecryption extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 5;
+    this.docs = "This function decrypts a string encrypted with the AES algorithm.\n\nThe decrypted output is returned as a string. See [`AESEncryption`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/cryptographic-functions/#cryptographicfunctions-aesencryption) for additional details.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -97,6 +98,7 @@ export class AESEncryption extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 5;
+    this.docs = "This function encrypts a string using the AES algorithm. The key is generated according to Password-Based Cryptography Specification Version 2.0 ([PKCS5S2](https://tools.ietf.org/html/rfc2898#section-4.1)).\n\nThe encrypted output is a base64-encoded string. The output from `AESEncryption` can be passed directly to [`AESDecryption`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/cryptographic-functions/#cryptographicfunctions-aesdecryption), for decryption, using the same parameters as when the plaintext string was encrypted.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -156,6 +158,7 @@ export class Base64Decode extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Decodes a base64-encoded string, returning binary data. See also [`Base64Encode`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/cryptographic-functions/#cryptographicfunctions-base64encode).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -188,6 +191,7 @@ export class Base64Decode extends Func {
  * maximum line length, this should be explicitly disabled only as needed.
  * To disable this, set the `jitterbit.base64.encoded.string.no.wrap` Jitterbit variable
  * to `true` before calling this function.
+ * 
  * This variable is supported with string data when using 10.49 agents and later, and
  * with binary data when using 10.x agents 10.66 and later and 11.x agents 11.4 and later.
  * 
@@ -206,6 +210,7 @@ export class Base64Encode extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Encodes the argument data, treating the characters in a string as binary data unless the input is already binary. If the type of the argument is not binary or a string, then the argument value is first converted to a string before encryption.\n\nA newline character (`\\n`) is added after every 64th character of the encoded result string. As many implementations of Base64 include newlines to limit the encoded result's maximum line length, this should be explicitly disabled only as needed. To disable this, set the `jitterbit.base64.encoded.string.no.wrap` Jitterbit variable to `true` before calling this function.\n\nThis variable is supported with string data when using 10.49 agents and later, and with binary data when using 10.x agents 10.66 and later and 11.x agents 11.4 and later.\n\nSee also [`Base64Decode`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/cryptographic-functions/#cryptographicfunctions-base64decode).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -281,6 +286,7 @@ export class Base64EncodeFile extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 2;
+    this.docs = "Reads a binary file from the specified source activity and returns the contents as a base64-encoded string. This method is generally used for files that could be binary. To read a text file, use [`ReadFile`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/file-functions/#filefunctions-readfile) instead.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/cryptographic-functions/#cryptographicfunctions-base64encodefile).";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -331,6 +337,7 @@ export class MD5 extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Applies the MD5 hash function to the supplied argument. The hash is returned as a 64-bit string of hex numbers. Non-string data will first be converted to a string.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -371,6 +378,7 @@ export class MD5AsTwoNumbers extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Applies the MD5 hash function to an input string and returns the result as an array with two 64-bit numbers. Non-string data will first be converted to a string.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -412,6 +420,7 @@ export class SHA256 extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Applies the SHA-256 hash function to an input string. The hash returned is a string of 64 hex numbers.\n\nIf the input is a string, it will first be converted to the UTF-8 byte representation. Non-string data will first be converted to a string.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {

@@ -10,7 +10,7 @@ import { Func, Parameter, Signature } from "../types";
  * The implementation of `Ceiling` function.
  * 
  * Returns the mathematical ceiling (rounded up to the nearest integer) of a given value as an integer.
- * The argument should be a double and is first converted to a double if not.
+ * The argument should be a `double` and is first converted to a `double` if not.
  */
 export class Ceiling extends Func {
   constructor() {
@@ -23,6 +23,7 @@ export class Ceiling extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns the mathematical ceiling (rounded up to the nearest integer) of a given value as an integer. The argument should be a `double` and is first converted to a `double` if not.";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -46,8 +47,8 @@ export class Ceiling extends Func {
 /**
  * The implementation of `Exp` function.
  * 
- * Returns the mathematical result e^d, or e to the power of d.
- * The argument should be a double and is first converted to a double if not.
+ * Returns the mathematical result e^`d`, or e to the power of `d`.
+ * The argument should be a `double` and is first converted to a `double` if not.
  */
 export class Exp extends Func {
   constructor() {
@@ -60,6 +61,7 @@ export class Exp extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns the mathematical result e^`d`, or e to the power of `d`. The argument should be a `double` and is first converted to a `double` if not.";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -84,7 +86,7 @@ export class Exp extends Func {
  * The implementation of `Floor` function.
  * 
  * Returns the mathematical floor (rounded down to the nearest integer) of a given value as an integer.
- * The argument should be a double and is first converted to a double if not.
+ * The argument should be a `double` and is first converted to a `double` if not.
  */
 export class Floor extends Func {
   constructor() {
@@ -97,6 +99,7 @@ export class Floor extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns the mathematical floor (rounded down to the nearest integer) of a given value as an integer. The argument should be a `double` and is first converted to a `double` if not.";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -121,7 +124,7 @@ export class Floor extends Func {
  * The implementation of `Log` function.
  * 
  * Returns the natural log (logarithm to the base e) of a given value.
- * The argument should be a double and is first converted to a double if not.
+ * The argument should be a `double` and is first converted to a `double` if not.
  */
 export class Log extends Func {
   constructor() {
@@ -134,6 +137,7 @@ export class Log extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns the natural log (logarithm to the base e) of a given value. The argument should be a `double` and is first converted to a `double` if not.";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -162,7 +166,7 @@ export class Log extends Func {
 /**
  * The implementation of `Log10` function.
  * 
- * Returns the logarithm to the base 10 of a given value. The argument should be a double and is first converted to a double if not.
+ * Returns the logarithm to the base 10 of a given value. The argument should be a `double` and is first converted to a `double` if not.
  */
 export class Log10 extends Func {
   constructor() {
@@ -175,6 +179,7 @@ export class Log10 extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns the logarithm to the base 10 of a given value. The argument should be a `double` and is first converted to a `double` if not.";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -205,7 +210,7 @@ export class Log10 extends Func {
  * 
  * Calculates the modulus (the remainder) of the division of the numerator by the denominator.
  * The return value has the same sign as the numerator.
- * If the denominator is 0, the numerator is returned.
+ * If the denominator is `0`, the numerator is returned.
  */
 export class Mod extends Func {
   constructor() {
@@ -221,6 +226,7 @@ export class Mod extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Calculates the modulus (the remainder) of the division of the numerator by the denominator. The return value has the same sign as the numerator. If the denominator is `0`, the numerator is returned.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -254,10 +260,10 @@ export class Mod extends Func {
 /**
  * The implementation of `Pow` function.
  * 
- * Returns the mathematical result base^exponent, or base to the power of exponent.
- * The arguments should be doubles and are first converted to doubles if not.
+ * Returns the mathematical result `base^exponent`, or base to the power of exponent.
+ * The arguments should be `double` and are first converted to `double` if not.
  * 
- * `Pow(0, 0)` returns 1.
+ * `Pow(0, 0)` returns `1`.
  */
 export class Pow extends Func {
   constructor() {
@@ -273,6 +279,7 @@ export class Pow extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Returns the mathematical result `base^exponent`, or base to the power of exponent. The arguments should be `double` and are first converted to `double` if not.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -304,7 +311,7 @@ export class Pow extends Func {
  * The implementation of `Round` function.
  * 
  * Returns the given value rounded to a specified precision and then converted to a string.
- * The argument should be a double and is first converted to a double if not.
+ * The argument should be a `double` and is first converted to a `double` if not.
  * This function is designed for displaying values (not computing) as the output is a string.
  * 
  * This function is similar to the String `Format` function.
@@ -323,6 +330,7 @@ export class Round extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 2;
+    this.docs = "Returns the given value rounded to a specified precision and then converted to a string. The argument should be a `double` and is first converted to a `double` if not. This function is designed for displaying values (not computing) as the output is a string.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -371,7 +379,7 @@ export class Round extends Func {
  * The implementation of `RoundToInt` function.
  * 
  * Returns the given value rounded to the nearest integer (no decimal places).
- * The argument should be a double and is first converted to a double if not.
+ * The argument should be a `double` and is first converted to a `double` if not.
  */
 export class RoundToInt extends Func {
   constructor() {
@@ -386,6 +394,7 @@ export class RoundToInt extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns the given value rounded to the nearest integer (no decimal places). The argument should be a `double` and is first converted to a `double` if not.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -410,7 +419,7 @@ export class RoundToInt extends Func {
  * The implementation of `Sqrt` function.
  * 
  * Returns the square root of a given value.
- * The argument should be a double and is first converted to a double if not.
+ * The argument should be a `double` and is first converted to a `double` if not.
  * 
  * This implementation throws instead of returning `-nan` for negative input.
  */
@@ -427,6 +436,7 @@ export class Sqrt extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns the square root of a given value. The argument should be a `double` and is first converted to a `double` if not.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {

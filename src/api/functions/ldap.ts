@@ -24,6 +24,7 @@ export class ArrayToMultipleValues extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Signals that an array should be used to populate a multiple-valued LDAP attribute when mapping to an LDAP target. The array is converted to XML and interpreted when the LDAP server is written to.";
   }
   
   call(args: RuntimeVal[], scope: Scope): never {
@@ -70,6 +71,7 @@ export class LDAPAdd extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "After a connection is established, `LDAPAdd` is used to add entries and attributes to the connected LDAP directory. The value is added to the node specified in `LDAPExecute`, which should be called immediately afterwards to have the changes take effect.\n\nSee also [`LDAPConnect`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/ldap-functions/#ldapfunctions-ldapconnect) and [`LDAPExecute`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/ldap-functions/#ldapfunctions-ldapexecute).";
   }
   
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -122,6 +124,7 @@ export class LDAPConnect extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 3;
     this.maxArgs = 5;
+    this.docs = "Connects to a directory using LDAP.\n\nSee also [`LDAPExecute`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/ldap-functions/#ldapfunctions-ldapexecute).";
   }
   
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -185,6 +188,7 @@ export class LDAPDeleteEntry extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "After a connection is established, `LDAPDeleteEntry` is used to remove an entry specified by a distinguished name.\n\nSee also [`LDAPConnect`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/ldap-functions/#ldapfunctions-ldapconnect) and [`LDAPExecute`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/ldap-functions/#ldapfunctions-ldapexecute).";
   }
   
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -219,7 +223,7 @@ export class LDAPDeleteEntry extends AsyncFunc {
  * to execute one or more modifications (add, remove, replace) that have previously been
  * specified with the `LDAPAdd`, `LDAPRemove`, or `LDAPReplace` functions.
  * 
- * See also the `LDAPConnect` and `LDAPExecute` functions.
+ * See also `LDAPConnect`.
  */
 export class LDAPExecute extends AsyncFunc {
   constructor() {
@@ -232,6 +236,7 @@ export class LDAPExecute extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "After a connection is established, `LDAPExecute` is used to execute one or more modifications (add, remove, replace) that have previously been specified with [`LDAPAdd`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/ldap-functions/#ldapfunctions-ldapadd), [`LDAPRemove`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/ldap-functions/#ldapfunctions-ldapremove), or [`LDAPReplace`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/ldap-functions/#ldapfunctions-ldapreplace).\n\nSee also [`LDAPConnect`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/ldap-functions/#ldapfunctions-ldapconnect).";
   }
   
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -266,6 +271,7 @@ export class LDAPExecute extends AsyncFunc {
  * of a specified type and with a specified value.
  * 
  * If the attribute type of that value is not found, an error is thrown.
+ * 
  * See also the `LDAPConnect` and `LDAPExecute` functions.
  */
 export class LDAPRemove extends AsyncFunc {
@@ -282,6 +288,7 @@ export class LDAPRemove extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Once a connection is established, `LDAPRemove` is used to remove an attribute of a specified type and with a specified value.\n\nIf the attribute type of that value is not found, an error is thrown.\n\nSee also [`LDAPConnect`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/ldap-functions/#ldapfunctions-ldapconnect) and [`LDAPExecute`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/ldap-functions/#ldapfunctions-ldapexecute).";
   }
   
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -337,6 +344,7 @@ export class LDAPRename extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 4;
+    this.docs = "Once a connection is established, `LDAPRename` is used to change the distinguished name of an entry in the connected directory.\n\nSee also [`LDAPConnect`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/ldap-functions/#ldapfunctions-ldapconnect) and [`LDAPExecute`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/ldap-functions/#ldapfunctions-ldapexecute).";
   }
   
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -400,6 +408,7 @@ export class LDAPReplace extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Once a connection is established, `LDAPReplace` is used to replace an existing attribute's value with a new value.\n\nSee also [`LDAPConnect`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/ldap-functions/#ldapfunctions-ldapconnect) and [`LDAPExecute`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/ldap-functions/#ldapfunctions-ldapexecute).";
   }
   
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -458,6 +467,7 @@ export class LDAPSearch extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 4;
     this.maxArgs = 100;
+    this.docs = "Once a connection is established, `LDAPSearch` is used to search within the connected directory.\n\nSee also [`LDAPConnect`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/ldap-functions/#ldapfunctions-ldapconnect) and [`LDAPExecute`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/ldap-functions/#ldapfunctions-ldapexecute).";
   }
   
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {

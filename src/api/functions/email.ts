@@ -9,6 +9,7 @@ import { AsyncFunc, Parameter, Signature } from "../types";
  * The implementation of `SendEmail` function.
  * 
  * Sends an email using the supplied information.
+ * 
  * On success, an empty string is returned; otherwise, any error messages are returned.
  * 
  * Only the first four parameters are required; the rest are optional.
@@ -38,6 +39,7 @@ export class SendEmail extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 4;
     this.maxArgs = 11;
+    this.docs = "Sends an email using the supplied information.\n\nOn success, an empty string is returned; otherwise, any error messages are returned.\n\nIf information is not specified, it will be read from the server configuration file. If it is not available in the configuration file, the email will not be sent.";
   }
   
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -111,6 +113,7 @@ export class SendEmail extends AsyncFunc {
  * The implementation of `SendEmailMessage` function.
  * 
  * Sends an email using a predefined email notification.
+ * 
  * On success, an empty string is returned; otherwise, any error messages are returned.
  * 
  * The email message used in this function call must be defined as an email notification
@@ -129,6 +132,7 @@ export class SendEmailMessage extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Sends an email using a predefined email notification.\n\nOn success, an empty string is returned; otherwise, any error messages are returned.\n\nThe email message used in this function call must be defined as an email notification in the current project.\n\nFor more information, see [Notifications](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/scripts/jitterbit-script#jitterbitscript-notifications).";
   }
   
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -176,6 +180,7 @@ export class SendSystemEmail extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 3;
     this.maxArgs = 3;
+    this.docs = "Sends an email using a pre-configured \"From\" address, SMTP servers, and account information. These are defined in the server configuration file. If not, use one of the other email functions.\n\nOn success, an empty string is returned; otherwise, any error messages are returned.";
   }
   
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {

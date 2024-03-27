@@ -46,6 +46,7 @@ export class ArgumentList extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 100;
+    this.docs = "This function initializes a set of local variables from its argument list.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-argumentlist).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -98,6 +99,7 @@ export class AutoNumber extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Returns the number of an instance within a particular hierarchy.\n\n**Warning**: This method has been deprecated and may be removed in a future version of Jitterbit. Use either the [`TargetInstanceCount`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-targetinstancecount) or [`SourceInstanceCount`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-sourceinstancecount) instead. `TargetInstanceCount` is equivalent to this function.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -140,6 +142,7 @@ export class CancelOperation extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Cancels a particular operation specified by the operation's reference path.";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -167,9 +170,9 @@ export class CancelOperation extends AsyncFunc {
 /**
  * The implementation of `CancelOperationChain` function.
  * 
- * If the current operation has either success or failure operations, calling this method will
- * cause those operations to be canceled.
- * Any operations linked by a condition will also be canceled.
+ * If the current operation has either success or failure operations, calling this function will
+ * cause those operations to be cancelled.
+ * Any operations linked by a condition will also be cancelled.
  * However, any scripts in the current operation will be completed.
  * 
  * This can be useful if an operation is running in a loop and the condition to stop
@@ -186,6 +189,7 @@ export class CancelOperationChain extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "If the current operation has either success or failure operations, calling this function will cause those operations to be cancelled. Any operations linked by a condition will also be cancelled. However, any scripts in the current operation will be completed.";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -242,6 +246,7 @@ export class Eval extends DeferrableFunc {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Evaluates the first argument; if valid, its result is returned as a string. Otherwise, the default value is evaluated and its results are returned as a string.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-eval).";
   }
 
   async callEval(args: Expr[], scope: Scope) {
@@ -292,7 +297,7 @@ export class Eval extends DeferrableFunc {
  * the function retrieves a specific element by its index (or indices for a multi-dimensional
  * array such as a record-set) using the remaining arguments.
  * 
- * Arrays are zero-indexed; the first element is at index 0 and the last element
+ * Arrays are zero-indexed; the first element is at index `0` and the last element
  * (of the array `$array`) is at index `[Length($array)-1]`.
  * 
  * Attempting to retrieve an element beyond the end of the array will result in
@@ -315,6 +320,7 @@ export class Get extends Func {
     ];
     this.minArgs = 1;
     this.maxArgs = 100;
+    this.docs = "Returns the value of a global variable with a given name. If passed an array or the name of a global variable that is an array, returns an element of the array. See also the complementary [`Set`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-set).\n\nIf the first argument is either an array or the name of a global variable that is an array, the function retrieves a specific element by its index (or indices for a multi-dimensional array such as a record-set) using the remaining arguments.\n\nArrays are zero-indexed; the first element is at index `0` and the last element (of the array `$array`) is at index `[Length($array)-1]`.\n\nAttempting to retrieve an element beyond the end of the array will result in a return value of `null`.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -376,6 +382,7 @@ export class Get extends Func {
  * The implementation of `GetChunkDataElement` function.
  * 
  * Returns the value of the chunk variable with a given name.
+ * 
  * A chunk variable is evaluated as each chunk of data is processed.
  * An alternative method is to use the `SCOPE_CHUNK` syntax of the `Set` function.
  * 
@@ -392,6 +399,7 @@ export class GetChunkDataElement extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns the value of the chunk variable with a given name.\n\nA chunk variable is evaluated as each chunk of data is processed. An alternative method is to use the `SCOPE_CHUNK` syntax of the `Set` function.\n\nSee also the [`SetChunkDataElement`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-setchunkdataelement) and [`Set`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-set) functions.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -433,6 +441,7 @@ export class GetHostByIP extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Resolves an IP address to a host name.";
   }
 
   async callAsync(args: RuntimeVal[], scope: Scope) {
@@ -477,7 +486,7 @@ export class GetHostByIP extends AsyncFunc {
  * Returns the unformatted input as a string given a source global variable.
  * 
  * This is useful if the standard Jitterbit representation of a data type
- * (such as a date or double) is not suitable and the "raw" input is required.
+ * (such as `date` or `double`) is not suitable and the "raw" input is required.
  * If this method is called on an object that is not a source global variable,
  * an empty string is returned.
  */
@@ -493,6 +502,7 @@ export class GetInputString extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns the unformatted input as a string given a source global variable.\n\nThis is useful if the standard Jitterbit representation of a data type (such as `date` or `double`) is not suitable and the \"raw\" input is required. If this method is called on an object that is not a source global variable, an empty string is returned.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -538,6 +548,7 @@ export class GetLastOperationRunStartTime extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns the last date and time the given operation was run.\n\nThe return value is a date (which includes the date and time).\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-getlastoperationrunstarttime).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -576,6 +587,7 @@ export class GetName extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns the name of a variable or a global variable.\n\nCertain functions return a named global variable array; if defined, this function retrieves the name of the value.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -607,12 +619,12 @@ export class GetName extends Func {
  * 
  * The result is returned as an array of arrays, with these elements in each sub-array:
  * 
- * - `0`: Operation GUID (string)
- * - `1`: The IsExecuting flag (boolean)
- * - `2`: Timestamp (date) for when the operation was added to the queue
- * - `3`: Seconds in current status (integer)
- * - `4`: Operation instance GUID (string)
- * - `5`: Operation name (string)
+ * - `0`: Operation GUID (`string`)
+ * - `1`: The IsExecuting flag (`bool`)
+ * - `2`: Timestamp for when the operation was added to the queue (`date`)
+ * - `3`: Seconds in current status (`integer`)
+ * - `4`: Operation instance GUID (`string`)
+ * - `5`: Operation name (`string`)
  * 
  * The operation tag argument is optional.
  * If the operation tag argument is present, only queue entries for that particular
@@ -631,6 +643,7 @@ export class GetOperationQueue extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 1;
+    this.docs = "Returns the contents of the operation queue as an array. Only operations that the current user has read access for will be returned.\n\nThe result is returned as an array of arrays, with these elements in each sub-array:\n- `0`: Operation GUID (`string`)\n- `1`: The IsExecuting flag (`bool`)\n- `2`: Timestamp for when the operation was added to the queue (`date`)\n- `3`: Seconds in current status (`integer`)\n- `4`: Operation instance GUID (`string`)\n- `5`: Operation name (`string`)";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -673,6 +686,7 @@ export class GetServerName extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Returns the name of the machine that the agent is running on.";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -694,7 +708,7 @@ export class GetServerName extends Func {
  * 
  * Returns a GUID string (a globally unique identifier, also known as a universally unique identifier or UUID).
  * 
- * The format of the GUID is `xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx`, where M is the version (4) and N is the variant (8).
+ * The format of the GUID is `xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx`, where `M` is the version (4) and `N` is the variant (8).
  */
 export class GUID extends Func {
   constructor() {
@@ -707,6 +721,7 @@ export class GUID extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Returns a GUID string (a globally unique identifier/UUID).\n\nThe format of the GUID is `xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx`, where `M` is the version (4) and `N` is the variant (8).";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -749,6 +764,7 @@ export class IfEmpty extends DeferrableFunc {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Returns the default value if the first argument is `null` or if the string representation of the argument is an empty string. Otherwise, it returns the first argument.";
   }
 
   async callEval(args: Expr[], scope: Scope) {
@@ -805,7 +821,7 @@ export class IfEmpty extends DeferrableFunc {
 /**
  * The implementation of `IfNull` function.
  * 
- * Returns the default value if the first argument is null, else returns the first argument.
+ * Returns the default value if the first argument is `null`, else returns the first argument.
  * 
  * This is a shortcut for an `If` function statement:
  * 
@@ -827,6 +843,7 @@ export class IfNull extends DeferrableFunc {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Returns the default value if the first argument is `null`, else returns the first argument.\n\nSee also [`IsNull`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-isnull) and [`IfEmpty`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-ifempty).";
   }
 
   async callEval(args: Expr[], scope: Scope) {
@@ -900,6 +917,7 @@ export class InitCounter extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 2;
+    this.docs = "Initializes a counter, optionally passing an initial value.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-initcounter).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -952,11 +970,11 @@ export class InitCounter extends Func {
  * Checks for `x` in the list of arguments (`arg1` through `argN`).
  * If a match (by value) is found, this function will return an integer representing
  * the position of the match in the list, with the first position in the list being
- * represented by the integer 1.
+ * represented by the integer `1`.
  * 
  * If the list contains more than one instance of `x`, this function returns the position
  * of the first match (the match with the lowest position index).
- * 0 is returned if the list does not contain a matching value or if only
+ * `0` is returned if the list does not contain a matching value or if only
  * a single argument is supplied.
  */
 export class InList extends Func {
@@ -973,6 +991,7 @@ export class InList extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 100;
+    this.docs = "Checks for `x` in the list of arguments (`arg1` through `argN`). If a match (by value) is found, this function will return an integer representing the position of the match in the list, with the first position in the list being represented by the integer `1`.\n\nIf the list contains more than one instance of `x`, this function returns the position of the first match (the match with the lowest position index). `0` is returned if the list does not contain a matching value or if only a single argument is supplied.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -1007,7 +1026,7 @@ export class InList extends Func {
 /**
  * The implementation of `IsInteger` function.
  * 
- * Returns true if the argument is of type integer or long or can be converted to
+ * Returns `true` if the argument is of type `integer` or `long` or can be converted to
  * an integer or long without any loss of information.
  */
 export class IsInteger extends Func {
@@ -1021,6 +1040,7 @@ export class IsInteger extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns `true` if the argument is of type `integer` or `long` or can be converted to an integer or long without any loss of information.";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -1066,6 +1086,7 @@ export class IsNull extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns `true` if the argument is `null`. Applies to database fields, variables, and functions that can return nulls.\n\nSee also [`IfNull`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-ifnull) and [`IfEmpty`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-ifempty).";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -1091,7 +1112,7 @@ export class IsNull extends Func {
 /**
  * The implementation of `IsValid` function.
  * 
- * Returns true if the evaluation of the argument results without an error.
+ * Returns `true` if the evaluation of the argument results without an error.
  */
 export class IsValid extends DeferrableFunc {
   constructor() {
@@ -1104,6 +1125,7 @@ export class IsValid extends DeferrableFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns `true` if the evaluation of the argument results without an error.";
   }
 
   async callEval(args: Expr[], scope: Scope) {
@@ -1147,7 +1169,7 @@ export class IsValid extends DeferrableFunc {
  * - `array`: the number of elements in the array is returned
  * - `binary`: the number of bytes is returned
  * - for all other types, an attempt is made to convert the argument to a string, and the length of the resulting string is returned.
- * - if the argument cannot be converted to a string, or the argument is `null` or of an unknown type, 0 is returned.
+ * - if the argument cannot be converted to a string, or the argument is `null` or of an unknown type, `0` is returned.
  */
 export class Length extends Func {
   constructor() {
@@ -1160,6 +1182,7 @@ export class Length extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns the length of the input argument.\n\nThe behavior of this method depends on the argument type:\n- `string`: the length of the string is returned\n- `array`: the number of elements in the array is returned\n- `binary`: the number of bytes is returned\n- for all other types, an attempt is made to convert the argument to a string, and the length of the resulting string is returned.\n- if the argument cannot be converted to a string, or the argument is `null` or of an unknown type, `0` is returned.";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -1197,7 +1220,7 @@ export class Length extends Func {
 /**
  * The implementation of `Null` function.
  * 
- * Returns null.
+ * Returns `null`.
  */
 export class Null extends Func {
   constructor() {
@@ -1210,6 +1233,7 @@ export class Null extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Returns `null`.";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -1246,6 +1270,7 @@ export class Random extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Generates a random integer number between and including the given minimum and maximum values.\n\nSee also [`RandomString`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-randomstring).";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -1280,7 +1305,7 @@ export class Random extends Func {
  * The implementation of `RandomString` function.
  * 
  * Generates a random string of the given length.
- * By default, the function uses alphanumeric characters; the set that includes a-z, A-Z, and 0-9.
+ * By default, the function uses alphanumeric characters; the set that includes `a-z`, `A-Z`, and `0-9`.
  * See also the `Random` function.
  */
 export class RandomString extends Func {
@@ -1297,6 +1322,7 @@ export class RandomString extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 2;
+    this.docs = "Generates a random string of the given length.\n\nBy default, the function uses alphanumeric characters; the set that includes `a-z`, `A-Z`, and `0-9`.\n\nSee also [`Random`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-random).";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -1361,6 +1387,7 @@ export class ReadArrayString extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 2;
+    this.docs = "Reads a string that represents a single or multi-dimensional array.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-readarraystring).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -1396,8 +1423,8 @@ export class ReadArrayString extends Func {
  * 
  * If it is called in a condition, it returns the instance number of the last instance that
  * was generated.
- * The first time this method is called in a loop it returns 0 (zero) if called in a condition;
- * otherwise, it returns 1 (one). The counter is reset to 0 each time a new loop is started.
+ * The first time this method is called in a loop it returns `0` if called in a condition;
+ * otherwise, it returns 1. The counter is reset to `0` each time a new loop is started.
  */
 export class RecordCount extends Func {
   constructor() {
@@ -1410,6 +1437,7 @@ export class RecordCount extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Returns the instance number of the target loop that is currently being generated.\n\nIf it is called in a condition, it returns the instance number of the last instance that was generated. The first time this method is called in a loop it returns `0` if called in a condition; otherwise, it returns 1. The counter is reset to `0` each time a new loop is started.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -1452,6 +1480,7 @@ export class ReRunOperation extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 1;
+    this.docs = "Re-runs the current operation.\n\nThe behavior of this method with respect to return value and global variables is identical to [`RunOperation`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-runoperation).";
   }
 
   async callAsync(args: RuntimeVal[], scope: Scope): Promise<never> {
@@ -1501,6 +1530,7 @@ export class RunOperation extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 2;
+    this.docs = "Runs an operation synchronously or asynchronously, with synchronous being the default.\n\nThe operation used in this function call must be defined as an operation in the current project.";
   }
 
   async callAsync(args: RuntimeVal[], scope: Scope): Promise<never> {
@@ -1558,6 +1588,7 @@ export class RunPlugin extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Runs a specified plugin and then continues execution of the current script. If multiple versions of a plugin are installed on an agent, the highest available version is used.\n\nReturns `true` if the plugin completes without errors. Returns `false` if the plugin could not be run or the plugin implementation itself returned an error.";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -1593,7 +1624,7 @@ export class RunPlugin extends AsyncFunc {
  * For more information, see the instructions on inserting scripts under
  * *Jitterbit Script* or *JavaScript*.
  * 
- * A list of values can be passed to a `RunScript` function as input variables.
+ * A list of values can be passed to a `RunScript` call as input variables.
  * The script will create local variables using these values with default names such as `_1`, `_2` ....
  * 
  * If comprehensive names are preferred, the `ArgumentList` function can be used to map a list
@@ -1617,6 +1648,7 @@ export class RunScript extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 100;
+    this.docs = "Runs the specified script and then continues execution of the current script. This method returns, on success, the return value of the called script as a string.\n\nThe script used in this function call must be defined as either a [Jitterbit Script](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/scripts/jitterbit-script) or [JavaScript](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/scripts/javascript) in the current project.\n\nA list of values can be passed to a `RunScript` call as input variables, see [`ArgumentList`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-argumentlist).";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -1680,6 +1712,7 @@ export class Set extends Func {
     ];
     this.minArgs = 2;
     this.maxArgs = 100;
+    this.docs = "Sets the value of a global variable with a given name to a value, and returns the value.\n\nSee also the complementary [`Get`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-get).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -1771,6 +1804,7 @@ export class SetChunkDataElement extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Sets the value of a specified chunk variable, and returns the value.\n\nA chunk variable is evaluated as each chunk of data is processed.\n\nAn alternative method is to use the `SCOPE_CHUNK` syntax of [`Set`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-set).\n\nSee also [`GetChunkDataElement`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-getchunkdataelement).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -1816,6 +1850,7 @@ export class Sleep extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Causes execution to be suspended for a specified number of seconds.";
   }
 
   async callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -1855,7 +1890,7 @@ export class Sleep extends AsyncFunc {
  * The value is independent of whether the target instance has been generated or not;
  * the same value is returned if called in a condition script or in a mapping script.
  * 
- * When the first source instance is used as the generator, 1 is returned, then 2, and so forth.
+ * When the first source instance is used as the generator, `1` is returned, then `2`, and so forth.
  * 
  * See also the `TargetInstanceCount` function.
  */
@@ -1870,6 +1905,7 @@ export class SourceInstanceCount extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Returns the instance count of the most recent generator.\n\nThe value is independent of whether the target instance has been generated or not; the same value is returned if called in a condition script or in a mapping script.\n\nWhen the first source instance is used as the generator, `1` is returned, then `2`, and so forth.\n\nSee also [`TargetInstanceCount`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-targetinstancecount).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -1896,8 +1932,8 @@ export class SourceInstanceCount extends Func {
  * The number returned by this method will be one less if it is called in a condition since,
  * in a condition, it is not known if the current target instance will be generated or not.
  * 
- * When the first target instance is generated, 1 is returned, then 2, and so forth.
- * If called in a condition, the sequence will instead be 0, 1, and so forth.
+ * When the first target instance is generated, `1` is returned, then `2`, and so forth.
+ * If called in a condition, the sequence will instead be `0`, `1`, and so forth.
  * 
  * See also the `SourceInstanceCount` function.
  */
@@ -1912,6 +1948,7 @@ export class TargetInstanceCount extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Returns the instance count of a generating target loop node.\n\nWhen called in a condition it returns the number of target instances that have been generated so far for the current loop node. The number returned by this method will be one less if it is called in a condition since, in a condition, it is not known if the current target instance will be generated or not.\n\nWhen the first target instance is generated, `1` is returned, then `2`, and so forth. If called in a condition, the sequence will instead be `0`, `1`, and so forth.\n\nSee also [`SourceInstanceCount`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-sourceinstancecount).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -1970,6 +2007,7 @@ export class WaitForOperation extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 3;
+    this.docs = "Stops execution of a script or mapping until all instances of the specified operation currently in the operation queue have finished processing. This method is useful if you want to add many instances of an operation to the queue for parallel processing and then wait for all of them to finish.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-waitforoperation).";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {

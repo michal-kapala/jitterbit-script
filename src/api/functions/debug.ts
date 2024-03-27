@@ -8,10 +8,10 @@ import { Func, Parameter, Signature } from "../types";
 /**
  * The implementation of `DebugBreak` function.
  * 
- * When passed an expression that evaluates to true, `DebugBreak()` causes
- * execution control to returnto the client when testing a script, expression,
+ * When passed an expression that evaluates to `true`, `DebugBreak()` causes
+ * execution control to return to the client when testing a script, expression,
  * transformation, or operation.
- * Returns true if execution was stopped; otherwise false is returned.
+ * Returns `true` if execution was stopped; otherwise `false` is returned.
 * 
 * The input argument is optional: `DebugBreak()` is equivalent to `DebugBreak(true)`.
 * 
@@ -33,6 +33,7 @@ export class DebugBreak extends Func {
       ])
     ];
     this.signature = this.signatures[0];
+    this.docs = "When passed an expression that evaluates to `true`, `DebugBreak()` causes execution control to return to the client when testing a script, expression, transformation, or operation.\n\nReturns `true` if execution was stopped; otherwise `false` is returned.\n\nThe input argument is optional: `DebugBreak()` is equivalent to `DebugBreak(true)`.\n\nFor more information, see [Script Testing](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/scripts/script-testing).";
   }
 
   call(args: RuntimeVal[], scope: Scope) {

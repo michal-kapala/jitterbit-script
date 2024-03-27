@@ -10,7 +10,7 @@ import { Func, Parameter, Signature } from "../types";
  * The implementation of `Count` function.
  * 
  * Counts all instances of a data element at a particular hierarchical level
- * in a source or target, where that data element contains a valid value (and is not null).
+ * in a source or target, where that data element contains a valid value (and is not `null`).
  * 
  * The function returns either an integer or an array of instances,
  * depending on the context in which it is called.
@@ -26,6 +26,7 @@ export class Count extends Func {
     ];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Counts all instances of a data element at a particular hierarchical level in a source or target, where that data element contains a valid value (and is not `null`).\n\nThe function returns either an integer or an array of instances, depending on the context in which it is called.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -73,7 +74,7 @@ export class Count extends Func {
  * Returns the number of source instances for a target node,
  * when the target node is referring to a parent of a mapping field.
  * 
- * If the target node is not a loop node, the function returns 1.
+ * If the target node is not a loop node, the function returns `1`.
  * See also the `SourceInstanceCount` function.
  */
 export class CountSourceRecords extends Func {
@@ -87,6 +88,7 @@ export class CountSourceRecords extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Returns the number of source instances for a target node, when the target node is referring to a parent of a mapping field.\n\nIf the target node is not a loop node, the function returns `1`. See also [`SourceInstanceCount`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-sourceinstancecount).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -130,6 +132,7 @@ export class Exist extends Func {
     ];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Checks for the existence of a value (`v`) in instances of a data element (`de`) or an array (`arr`) and returns `true` (or `false`) depending if it is found.\n\nThe function returns either a boolean or an array of instances, depending on the context in which it is called.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -205,6 +208,7 @@ export class FindByPos extends Func {
     ];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Returns the value of a data element from an instance that occurs multiple times. It can also be used to return an element of an array, in a 1-based fashion.\n\nIf a negative number is specified for the occurrence or array, counting will begin from the last row or element. Note that the index is 1-based.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -254,6 +258,7 @@ export class FindByPos extends Func {
  * The implementation of `FindValue` function.
  * 
  * Searches multiple instances of a data element (`de1`) looking for the value specified in `v`.
+ * 
  * If the function finds the value, it returns the value in the field specified in
  * the third parameter (`de2`) for that found instance.
  * If the value is not found, the function returns `null`.
@@ -274,6 +279,7 @@ export class FindValue extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 3;
     this.maxArgs = 3;
+    this.docs = "Searches multiple instances of a data element (`de1`) looking for the value specified in `v`.\n\nIf the function finds the value, it returns the value in the field specified in the third parameter (`de2`) for that found instance. If the value is not found, the function returns `null`.\n\n See also [`HasKey`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/dictionary-and-array-functions/#dictionaryandarrayfunctions-haskey).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -343,6 +349,7 @@ export class GetInstance extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Returns the instance data element which was defined by calling [`SetInstances`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/instance-functions/#instancefunctions-setinstances) function during the generation of the parent.\n\nAs an alternative to this function, see [`ArgumentList`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/general-functions/#generalfunctions-argumentlist).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -378,6 +385,7 @@ export class Max extends Func {
     ];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns the maximum value of instances of a data element at a particular level in the hierarchy of a data structure.\n\nIt can also be used to return the maximum value of an array.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -457,6 +465,7 @@ export class Min extends Func {
     ];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns the minimum value of instances of a data element at a particular level in the hierarchy of a data structure.\n\nIt can also be used to return the minimum value of an array.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -535,6 +544,7 @@ export class ResolveOneOf extends Func {
     ];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns the first non-null value from instances of a data element.\n\nThis function is generally used for retrieving the value of a \"one-of\" source data element. It can also be used with arrays, and will return the first non-null element.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -627,6 +637,7 @@ export class SetInstances extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Defines the source instances for a target loop node.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/instance-functions/#instancefunctions-setinstances).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -691,6 +702,7 @@ export class SortInstances extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 100;
+    this.docs = "Sorts the generation of target loop data elements based on one or more data elements in the source or target.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/instance-functions/#instancefunctions-sortinstances).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -752,7 +764,7 @@ export class SortInstances extends Func {
  * The data type of both `de` and `arr` must be one of integer, long, float, double, or string.
  * The data types of all instances or all elements must be the same.
  * 
- * If the array is empty, 0 (zero) is returned.
+ * If the array is empty, `0` is returned.
  * Though null values will be ignored in arrays with another data type,
  * an array with just nulls will return an error.
  */
@@ -767,6 +779,7 @@ export class Sum extends Func {
     ];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Takes the value of each instance of a data element at a particular hierarchical level and returns the sum.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/instance-functions/#instancefunctions-sum).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -849,6 +862,7 @@ export class SumCSV extends Func {
     ];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Concatenates each instance of a field of a data element or each element of an array, with a comma delimiter between each instance or element.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/instance-functions/#instancefunctions-sumcsv).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -919,6 +933,7 @@ export class SumString extends Func {
     ];
     this.minArgs = 1;
     this.maxArgs = 3;
+    this.docs = "Concatenates each instance of the specified data elements or each element of an array, with a delimiter automatically appended to the end of each concatenated string.\n\nIf the parameter `omitLast` is `true`, the delimiter after the last string is omitted.\n\nSee also [`SumCSV`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/instance-functions/#instancefunctions-sumcsv).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {

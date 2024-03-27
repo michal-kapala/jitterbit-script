@@ -26,6 +26,7 @@ export class ReadCache extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 3;
+    this.docs = "Reads from a common cache stored on Harmony.";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -83,6 +84,7 @@ export class WriteCache extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 4;
+    this.docs = "Writes to a common cache stored on Harmony.";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {

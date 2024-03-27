@@ -21,6 +21,7 @@ export class DiffAdd extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Requests the added records as input for the next transformation that is run.";
   }
   
   call(args: RuntimeVal[], scope: Scope): never {
@@ -41,6 +42,7 @@ export class DiffAdd extends Func {
  * The implementation of `DiffComplete` function.
  * 
  * Flags the diff process as complete.
+ * 
  * This method is to be called when the diff process completes successfully;
  * otherwise, the diff process will be left in an inconsistent state.
  * In that case, the next time the diff operation runs, no records will be processed.
@@ -56,6 +58,7 @@ export class DiffComplete extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Flags the diff process as complete.\n\nThis method is to be called when the diff process completes successfully; otherwise, the diff process will be left in an inconsistent state. In that case, the next time the diff operation runs, no records will be processed.";
   }
   
   call(args: RuntimeVal[], scope: Scope): never {
@@ -88,6 +91,7 @@ export class DiffDelete extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Requests the deleted records as input for the next transformation that is run.";
   }
   
   call(args: RuntimeVal[], scope: Scope): never {
@@ -108,7 +112,8 @@ export class DiffDelete extends Func {
  * The implementation of `DiffKeyList` function.
  * 
  * Sets the list of keys to be used for uniquely identifying a record in the diff source.
- * This method is typically called in conjunction with the `InitializeDiff` function.
+ * 
+ * This method is typically called in conjunction with [`InitializeDiff`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/diff-functions/#difffunctions-initializediff).
  * 
  * Supports up to 100-argument calls.
  */
@@ -126,6 +131,7 @@ export class DiffKeyList extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 100;
+    this.docs = "Sets the list of keys to be used for uniquely identifying a record in the diff source.\n\nThis method is typically called in conjunction with [`InitializeDiff`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/diff-functions/#difffunctions-initializediff).";
   }
   
   call(args: RuntimeVal[], scope: Scope): never {
@@ -175,6 +181,7 @@ export class DiffNode extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "For hierarchical sources, this specifies the node to be used as the repeating node that the diff is performed on.";
   }
   
   call(args: RuntimeVal[], scope: Scope): never {
@@ -211,6 +218,7 @@ export class DiffUpdate extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Requests the updated records as input for the next transformation that is run.";
   }
   
   call(args: RuntimeVal[], scope: Scope): never {
@@ -252,6 +260,7 @@ export class InitializeDiff extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Initializes a new diff session.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/diff-functions/#difffunctions-initializediff).";
   }
   
   call(args: RuntimeVal[], scope: Scope): never {
@@ -303,6 +312,7 @@ export class OrderedDiffKeyList extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 100;
+    this.docs = "Sets the list of keys used for uniquely identifying a record in the source and specifies the key's record order as either ascending (`true`) or descending (`false`).\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/diff-functions/#difffunctions-ordereddiffkeylist).";
   }
   
   call(args: RuntimeVal[], scope: Scope): never {
@@ -364,10 +374,10 @@ export class OrderedDiffKeyList extends Func {
  * 
  * The `action` parameter (either 0 or 1) specifies how the diff session is to be reset:
  * 
- * `0` (Reset): Completely forgets the latest snapshot and starts over from the beginning.
+ * - `0` (Reset): Completely forgets the latest snapshot and starts over from the beginning.
  * This will force the system to treat all entries as "added".
  * 
- * `1` (Purge): Removes any files left over from a previous diff session.This does not reset
+ * - `1` (Purge): Removes any files left over from a previous diff session.This does not reset
  * the latest snapshot;it only clears stale files left from old, failed, or canceled diff sessions.
  * 
  * This method is typically called when something has been changed in an existing diff process
@@ -389,6 +399,7 @@ export class ResetDiff extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Resets an existing diff session. See full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/diff-functions/#difffunctions-resetdiff).";
   }
   
   call(args: RuntimeVal[], scope: Scope): never {
@@ -433,6 +444,7 @@ export class SetDiffChunkSize extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Sets the chunk size (in bytes) used while diffing.\n\nA larger chunk size will make the system use more memory but it will process the diff faster. The default is 50000 bytes; if you have sufficient memory, you can increase this number.\n\nThis method is typically called in conjunction with [`InitializeDiff`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/diff-functions/#difffunctions-initializediff).";
   }
   
   call(args: RuntimeVal[], scope: Scope): never {

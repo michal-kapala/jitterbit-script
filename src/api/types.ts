@@ -14,6 +14,7 @@ export abstract class Func {
   signature!: Signature;
   minArgs!: number;
   maxArgs!: number;
+  docs!: string;
 
   /**
    * Validates argument list and executes the function's implementation.

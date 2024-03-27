@@ -36,6 +36,7 @@ export class GetLastError extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Returns the last error reported in a script or transformation. It can be used with the `ResetError` and `Eval` functions for error handling.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/logging-and-error-functions/#logginganderrorfunctions-getlasterror).";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -81,6 +82,7 @@ export class RaiseError extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Causes a script or transformation to fail, and the contents of the parameter message to be displayed in the error log.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -121,6 +123,7 @@ export class ResetLastError extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Sets the last error to an empty string. This is identical to calling `SetLastError(\"\")`.\n\nSee also [`SetLastError`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/logging-and-error-functions/#logginganderrorfunctions-setlasterror).";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -161,6 +164,7 @@ export class SetLastError extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Sets a user-defined last error. The message will be logged as a warning and the `GetLastError` function will return the message unless another error occurs.\n\nSee also [`ResetLastError`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/logging-and-error-functions/#logginganderrorfunctions-resetlasterror).";
   }
 
   call(args: RuntimeVal[], scope: Scope) {

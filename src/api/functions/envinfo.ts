@@ -21,6 +21,7 @@ export class GetAgentGroupID extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Returns the ID of the agent group that the operation or expression is currently running in.";
   }
   
   call(args: RuntimeVal[], scope: Scope): never {
@@ -53,6 +54,7 @@ export class GetAgentGroupName extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Returns the name of the agent group that the operation or expression is currently running in.";
   }
   
   call(args: RuntimeVal[], scope: Scope): never {
@@ -85,6 +87,7 @@ export class GetAgentID extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Returns the ID of the agent that is running the operation or expression.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -117,6 +120,7 @@ export class GetAgentName extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Returns the name of the agent that the operation or expression is currently running in.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -149,6 +153,7 @@ export class GetAgentVersionID extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Returns the version ID of the agent that the operation or expression is currently running in.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -181,6 +186,7 @@ export class GetAgentVersionName extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Returns the version name of the agent that the operation or expression is currently running in.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -213,6 +219,7 @@ export class GetEnvironmentID extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Returns the ID of the environment that the operation or expression is currently running in.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -245,6 +252,7 @@ export class GetEnvironmentName extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Returns the name of the environment that the operation or expression is currently running in.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -277,6 +285,7 @@ export class GetOrganizationID extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Returns the ID of the organization that the operation or expression is currently running in.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -309,6 +318,7 @@ export class GetOrganizationName extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Returns the name of the organization that the operation or expression is currently running in.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {

@@ -32,6 +32,7 @@ export class Attribute extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Creates an attribute for an XML node. See also [`CreateNode`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/xml-functions/#xmlfunctions-createnode).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -92,6 +93,7 @@ export class CreateNode extends Func {
     this.minArgs = 2;
     // POD: subelement limit
     this.maxArgs = 100;
+    this.docs = "Creates a string representing an XML node.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/xml-functions/#xmlfunctions-createnode).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -151,6 +153,7 @@ export class GetNodeName extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Retrieves the name of a node.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/xml-functions/#xmlfunctions-getnodename).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -199,6 +202,7 @@ export class GetNodeValue extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Retrieves the value of a node.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/xml-functions/#xmlfunctions-getnodevalue).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -248,6 +252,7 @@ export class GetXMLString extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 2;
+    this.docs = "Returns (when used in a transformation mapping) the corresponding XML string found in the source XML document at the specified path.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/xml-functions/#xmlfunctions-getxmlstring).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -277,7 +282,7 @@ export class GetXMLString extends Func {
  * The implementation of `IsNil` function.
  * 
  * Returns (when used in a Formula Builder mapping) if the corresponding XML node has
- * the attribute `xsi:nil` with the value of true (or 1).
+ * the attribute `xsi:nil` with the value of `true` (or `1`).
  * 
  * To enter a path to a node into the function for the path parameter,
  * drag and drop the desired XML node folder from the Source Objects tab
@@ -301,6 +306,7 @@ export class IsNil extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns (when used in a Formula Builder mapping) if the corresponding XML node has the attribute `xsi:nil` with the value of `true` (or `1`).\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/xml-functions/#xmlfunctions-isnil).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -353,6 +359,7 @@ export class RunXSLT extends AsyncFunc {
     this.minArgs = 2;
     // POD: XML document limit
     this.maxArgs = 100;
+    this.docs = "Supports running [XSLT](https://www.w3.org/TR/xslt-30/) on a number of input XML documents. Takes as input an XSLT stylesheet and one or more XML documents and returns an array of XML documents.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/xml-functions/#xmlfunctions-runxslt).";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -397,7 +404,7 @@ export class RunXSLT extends AsyncFunc {
 /**
  * The implementation of `SelectNodeFromXMLAny` function.
  * 
- * Returns the first XML node from a list of XML Any nodes that match the node name.
+ * Returns the first XML node from a list of XML `Any` nodes that match the node name.
  * 
  * To enter a path to an array of XML nodes into the function for the `anyNodes` parameter,
  * drag and drop the desired XML node folder from the Source Objects tab
@@ -419,6 +426,7 @@ export class SelectNodeFromXMLAny extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Returns the first XML node from a list of XML `Any` nodes that match the node name.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/xml-functions/#xmlfunctions-selectnodefromxmlany).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -481,6 +489,7 @@ export class SelectNodes extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 100;
+    this.docs = "Runs an [XPath](https://www.w3.org/TR/xpath-31/) query on either an XML fragment or an XML node returned from another function, and returns the results of the query.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/xml-functions/#xmlfunctions-selectnodes).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -553,6 +562,7 @@ export class SelectNodesFromXMLAny extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 100;
+    this.docs = "Returns an array of all the XML nodes that are matched by an [XPath](https://www.w3.org/TR/xpath-31/) query run against either a path of a value node of an XML Any element or an array of XML nodes.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/xml-functions/#xmlfunctions-selectnodesfromxmlany).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -630,6 +640,7 @@ export class SelectSingleNode extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 100;
+    this.docs = "Runs an [XPath](https://www.w3.org/TR/xpath-31/) query on either an XML fragment or an XML node returned from another function, and returns the first node in the results of the query.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/xml-functions/#xmlfunctions-selectsinglenode).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {

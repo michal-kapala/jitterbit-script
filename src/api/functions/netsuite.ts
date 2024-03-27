@@ -10,11 +10,11 @@ import { AsyncFunc, Parameter, Signature } from "../types";
  * 
  * Retrieves the picklist values for a field from NetSuite.
  * 
- * The function response is a dictionary (map), where:
+ * The function response is a `dictionary` (map), where:
  * 
- * 1. The dictionary keys are the picklist values.
+ * - The dictionary keys are the picklist values.
  * 
- * 2. The dictionary values are a map with two elements: the internal ID and the external ID for each picklist.
+ * - The dictionary values are a map with two elements: the internal ID and the external ID for each picklist.
  */
 export class NetSuiteGetSelectValue extends AsyncFunc {
   constructor() {
@@ -32,6 +32,7 @@ export class NetSuiteGetSelectValue extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 3;
     this.maxArgs = 4;
+    this.docs = "Retrieves the picklist values for a field from NetSuite.\n\nThe function response is a `dictionary` (map), where:\n- The dictionary keys are the picklist values.\n- The dictionary values are a map with two elements: the internal ID and the external ID for each picklist.";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -84,6 +85,7 @@ export class NetSuiteGetServerTime extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Retrieves the server date-time from a NetSuite server.";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -127,6 +129,7 @@ export class NetSuiteLogin extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Retrieves a new session ID from a NetSuite endpoint for use in REST or SOAP calls that are used outside of the NetSuite connector. This provides a simple way to log in to NetSuite without requiring authentication headers for each web service call.";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {

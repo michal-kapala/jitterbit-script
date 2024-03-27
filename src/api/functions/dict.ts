@@ -11,7 +11,7 @@ import TypeEnv from "../../typechecker/environment";
  * 
  * Adds a value to a dictionary for a specific key.
  * 
- * The key must be a string or have a string representation, with null keys not allowed. Any value is allowed, even null values.
+ * The key must be a string or have a string representation, with `null` keys not allowed. Any value is allowed, even `null` values.
  * 
  * Returns `true` if the value was added and the new key added to the dictionary or `false` if the key already existed and the value at that key was instead updated. If the first argument is not defined or is not a dictionary, it will be initialized to an empty dictionary before the value is added.
  * 
@@ -33,6 +33,7 @@ export class AddToDict extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 3;
     this.maxArgs = 3;
+    this.docs = "Adds a value to a dictionary for a specific key.\n\nThe key must be a string or have a string representation, with `null` keys not allowed. Any value is allowed, even `null` values.\n\nReturns `true` if the value was added and the new key added to the dictionary or `false` if the key already existed and the value at that key was instead updated. If the first argument is not defined or is not a dictionary, it will be initialized to an empty dictionary before the value is added.\n\nAlso see [`Dict`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/dictionary-and-array-functions/#dictionaryandarrayfunctions-dict).";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -97,6 +98,7 @@ export class CollectValues extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Returns an array containing the values corresponding to the names in the argument array, returned in the same order as the keys in the array.";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -156,6 +158,7 @@ export class GetKeys extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns an array of the keys in a dictionary. The argument must be an existing dictionary.";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -209,6 +212,7 @@ export class GetSourceInstanceMap extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns a dictionary (map) containing the attribute name and its value from an element node.\n\nAs an alternative to this function, see [`GetSourceInstanceArray`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/dictionary-and-array-functions/#dictionaryandarrayfunctions-getsourceinstancearray).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -254,6 +258,7 @@ export class GetSourceInstanceElementMap extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns a dictionary (map) containing the sub-element's value from an element node. As an alternative to this function, see [`GetSourceInstanceElementArray`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/dictionary-and-array-functions/#dictionaryandarrayfunctions-getsourceinstanceelementarray).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -291,6 +296,7 @@ export class Dict extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Creates an empty dictionary.";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -311,7 +317,8 @@ export class Dict extends Func {
  * The implementation of `HasKey` function.
  * 
  * Checks whether a dictionary contains a specified key. Returns `false` if the first argument is not a dictionary or if the key was not found.
- * As an equivalent function that works for arrays, see the examples of the `FindValue` function.
+ * 
+ * As an equivalent function that works for arrays, see the examples of [`FindValue`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/instance-functions/#instancefunctions-findvalue).
  */
 export class HasKey extends Func {
   constructor() {
@@ -327,6 +334,7 @@ export class HasKey extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Checks whether a dictionary contains a specified key. Returns `false` if the first argument is not a dictionary or if the key was not found. As an equivalent function that works for arrays, see the examples of [`FindValue`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/instance-functions/#instancefunctions-findvalue).";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -360,19 +368,20 @@ export class HasKey extends Func {
 /**
  * The implementation of `Map` function.
  * 
- * An alias for `Dict`. See the function `Dict`.
+ * An alias for `Dict`. See [`Dict`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/dictionary-and-array-functions/#dictionaryandarrayfunctions-dict).
  */
 export class Map extends Dict {
   constructor() {
     super();
     this.name = "Map";
+    this.docs = "An alias for `Dict`. See [`Dict`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/dictionary-and-array-functions/#dictionaryandarrayfunctions-dict).";
   }
 }
 
 /**
  * The implementation of `MapCache` function.
  * 
- * This function caches a key/value pair to a dictionary.
+ * Caches a key/value pair to a dictionary.
  * If the key already exists in the dictionary, the corresponding value will be returned;
  * otherwise, the third argument will be evaluated, and that value would be stored in the dictionary for the key.
  */
@@ -393,6 +402,7 @@ export class MapCache extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 3;
     this.maxArgs = 3;
+    this.docs = "Caches a key/value pair to a dictionary.\n\nIf the key already exists in the dictionary, the corresponding value will be returned; otherwise, the third argument will be evaluated, and that value would be stored in the dictionary for the key."
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -434,7 +444,8 @@ export class MapCache extends Func {
  * The implementation of `RemoveKey` function.
  * 
  * Removes a key-value pair with a specific key from a dictionary.
- * The key must be a string or have a string representation, and null values are not allowed.
+ * 
+ * The key must be a string or have a string representation, and `null` values are not allowed.
  * Returns `true` if the key-value pair was removed and `false` if the key didn't exist.
  */
 export class RemoveKey extends Func {
@@ -451,6 +462,7 @@ export class RemoveKey extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Removes a key-value pair with a specific key from a dictionary.\n\nThe key must be a string or have a string representation, and `null` values are not allowed. Returns `true` if the key-value pair was removed and `false` if the key didn't exist.";
   }
 
   call(args: RuntimeVal[], scope: Scope) {

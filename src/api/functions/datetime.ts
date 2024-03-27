@@ -36,6 +36,7 @@ export class ConvertTimeZone extends Func {
         new Parameter("bool", "ignoreDST", false, new JbBool(false)),
       ])
     ];
+    this.docs = "Take a date and returns it converted from one time zone to another time zone.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -102,7 +103,7 @@ export class ConvertTimeZone extends Func {
 /**
  * The implementation of `CVTDate` function.
  * 
- * Converts a date object or date string in the input format to a date string in the output format.
+ * Converts a `date` object or date string in the input format to a date string in the output format.
  */
 export class CVTDate extends Func {
   constructor() {
@@ -123,6 +124,7 @@ export class CVTDate extends Func {
         new Parameter("string", "outputFormat")
       ]),
     ];
+    this.docs = "Converts a date object or date string in the input format to a date string in the output format.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -199,6 +201,7 @@ export class DateAdd extends Func {
         new Parameter("string", "d")
       ]),
     ];
+    this.docs = "Returns a date string after adding a number to a specified part of a date object.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -271,6 +274,7 @@ export class DayOfMonth extends Func {
         new Parameter("string", "d")
       ]),
     ];
+    this.docs = "Returns the day of the month (1-31) of a date object or date string.";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -345,6 +349,7 @@ export class DayOfWeek extends Func {
         new Parameter("string", "d")
       ]),
     ];
+    this.docs = "Returns the day of the week for a date object or date string, with 0 for Sunday, 1 for Monday, on through 6 for Saturday.\n\nThis definition is independent of locale. For the weekday name, call [`FormatDate`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/date-and-time-functions/#dateandtimefunctions-formatdate) instead.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -419,6 +424,7 @@ export class FormatDate extends Func {
         new Parameter("string", "format"),
       ]),
     ];
+    this.docs = "Converts a date object to a string according to a format string. This is similar to the [`CVTDate`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/date-and-time-functions/#dateandtimefunctions-cvtdate) function and uses the same format strings.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -488,6 +494,7 @@ export class GeneralDate extends Func {
       new Signature("string", [new Parameter("date", "d")]),
       new Signature("string", [new Parameter("string", "d")]),
     ];
+    this.docs = "Returns a string in the [general date format](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/date-and-time-functions/#dateandtimefunctions-format-strings) for a date object or date string.";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -569,6 +576,7 @@ export class GetUTCFormattedDate extends Func {
         new Parameter("bool", "is_european_format", false)
       ])
     ];
+    this.docs = "Returns a date string without time information. Converts a date object or date string to a string according to a time zone code.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -649,6 +657,7 @@ export class GetUTCFormattedDateTime extends Func {
         new Parameter("bool", "is_european_format", false)
       ])
     ];
+    this.docs = "Returns a date string with time information. Converts a date object or date string to a string according to a time zone code.";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -724,6 +733,7 @@ export class LastDayOfMonth extends Func {
       new Signature("date", [new Parameter("date", "d")]),
       new Signature("date", [new Parameter("string", "d")])
     ];
+    this.docs = "Returns a date object representing the last day of the month for a date object or date string.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -803,6 +813,7 @@ export class LongDate extends Func {
       new Signature("string", [new Parameter("date", "d")]),
       new Signature("string", [new Parameter("string", "d")])
     ];
+    this.docs = "Returns a string in the [long date format](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/date-and-time-functions/#dateandtimefunctions-format-strings) for a date object or date string.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -940,6 +951,7 @@ export class LongTime extends Func {
       new Signature("string", [new Parameter("date", "d")]),
       new Signature("string", [new Parameter("string", "d")])
     ];
+    this.docs = "Returns a string in the [long time format](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/date-and-time-functions/#dateandtimefunctions-format-strings) for a date object or date string.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -1014,6 +1026,7 @@ export class MediumDate extends Func {
       new Signature("string", [new Parameter("date", "d")]),
       new Signature("string", [new Parameter("string", "d")])
     ];
+    this.docs = "Returns a string in the [medium date format](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/date-and-time-functions/#dateandtimefunctions-format-strings) for a date object or date string.";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -1118,6 +1131,7 @@ export class MediumTime extends Func {
       new Signature("string", [new Parameter("date", "d")]),
       new Signature("string", [new Parameter("string", "d")])
     ];
+    this.docs = "Returns a string in the [medium time format](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/date-and-time-functions/#dateandtimefunctions-format-strings) for a date object or date string.";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -1192,6 +1206,7 @@ export class MonthOfYear extends Func {
       new Signature("number", [new Parameter("date", "d")]),
       new Signature("number", [new Parameter("string", "d")])
     ];
+    this.docs = "Returns the month (1-12) for a date object or date string.";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -1262,6 +1277,7 @@ export class Now extends Func {
     this.maxArgs = 0;
     this.signatures = [new Signature("date", [])];
     this.signature = this.signatures[0];
+    this.docs = "Returns a date object representing the date and time values at the moment the function was run. The fraction of the second is truncated.";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -1295,6 +1311,7 @@ export class Now_ extends Func {
     this.maxArgs = 0;
     this.signatures = [new Signature("date", [])];
     this.signature = this.signatures[0];
+    this.docs = "Returns a date object representing the date and time values at the moment the function was run. The time value includes the fraction of second (milliseconds).";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -1331,6 +1348,7 @@ export class ShortDate extends Func {
       new Signature("string", [new Parameter("date", "d")]),
       new Signature("string", [new Parameter("string", "d")])
     ];
+    this.docs = "Returns a string in the [short date format](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/date-and-time-functions/#dateandtimefunctions-format-strings) for a date object or date string.";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -1404,6 +1422,7 @@ export class ShortTime extends Func {
       new Signature("string", [new Parameter("date", "d")]),
       new Signature("string", [new Parameter("string", "d")])
     ];
+    this.docs = "Returns a string in the [short time format](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/date-and-time-functions/#dateandtimefunctions-format-strings) for a date object or date string.";
   }
 
   call(args: RuntimeVal[], scope: Scope) {

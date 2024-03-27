@@ -27,6 +27,7 @@ export class BinaryToHex extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Converts a binary value to a string representing the hexadecimal values of each byte. The resulting string will be all lowercase. The result of this function call is undefined if the argument is not a binary value.\n\nThis is the reverse of the function [`HexToBinary`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/conversion-functions/#conversionfunctions-hextobinary).";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -71,6 +72,7 @@ export class BinaryToUUID extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Converts a 16-byte binary value to a string in the standard UUID format. The resulting string will always be lowercase.\n\nThis is the reverse of the function [`UUIDToBinary`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/conversion-functions/#conversionfunctions-uuidtobinary).";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -116,6 +118,7 @@ export class Bool extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Converts any data type to a boolean value (`true` or `false`). If the data is an integer or a floating-point number not equal to zero, the result is `true` (`1`).\n\nThe strings `\"true\"` and `\"T\"` return `true` independently of case (`\"TRUE\"`, `\"t\"`, and `\"True\"` all return `true`). In all other cases, the result is `false` (`0`).";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -206,6 +209,7 @@ export class DateFunc extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Converts the argument to a date. If the input is a string, it has to be formatted using one of the standard date formats such as `\"12/25/2018 12:30\"`, `\"2018-12-25\"`, `\"2018-12-25T12:30:00\"`, `\"December 25, 2018\"`, or `\"DEC 25, 2018\"`.\n\nIf the input string is not in one of the four predefined date formats (`GeneralDate`, `LongDate`, `MediumDate`, or `ShortDate`) that can be read by the `Date` function, it can be converted first to a standard format by the `CVTDate` function. Hour, minute, and second are optional.\n\nIf the input is an integer or a double, the input is interpreted as the number of seconds from 12:00:00 AM of 1/1/1970 UTC, the start of the UNIX epoch.\n\nNote that `Date(Long(Now())) == Now()`.\n\n";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -280,7 +284,7 @@ export class DateFunc extends Func {
  * The implementation of `Double` function.
  * 
  * A best-effort is made to convert the argument to a double.
- * If the data type being evaluated cannot be converted to a double, the function returns 0.
+ * If the data type being evaluated cannot be converted to a double, the function returns `0`.
  * If the data being evaluated is a date or time record, the result is
  * the number of seconds from 12:00:00 AM of 1/1/1970 UTC (the start of the UNIX epoch).
  */
@@ -297,6 +301,7 @@ export class Double extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "A best-effort is made to convert the argument to a double. If the data type being evaluated cannot be converted to a double, the function returns `0`. If the data being evaluated is a date or time record, the result is the number of seconds from 12:00:00 AM of 1/1/1970 UTC (the start of the UNIX epoch).";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -356,7 +361,7 @@ export class Double extends Func {
  * The implementation of `Float` function.
  * 
  * A best-effort is made to convert the argument to a float.
- * If the data type being evaluated cannot be converted to a float the function returns 0.
+ * If the data type being evaluated cannot be converted to a float the function returns `0`.
  * If the data being evaluated is a date or time record, the result is
  * the number of seconds from 12:00:00 AM of 1/1/1970 UTC (the start of the UNIX epoch).
  */
@@ -373,6 +378,7 @@ export class Float extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "A best-effort is made to convert the argument to a float. If the data type being evaluated cannot be converted to a float the function returns `0`. If the data being evaluated is a date or time record, the result is the number of seconds from 12:00:00 AM of 1/1/1970 UTC (the start of the UNIX epoch).";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -385,6 +391,7 @@ export class Float extends Func {
     // POD: the original function returns null when passed a null value
     return new JbNumber(args[0].toNumber());
   }
+
   protected chooseSignature(args: RuntimeVal[]) {
     this.signature = this.signatures[0];
   }
@@ -450,6 +457,7 @@ export class HexToBinary extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Converts a hex-string to a binary value. The resulting value will contain the bytes represented by each pair of characters in the input string. The input string is case-insensitive.\n\nThis is the reverse of the function [`BinaryToHex`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/conversion-functions/#conversionfunctions-binarytohex).";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -476,7 +484,7 @@ export class HexToBinary extends Func {
 /**
  * The implementation of `HexToString` function.
  * 
- * Converts a hex-string to a string value. The resulting value will contain the characters represented by each pair of characters in the input string. The input string is case-insensitive. As the input characters are hex, the character pairs of the input string must be limited to the range "00" through "FF".
+ * Converts a hex-string to a string value. The resulting value will contain the characters represented by each pair of characters in the input string. The input string is case-insensitive. As the input characters are hex, the character pairs of the input string must be limited to the range `00` through `FF`.
  * 
  * To use UTF-8 for the outgoing string value, set `jitterbit.scripting.hex.enable_unicode_support` to `true` upstream of this function when using agent versions 10.70.1 or later or 11.8.1 or later.
  * 
@@ -495,6 +503,7 @@ export class HexToString extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Converts a hex-string to a string value. The resulting value will contain the characters represented by each pair of characters in the input string. The input string is case-insensitive. As the input characters are hex, the character pairs of the input string must be limited to the range `00` through `FF`.\n\nTo use UTF-8 for the outgoing string value, set `jitterbit.scripting.hex.enable_unicode_support` to `true` upstream of this function when using agent versions 10.70.1 or later or 11.8.1 or later.\n\nThis is the reverse of the function [`StringToHex`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/conversion-functions/#conversionfunctions-stringtohex).";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -537,7 +546,7 @@ export class HexToString extends Func {
  * The implementation of `Int` function.
  * 
  * A best-effort is made to convert the argument to an integer.
- * If the data type being evaluated cannot be converted to an integer, the function returns 0.
+ * If the data type being evaluated cannot be converted to an integer, the function returns `0`.
  * If the data being evaluated is a date or time record, the result is
  * the number of seconds from 12:00:00 AM of 1/1/1970 UTC (the start of the UNIX epoch).
  */
@@ -554,6 +563,7 @@ export class Int extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "A best-effort is made to convert the argument to an integer. If the data type being evaluated cannot be converted to an integer, the function returns `0`. If the data being evaluated is a date or time record, the result is the number of seconds from 12:00:00 AM of 1/1/1970 UTC (the start of the UNIX epoch).";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -615,7 +625,7 @@ export class Int extends Func {
  * The implementation of `Long` function.
  * 
  * A best-effort is made to convert the argument to a long integer.
- * If the data type being evaluated cannot be converted to a long integer, the function returns 0.
+ * If the data type being evaluated cannot be converted to a long integer, the function returns `0`.
  * If the data being evaluated is a date or time record, the result is
  * the number of seconds from 12:00:00 AM of 1/1/1970 UTC (the start of the UNIX epoch).
  */
@@ -632,6 +642,7 @@ export class Long extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "A best-effort is made to convert the argument to a long integer. If the data type being evaluated cannot be converted to a long integer, the function returns `0`. If the data being evaluated is a date or time record, the result is the number of seconds from 12:00:00 AM of 1/1/1970 UTC (the start of the UNIX epoch).";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
@@ -694,14 +705,14 @@ export class Long extends Func {
  * 
  * Converts any data type to a string. If the data being evaluated is already a string, no conversion takes place.
  * 
- * If the data type is a date or time record, the date is returned in ISO 8601 format (yyyy-mm-dd HH:MM:SS).
+ * If the data type is a date or time record, the date is returned in ISO 8601 format (`yyyy-mm-dd HH:MM:SS`).
  * For other date formats, use the functions `CVTDate` or `FormatDate`.
  * 
  * Binary data that contains null bytes is returned as a string representing the hexadecimal values of each byte, just as if `BinaryToHex` had been called.
  * If the binary data contains no null bytes, then a string representation is returned with the assumption that the bytes represent a UTF-8-encoded string.
  * If you always want a hexadecimal representation, use the `BinaryToHex` function instead.
  * 
- * For a boolean value, the strings "1" or "0" are returned.
+ * For a boolean value, the strings `"1"` or `"0"` are returned.
  */
 export class String extends Func {
   constructor() {
@@ -716,6 +727,7 @@ export class String extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Converts any data type to a string. If the data being evaluated is already a string, no conversion takes place.\n\nIf the data type is a date or time record, the date is returned in ISO 8601 format (`yyyy-mm-dd HH:MM:SS`). For other date formats, use the functions [`CVTDate`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/date-and-time-functions/#dateandtimefunctions-cvtdate) or [`FormatDate`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/date-and-time-functions/#dateandtimefunctions-formatdate). Binary data that contains null bytes is returned as a string representing the hexadecimal values of each byte, just as if `BinaryToHex` had been called. If the binary data contains no null bytes, then a string representation is returned with the assumption that the bytes represent a UTF-8-encoded string. If you always want a hexadecimal representation, use the [`BinaryToHex`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/conversion-functions/#conversionfunctions-binarytohex) function instead.\n\nFor a boolean value, the strings `\"1\"` or `\"0\"` are returned.";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -768,9 +780,9 @@ export class String extends Func {
  * Converts a string value to a string representing the hexadecimal values of each byte.
  * The resulting string will be all lowercase.
  * 
- * To use UTF-8 for the incoming string value, set `jitterbit.scripting.hex.enable_unicode_support` to true upstream of this function when using agent versions 10.70.1 or later or 11.8.1 or later.
+ * To use UTF-8 for the incoming string value, set `jitterbit.scripting.hex.enable_unicode_support` to `true` upstream of this function when using agent versions 10.70.1 or later or 11.8.1 or later.
  * 
- * Warning: this function has reversed logic regarding UTF-8, set `jitterbit.scripting.hex.enable_unicode_support` to opt out of UTF-8 (original Jitterbit bug).
+ * **Warning**: this function has reversed logic regarding UTF-8, set `jitterbit.scripting.hex.enable_unicode_support` to opt out of UTF-8 (original Jitterbit bug).
  * 
  * This is the reverse of the function `HexToString`.
  */
@@ -787,6 +799,7 @@ export class StringToHex extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Converts a string value to a string representing the hexadecimal values of each byte. The resulting string will be all lowercase.\n\nTo use UTF-8 for the incoming string value, set `jitterbit.scripting.hex.enable_unicode_support` to `true` upstream of this function when using agent versions 10.70.1 or later or 11.8.1 or later.\n\n**Warning**: this function has reversed logic regarding UTF-8, set `jitterbit.scripting.hex.enable_unicode_support` to opt out of UTF-8 (original Jitterbit bug).\n\nThis is the reverse of the function [`HexToString`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/conversion-functions/#conversionfunctions-hextostring).";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -832,7 +845,7 @@ export class StringToHex extends Func {
  * The format of the input should be `nnnnnnnn-nnnn-nnnn-nnnn-nnnnnnnnnnnn` where each pair (`nn`)
  * is the hexadecimal representation of the corresponding byte.
  * 
- * The case of the input string does not matter. The returned binary value is 16 bytes long.
+ * The case of the input string does not matter. The returned binary value is 16 bytes-long.
  * 
  * This is the reverse of the function `BinaryToUUID`.
  */
@@ -849,6 +862,7 @@ export class UUIDToBinary extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Converts a UUID string to a binary value containing the corresponding bytes. The size of the input string must be 36 characters.\n\nThe format of the input should be `nnnnnnnn-nnnn-nnnn-nnnn-nnnnnnnnnnnn` where each pair (`nn`) is the hexadecimal representation of the corresponding byte.\n\nThe case of the input string does not matter. The returned binary value is 16 bytes-long.\n\nThis is the reverse of the function [`BinaryToUUID`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/conversion-functions/#conversionfunctions-binarytouuid).";
   }
 
   call(args: RuntimeVal[], scope: Scope) {

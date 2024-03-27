@@ -39,6 +39,7 @@ export class Validate extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 3;
+    this.docs = "This function is intended to be called from a script used for text validation. It provides for that validation script the same validation as can be defined for a text document file format.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/text-validation-functions/#textvalidationfunctions-validate).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {

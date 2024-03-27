@@ -13,7 +13,7 @@ import { AsyncFunc, Func, Parameter, Signature } from "../types";
  * and subsequent lookups use this cache instead of repeatedly querying the database
  * (an alternative to caching is to use the functions `Set` and `Get`).
  * 
- * If there are no rows returned for the query specified in `sql`, the function returns null.
+ * If there are no rows returned for the query specified in `sql`, the function returns `null`.
  * 
  * The global Jitterbit variable `$jitterbit.scripting.db.rows_affected` is not set by this method.
  * 
@@ -34,6 +34,7 @@ export class CacheLookup extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "This function is the same as `DBLookup`, except that the first lookup caches the information and subsequent lookups use this cache instead of repeatedly querying the database (an alternative to caching is to use the functions `Set` and `Get`).\n\nIf there are no rows returned for the query specified in `sql`, the function returns `null`.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/database-functions/#databasefunctions-cachelookup).";
   }
   
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -102,6 +103,7 @@ export class CallStoredProcedure extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 3;
     this.maxArgs = 100;
+    this.docs = "Calls the stored procedure `spName` using the connection information specified by the database connection identified by `databaseId`.\n\nIf applicable, the returned `resultSet` is a two-dimensional array of strings. If the stored procedure returns no `resultSet` or if using an ODBC driver, this argument is ignored.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/database-functions/#databasefunctions-callstoredprocedure).";
   }
 
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -165,6 +167,7 @@ export class DBCloseConnection extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Commits the current transaction and closes the database connection.\n\nThe database used in this function call must be defined as a Database connection in the current project. For more information, see [Endpoints](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/scripts/jitterbit-script#jitterbitscript-connectors).";
   }
   
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -196,23 +199,23 @@ export class DBCloseConnection extends AsyncFunc {
  * 
  * If the SQL statement produces a result set, there are two ways to retrieve the data:
  * 
- * 1. If you specify only the two required parameters (first form),
+ * - If you specify only the two required parameters (first form),
  * the function will return the full record set as an array of rows.
  * 
- * You can then use a `While()` loop to iterate over the rows and use `Get()` to retrieve the data.
- * If no rows are returned, the method returns an empty array `(Length($arr) == 0)`.
+ *     You can then use a `While()` loop to iterate over the rows and use `Get()` to retrieve the data.
+ *     If no rows are returned, the method returns an empty array `(Length($arr) == 0)`.
  * 
- * 2. If you specify output variables in addition to the two required parameters (second form),
+ * - If you specify output variables in addition to the two required parameters (second form),
  * the values of the fields of the first row are returned.
  * 
- * Pass names of global variables within quotes as parameters after the first two parameters.
- * The value of the first field of the first row will be written to the global variable passed
- * as the third parameter, the second field of the first row to the fourth parameter, and so on.
- * Alternatively, the global variables can be passed by reference by preceding them
- * with a `$` sign, such as `$output`.
+ *     Pass names of global variables within quotes as parameters after the first two parameters.
+ *     The value of the first field of the first row will be written to the global variable passed
+ *     as the third parameter, the second field of the first row to the fourth parameter, and so on.
+ *     Alternatively, the global variables can be passed by reference by preceding them
+ *     with a `$` sign, such as `$output`.
  * 
- * The return value in this case is the number of records returned; either 1 (if records were found)
- * or 0 (if none were returned).
+ *     The return value in this case is the number of records returned; either 1 (if records were found)
+ *     or 0 (if none were returned).
  * 
  * The returned data values are always strings.
  * Binary data is returned as its hex-string representation.
@@ -241,6 +244,7 @@ export class DBExecute extends AsyncFunc {
     ];
     this.minArgs = 2;
     this.maxArgs = 100;
+    this.docs = "Executes a SQL statement on a database and returns the results.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/database-functions/#databasefunctions-dbexecute)."
   }
   
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -287,7 +291,7 @@ export class DBExecute extends AsyncFunc {
 /**
  * The implementation of `DBLoad` function.
  * 
- * akes a source (a single file in CSV format) and loads the data into a specified
+ * Takes a source (a single file in CSV format) and loads the data into a specified
  * table in a target database.
  * 
  * The parameter `columnKeynames` is not used when only inserting (`mode=2`)
@@ -316,6 +320,7 @@ export class DBLoad extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 5;
     this.maxArgs = 9;
+    this.docs = "Takes a source (a single file in CSV format) and loads the data into a specified table in a target database.\n\nThe parameter `columnKeynames` is not used when only inserting (`mode=2`) and may be omitted in that case.";
   }
   
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -403,6 +408,7 @@ export class DBLookup extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Executes a SQL statement on a database and returns the first field of the first result matching the specified criteria.\n\nThe returned data value is always a string.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/database-functions/#databasefunctions-dblookup).";
   }
   
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -465,6 +471,7 @@ export class DBLookupAll extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 2;
     this.maxArgs = 2;
+    this.docs = "Executes a SQL statement on a database and returns the results matching the specified criteria.\n\nThe returned data is always returned as a two-dimensional array of strings.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/database-functions/#databasefunctions-dblookupall).";
   }
   
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -517,6 +524,7 @@ export class DBRollbackTransaction extends AsyncFunc {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Rolls back the current transaction and closes the Database connection.\n\nThe database used in this function call must be defined as a database connection in the current project.";
   }
   
   callAsync(args: RuntimeVal[], scope: Scope): Promise<RuntimeVal> {
@@ -550,6 +558,7 @@ export class DBWrite extends DBLoad {
   constructor() {
     super();
     this.name = "DBWrite";
+    this.docs = "An alias for the function `DBLoad`. See [`DBLoad`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/database-functions/#databasefunctions-dbload) for details.";
   }
 }
 
@@ -557,7 +566,7 @@ export class DBWrite extends DBLoad {
  * The implementation of `SetDBInsert` function.
  * 
  * Overrides the current setting of the insert/update mode to "insert" for the current record.
- * The return value is null.
+ * The return value is `null`.
  */
 export class SetDBInsert extends Func {
   constructor() {
@@ -570,6 +579,7 @@ export class SetDBInsert extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Overrides the current setting of the insert/update mode to \"insert\" for the current record. The return value is `null`.";
   }
   
   call(args: RuntimeVal[], scope: Scope): never {
@@ -590,7 +600,7 @@ export class SetDBInsert extends Func {
  * The implementation of `SetDBUpdate` function.
  * 
  * Overrides the current setting of the insert/update mode to "update" for the current record.
- * The return value is null.
+ * The return value is `null`.
  */
 export class SetDBUpdate extends Func {
   constructor() {
@@ -603,6 +613,7 @@ export class SetDBUpdate extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Overrides the current setting of the insert/update mode to \"update\" for the current record. The return value is `null`.";
   }
   
   call(args: RuntimeVal[], scope: Scope): never {
@@ -645,6 +656,7 @@ export class SQLEscape extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 2;
+    this.docs = "Performs the necessary escaping of literal strings used in a SQL statement.\n\nSee full documentation [here](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/database-functions/#databasefunctions-sqlescape).";
   }
   
   call(args: RuntimeVal[], scope: Scope): never {
@@ -675,7 +687,7 @@ export class SQLEscape extends Func {
  * The implementation of `Unmap` function.
  * 
  * For use in mappings, this function sets a database target field to be treated as unmapped.
- * The return value is null.
+ * The return value is `null`.
  */
 export class Unmap extends Func {
   constructor() {
@@ -688,6 +700,7 @@ export class Unmap extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "For use in mappings, this function sets a database target field to be treated as unmapped. The return value is `null`.";
   }
   
   call(args: RuntimeVal[], scope: Scope): never {

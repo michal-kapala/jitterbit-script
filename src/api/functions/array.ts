@@ -20,6 +20,7 @@ export class Array extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 0;
     this.maxArgs = 0;
+    this.docs = "Creates an empty array. Though arrays don't need to be initialized prior to use, this method can be used to be explicit or to reset an already-existing array. Arrays are zero-based, and values are retrieved using indexes.";
   }
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -45,6 +46,7 @@ export class Collection extends Array {
   constructor() {
     super();
     this.name = "Collection";
+    this.docs = "An alias for `Array`. See the function [`Array`](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/functions/dictionary-and-array-functions/#dictionaryandarrayfunctions-array).";
   }
 }
 
@@ -55,7 +57,7 @@ export class Collection extends Array {
  * 
  * Compare with the function `GetSourceInstanceMap` which returns a map of the keys (the attributes) and values for a node.
  * 
- * To enter an n path into the function, drag and drop the desired XML node folder from the Source Objects tab of the script component palette to the script to insert its qualified path at the location of your cursor, or enter its reference path manually. For more information, see the instructions on inserting source objects.
+ * To enter an `n` path into the function, drag and drop the desired XML node folder from the Source Objects tab of the script component palette to the script to insert its qualified path at the location of your cursor, or enter its reference path manually. For more information, see the instructions on inserting source objects.
  */
 export class GetSourceAttrNames extends Func {
   constructor() {
@@ -70,6 +72,7 @@ export class GetSourceAttrNames extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns an array containing the names of the attributes of a node, in the order that the attributes appear in the node.\n\nCompare with the function `GetSourceInstanceMap` which returns a map of the keys (the attributes) and values for a node.\n\nCompare with the function `GetSourceInstanceMap` which returns a map of the keys (the attributes) and values for a node.\n\nTo enter an `n` path into the function, drag and drop the desired XML node folder from the Source Objects tab of the script component palette to the script to insert its qualified path at the location of your cursor, or enter its reference path manually. For more information, see the instructions on [inserting source objects](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/scripts/jitterbit-script#jitterbitscript-source-objects).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -96,7 +99,7 @@ export class GetSourceAttrNames extends Func {
  * 
  * Compare with the function `GetSourceInstanceElementMap` which returns a map of a node.
  * 
- * To enter an n path into the function, drag and drop the desired XML node folder
+ * To enter an `n` path into the function, drag and drop the desired XML node folder
  * from the Source Objects tab of the script component palette to the script
  * to insert its qualified path at the location of your cursor, or enter its reference path manually.
  * For more information, see the instructions on inserting source objects.
@@ -114,6 +117,7 @@ export class GetSourceElementNames extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns an array containing the names of the simple sub-elements for a node in the order that the attributes appear in the node.\n\nCompare with the function `GetSourceInstanceElementMap` which returns a map of a node.\n\nTo enter an `n` path into the function, drag and drop the desired XML node folder from the **Source Objects** tab of the script component palette to the script to insert its qualified path at the location of your cursor, or enter its reference path manually. For more information, see the instructions on [inserting source objects](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/scripts/jitterbit-script#jitterbitscript-source-objects).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -140,7 +144,7 @@ export class GetSourceElementNames extends Func {
  * 
  * As an alternative to this function, see `GetSourceInstanceMap`.
  * 
- * To enter an n path into the function, drag and drop the desired XML node folder from the Source Objects tab of the script component palette to the script to insert its qualified path at the location of your cursor, or enter its reference path manually.
+ * To enter an `n` path into the function, drag and drop the desired XML node folder from the Source Objects tab of the script component palette to the script to insert its qualified path at the location of your cursor, or enter its reference path manually.
  * For more information, see the instructions on inserting source objects.
  */
 export class GetSourceInstanceArray extends Func {
@@ -156,6 +160,7 @@ export class GetSourceInstanceArray extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns an array containing the attribute's value from an element node. The value in the array is labeled with the attribute's name, and can be retrieved either by its index or by its name as in a dictionary data element.\n\nAs an alternative to this function, see `GetSourceInstanceMap`.\n\nTo enter an n path into the function, drag and drop the desired XML node folder from the **Source Objects** tab of the script component palette to the script to insert its qualified path at the location of your cursor, or enter its reference path manually. For more information, see the instructions on [inserting source objects](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/scripts/jitterbit-script#jitterbitscript-source-objects).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -197,6 +202,7 @@ export class GetSourceInstanceElementArray extends Func {
     this.signature = this.signatures[0];
     this.minArgs = 1;
     this.maxArgs = 1;
+    this.docs = "Returns an array containing the sub-element's value from an element node. The value in the array is labeled with the name of the sub-element, and can be retrieved either by its index or by its name as in the dictionary data element.\n\nAs an alternative to this function, see `GetSourceInstanceElementMap`.\n\nTo enter an `n` path into the function, drag and drop the desired XML node folder from the **Source Objects** tab of the script component palette to the script to insert its qualified path at the location of your cursor, or enter its reference path manually. For more information, see the instructions on [inserting source objects](https://success.jitterbit.com/cloud-studio/cloud-studio-reference/scripts/jitterbit-script#jitterbitscript-source-objects).";
   }
 
   call(args: RuntimeVal[], scope: Scope): never {
@@ -224,7 +230,7 @@ type Evaluation = { eval: number; elem: RuntimeVal; };
 /**
  * The implementation of `SortArray` function.
  * 
- * Sorts an array in-place. The return value is undefined and should be ignored (it's actually `null`).
+ * Sorts an array in-place. The return value is undefined and should be ignored (`null`).
  * 
  * In the first form, the second parameter (optional) specifies the sort order.
  * 
@@ -254,6 +260,7 @@ export class SortArray extends Func {
     ];
     this.minArgs = 1;
     this.maxArgs = 3;
+    this.docs = "Sorts an array in-place. The return value is undefined and should be ignored (`null`).\n\nIn the first form, the second parameter (optional) specifies the sort order.\n\nIn the second form, for multi-dimentional arrays, the function sorts the array according to a zero-based index specified in the second parameter (required). In the second form, the third argument (optional) specifies the sort order.\n\nThe default sort order is ascending in both forms.\n\nAfter the function returns, the array will be sorted in-place. If specified, it will be sorted according to the index.\n\nMultiple sorting of the same array is possible by applying the `SortArray` function repeatedly.";
   } 
 
   call(args: RuntimeVal[], scope: Scope) {
@@ -565,6 +572,7 @@ export class ReduceDimension extends Func {
       ])
     ];
     this.signature = this.signatures[0];
+    this.docs = "Given a multi-dimensional array with `n` dimensions, the function returns an array with `n-1` dimensions. The lowest dimension of the input array will disappear, and their members will be collected to the next level dimension.";
   }
   
   call(args: RuntimeVal[], scope: Scope) {
