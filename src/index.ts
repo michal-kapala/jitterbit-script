@@ -1,12 +1,13 @@
 import Api from "./api";
 import { Func } from "./api/types";
 import Parser from "./frontend/parser";
+import { Position } from "./frontend/types";
 import Diagnostic from "./diagnostic";
 import Scope from "./runtime/scope";
 import evaluate from "./runtime/interpreter";
-import { CodeAnalysis } from "./typechecker/ast";
 import Typechecker from "./typechecker/typechecker";
 import {
+  CodeAnalysis,
   TypedArrayLiteral,
   TypedAssignment,
   TypedBinaryExpr,
@@ -33,6 +34,7 @@ export {
   Typechecker,
   Diagnostic,
   CodeAnalysis,
+  Position,
   TypedArrayLiteral,
   TypedAssignment,
   TypedBinaryExpr,
