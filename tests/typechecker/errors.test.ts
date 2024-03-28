@@ -275,4 +275,22 @@ msg = Case(
     const result = typecheck("");
     expect(result.diagnostics.length).toStrictEqual(0);
   });
+
+  test('"<" script.', function() {
+    const result = typecheck("<");
+    expect(result.diagnostics.length).toStrictEqual(2);
+    // No <trans> tag, the script returns its content as string.
+    expect(result.diagnostics[0].error).toStrictEqual(true);
+    // The script is missing '</trans>' scope closing tag.
+    expect(result.diagnostics[1].error).toStrictEqual(true);
+  });
+
+  test('Fish script ("<><").', function() {
+    const result = typecheck("<");
+    expect(result.diagnostics.length).toStrictEqual(2);
+    // No <trans> tag, the script returns its content as string.
+    expect(result.diagnostics[0].error).toStrictEqual(true);
+    // The script is missing '</trans>' scope closing tag.
+    expect(result.diagnostics[1].error).toStrictEqual(true);
+  });
 });

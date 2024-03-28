@@ -214,13 +214,17 @@ export default class Parser {
       }
     }
     // Remove <trans> and </trans>, restore EOF
-    this.tokens.shift();
-    const last = this.tokens.pop() as Token;
-    if(last.type === TokenType.CloseTransTag) {
-      this.endTagStart = last.begin;
-      this.endTagEnd = last.end;
+    if(diagnostics && this.tokens.length < 2)
+      return result;
+    else {
+      this.tokens.shift();
+      const last = this.tokens.pop() as Token;
+      if(last.type === TokenType.CloseTransTag) {
+        this.endTagStart = last.begin;
+        this.endTagEnd = last.end;
+      }
+      this.tokens.push(new Token("EndOfFile", TokenType.EOF, last.end, last.end));
     }
-    this.tokens.push(new Token("EndOfFile", TokenType.EOF, last.end, last.end));
     return result;
   }
 
