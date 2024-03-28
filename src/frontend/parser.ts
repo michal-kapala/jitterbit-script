@@ -145,6 +145,14 @@ export default class Parser {
    * @throws `ParserError` (runtime-only)
    */
   private removeScopeTags(diagnostics?: Diagnostic[]): boolean {
+    // empty script
+    if(this.tokens.length === 0) {
+      if(diagnostics)
+        return true;
+      else
+        throw new ParserError("Empty script.");
+    }
+    
     // find the evaluation scope - <trans>...</trans>
     let result = false;
     let openIdx: number | null = null;

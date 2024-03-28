@@ -270,4 +270,9 @@ msg = Case(
     // Expected expression before the end of script.
     expect(result.diagnostics[0].error).toStrictEqual(true);
   });
+
+  test('Empty file.', function() {
+    const result = typecheck("");
+    expect(result.diagnostics.length).toStrictEqual(0);
+  });
 });
