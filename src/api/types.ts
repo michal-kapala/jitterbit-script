@@ -37,27 +37,22 @@ export abstract class Func {
   abstract analyzeCall(args: TypedExpr[], env: TypeEnv): TypeInfo;
 
   /**
-   * The function's signature string.
+   * Returns the function's signature.
+   * 
+   * For polymorphic functions the specified or default (first) is returned.
+   * @param sigIdx
    * @returns 
    */
-  toString() {
-    if(this.signature) {
-      let signature = `${this.name}(`;
-      let optionals = false;
-      const params = this.signature.params;
-      for(let idx = 0; idx < this.signature.params.length; idx++) {
-        if(!optionals && !params[idx].required) {
-          optionals = true;
-          signature += "[";
-        }
-        signature += `${params[idx].type} ${params[idx].name}, `;
-      }
-      signature = signature.substring(0, signature.length - 2);
-      signature += optionals ? "])" : ")";
-      signature += `: ${this.signature.returnType}`;
-      return signature;
-    }
-    else return `${this.name} (polymorphic)`;
+  toString(sigIdx?: number) {
+    // single signature
+    if(this.signature)
+      return this.signature.toString(this.name);
+    // specified
+    else if(sigIdx && 0 <= sigIdx && sigIdx < this.signatures.length)
+      return this.signatures[sigIdx].toString(this.name);
+    // first (default)
+    else
+      return this.signatures[0].toString(this.name);
   }
 }
 
@@ -139,6 +134,29 @@ export class Signature {
   constructor(returnType: ValueType, params: Parameter[]) {
     this.returnType = returnType;
     this.params = params;
+  }
+
+  /**
+   * Returns the signature's string representation.
+   * @param funcName
+   * @returns 
+   */
+  toString(funcName: string) {
+    let result = `${funcName}(`;
+    let optionals = false;
+    const params = this.params;
+    for(let idx = 0; idx < this.params.length; idx++) {
+      if(!optionals && !params[idx].required) {
+        optionals = true;
+        result += "[";
+      }
+      result += `${params[idx].type} ${params[idx].name}, `;
+    }
+    if(this.params.length > 0)
+      result = result.substring(0, result.length - 2);
+    result += optionals ? "])" : ")";
+    result += `: ${this.returnType}`;
+    return result;
   }
 }
 

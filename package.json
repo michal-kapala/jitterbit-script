@@ -1,6 +1,6 @@
 {
   "name": "jitterbit-script",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "Static typechecker and interpreter for Jitterbit Script",
   "main": "build/index.js",
   "scripts": {
