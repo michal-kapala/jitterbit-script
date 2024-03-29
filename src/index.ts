@@ -1,5 +1,5 @@
 import Api from "./api";
-import { Func } from "./api/types";
+import { Func, Parameter, Signature } from "./api/types";
 import Parser from "./frontend/parser";
 import { Position } from "./frontend/types";
 import Diagnostic from "./diagnostic";
@@ -28,6 +28,8 @@ import {
 export {
   Api,
   Func,
+  Signature,
+  Parameter,
   Parser,
   Scope,
   evaluate,
