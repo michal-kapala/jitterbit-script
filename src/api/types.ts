@@ -10,7 +10,7 @@ import TypeEnv from "../typechecker/environment";
 export abstract class Func {
   name!: string;
   module!: FuncModule;
-  protected signatures!: Signature[];
+  signatures!: Signature[];
   signature!: Signature;
   minArgs!: number;
   maxArgs!: number;
